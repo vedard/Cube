@@ -26,7 +26,6 @@ int BlocInfo::GetDurabilite() const
 
 void BlocInfo::Afficher() const
 {
-	
 	std::cout
 		<< "Nom: " << m_nom
 		<< " Type: " << m_type

@@ -1,2 +1,5 @@
-﻿  blocinfo.cpp
+﻿  main.cpp
+  blocinfo.cpp
+  blocArray3d.cpp
+  Generating Code...
   Cube.vcxproj -> E:\Project\Visual Studio\cube\Cube\Debug\Cube.exe
