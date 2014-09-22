@@ -80,11 +80,13 @@
   <ItemGroup>
     <ClCompile Include="blocArray3d.cpp" />
     <ClCompile Include="blocinfo.cpp" />
+    <ClCompile Include="chunk.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="blocArray3d.h" />
     <ClInclude Include="blocinfo.h" />
+    <ClInclude Include="chunk.h" />
     <ClInclude Include="define.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
