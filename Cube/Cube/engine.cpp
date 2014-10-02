@@ -214,6 +214,12 @@ void Engine::MouseMoveEvent(int x, int y)
 	if(x == (Width() / 2) && y == (Height() / 2))
 		return;
     CenterMouse();
+
+	float relativeX = x - Width() / 2;
+	float relativeY = y - Height() / 2;
+
+	m_player.TurnLeftRight(relativeX * MOUSE_SENSIBILITY);
+	m_player.TurnTopBottom(relativeY * MOUSE_SENSIBILITY);
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
