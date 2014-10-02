@@ -27,6 +27,7 @@ private:
     bool m_wireframe;
 
     Texture m_textureFloor;
+	Texture m_textureWall;
 };
 
 #endif // ENGINE_H__

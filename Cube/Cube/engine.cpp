@@ -27,6 +27,7 @@ void Engine::Init()
     glEnable(GL_LIGHTING);
     glEnable (GL_LINE_SMOOTH);
 
+	glEnable(GL_CULL_FACE);
 
     // Light
     GLfloat light0Pos[4]  = {0.0f, CHUNK_SIZE_Y, 0.0f, 1.0f};
@@ -50,7 +51,8 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
-    LoadTexture(m_textureFloor, TEXTURE_PATH "checker.bmp");
+	LoadTexture(m_textureFloor, TEXTURE_PATH "gazon.jpg");
+	LoadTexture(m_textureWall, TEXTURE_PATH "wall.jpg");
 }
 
 void Engine::UnloadResource()
@@ -69,12 +71,83 @@ void Engine::Render(float elapsedTime)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+	//Cube
+	glPushMatrix();
+	glTranslatef(0, 0, -10);
+	glRotatef(gameTime * 100.f, 0, 1, 0);
+	glTranslatef(-0.5, 0, 0.5);
+
+	m_textureWall.Bind();
+	glBegin(GL_QUADS);
+
+		//face
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(1, 0, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(1, 1, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 1, 0);
+		//droite
+		glTexCoord2f(0, 0);
+		glVertex3f(1, 0, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(1, 0, -1);
+		glTexCoord2f(1, 1);
+		glVertex3f(1, 1, -1);
+		glTexCoord2f(0, 1);
+		glVertex3f(1, 1, 0);
+
+		//gauche
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 1, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(0, 1, -1);
+		glTexCoord2f(1, 0);
+		glVertex3f(0, 0, -1);
+
+		//deriere
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, -1);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 1, -1);
+		glTexCoord2f(1, 1);
+		glVertex3f(1, 1, -1);
+		glTexCoord2f(1, 0);
+		glVertex3f(1, 0, -1);
+
+		//Haut
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 1, 0);
+		glTexCoord2f(1, 0);
+		glVertex3f(1, 1, 0);
+		glTexCoord2f(1, 1);
+		glVertex3f(1, 1, -1);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 1, -1);
+
+		//Bas
+		glTexCoord2f(0, 0);
+		glVertex3f(0, 0, 0);
+		glTexCoord2f(0, 1);
+		glVertex3f(0, 0, -1);
+		glTexCoord2f(1, 1);
+		glVertex3f(1, 0, -1);
+		glTexCoord2f(1, 0);
+		glVertex3f(1, 0, 0);
+
+	glEnd();
+	glPopMatrix();
+
     // Plancher
     m_textureFloor.Bind();
     float nbRep = 50.f;
     glBegin(GL_QUADS);
-    glNormal3f(0, 1, 0);            // Normal vector
-    glTexCoord2f(0, 0);
+	glNormal3f(0.f, 1.f, 0.f);            // Normal vector
+	glTexCoord2f(0.f, 0.f);
     glVertex3f(-100.f, -2.f, 100.f);
     glTexCoord2f(nbRep, 0);
     glVertex3f(100.f, -2.f, 100.f);
