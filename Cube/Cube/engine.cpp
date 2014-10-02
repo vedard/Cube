@@ -5,7 +5,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false)
+Engine::Engine() : m_wireframe(false), m_player(0, 1.8, 0, 0, 0)
 {
 }
 
@@ -70,6 +70,11 @@ void Engine::Render(float elapsedTime)
     // Transformations initiales
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+	//Update le player
+	m_player.Move(0,0,0,0, elapsedTime);
+	m_player.ApplyRotation();
+	m_player.ApplyTranslation();
 
 	//Cube
 	glPushMatrix();
@@ -148,13 +153,13 @@ void Engine::Render(float elapsedTime)
     glBegin(GL_QUADS);
 	glNormal3f(0.f, 1.f, 0.f);            // Normal vector
 	glTexCoord2f(0.f, 0.f);
-    glVertex3f(-100.f, -2.f, 100.f);
+    glVertex3f(-100.f, 0.f, 100.f);
     glTexCoord2f(nbRep, 0);
-    glVertex3f(100.f, -2.f, 100.f);
+    glVertex3f(100.f, 0.f, 100.f);
     glTexCoord2f(nbRep, nbRep);
-    glVertex3f(100.f, -2.f, -100.f);
+    glVertex3f(100.f, 0.f, -100.f);
     glTexCoord2f(0, nbRep);
-    glVertex3f(-100.f, -2.f, -100.f);
+    glVertex3f(-100.f, 0.f, -100.f);
     glEnd();
 }
 

@@ -85,6 +85,7 @@
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="openglcontext.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="tool.cpp" />
   </ItemGroup>
@@ -95,6 +96,7 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="openglcontext.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="tool.h" />
   </ItemGroup>

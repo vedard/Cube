@@ -25,6 +25,8 @@ typedef long long int64;
 #define CHUNK_SIZE_Y 128
 #define CHUNK_SIZE_Z 16
 
+#define PI 3.14159265358
+
 enum BlockType {BTYPE_AIR, BTYPE_DIRT, BTYPE_GRASS};
 
 
