@@ -7,6 +7,10 @@
 
 Engine::Engine() : m_wireframe(false), m_player(0, 1.8, 0, 0, 0)
 {
+	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
+	{
+		m_keyboard[i] = false;
+	}
 }
 
 Engine::~Engine()
@@ -72,7 +76,7 @@ void Engine::Render(float elapsedTime)
     glLoadIdentity();
 
 	//Update le player
-	m_player.Move(0,0,0,0, elapsedTime);
+	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], elapsedTime);
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
@@ -165,32 +169,39 @@ void Engine::Render(float elapsedTime)
 
 void Engine::KeyPressEvent(unsigned char key)
 {
-    switch(key)
-    {
-    case 36:	// ESC
-        Stop();
-        break;
-    case 94:	// F10
-        SetFullscreen(!IsFullscreen());
-        break;
-    default:
-        std::cout << "Unhandled key: " << (int)key << std::endl;
-    }
+	//update le teableau
+	m_keyboard[key] = true;
+
+	//Esc -> Arrete le programme
+	if (m_keyboard[36])
+		Stop();
+	
+	//f10 -> toggle fulscreen mode
+	else if (m_keyboard[94])
+		SetFullscreen(!IsFullscreen());
+
+	//y -> toggle wireframe mode
+	else if (m_keyboard[24])
+	{
+		m_wireframe = !m_wireframe;
+		if (m_wireframe)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+   
+	//Affiche la touche appuie
+    std::cout << "Unhandled key: " << (int)key << std::endl;
+    
+
 
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
-    switch(key)
-    {
-    case 24:       // Y
-        m_wireframe = !m_wireframe;
-        if(m_wireframe)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        break;
-    }
+	//update le teableau
+	m_keyboard[key] = false;
+
 }
 
 void Engine::MouseMoveEvent(int x, int y)

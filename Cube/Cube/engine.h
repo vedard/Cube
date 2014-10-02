@@ -29,6 +29,8 @@ private:
 
 	Player m_player;
 
+	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
+
     Texture m_textureFloor;
 	Texture m_textureWall;
 };
