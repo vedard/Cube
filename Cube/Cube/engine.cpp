@@ -46,6 +46,8 @@ void Engine::Init()
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
 
+	
+
     CenterMouse();
     HideCursor();
 }
@@ -171,34 +173,34 @@ void Engine::Render(float elapsedTime)
     glEnd();
 
 	glPushMatrix();
-	
+	glRotatef(gameTime * 1.2, 0, 1, 0);
 	m_textureSky.Bind();
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0.50);			glVertex3f(-2048, -2048, -2048);
-	glTexCoord2f(0.25, 0.50);		glVertex3f(2048, -2048, -2048);
-	glTexCoord2f(0.25, 0.25);		glVertex3f(2048, 2048, -2048);
-	glTexCoord2f(0, 0.25);			glVertex3f(-2048, 2048, -2048);
+	glTexCoord2f(0, 0.50);			glVertex3f(-1024, -1024, -1024);
+	glTexCoord2f(0.25, 0.50);		glVertex3f(1024, -1024, -1024);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(1024, 1024, -1024);
+	glTexCoord2f(0, 0.25);			glVertex3f(-1024, 1024, -1024);
 
-	glTexCoord2f(0.25, 0.25);		glVertex3f(2048, 2048, -2048);
-	glTexCoord2f(0.25, 0.5);		glVertex3f(2048, -2048, -2048);
-	glTexCoord2f(0.5, 0.5);			glVertex3f(2048, -2048, 2048);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(2048, 2048, 2048);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(1024, 1024, -1024);
+	glTexCoord2f(0.25, 0.5);		glVertex3f(1024, -1024, -1024);
+	glTexCoord2f(0.5, 0.5);			glVertex3f(1024, -1024, 1024);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
 
-	glTexCoord2f(0.75, 0.50);			glVertex3f(-2048, -2048, 2048);
-	glTexCoord2f(0.75, 0.25);			glVertex3f(-2048, 2048, 2048);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(2048, 2048, 2048);
-	glTexCoord2f(0.5, 0.50);		glVertex3f(2048, -2048, 2048);
+	glTexCoord2f(0.75, 0.50);			glVertex3f(-1024, -1024, 1024);
+	glTexCoord2f(0.75, 0.25);			glVertex3f(-1024, 1024, 1024);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
+	glTexCoord2f(0.5, 0.50);		glVertex3f(1024, -1024, 1024);
 
-	glTexCoord2f(0.75, 0.25);		glVertex3f(-2048, 2048, 2048);
-	glTexCoord2f(0.75, 0.50);		glVertex3f(-2048, -2048, 2048);
-	glTexCoord2f(1, 0.50);			glVertex3f(-2048, -2048, -2048);
-	glTexCoord2f(1, 0.25);		glVertex3f(-2048, 2048, -2048);
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-1024, 1024, 1024);
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-1024, -1024, 1024);
+	glTexCoord2f(1, 0.50);			glVertex3f(-1024, -1024, -1024);
+	glTexCoord2f(1, 0.25);		glVertex3f(-1024, 1024, -1024);
 
-	glTexCoord2f(0.5, 0);		glVertex3f(-2048, 2048, 2048);
-	glTexCoord2f(0.25, 0);		glVertex3f(-2048, 2048, -2048);
-	glTexCoord2f(0.25, 0.25);			glVertex3f(2048, 2048, -2048);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(2048, 2048, 2048);
+	glTexCoord2f(0.5, 0);		glVertex3f(-1024, 1024, 1024);
+	glTexCoord2f(0.25, 0);		glVertex3f(-1024, 1024, -1024);
+	glTexCoord2f(0.25, 0.25);			glVertex3f(1024, 1024, -1024);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
 	glEnd();
 
 	
