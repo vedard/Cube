@@ -11,9 +11,10 @@ public:
 	~Player();
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
-	void Move(bool front, bool back, bool left, bool right, float elapsedTime);
+	void Move(bool front, bool back, bool left, bool right,bool shift, float elapsedTime);
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
+	void ToggleNoClip();
 
 private:
 	float m_posX, //position
@@ -22,6 +23,8 @@ private:
 		m_rotX,  //orientation
 		m_rotY, 
 		m_vitesse; //vitesse de deplacement
+
+	bool m_noClip;
 };
 
 #endif

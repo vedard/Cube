@@ -33,6 +33,7 @@ private:
 
     Texture m_textureFloor;
 	Texture m_textureWall;
+	Texture m_textureSky;
 };
 
 #endif // ENGINE_H__

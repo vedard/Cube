@@ -5,7 +5,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(0, 1.8, 0, 0, 0)
+Engine::Engine() : m_wireframe(false), m_player(0, 1.7, 0, 0, 0)
 {
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
 	{
@@ -24,13 +24,14 @@ void Engine::Init()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective( 45.0f, (float)Width() / (float)Height(), 0.1f, 1000.0f);
+    gluPerspective( 45.0f, (float)Width() / (float)Height(), 0.1f, 10000000.0f);
     glEnable(GL_DEPTH_TEST);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_LIGHTING);
     glEnable (GL_LINE_SMOOTH);
 
+	
 	glEnable(GL_CULL_FACE);
 
     // Light
@@ -57,6 +58,7 @@ void Engine::LoadResource()
 {
 	LoadTexture(m_textureFloor, TEXTURE_PATH "gazon.jpg");
 	LoadTexture(m_textureWall, TEXTURE_PATH "wall.jpg");
+	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 }
 
 void Engine::UnloadResource()
@@ -76,13 +78,15 @@ void Engine::Render(float elapsedTime)
     glLoadIdentity();
 
 	//Update le player
-	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], elapsedTime);
+	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D],m_keyboard[sf::Keyboard::LShift], elapsedTime);
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
 	//Cube
 	glPushMatrix();
+
 	glTranslatef(0, 0, -10);
+
 	glRotatef(gameTime * 100.f, 0, 1, 0);
 	glTranslatef(-0.5, 0, 0.5);
 
@@ -153,18 +157,52 @@ void Engine::Render(float elapsedTime)
 
     // Plancher
     m_textureFloor.Bind();
-    float nbRep = 50.f;
+    float nbRep = 130.f;
     glBegin(GL_QUADS);
-	glNormal3f(0.f, 1.f, 0.f);            // Normal vector
-	glTexCoord2f(0.f, 0.f);
-    glVertex3f(-100.f, 0.f, 100.f);
-    glTexCoord2f(nbRep, 0);
-    glVertex3f(100.f, 0.f, 100.f);
-    glTexCoord2f(nbRep, nbRep);
-    glVertex3f(100.f, 0.f, -100.f);
-    glTexCoord2f(0, nbRep);
-    glVertex3f(-100.f, 0.f, -100.f);
+		glNormal3f(0.f, 1.f, 0.f);            // Normal vector
+		glTexCoord2f(0.f, 0.f);
+		glVertex3f(-100.f, 0.f, 100.f);
+		glTexCoord2f(nbRep, 0);
+		glVertex3f(100.f, 0.f, 100.f);
+		glTexCoord2f(nbRep, nbRep);
+		glVertex3f(100.f, 0.f, -100.f);
+		glTexCoord2f(0, nbRep);
+		glVertex3f(-100.f, 0.f, -100.f);
     glEnd();
+
+	glPushMatrix();
+	
+	m_textureSky.Bind();
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0.50);			glVertex3f(-2048, -2048, -2048);
+	glTexCoord2f(0.25, 0.50);		glVertex3f(2048, -2048, -2048);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(2048, 2048, -2048);
+	glTexCoord2f(0, 0.25);			glVertex3f(-2048, 2048, -2048);
+
+	glTexCoord2f(0.25, 0.25);		glVertex3f(2048, 2048, -2048);
+	glTexCoord2f(0.25, 0.5);		glVertex3f(2048, -2048, -2048);
+	glTexCoord2f(0.5, 0.5);			glVertex3f(2048, -2048, 2048);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(2048, 2048, 2048);
+
+	glTexCoord2f(0.75, 0.50);			glVertex3f(-2048, -2048, 2048);
+	glTexCoord2f(0.75, 0.25);			glVertex3f(-2048, 2048, 2048);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(2048, 2048, 2048);
+	glTexCoord2f(0.5, 0.50);		glVertex3f(2048, -2048, 2048);
+
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-2048, 2048, 2048);
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-2048, -2048, 2048);
+	glTexCoord2f(1, 0.50);			glVertex3f(-2048, -2048, -2048);
+	glTexCoord2f(1, 0.25);		glVertex3f(-2048, 2048, -2048);
+
+	glTexCoord2f(0.5, 0);		glVertex3f(-2048, 2048, 2048);
+	glTexCoord2f(0.25, 0);		glVertex3f(-2048, 2048, -2048);
+	glTexCoord2f(0.25, 0.25);			glVertex3f(2048, 2048, -2048);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(2048, 2048, 2048);
+	glEnd();
+
+	
+	glPopMatrix();
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -179,6 +217,9 @@ void Engine::KeyPressEvent(unsigned char key)
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[94])
 		SetFullscreen(!IsFullscreen());
+	//V -> toogle noclip mode
+	else if (m_keyboard[sf::Keyboard::V])
+		m_player.ToggleNoClip();
 
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
@@ -220,6 +261,34 @@ void Engine::MouseMoveEvent(int x, int y)
 
 	m_player.TurnLeftRight(relativeX * MOUSE_SENSIBILITY);
 	m_player.TurnTopBottom(relativeY * MOUSE_SENSIBILITY);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
