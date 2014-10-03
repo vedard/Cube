@@ -27,7 +27,7 @@ void Player::TurnTopBottom(float value)
 	if (m_rotY < -90)
 		m_rotY = -90;
 
-	std::cout << m_rotY << std::endl;
+	
 }
 
 void Player::Move(bool front, bool back, bool left, bool right, bool shift, float elapsedTime)
@@ -87,5 +87,12 @@ void Player::ApplyTranslation() const
 
 void Player::ToggleNoClip()
 {
-	m_noClip = !m_noClip;
+	if (m_noClip)
+	{
+		m_noClip = false;
+		m_posY = 1.7;
+	}
+	else
+		m_noClip = true;
+
 }

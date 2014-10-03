@@ -86,9 +86,7 @@ void Engine::Render(float elapsedTime)
 
 	//Cube
 	glPushMatrix();
-
 	glTranslatef(0, 0, -10);
-
 	glRotatef(gameTime * 100.f, 0, 1, 0);
 	glTranslatef(-0.5, 0, 0.5);
 
@@ -172,35 +170,37 @@ void Engine::Render(float elapsedTime)
 		glVertex3f(-100.f, 0.f, -100.f);
     glEnd();
 
+
+	//Ciel
 	glPushMatrix();
 	glRotatef(gameTime * 1.2, 0, 1, 0);
 	m_textureSky.Bind();
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0.50);			glVertex3f(-1024, -1024, -1024);
-	glTexCoord2f(0.25, 0.50);		glVertex3f(1024, -1024, -1024);
-	glTexCoord2f(0.25, 0.25);		glVertex3f(1024, 1024, -1024);
-	glTexCoord2f(0, 0.25);			glVertex3f(-1024, 1024, -1024);
+		glTexCoord2f(0, 0.50);			glVertex3f(-1024, -1024, -1024);
+		glTexCoord2f(0.25, 0.50);		glVertex3f(1024, -1024, -1024);
+		glTexCoord2f(0.25, 0.25);		glVertex3f(1024, 1024, -1024);
+		glTexCoord2f(0, 0.25);			glVertex3f(-1024, 1024, -1024);
 
-	glTexCoord2f(0.25, 0.25);		glVertex3f(1024, 1024, -1024);
-	glTexCoord2f(0.25, 0.5);		glVertex3f(1024, -1024, -1024);
-	glTexCoord2f(0.5, 0.5);			glVertex3f(1024, -1024, 1024);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
+		glTexCoord2f(0.25, 0.25);		glVertex3f(1024, 1024, -1024);
+		glTexCoord2f(0.25, 0.5);		glVertex3f(1024, -1024, -1024);
+		glTexCoord2f(0.5, 0.5);			glVertex3f(1024, -1024, 1024);
+		glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
 
-	glTexCoord2f(0.75, 0.50);			glVertex3f(-1024, -1024, 1024);
-	glTexCoord2f(0.75, 0.25);			glVertex3f(-1024, 1024, 1024);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
-	glTexCoord2f(0.5, 0.50);		glVertex3f(1024, -1024, 1024);
+		glTexCoord2f(0.75, 0.50);			glVertex3f(-1024, -1024, 1024);
+		glTexCoord2f(0.75, 0.25);			glVertex3f(-1024, 1024, 1024);
+		glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
+		glTexCoord2f(0.5, 0.50);		glVertex3f(1024, -1024, 1024);
 
-	glTexCoord2f(0.75, 0.25);		glVertex3f(-1024, 1024, 1024);
-	glTexCoord2f(0.75, 0.50);		glVertex3f(-1024, -1024, 1024);
-	glTexCoord2f(1, 0.50);			glVertex3f(-1024, -1024, -1024);
-	glTexCoord2f(1, 0.25);		glVertex3f(-1024, 1024, -1024);
+		glTexCoord2f(0.75, 0.25);		glVertex3f(-1024, 1024, 1024);
+		glTexCoord2f(0.75, 0.50);		glVertex3f(-1024, -1024, 1024);
+		glTexCoord2f(1, 0.50);			glVertex3f(-1024, -1024, -1024);
+		glTexCoord2f(1, 0.25);		glVertex3f(-1024, 1024, -1024);
 
-	glTexCoord2f(0.5, 0);		glVertex3f(-1024, 1024, 1024);
-	glTexCoord2f(0.25, 0);		glVertex3f(-1024, 1024, -1024);
-	glTexCoord2f(0.25, 0.25);			glVertex3f(1024, 1024, -1024);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
+		glTexCoord2f(0.5, 0);		glVertex3f(-1024, 1024, 1024);
+		glTexCoord2f(0.25, 0);		glVertex3f(-1024, 1024, -1024);
+		glTexCoord2f(0.25, 0.25);			glVertex3f(1024, 1024, -1024);
+		glTexCoord2f(0.5, 0.25);		glVertex3f(1024, 1024, 1024);
 	glEnd();
 
 	
@@ -236,7 +236,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	//Affiche la touche appuie
     std::cout << "Unhandled key: " << (int)key << std::endl;
     
-
+	
 
 }
 
