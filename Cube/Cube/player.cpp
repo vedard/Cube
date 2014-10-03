@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_posX(posX), m_posY(posY), m_posZ(posZ), m_rotX(rotX), m_rotY(rotY), m_vitesse(0.1), m_noClip(false)
+Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_posX(posX), m_posY(posY), m_posZ(posZ), m_rotX(rotX), m_rotY(rotY), m_vitesse(4), m_noClip(false)
 {
 	
 }
@@ -33,7 +33,7 @@ void Player::TurnTopBottom(float value)
 void Player::Move(bool front, bool back, bool left, bool right, bool shift, float elapsedTime)
 {
 	float orientationPlayer = m_rotX * PI / 180;
-	float multiplieur = (shift) ? m_vitesse * 1.7 : m_vitesse;
+	float multiplieur = (shift) ? m_vitesse * 1.7 * elapsedTime : m_vitesse * elapsedTime;
 	
 
 	//Selon la touche appuié et l'orientation on determine la direction que le personnage avance
