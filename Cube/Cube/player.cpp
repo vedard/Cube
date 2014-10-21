@@ -90,7 +90,7 @@ void Player::ToggleNoClip()
 	if (m_noClip)
 	{
 		m_noClip = false;
-		m_posY = 1.7;
+		m_posY = 1.7f;
 	}
 	else
 		m_noClip = true;

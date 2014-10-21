@@ -1,6 +1,7 @@
 #ifndef DEFINE_H__
 #define DEFINE_H__
 
+#include <GL/glew.h>
 #include <SFML/Window.hpp>
 
 #ifdef _WIN32
@@ -27,7 +28,8 @@ typedef long long int64;
 
 #define PI 3.14159265358
 
-enum BlockType {BTYPE_AIR, BTYPE_DIRT, BTYPE_GRASS};
+typedef uint8 BlockType;
+enum BLOCK_TYPE { BTYPE_AIR, BTYPE_DIRT, BTYPE_GRASS };
 
 
 #define TEXTURE_PATH        "../Cube/media/textures/"

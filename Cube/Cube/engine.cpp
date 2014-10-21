@@ -19,6 +19,13 @@ Engine::~Engine()
 
 void Engine::Init()
 {
+	GLenum err = glewInit();
+	if (err != GLEW_OK)
+	{
+		std::cerr << " Error while initializing glew .. abording (" << glewGetErrorString(err) << ")" << std::endl;
+		abort();
+	}
+
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glEnable( GL_TEXTURE_2D );
 
@@ -84,76 +91,7 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
-	//Cube
-	glPushMatrix();
-	glTranslatef(0, 0, -10);
-	glRotatef(gameTime * 100.f, 0, 1, 0);
-	glTranslatef(-0.5, 0, 0.5);
-
-	m_textureWall.Bind();
-	glBegin(GL_QUADS);
-
-		//face
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(1, 0, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(1, 1, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 1, 0);
-		//droite
-		glTexCoord2f(0, 0);
-		glVertex3f(1, 0, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(1, 0, -1);
-		glTexCoord2f(1, 1);
-		glVertex3f(1, 1, -1);
-		glTexCoord2f(0, 1);
-		glVertex3f(1, 1, 0);
-
-		//gauche
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 1, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(0, 1, -1);
-		glTexCoord2f(1, 0);
-		glVertex3f(0, 0, -1);
-
-		//deriere
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, -1);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 1, -1);
-		glTexCoord2f(1, 1);
-		glVertex3f(1, 1, -1);
-		glTexCoord2f(1, 0);
-		glVertex3f(1, 0, -1);
-
-		//Haut
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 1, 0);
-		glTexCoord2f(1, 0);
-		glVertex3f(1, 1, 0);
-		glTexCoord2f(1, 1);
-		glVertex3f(1, 1, -1);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 1, -1);
-
-		//Bas
-		glTexCoord2f(0, 0);
-		glVertex3f(0, 0, 0);
-		glTexCoord2f(0, 1);
-		glVertex3f(0, 0, -1);
-		glTexCoord2f(1, 1);
-		glVertex3f(1, 0, -1);
-		glTexCoord2f(1, 0);
-		glVertex3f(1, 0, 0);
-
-	glEnd();
-	glPopMatrix();
+	
 
     // Plancher
     m_textureFloor.Bind();
