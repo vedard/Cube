@@ -1,6 +1,7 @@
 #ifndef PLAYER_H__
 #define PLAYER_H__
 #include "define.h"
+#include "vector3.h"
 
 class Player
 {
@@ -15,12 +16,12 @@ public:
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
 	void ToggleNoClip();
+	Vector3<float> Position() const;
 
 private:
-	float m_posX, //position
-		m_posY, 
-		m_posZ, 
-		m_rotX,  //orientation
+	
+	Vector3<float> m_pos;
+	float m_rotX,  //orientation
 		m_rotY, 
 		m_vitesse; //vitesse de deplacement
 

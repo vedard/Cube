@@ -79,7 +79,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="blockarray3d.cpp" />
     <ClCompile Include="blockinfo.cpp" />
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="engine.cpp" />
@@ -90,7 +89,8 @@
     <ClCompile Include="tool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="blockarray3d.h" />
+    <ClInclude Include="array2d.h" />
+    <ClInclude Include="array3d.h" />
     <ClInclude Include="blockinfo.h" />
     <ClInclude Include="chunk.h" />
     <ClInclude Include="define.h" />
@@ -99,6 +99,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="tool.h" />
+    <ClInclude Include="vector3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
