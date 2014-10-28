@@ -92,7 +92,7 @@
     <ClInclude Include="array2d.h" />
     <ClInclude Include="array3d.h" />
     <ClInclude Include="blockinfo.h" />
-    <ClInclude Include="chunk.h" />
+    <ClInclude Include="C:\Users\Vincent\Desktop\TP3\shader.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="openglcontext.h" />
