@@ -81,10 +81,12 @@
   <ItemGroup>
     <ClCompile Include="blockinfo.cpp" />
     <ClCompile Include="chunk.cpp" />
+    <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="shader.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="tool.cpp" />
   </ItemGroup>
@@ -92,11 +94,13 @@
     <ClInclude Include="array2d.h" />
     <ClInclude Include="array3d.h" />
     <ClInclude Include="blockinfo.h" />
-    <ClInclude Include="C:\Users\Vincent\Desktop\TP3\shader.h" />
+    <ClInclude Include="chunk.h" />
+    <ClInclude Include="chunkmesh.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="shader.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />

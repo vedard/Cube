@@ -23,6 +23,7 @@ class Shader
     private:
         bool CheckShaderError(GLenum shader, bool verbose);
         bool CheckProgramError(GLenum program, bool showWarning, bool verbose);
+		
 };
 
 
