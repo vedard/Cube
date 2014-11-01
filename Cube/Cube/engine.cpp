@@ -5,7 +5,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(0, 1.7, 0, 0, 0), m_testChunk(), m_shader01()
+Engine::Engine() : m_wireframe(false), m_player(0, 1.62, 0, 0, 0), m_testChunk(), m_shader01()
 {
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
 	{
@@ -190,6 +190,10 @@ void Engine::KeyPressEvent(unsigned char key)
 	else if (m_keyboard[sf::Keyboard::V])
 		m_player.ToggleNoClip();
 
+	//Lctr -> Sneak
+	else if (m_keyboard[sf::Keyboard::LControl])
+		m_player.SetSneak(true);
+
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
 	{
@@ -206,6 +210,10 @@ void Engine::KeyReleaseEvent(unsigned char key)
 {
 	//update le teableau
 	m_keyboard[key] = false;
+
+	//end sneak
+	if (!m_keyboard[sf::Keyboard::LControl])
+		m_player.SetSneak(false);
 
 }
 

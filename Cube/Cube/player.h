@@ -16,6 +16,7 @@ public:
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
 	void ToggleNoClip();
+	void SetSneak(bool sneak);
 	Vector3<float> Position() const;
 
 private:
@@ -26,6 +27,7 @@ private:
 		m_vitesse; //vitesse de deplacement
 
 	bool m_noClip;
+	bool m_sneaked;
 };
 
 #endif

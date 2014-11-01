@@ -72,6 +72,7 @@ void Chunk::Update()
 
 void Chunk::AddBlockToMesh(ChunkMesh::VertexData * vd, int & count, BlockType bt, int x, int y, int z)
 {
+	
 	// face
 	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 1.f, 1.f, 1.f, 0.5f, 0.5f);
 	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, 0.5f, 0.75f);
