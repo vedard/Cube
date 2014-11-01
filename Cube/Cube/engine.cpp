@@ -56,23 +56,33 @@ void Engine::Init()
 	CenterMouse();
 	HideCursor();
 
+
 	
-
 	//Creation des chunk
-
+	m_testChunk = new Chunk[10];
 	for (int x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 		{
-			for (int y = 0; y < 32; ++y)
+			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
-				if (x % 2 == 0 && y % 2 == 0 && z % 2 == 0)
-					m_testChunk.SetBlock(x, y, z, BTYPE_DIRT);
+				if (x % 2 == 0 && y % 2 == 0 && z % 2 == 0 && y > 3 && y < 32)
+					m_testChunk[9].SetBlock(x, y, z, BTYPE_DIRT);
 
-				
+				if (y >= CHUNK_SIZE_Y - 10)
+					for (int i = 0; i < 9; i++)
+						m_testChunk[i].SetBlock(x, y, z, BTYPE_DIRT);			
 			}
 		}
 	}
+
+	//On place les chunk au bonne endroit (plancher)
+	for (int i = 0; i < 9; i++)
+	{
+			m_testChunk[i].SetPosition(((i / 3)-1) * CHUNK_SIZE_X, -1 * CHUNK_SIZE_Y, ((i %3)-1) * CHUNK_SIZE_Z);	
+	}
+	
+	
 }
 
 void Engine::DeInit()
@@ -115,21 +125,6 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
-	// Plancher
-	m_textureChecker.Bind();
-	float nbRep = 130.f;
-	glBegin(GL_QUADS);
-	glNormal3f(0.f, 1.f, 0.f);            // Normal vector
-	glTexCoord2f(0.f, 0.f);
-	glVertex3f(-100.f, 0.f, 100.f);
-	glTexCoord2f(nbRep, 0);
-	glVertex3f(100.f, 0.f, 100.f);
-	glTexCoord2f(nbRep, nbRep);
-	glVertex3f(100.f, 0.f, -100.f);
-	glTexCoord2f(0, nbRep);
-	glVertex3f(-100.f, 0.f, -100.f);
-	glEnd();
-
 
 	//Ciel
 	glPushMatrix();
@@ -166,15 +161,14 @@ void Engine::Render(float elapsedTime)
 
 	glPopMatrix();
 
-
-
+	//Render des chunk
 	m_textureGrass.Bind();
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		if (m_testChunk.IsDirty())
-			m_testChunk.Update();
+		if (m_testChunk[i].IsDirty())
+			m_testChunk[i].Update();
 		m_shader01.Use();
-		m_testChunk.Render();
+		m_testChunk[i].Render();
 		Shader::Disable();
 	}
 

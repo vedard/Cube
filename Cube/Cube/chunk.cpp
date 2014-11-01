@@ -1,13 +1,14 @@
 #include "chunk.h"
 #include <iostream>
 
-Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_isDirty(true), m_chunkMesh()
+Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_isDirty(true), m_chunkMesh(), m_position(0,0,0)
 {
 	m_blocks.Reset(BTYPE_AIR);
 }
 
 Chunk::~Chunk()
 {
+	
 }
 
 void Chunk::RemoveBloc(int x, int y, int z)
@@ -25,6 +26,13 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type)
 BlockType Chunk::GetBlock(int x, int y, int z)
 {
 	return m_blocks.Get(x, y, z);
+}
+
+void Chunk::SetPosition(int x, int y, int z)
+{
+	m_position.x = x;
+	m_position.y = y;
+	m_position.z = z;
 }
 
 void Chunk::Update()
@@ -46,10 +54,10 @@ void Chunk::Update()
 					BlockType bt = GetBlock(x, y, z);
 					if (bt != BTYPE_AIR)
 					{
-						AddBlockToMesh(vd, count, bt, x, y, z);
+						AddBlockToMesh(vd, count, bt, x + m_position.x , y + m_position.y, z + m_position.z);
 					}
 				}
-			}
+			} 
 		}
 		if (count > USHRT_MAX)
 		{
@@ -61,6 +69,7 @@ void Chunk::Update()
 	}
 	m_isDirty = false;
 }
+
 void Chunk::AddBlockToMesh(ChunkMesh::VertexData * vd, int & count, BlockType bt, int x, int y, int z)
 {
 	// face

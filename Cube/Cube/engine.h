@@ -38,7 +38,7 @@ private:
 	Texture m_textureChecker;
 	Texture m_textureSky;
 	Shader m_shader01;
-	Chunk m_testChunk;
+	Chunk* m_testChunk;
 };
 
 #endif // ENGINE_H__
