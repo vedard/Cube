@@ -47,22 +47,36 @@ void Player::Move(bool front, bool back, bool left, bool right, bool shift, floa
 	//Selon la touche appuié et l'orientation on determine la direction que le personnage avance
 	if (front)
 	{
-		m_pos.x += cos(PI / 2 + orientationPlayer) * multiplieur;
-		m_pos.z += sin(PI / 2 + orientationPlayer) * multiplieur;
 
-		//deplacement verticale
+		//deplacement verticale si noclip
 		if (m_noClip)
+		{
+			m_pos.x += cos(PI / 2 + orientationPlayer) * multiplieur * (cos(-m_rotY * PI / 180));
+			m_pos.z += sin(PI / 2 + orientationPlayer) * multiplieur * (cos(-m_rotY * PI / 180));
 			m_pos.y += sin(-m_rotY * PI / 180) * multiplieur;
+		}
 
+		else
+		{
+			m_pos.x += cos(PI / 2 + orientationPlayer) * multiplieur;
+			m_pos.z += sin(PI / 2 + orientationPlayer) * multiplieur;
+		}
 	}
 	if (back)
 	{
-		m_pos.x += cos(PI * 1.5 + orientationPlayer) * multiplieur;
-		m_pos.z += sin(PI * 1.5 + orientationPlayer) * multiplieur;
-
-		//deplacement verticale
+		//deplacement verticale si noclip
 		if (m_noClip)
+		{
+			m_pos.x += cos(PI * 1.5 + orientationPlayer) * multiplieur * (cos(m_rotY * PI / 180));
+			m_pos.z += sin(PI * 1.5 + orientationPlayer) * multiplieur * (cos(m_rotY * PI / 180));
 			m_pos.y += sin(m_rotY * PI / 180) * multiplieur;
+		}
+
+		else
+		{
+			m_pos.x += cos(PI / 2 + orientationPlayer) * multiplieur;
+			m_pos.z += sin(PI / 2 + orientationPlayer) * multiplieur;
+		}
 	}
 	if (right)
 	{

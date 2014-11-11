@@ -6,10 +6,14 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#endif
 
 #include <gl/GL.h>
 #include <gl/GLU.h>
+#endif
+
+#ifndef _WIN32
+#include <GL/glut.h>
+#endif
 
 typedef unsigned char uint8;
 typedef unsigned short uint16;
