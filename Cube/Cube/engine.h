@@ -1,8 +1,9 @@
 #ifndef ENGINE_H__
 #define ENGINE_H__
 #include "define.h"
-#include "openglcontext.h"
 #include "texture.h"
+#include "openglcontext.h"
+#include "textureatlas.h"
 #include "player.h"
 #include "shader.h"
 #include "chunk.h"
@@ -25,6 +26,8 @@ public:
 
 private:
     bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
+	void DrawHud();
+	void PrintText(unsigned int x, unsigned int y, const std::string & t);
 
 private:
     bool m_wireframe;
@@ -33,12 +36,20 @@ private:
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 
+	TextureAtlas m_textureAtlas;
 	Texture m_textureTest;
 	Texture m_textureGrass;
 	Texture m_textureChecker;
 	Texture m_textureSky;
+	Texture m_textureFont;
+	Texture m_textureCrosshair;
 	Shader m_shader01;
 	Chunk* m_testChunk;
+
+	//Indexe de la texutre dans l'atlas
+	TextureAtlas::TextureIndex* m_texBlockIndex;
+
+	
 };
 
 #endif // ENGINE_H__

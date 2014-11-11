@@ -3,6 +3,7 @@
 #include "array3d.h"
 #include "chunkmesh.h"
 #include "vector3.h"
+#include "textureatlas.h"
 
 
 

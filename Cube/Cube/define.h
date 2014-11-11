@@ -33,7 +33,7 @@ typedef long long int64;
 #define PI 3.14159265358
 
 typedef uint8 BlockType;
-enum BLOCK_TYPE { BTYPE_AIR, BTYPE_DIRT, BTYPE_GRASS };
+enum BLOCK_TYPE { BTYPE_AIR, BTYPE_DIRT, BTYPE_GRASS, BTYPE_TEST };
 
 
 #define TEXTURE_PATH        "../Cube/media/textures/"
