@@ -74,8 +74,8 @@ void Player::Move(bool front, bool back, bool left, bool right, bool shift, floa
 
 		else
 		{
-			m_pos.x += cos(PI / 2 + orientationPlayer) * multiplieur;
-			m_pos.z += sin(PI / 2 + orientationPlayer) * multiplieur;
+			m_pos.x += cos(PI * 1.5 + orientationPlayer) * multiplieur;
+			m_pos.z += sin(PI * 1.5 + orientationPlayer) * multiplieur;
 		}
 	}
 	if (right)

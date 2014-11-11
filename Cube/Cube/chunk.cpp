@@ -53,9 +53,23 @@ void Chunk::Update()
 		    break;
 		  BlockType bt = GetBlock(x, y, z);
 		  if (bt != BTYPE_AIR)
-		    {
-		      AddBlockToMesh(vd, count, bt, x + m_position.x , y + m_position.y, z + m_position.z);
-		    }
+		  {
+			  if (x == 0 || y == 0 || z == 0 || x == CHUNK_SIZE_X - 1 || y == CHUNK_SIZE_Y - 1 || z == CHUNK_SIZE_Z - 1)
+			  {
+
+				  AddBlockToMesh(vd, count, bt, x + m_position.x, y + m_position.y, z + m_position.z);
+
+			  }
+			  else if (
+				  GetBlock(x + 1, y, z) == BTYPE_AIR || GetBlock(x + 1, y + 1, z) == BTYPE_AIR || GetBlock(x, y + 1, z) == BTYPE_AIR || GetBlock(x - 1, y + 1, z) == BTYPE_AIR || GetBlock(x - 1, y, z) == BTYPE_AIR || GetBlock(x - 1, y - 1, z) == BTYPE_AIR || GetBlock(x, y - 1, z) == BTYPE_AIR || GetBlock(x + 1, y - 1, z) == BTYPE_AIR ||
+				  GetBlock(x + 1, y, z + 1) == BTYPE_AIR || GetBlock(x + 1, y + 1, z + 1) == BTYPE_AIR || GetBlock(x, y + 1, z + 1) == BTYPE_AIR || GetBlock(x - 1, y + 1, z + 1) == BTYPE_AIR || GetBlock(x - 1, y, z + 1) == BTYPE_AIR || GetBlock(x - 1, y - 1, z + 1) == BTYPE_AIR || GetBlock(x, y - 1, z + 1) == BTYPE_AIR || GetBlock(x + 1, y - 1, z + 1) == BTYPE_AIR || GetBlock(x, y, z + 1) == BTYPE_AIR ||
+				  GetBlock(x + 1, y, z - 1) == BTYPE_AIR || GetBlock(x + 1, y + 1, z - 1) == BTYPE_AIR || GetBlock(x, y + 1, z - 1) == BTYPE_AIR || GetBlock(x - 1, y + 1, z - 1) == BTYPE_AIR || GetBlock(x - 1, y, z - 1) == BTYPE_AIR || GetBlock(x - 1, y - 1, z - 1) == BTYPE_AIR || GetBlock(x, y - 1, z - 1) == BTYPE_AIR || GetBlock(x + 1, y - 1, z - 1) == BTYPE_AIR || GetBlock(x, y, z - 1) == BTYPE_AIR
+				  )
+			  {
+				  AddBlockToMesh(vd, count, bt, x + m_position.x, y + m_position.y, z + m_position.z);
+			  }
+
+		  }
 		}
 	    } 
 	}
