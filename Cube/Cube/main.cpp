@@ -5,10 +5,11 @@
 
 
 
-int main()
+int main(int *argcp, char **argv)
 {
     Tool::CheckTypes();
 
+	
     Engine engine;
     engine.SetMaxFps(60);
     engine.Start("Cube", 1366, 768, false);

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <GL/freeglut.h>
 
 
 
@@ -58,8 +59,7 @@ void Engine::Init()
 
 	CenterMouse();
 	HideCursor();
-
-
+	
 	
 	//Creation des chunk
 	m_testChunk = new Chunk[10];
@@ -122,6 +122,7 @@ void Engine::UnloadResource()
 
 void Engine::Render(float elapsedTime)
 {
+	
 	static float gameTime = elapsedTime;
 
 	gameTime += elapsedTime;
@@ -190,6 +191,9 @@ void Engine::Render(float elapsedTime)
 	DrawHud();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -302,7 +306,7 @@ void Engine::DrawHud()
 	PrintText(10, Height() - 25, ss.str());
 
 	ss.str("");
-	ss << "Position: " << "test pos";
+	ss << "Position: " << m_player.Position();
 	PrintText(10, 10, ss.str());
 
 	// Affichage du crosshair

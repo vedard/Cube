@@ -39,6 +39,6 @@ enum BLOCK_TYPE { BTYPE_AIR, BTYPE_DIRT, BTYPE_GRASS, BTYPE_TEST };
 #define TEXTURE_PATH        "../Cube/media/textures/"
 #define SHADER_PATH  "../Cube/media/shaders/"
 #define VIEW_DISTANCE       128
-#define MOUSE_SENSIBILITY 1/8
+#define MOUSE_SENSIBILITY 1/4
 
 #endif // DEFINE_H__
