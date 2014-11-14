@@ -3,24 +3,35 @@
 
 #include <string>
 #include "define.h"
+#include "textureatlas.h"
 
 class BlockInfo
 {
-    public:
-    BlockInfo(BlockType type, const std::string& nom);
-    ~BlockInfo();
+public:
+	BlockInfo();
+	BlockInfo(BlockType type, const std::string& nom);
+	~BlockInfo();
 
-    BlockType GetType() const;
+	void Init(BlockType type, const std::string& nom);
 
-    void SetDurabilite(int durabilite);
-    int GetDurabilite() const;
+	BlockType GetType() const;
 
-    void Afficher() const;
+	void SetDurabilite(int durabilite);
+	int GetDurabilite() const;
+	void SetCoordAtlas(float u, float v, float w, float h);
 
-    private:
-    BlockType m_type;
-    std::string m_nom;
-    int m_durabilite;
+	void Afficher() const;
+
+private:
+	//Type
+	BlockType m_type;
+	std::string m_nom;
+	int m_durabilite;
+
+public:
+	//Position texture dans l'atlas
+	float u, v, w, h;
+
 
 };
 

@@ -3,7 +3,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
-#include <GL/freeglut.h>
+
 
 
 
@@ -14,11 +14,15 @@ Engine::Engine() : m_wireframe(false), m_player(0, 1.62, 0, 0, 0), m_testChunk()
 		m_keyboard[i] = false;
 	}
 
-	m_texBlockIndex = new TextureAtlas::TextureIndex[256];
+	
+
+	bInfo = new BlockInfo[256];
+
 }
 
 Engine::~Engine()
 {
+	delete[] bInfo;
 }
 
 void Engine::Init()
@@ -69,15 +73,25 @@ void Engine::Init()
 		{
 			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
+				//Chunk de test
 				if (x % 2 == 0 && y % 2 == 0 && z % 2 == 0 && y > 3 && y < 32)
-					m_testChunk[9].SetBlock(x, y, z, BTYPE_DIRT);
+					m_testChunk[9].SetBlock(x, y, z, BTYPE_GRASS);
 
+				if (x % 4 == 0 && y % 4 == 0 && z % 4 == 0 && y > 3 && y < 32)
+					m_testChunk[9].SetBlock(x, y, z, BTYPE_STONE);
+
+				if (x % 4 == 0 && y % 2 == 0 && z % 4 == 0 && y > 1 && y < 3)
+					m_testChunk[9].SetBlock(x, y, z, BTYPE_TEST);
+
+				//plancher
 				if (y >= CHUNK_SIZE_Y - 10)
 					for (int i = 0; i < 9; i++)
-						m_testChunk[i].SetBlock(x, y, z, BTYPE_DIRT);			
+						m_testChunk[i].SetBlock(x, y, z, BTYPE_GRASS);			
 			}
 		}
 	}
+
+	m_testChunk[9].SetBlock(2, 0, 3, BTYPE_CHEST);
 
 	//On place les chunk au bonne endroit (plancher)
 	for (int i = 0; i < 9; i++)
@@ -94,13 +108,27 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
-
+	//Load texture qui ne sont pas dans l'atlas
 	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 	LoadTexture(m_textureCrosshair, TEXTURE_PATH "cross.bmp");
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.bmp");
 	
-	m_texBlockIndex[BTYPE_DIRT] = m_textureAtlas.AddTexture(TEXTURE_PATH "block_grass.bmp");
-	m_texBlockIndex[BTYPE_TEST] = m_textureAtlas.AddTexture(TEXTURE_PATH "block_test.bmp");
+	//Load texture dans l'atlas
+	bInfo[BTYPE_GRASS].Init(BTYPE_GRASS, "Grass");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_grass.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_GRASS].u, bInfo[BTYPE_GRASS].v, bInfo[BTYPE_GRASS].w, bInfo[BTYPE_GRASS].h);
+	
+	bInfo[BTYPE_TEST].Init(BTYPE_TEST, "Test");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_test.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_TEST].u, bInfo[BTYPE_TEST].v, bInfo[BTYPE_TEST].w, bInfo[BTYPE_TEST].h);
+
+	bInfo[BTYPE_STONE].Init(BTYPE_STONE, "Stone");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_stone.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_STONE].u, bInfo[BTYPE_STONE].v, bInfo[BTYPE_STONE].w, bInfo[BTYPE_STONE].h);
+
+	bInfo[BTYPE_CHEST].Init(BTYPE_CHEST, "Chest");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_CHEST].u, bInfo[BTYPE_CHEST].v, bInfo[BTYPE_CHEST].w, bInfo[BTYPE_CHEST].h);
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -126,6 +154,9 @@ void Engine::Render(float elapsedTime)
 	static float gameTime = elapsedTime;
 
 	gameTime += elapsedTime;
+
+	//On met a jour le fps
+	m_fps = 1 /elapsedTime;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -180,12 +211,13 @@ void Engine::Render(float elapsedTime)
 	for (int i = 0; i < 10; i++)
 	{
 		if (m_testChunk[i].IsDirty())
-			m_testChunk[i].Update();
+			m_testChunk[i].Update(bInfo);
 		m_shader01.Use();
 		m_testChunk[i].Render();
 		Shader::Disable();
 	}
 
+	//Render le hui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	DrawHud();
@@ -302,7 +334,7 @@ void Engine::DrawHud()
 
 	std::ostringstream ss;
 
-	ss << "Fps: " << "test Fps";
+	ss << "Fps: " << m_fps;
 	PrintText(10, Height() - 25, ss.str());
 
 	ss.str("");
@@ -353,6 +385,6 @@ void Engine::PrintText(unsigned int x, unsigned int y, const std::string & t)
 		glTexCoord2f(left, 1.0f - top);
 		glVertex2f(0, 12);
 		glEnd();
-		glTranslated(8, 0, 0);
+		glTranslated(10, 0, 0);
 	}
 }

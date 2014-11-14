@@ -7,6 +7,7 @@
 #include "player.h"
 #include "shader.h"
 #include "chunk.h"
+#include "blockinfo.h"
 
 class Engine : public OpenglContext
 {
@@ -23,6 +24,7 @@ public:
     virtual void MouseMoveEvent(int x, int y);
     virtual void MousePressEvent(const MOUSE_BUTTON &button, int x, int y);
     virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y);
+	
 
 private:
     bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
@@ -47,7 +49,10 @@ private:
 	Chunk* m_testChunk;
 
 	//Indexe de la texutre dans l'atlas
-	TextureAtlas::TextureIndex* m_texBlockIndex;
+	TextureAtlas::TextureIndex m_texBlockIndex;
+	BlockInfo* bInfo;
+
+	int m_fps;
 
 	
 };

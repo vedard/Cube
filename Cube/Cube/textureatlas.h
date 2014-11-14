@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <IL/ilu.h>
+#include "vector3.h"
 
 class TextureAtlas
 {

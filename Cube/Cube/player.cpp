@@ -35,7 +35,6 @@ void Player::Move(bool front, bool back, bool left, bool right, bool shift, floa
 	float orientationPlayer = m_rotX * PI / 180;
 	float multiplieur = m_vitesse * elapsedTime;
 
-
 	if (m_sneaked)
 		multiplieur *= 0.7;
 	else if (m_noClip)
