@@ -9,13 +9,13 @@
 
 Engine::Engine() : m_wireframe(false), m_player(0, 1.62, 0, 0, 0), m_testChunk(), m_shader01(), m_textureAtlas(2)
 {
+	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
 	{
 		m_keyboard[i] = false;
 	}
 
-	
-
+	//Creation du tableau
 	bInfo = new BlockInfo[256];
 
 }
@@ -63,8 +63,8 @@ void Engine::Init()
 
 	CenterMouse();
 	HideCursor();
-	
-	
+
+
 	//Creation des chunk
 	m_testChunk = new Chunk[10];
 	for (int x = 0; x < CHUNK_SIZE_X; ++x)
@@ -74,19 +74,19 @@ void Engine::Init()
 			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				//Chunk de test
-				if (x % 2 == 0 && y % 2 == 0 && z % 2 == 0 && y > 3 && y < 32)
+				if (x % 2 == 0 && y % 2 == 0 && z % 2 == 0 && y > 9 && y < 32)
 					m_testChunk[9].SetBlock(x, y, z, BTYPE_GRASS);
 
-				if (x % 4 == 0 && y % 4 == 0 && z % 4 == 0 && y > 3 && y < 32)
+				if (x % 4 == 0 && y % 4 == 0 && z % 4 == 0 && y > 9 && y < 32)
 					m_testChunk[9].SetBlock(x, y, z, BTYPE_STONE);
 
-				if (x % 4 == 0 && y % 2 == 0 && z % 4 == 0 && y > 1 && y < 3)
+				if (x % 1 == 0 && y % 1 == 0 && z % 1 == 0 && y > 7 && y < 9)
 					m_testChunk[9].SetBlock(x, y, z, BTYPE_TEST);
 
 				//plancher
 				if (y >= CHUNK_SIZE_Y - 10)
 					for (int i = 0; i < 9; i++)
-						m_testChunk[i].SetBlock(x, y, z, BTYPE_GRASS);			
+						m_testChunk[i].SetBlock(x, y, z, BTYPE_GRASS);
 			}
 		}
 	}
@@ -96,10 +96,10 @@ void Engine::Init()
 	//On place les chunk au bonne endroit (plancher)
 	for (int i = 0; i < 9; i++)
 	{
-			m_testChunk[i].SetPosition(((i / 3)-1) * CHUNK_SIZE_X, -1 * CHUNK_SIZE_Y, ((i %3)-1) * CHUNK_SIZE_Z);	
+		m_testChunk[i].SetPosition(((i / 3) - 1) * CHUNK_SIZE_X, -1 * CHUNK_SIZE_Y, ((i % 3) - 1) * CHUNK_SIZE_Z);
 	}
-	
-	
+
+
 }
 
 void Engine::DeInit()
@@ -112,12 +112,12 @@ void Engine::LoadResource()
 	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 	LoadTexture(m_textureCrosshair, TEXTURE_PATH "cross.bmp");
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.bmp");
-	
+
 	//Load texture dans l'atlas
 	bInfo[BTYPE_GRASS].Init(BTYPE_GRASS, "Grass");
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_grass.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_GRASS].u, bInfo[BTYPE_GRASS].v, bInfo[BTYPE_GRASS].w, bInfo[BTYPE_GRASS].h);
-	
+
 	bInfo[BTYPE_TEST].Init(BTYPE_TEST, "Test");
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_test.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_TEST].u, bInfo[BTYPE_TEST].v, bInfo[BTYPE_TEST].w, bInfo[BTYPE_TEST].h);
@@ -150,13 +150,13 @@ void Engine::UnloadResource()
 
 void Engine::Render(float elapsedTime)
 {
-	
+
 	static float gameTime = elapsedTime;
 
 	gameTime += elapsedTime;
 
 	//On met a jour le fps
-	m_fps = 1 /elapsedTime;
+	m_fps = 1 / elapsedTime;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -223,6 +223,7 @@ void Engine::Render(float elapsedTime)
 	DrawHud();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 
 
 
@@ -334,12 +335,12 @@ void Engine::DrawHud()
 
 	std::ostringstream ss;
 
-	ss << "Fps: " << m_fps;
-	PrintText(10, Height() - 25, ss.str());
+	ss << "Fps: " << m_fps ;
+	PrintText(10, Height() - 25,16, ss.str());
 
 	ss.str("");
 	ss << "Position: " << m_player.Position();
-	PrintText(10, 10, ss.str());
+	PrintText(10, 10,16, ss.str());
 
 	// Affichage du crosshair
 	m_textureCrosshair.Bind();
@@ -366,25 +367,26 @@ void Engine::DrawHud()
 	glPopMatrix();
 }
 
-void Engine::PrintText(unsigned int x, unsigned int y, const std::string & t)
+void Engine::PrintText(unsigned int x, unsigned int y, int size , const std::string & t)
 {
 	glLoadIdentity();
 	glTranslated(x, y, 0);
-	for (unsigned int i = 0; i<t.length(); ++i)
+	for (unsigned int i = 0; i < t.length(); ++i)
 	{
 		float left = (float)((t[i] - 32) % 16) / 16.0f;
-		float top = (float)((t[i] - 32) / 16) / 16.0f;
+		float top = (float)((t[i] - 175) / 16) / 16.0f;
+
 		top += 0.5f;
 		glBegin(GL_QUADS);
 		glTexCoord2f(left, 1.0f - top - 0.0625f);
 		glVertex2f(0, 0);
 		glTexCoord2f(left + 0.0625f, 1.0f - top - 0.0625f);
-		glVertex2f(12, 0);
+		glVertex2f(size, 0);
 		glTexCoord2f(left + 0.0625f, 1.0f - top);
-		glVertex2f(12, 12);
+		glVertex2f(size, size);
 		glTexCoord2f(left, 1.0f - top);
-		glVertex2f(0, 12);
+		glVertex2f(0, size);
 		glEnd();
-		glTranslated(10, 0, 0);
+		glTranslated(13, 0, 0);
 	}
 }

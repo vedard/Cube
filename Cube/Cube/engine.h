@@ -29,7 +29,7 @@ public:
 private:
     bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawHud();
-	void PrintText(unsigned int x, unsigned int y, const std::string & t);
+	void PrintText(unsigned int x, unsigned int y, int size, const std::string & t);
 
 private:
     bool m_wireframe;

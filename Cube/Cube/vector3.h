@@ -2,7 +2,7 @@
 #define VECTOR3_H__
 #include <iostream>
 #include <cmath>
-
+#include <iomanip>
 
 
 template <class T>
@@ -222,7 +222,7 @@ bool Vector3<T>::operator!=(const Vector3<T>& v) const
 template <class T>
 std::ostream& operator<<( std::ostream& o,const Vector3<T>& v )
 {
-	return o << v.x << " " << v.y << " " << v.z;
+	return o << std::setprecision(2) << std::fixed << v.x << "   " << v.y << "   " << v.z;
 }
 
 #endif // VECTOR3_H__
