@@ -7,7 +7,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_testChunk(), m_shader01(), m_textureAtlas(2)
+Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(2), m_Chunk(WORLD_SIZE, WORLD_SIZE)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -15,15 +15,16 @@ Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_testChunk(), m
 		m_keyboard[i] = false;
 	}
 
-	//Creation du tableau
+	//Creation du tableau de block info
 	m_bInfo = new BlockInfo[256];
+
+
 
 }
 
 Engine::~Engine()
 {
 	delete[] m_bInfo;
-	delete[] m_testChunk;
 }
 
 void Engine::Init()
@@ -65,89 +66,81 @@ void Engine::Init()
 	CenterMouse();
 	HideCursor();
 
-
-	//Creation des chunk
-	m_testChunk = new Chunk[10];
-	for (int x = 0; x < CHUNK_SIZE_X; ++x)
+	for (int i = 0; i < WORLD_SIZE; i++)
 	{
-		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+		for (int j = 0; j < WORLD_SIZE; j++)	//Parcours les chunks
 		{
-			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+			m_Chunk.Get(i, j).SetPosition(CHUNK_SIZE_X * (i - WORLD_SIZE / 2), -CHUNK_SIZE_Y / 2, CHUNK_SIZE_Z * (j - WORLD_SIZE/2));
+
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			{
-				//Chunk de test
-				if (x % 2 == 0 && y % 2 == 0 && z % 2 == 0 && y > 9 && y < 32)
-					m_testChunk[9].SetBlock(x, y, z, BTYPE_GRASS);
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+				{
+					for (int y = 0; y < CHUNK_SIZE_Y; ++y)	//parcours les blocks du chunk
+					{
+						
+							if ( y < 52 && y > 40  )
+								m_Chunk.Get(i, j).SetBlock(x, y, z, BTYPE_STONE);
+						
+							if (y < 64 && y >= 52)
+								m_Chunk.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
 
-				if (x % 4 == 0 && y % 4 == 0 && z % 4 == 0 && y > 9 && y < 32)
-					m_testChunk[9].SetBlock(x, y, z, BTYPE_STONE);
-
-				if ((x + 2) % 4 == 0 && y % 4 == 0 && (z + 2) % 4 == 0 && y > 9 && y < 32)
-					m_testChunk[9].SetBlock(x, y, z, BTYPE_WOOD_PLANK);
-
-				if (x % 1 == 0 && y % 1 == 0 && z % 1 == 0 && y > 7 && y < 9)
-					m_testChunk[9].SetBlock(x, y, z, BTYPE_TEST);
-
-				//plancher
-				if (y >= CHUNK_SIZE_Y - 10)
-					for (int i = 0; i < 9; i++)
-						m_testChunk[i].SetBlock(x, y, z, BTYPE_GRASS);
+					}
+				}
 			}
 		}
 	}
 
-	m_testChunk[9].SetBlock(2, 0, 3, BTYPE_CHEST);
+
+	
 
 	//Terrain de jeux
 
 	//Arche
-	m_testChunk[9].SetBlock(5, 2, 5, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(6, 2, 5, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(7, 2, 5, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(5, 1, 5, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(7, 1, 5, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(5, 0, 5, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(7, 0, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 2 + 64, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(6, 2 + 64, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 2 + 64, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 1 + 64, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 1 + 64, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 0 + 64, 5, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 0 + 64, 5, BTYPE_WOOD_PLANK);
 
 	//Mur
-	m_testChunk[9].SetBlock(10, 0, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(11, 0, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(12, 0, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(13, 0, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(10, 1, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(11, 1, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(12, 1, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(13, 1, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(10, 2, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(11, 2, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(12, 2, 14, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(13, 2, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 14, BTYPE_WOOD_PLANK);
 
 	//Mur 2
-	m_testChunk[9].SetBlock(2, 0, 8, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 0, 9, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 0, 10, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 0, 11, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 1, 8, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 1, 9, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 1, 10, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 1, 11, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 2, 8, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 2, 9, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 2, 10, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(2, 2, 11, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 8, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 9, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 10, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 11, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 8, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 9, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 10, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 11, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 8, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 9, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 10, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 11, BTYPE_WOOD_PLANK);
 
 	//Esclaier
-	m_testChunk[9].SetBlock(13, 0, 6, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(13, 1, 7, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(13, 2, 8, BTYPE_WOOD_PLANK);
-	m_testChunk[9].SetBlock(13, 3, 9, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 6, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 7, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 8, BTYPE_WOOD_PLANK);
+	m_Chunk.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 3 + 64, 9, BTYPE_WOOD_PLANK);
 
 
-	//On place les chunk au bonne endroit (plancher)
-	for (int i = 0; i < 9; i++)
-	{
-		m_testChunk[i].SetPosition(((i / 3) - 1) * CHUNK_SIZE_X, -1 * CHUNK_SIZE_Y, ((i % 3) - 1) * CHUNK_SIZE_Z);
-	}
+	
 
 
 }
@@ -184,7 +177,7 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_CHEST].u, m_bInfo[BTYPE_CHEST].v, m_bInfo[BTYPE_CHEST].w, m_bInfo[BTYPE_CHEST].h);
 
-	
+
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -261,16 +254,32 @@ void Engine::Render(float elapsedTime)
 
 	glPopMatrix();
 
-	//Render des chunk
+	////Render des chunk
+
+	//m_textureAtlas.Bind();
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	if (m_testChunk[i].IsDirty())
+	//		m_testChunk[i].Update(m_bInfo);
+	//	m_shader01.Use();
+	//	m_testChunk[i].Render();
+	//	Shader::Disable();
+	//}
 
 	m_textureAtlas.Bind();
-	for (int i = 0; i < 10; i++)
+
+	for (int i = 0; i < WORLD_SIZE; i++)
 	{
-		if (m_testChunk[i].IsDirty())
-			m_testChunk[i].Update(m_bInfo);
-		m_shader01.Use();
-		m_testChunk[i].Render();
-		Shader::Disable();
+		for (int j = 0; j < WORLD_SIZE; j++)	//Parcour les chunk
+		{
+			if (m_Chunk.Get(i, j).IsDirty())
+				m_Chunk.Get(i, j).Update(m_bInfo);
+			m_shader01.Use();
+			m_Chunk.Get(i, j).Render();
+			Shader::Disable();
+
+
+		}
 	}
 
 	//Render le hui
@@ -396,9 +405,9 @@ void Engine::DrawHud()
 	std::ostringstream ss;
 
 	ss << "Fps: " << m_fps;
-	PrintText(10, Height() - 25,16, ss.str());
+	PrintText(10, Height() - 25, 16, ss.str());
 
-	
+
 	ss.str("");
 	ss << m_player.Position();
 	PrintText(10, 10, 16, ss.str());
@@ -406,7 +415,7 @@ void Engine::DrawHud()
 	ss.str("");
 	ss << "Health:";
 	//Pour chaque 10 point de vie on met un carre sinon un espace
-	for (int i = 0; i < m_player.GetHP()/5; i++)
+	for (int i = 0; i < m_player.GetHP() / 5; i++)
 	{
 		ss << "Û"; // Le carractere Û est remplacer par █ dans le texture font
 	}
@@ -414,7 +423,7 @@ void Engine::DrawHud()
 	{
 		ss << " ";
 	}
-	PrintText((Width() - ss.str().length() * 12 ) - 10, Height() - 25, 16, ss.str());
+	PrintText((Width() - ss.str().length() * 12) - 10, Height() - 25, 16, ss.str());
 
 	// Affichage du crosshair
 	m_textureCrosshair.Bind();
@@ -441,7 +450,7 @@ void Engine::DrawHud()
 	glPopMatrix();
 }
 
-void Engine::PrintText(unsigned int x, unsigned int y, int size , const std::string & t)
+void Engine::PrintText(unsigned int x, unsigned int y, int size, const std::string & t)
 {
 	glLoadIdentity();
 	glTranslated(x, y, 0);
@@ -461,6 +470,6 @@ void Engine::PrintText(unsigned int x, unsigned int y, int size , const std::str
 		glTexCoord2f(left, 1.0f - top);
 		glVertex2f(0, size);
 		glEnd();
-		glTranslated(size - (size/4), 0, 0);
+		glTranslated(size - (size / 4), 0, 0);
 	}
 }

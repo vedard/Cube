@@ -1,5 +1,5 @@
-#ifndef ARRAY3D_H__
-#define ARRAY3D_H__
+#ifndef ARRAY2D_H__
+#define ARRAY2D_H__
 
 #include "define.h"
 
@@ -12,7 +12,7 @@ public:
 	Array2d(const Array2d<t>& array);
 
 	void Set(int x, int y, t value);
-	t Get(int x, int y)  const;
+	t& Get(int x, int y);
 	void Reset(t value);
 
 private:
@@ -25,7 +25,7 @@ Array2d<t>::Array2d(int x, int y) : m_x(x), m_y(y)
 {
 	m_data = new t[m_x * m_y ];
 
-	Reset(0);
+	
 }
 
 template<class t>
@@ -52,7 +52,7 @@ void Array2d<t>::Set(int x, int y, t value)
 }
 
 template<class t>
-t Array2d<t>::Get(int x, int y)  const
+t& Array2d<t>::Get(int x, int y)  
 {
 	return m_data[x + (y * m_x)];
 }

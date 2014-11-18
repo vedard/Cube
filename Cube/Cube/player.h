@@ -2,6 +2,8 @@
 #define PLAYER_H__
 #include "define.h"
 #include "vector3.h"
+#include "array2d.h"
+#include "chunk.h"
 
 class Player
 {
@@ -12,7 +14,7 @@ public:
 	~Player();
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
-	void Move(bool front, bool back, bool left, bool right,bool shift, float elapsedTime);
+	void Move(bool front, bool back, bool left, bool right, bool shift, float elapsedTime);
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
 	void ToggleNoClip();

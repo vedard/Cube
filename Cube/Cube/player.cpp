@@ -97,7 +97,7 @@ void Player::Move(bool front, bool back, bool left, bool right, bool shift, floa
 		//Chute
 		m_pos.y -= m_vitesseY;
 		//Acceleration
-		m_vitesseY += 0.01;
+		m_vitesseY += 0.5 * elapsedTime;
 
 		//Si on touche le sol
 		if (m_pos.y <= 0)
@@ -157,7 +157,7 @@ void Player::Jump()
 {
 	if (!m_air)
 	{
-		m_vitesseY = -0.15;
+		m_vitesseY = -0.20;
 		m_air = true;
 	}
 }

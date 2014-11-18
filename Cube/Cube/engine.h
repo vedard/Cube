@@ -8,6 +8,7 @@
 #include "shader.h"
 #include "chunk.h"
 #include "blockinfo.h"
+#include "array2d.h"
 
 class Engine : public OpenglContext
 {
@@ -43,7 +44,7 @@ private:
 	Texture m_textureFont;
 	Texture m_textureCrosshair;
 	Shader m_shader01;
-	Chunk* m_testChunk;
+	Array2d<Chunk> m_Chunk;
 
 	//Indexe de la texutre dans l'atlas
 	TextureAtlas::TextureIndex m_texBlockIndex;
