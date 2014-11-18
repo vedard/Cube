@@ -39,9 +39,6 @@ private:
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 
 	TextureAtlas m_textureAtlas;
-	Texture m_textureTest;
-	Texture m_textureGrass;
-	Texture m_textureChecker;
 	Texture m_textureSky;
 	Texture m_textureFont;
 	Texture m_textureCrosshair;
@@ -50,7 +47,7 @@ private:
 
 	//Indexe de la texutre dans l'atlas
 	TextureAtlas::TextureIndex m_texBlockIndex;
-	BlockInfo* bInfo;
+	BlockInfo* m_bInfo;
 
 	int m_fps;
 

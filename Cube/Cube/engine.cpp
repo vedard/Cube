@@ -1,4 +1,4 @@
-#include "engine.h"
+ï»¿#include "engine.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -7,7 +7,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(0, 1.62, 0, 0, 0), m_testChunk(), m_shader01(), m_textureAtlas(2)
+Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_testChunk(), m_shader01(), m_textureAtlas(2)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -16,13 +16,14 @@ Engine::Engine() : m_wireframe(false), m_player(0, 1.62, 0, 0, 0), m_testChunk()
 	}
 
 	//Creation du tableau
-	bInfo = new BlockInfo[256];
+	m_bInfo = new BlockInfo[256];
 
 }
 
 Engine::~Engine()
 {
-	delete[] bInfo;
+	delete[] m_bInfo;
+	delete[] m_testChunk;
 }
 
 void Engine::Init()
@@ -80,6 +81,9 @@ void Engine::Init()
 				if (x % 4 == 0 && y % 4 == 0 && z % 4 == 0 && y > 9 && y < 32)
 					m_testChunk[9].SetBlock(x, y, z, BTYPE_STONE);
 
+				if ((x + 2) % 4 == 0 && y % 4 == 0 && (z + 2) % 4 == 0 && y > 9 && y < 32)
+					m_testChunk[9].SetBlock(x, y, z, BTYPE_WOOD_PLANK);
+
 				if (x % 1 == 0 && y % 1 == 0 && z % 1 == 0 && y > 7 && y < 9)
 					m_testChunk[9].SetBlock(x, y, z, BTYPE_TEST);
 
@@ -92,6 +96,52 @@ void Engine::Init()
 	}
 
 	m_testChunk[9].SetBlock(2, 0, 3, BTYPE_CHEST);
+
+	//Terrain de jeux
+
+	//Arche
+	m_testChunk[9].SetBlock(5, 2, 5, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(6, 2, 5, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(7, 2, 5, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(5, 1, 5, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(7, 1, 5, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(5, 0, 5, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(7, 0, 5, BTYPE_WOOD_PLANK);
+
+	//Mur
+	m_testChunk[9].SetBlock(10, 0, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(11, 0, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(12, 0, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(13, 0, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(10, 1, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(11, 1, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(12, 1, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(13, 1, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(10, 2, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(11, 2, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(12, 2, 14, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(13, 2, 14, BTYPE_WOOD_PLANK);
+
+	//Mur 2
+	m_testChunk[9].SetBlock(2, 0, 8, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 0, 9, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 0, 10, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 0, 11, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 1, 8, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 1, 9, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 1, 10, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 1, 11, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 2, 8, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 2, 9, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 2, 10, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(2, 2, 11, BTYPE_WOOD_PLANK);
+
+	//Esclaier
+	m_testChunk[9].SetBlock(13, 0, 6, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(13, 1, 7, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(13, 2, 8, BTYPE_WOOD_PLANK);
+	m_testChunk[9].SetBlock(13, 3, 9, BTYPE_WOOD_PLANK);
+
 
 	//On place les chunk au bonne endroit (plancher)
 	for (int i = 0; i < 9; i++)
@@ -114,21 +164,27 @@ void Engine::LoadResource()
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.bmp");
 
 	//Load texture dans l'atlas
-	bInfo[BTYPE_GRASS].Init(BTYPE_GRASS, "Grass");
+	m_bInfo[BTYPE_GRASS].Init(BTYPE_GRASS, "Grass");
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_grass.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_GRASS].u, bInfo[BTYPE_GRASS].v, bInfo[BTYPE_GRASS].w, bInfo[BTYPE_GRASS].h);
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_GRASS].u, m_bInfo[BTYPE_GRASS].v, m_bInfo[BTYPE_GRASS].w, m_bInfo[BTYPE_GRASS].h);
 
-	bInfo[BTYPE_TEST].Init(BTYPE_TEST, "Test");
+	m_bInfo[BTYPE_TEST].Init(BTYPE_TEST, "Test");
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_test.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_TEST].u, bInfo[BTYPE_TEST].v, bInfo[BTYPE_TEST].w, bInfo[BTYPE_TEST].h);
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_TEST].u, m_bInfo[BTYPE_TEST].v, m_bInfo[BTYPE_TEST].w, m_bInfo[BTYPE_TEST].h);
 
-	bInfo[BTYPE_STONE].Init(BTYPE_STONE, "Stone");
+	m_bInfo[BTYPE_STONE].Init(BTYPE_STONE, "Stone");
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_stone.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_STONE].u, bInfo[BTYPE_STONE].v, bInfo[BTYPE_STONE].w, bInfo[BTYPE_STONE].h);
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_STONE].u, m_bInfo[BTYPE_STONE].v, m_bInfo[BTYPE_STONE].w, m_bInfo[BTYPE_STONE].h);
 
-	bInfo[BTYPE_CHEST].Init(BTYPE_CHEST, "Chest");
+	m_bInfo[BTYPE_WOOD_PLANK].Init(BTYPE_WOOD_PLANK, "Wood Plank");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_wood_plank.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WOOD_PLANK].u, m_bInfo[BTYPE_WOOD_PLANK].v, m_bInfo[BTYPE_WOOD_PLANK].w, m_bInfo[BTYPE_WOOD_PLANK].h);
+
+	m_bInfo[BTYPE_CHEST].Init(BTYPE_CHEST, "Chest");
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, bInfo[BTYPE_CHEST].u, bInfo[BTYPE_CHEST].v, bInfo[BTYPE_CHEST].w, bInfo[BTYPE_CHEST].h);
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_CHEST].u, m_bInfo[BTYPE_CHEST].v, m_bInfo[BTYPE_CHEST].w, m_bInfo[BTYPE_CHEST].h);
+
+	
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -156,7 +212,7 @@ void Engine::Render(float elapsedTime)
 	gameTime += elapsedTime;
 
 	//On met a jour le fps
-	m_fps = 1 / elapsedTime;
+	m_fps = round(1 / elapsedTime);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -186,8 +242,8 @@ void Engine::Render(float elapsedTime)
 	glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 
-	glTexCoord2f(0.75, 0.50);			glVertex3f(-512, -512, 512);
-	glTexCoord2f(0.75, 0.25);			glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 	glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
 
@@ -198,7 +254,7 @@ void Engine::Render(float elapsedTime)
 
 	glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
 	glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
-	glTexCoord2f(0.25, 0.25);			glVertex3f(512, 512, -512);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 	glEnd();
 
@@ -211,7 +267,7 @@ void Engine::Render(float elapsedTime)
 	for (int i = 0; i < 10; i++)
 	{
 		if (m_testChunk[i].IsDirty())
-			m_testChunk[i].Update(bInfo);
+			m_testChunk[i].Update(m_bInfo);
 		m_shader01.Use();
 		m_testChunk[i].Render();
 		Shader::Disable();
@@ -249,6 +305,10 @@ void Engine::KeyPressEvent(unsigned char key)
 	else if (m_keyboard[sf::Keyboard::LControl])
 		m_player.SetSneak(true);
 
+	//space -> jump
+	else if (m_keyboard[sf::Keyboard::Space])
+		m_player.Jump();
+
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
 	{
@@ -274,9 +334,9 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 void Engine::MouseMoveEvent(int x, int y)
 {
-	// Centrer la souris seulement si elle n'est pas déjà centrée
-	// Il est nécessaire de faire la vérification pour éviter de tomber
-	// dans une boucle infinie où l'appel à CenterMouse génère un
+	// Centrer la souris seulement si elle n'est pas dÃ©jÃ  centrÃ©e
+	// Il est nÃ©cessaire de faire la vÃ©rification pour Ã©viter de tomber
+	// dans une boucle infinie oÃ¹ l'appel Ã  CenterMouse gÃ©nÃ¨re un
 	// MouseMoveEvent, qui rapelle CenterMouse qui rapelle un autre 
 	// MouseMoveEvent, etc
 	if (x == (Width() / 2) && y == (Height() / 2))
@@ -335,12 +395,26 @@ void Engine::DrawHud()
 
 	std::ostringstream ss;
 
-	ss << "Fps: " << m_fps ;
+	ss << "Fps: " << m_fps;
 	PrintText(10, Height() - 25,16, ss.str());
 
+	
 	ss.str("");
-	ss << "Position: " << m_player.Position();
-	PrintText(10, 10,16, ss.str());
+	ss << m_player.Position();
+	PrintText(10, 10, 16, ss.str());
+
+	ss.str("");
+	ss << "Health:";
+	//Pour chaque 10 point de vie on met un carre sinon un espace
+	for (int i = 0; i < m_player.GetHP()/5; i++)
+	{
+		ss << "Ã›"; // Le carractere Ã› est remplacer par â–ˆ dans le texture font
+	}
+	for (int i = 0; i < 100 / 5 - m_player.GetHP() / 5; i++)
+	{
+		ss << " ";
+	}
+	PrintText((Width() - ss.str().length() * 12 ) - 10, Height() - 25, 16, ss.str());
 
 	// Affichage du crosshair
 	m_textureCrosshair.Bind();
@@ -387,6 +461,6 @@ void Engine::PrintText(unsigned int x, unsigned int y, int size , const std::str
 		glTexCoord2f(left, 1.0f - top);
 		glVertex2f(0, size);
 		glEnd();
-		glTranslated(13, 0, 0);
+		glTranslated(size - (size/4), 0, 0);
 	}
 }

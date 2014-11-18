@@ -4,7 +4,9 @@
 #include <cmath>
 
 
-Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_rotX(rotX), m_rotY(rotY), m_vitesse(4), m_noClip(false), m_sneaked(false)
+Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_rotX(rotX), m_rotY(rotY), 
+																			 m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0), 
+																			 m_height(1.62), m_health(100)
 {
 
 }
@@ -41,7 +43,6 @@ void Player::Move(bool front, bool back, bool left, bool right, bool shift, floa
 		multiplieur *= 3;
 	else if (shift)
 		multiplieur *= 1.7;
-
 
 	//Selon la touche appuié et l'orientation on determine la direction que le personnage avance
 	if (front)
@@ -89,6 +90,23 @@ void Player::Move(bool front, bool back, bool left, bool right, bool shift, floa
 		m_pos.z += sin(0 + orientationPlayer) * multiplieur;
 
 	}
+
+	//Gravité
+	if (!m_noClip)
+	{
+		//Chute
+		m_pos.y -= m_vitesseY;
+		//Acceleration
+		m_vitesseY += 0.01;
+
+		//Si on touche le sol
+		if (m_pos.y <= 0)
+		{
+			m_pos.y = 0;
+			m_vitesseY = 0;
+			m_air = false;
+		}
+	}
 }
 
 void Player::ApplyRotation() const
@@ -101,8 +119,9 @@ void Player::ApplyRotation() const
 
 void Player::ApplyTranslation() const
 {
+	
 	glMatrixMode(GL_MODELVIEW);
-	glTranslatef(m_pos.x, -m_pos.y, m_pos.z);
+	glTranslatef(m_pos.x, -(m_pos.y + m_height), m_pos.z);
 
 	//Si on est baisse 
 	if (m_sneaked)
@@ -114,11 +133,12 @@ void Player::ToggleNoClip()
 	if (m_noClip)
 	{
 		m_noClip = false;
-		m_pos.y = 1.7f;
 	}
 	else
+	{
 		m_noClip = true;
-
+		m_vitesseY = 0;
+	}
 }
 
 void Player::SetSneak(bool sneak)
@@ -131,4 +151,18 @@ void Player::SetSneak(bool sneak)
 Vector3<float> Player::Position() const
 {
 	return m_pos;
+}
+
+void Player::Jump()
+{
+	if (!m_air)
+	{
+		m_vitesseY = -0.15;
+		m_air = true;
+	}
+}
+
+int Player::GetHP()
+{
+	return m_health;
 }

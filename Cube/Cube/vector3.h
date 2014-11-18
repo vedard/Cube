@@ -41,9 +41,9 @@ public:
 	Vector3<T>& operator-=(const T& v);
 	Vector3<T>& operator/=(const T& v);
 	Vector3<T>& operator*=(const T& v);
-	
+
 	template <class U>
-	friend std::ostream& operator<<( std::ostream& o,const Vector3<U>& v );
+	friend std::ostream& operator<<(std::ostream& o, const Vector3<U>& v);
 
 	bool operator==(const Vector3<T>& v) const;
 	bool operator!=(const Vector3<T>& v) const;
@@ -220,9 +220,9 @@ bool Vector3<T>::operator!=(const Vector3<T>& v) const
 }
 
 template <class T>
-std::ostream& operator<<( std::ostream& o,const Vector3<T>& v )
+std::ostream& operator<<(std::ostream& o, const Vector3<T>& v)
 {
-	return o << std::setprecision(2) << std::fixed << v.x << "   " << v.y << "   " << v.z;
+	return o << std::setprecision(2) << std::fixed << "X:" << v.x << " Z:" << v.z << " Y:" << v.y;
 }
 
 #endif // VECTOR3_H__

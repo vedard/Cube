@@ -17,6 +17,8 @@ public:
 	void ApplyTranslation() const;
 	void ToggleNoClip();
 	void SetSneak(bool sneak);
+	void Jump();
+	int GetHP();
 	Vector3<float> Position() const;
 
 private:
@@ -25,9 +27,14 @@ private:
 	float m_rotX,  //orientation
 		m_rotY, 
 		m_vitesse; //vitesse de deplacement
+	float m_vitesseY;   //Vittesse verticale (gravité et saut)
+	float m_height;     //Position des yeux relativement aux pied
 
-	bool m_noClip;
-	bool m_sneaked;
+	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)
+	bool m_sneaked;		//Si on est penché
+	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)
+
+	int m_health;		//Vie du personnage
 };
 
 #endif

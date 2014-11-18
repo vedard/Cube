@@ -12,6 +12,6 @@ int main(int *argcp, char **argv)
 	
     Engine engine;
     engine.SetMaxFps(60);
-    engine.Start("Cube", 1366, 768, false);
+    engine.Start("Cube", 1366, 760, false);
 	
 }
