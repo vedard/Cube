@@ -5,7 +5,7 @@
 
 
 
-int main(int *argcp, char **argv)
+int main()
 {
     Tool::CheckTypes();
 

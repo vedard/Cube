@@ -417,7 +417,7 @@ void Engine::DrawHud()
 	//Pour chaque 10 point de vie on met un carre sinon un espace
 	for (int i = 0; i < m_player.GetHP() / 5; i++)
 	{
-		ss << "Û"; // Le carractere Û est remplacer par █ dans le texture font
+		ss << (char)254; // Le carractere Û est remplacer par █ dans le texture font
 	}
 	for (int i = 0; i < 100 / 5 - m_player.GetHP() / 5; i++)
 	{
