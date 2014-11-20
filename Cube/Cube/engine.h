@@ -44,7 +44,7 @@ private:
 	Texture m_textureFont;
 	Texture m_textureCrosshair;
 	Shader m_shader01;
-	Array2d<Chunk> m_Chunk;
+	Array2d<Chunk> m_Chunks;
 
 	//Indexe de la texutre dans l'atlas
 	TextureAtlas::TextureIndex m_texBlockIndex;

@@ -30,11 +30,25 @@ BlockType Chunk::GetBlock(int x, int y, int z)
 	return m_blocks.Get(x, y, z);
 }
 
+Vector3<float> &Chunk::GetBlockPos(int x, int y, int z)
+{
+	Vector3<float> posblock;
+	posblock.x = m_position.x + x ;
+	posblock.y = m_position.y + y;
+	posblock.z = m_position.z + z ;
+
+	return posblock;
+}
+
 void Chunk::SetPosition(int x, int y, int z)
 {
 	m_position.x = x;
 	m_position.y = y;
 	m_position.z = z;
+}
+Vector3<float> &Chunk::GetPosition()
+{
+	return m_position;
 }
 
 void Chunk::Update(BlockInfo* binfo)
@@ -62,6 +76,7 @@ void Chunk::Update(BlockInfo* binfo)
 						{
 							AddBlockToMesh(vd, count, binfo[bt], x + m_position.x, y + m_position.y, z + m_position.z);
 						}
+						//Si on block touche a de l'aire on l'affiche
 						else if (
 							GetBlock(x + 1, y, z) == BTYPE_AIR || GetBlock(x + 1, y + 1, z) == BTYPE_AIR || GetBlock(x, y + 1, z) == BTYPE_AIR || GetBlock(x - 1, y + 1, z) == BTYPE_AIR || GetBlock(x - 1, y, z) == BTYPE_AIR || GetBlock(x - 1, y - 1, z) == BTYPE_AIR || GetBlock(x, y - 1, z) == BTYPE_AIR || GetBlock(x + 1, y - 1, z) == BTYPE_AIR ||
 							GetBlock(x + 1, y, z + 1) == BTYPE_AIR || GetBlock(x + 1, y + 1, z + 1) == BTYPE_AIR || GetBlock(x, y + 1, z + 1) == BTYPE_AIR || GetBlock(x - 1, y + 1, z + 1) == BTYPE_AIR || GetBlock(x - 1, y, z + 1) == BTYPE_AIR || GetBlock(x - 1, y - 1, z + 1) == BTYPE_AIR || GetBlock(x, y - 1, z + 1) == BTYPE_AIR || GetBlock(x + 1, y - 1, z + 1) == BTYPE_AIR || GetBlock(x, y, z + 1) == BTYPE_AIR ||

@@ -16,7 +16,9 @@ public:
     void RemoveBloc(int x, int y, int z);
     void SetBlock(int x, int y, int z, BlockType type);
 	void SetPosition(int x, int y, int z);
+	Vector3<float> &GetPosition();
     BlockType GetBlock(int x, int y, int z);
+	Vector3<float> &GetBlockPos(int x, int y, int z);
 	void Update(BlockInfo* binfo);
 	void AddBlockToMesh(ChunkMesh::VertexData * vd, int & count, BlockInfo binfo, int x, int y, int z);
 	void Render() const;

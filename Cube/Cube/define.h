@@ -29,7 +29,7 @@ typedef long long int64;
 #define CHUNK_SIZE_X 16
 #define CHUNK_SIZE_Y 128
 #define CHUNK_SIZE_Z 16
-#define WORLD_SIZE 4
+#define WORLD_SIZE 3
 
 #define PI 3.14159265358
 
@@ -37,8 +37,8 @@ typedef uint8 BlockType;
 enum BLOCK_TYPE { BTYPE_AIR, BTYPE_GRASS, BTYPE_TEST, BTYPE_STONE, BTYPE_CHEST, BTYPE_WOOD_PLANK };
 
 
-#define TEXTURE_PATH        "../Cube/media/textures/"
-#define SHADER_PATH  "../Cube/media/shaders/"
+#define TEXTURE_PATH	"../Cube/media/textures/"
+#define SHADER_PATH		"../Cube/media/shaders/"
 #define VIEW_DISTANCE       128
 #define MOUSE_SENSIBILITY 1/4
 
