@@ -6,7 +6,7 @@
 
 Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_rotX(rotX), m_rotY(rotY),
 m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0),
-m_height(1.62), m_health(100), m_running(false)
+m_height(1.62), m_health(100), m_running(false), m_width(0.2)
 {
 
 }
@@ -106,12 +106,16 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		m_pos.y -= m_vitesseY;
 		if (CheckCollision(chunks))
 		{
-			m_air = false;
+			if (m_vitesseY > 0)
+				m_air = false;
 			m_pos.y += m_vitesseY;
 			m_vitesseY = 0;
 		}
+		else
+			m_air = true;
+
 		//Acceleration
-		m_vitesseY += 0.5 * elapsedTime;
+		m_vitesseY += 0.013 ;
 	}
 }
 
@@ -141,31 +145,17 @@ bool Player::CheckCollision(Array2d<Chunk>& chunks)
 							{
 								Vector3<float> block = chunks.Get(i, j).GetBlockPos(x, y, z);
 
-								//Si le player est dans le block
-								if (//Pied
-									(m_pos.x >= block.x
-									&& m_pos.x < block.x + 1
-									&& m_pos.y >= block.y
-									&& m_pos.y < block.y + 1
-									&& m_pos.z >= block.z
-									&& m_pos.z < block.z + 1) ||
-									//Millieu du corps
-									(m_pos.x >= block.x
-									&& m_pos.x < block.x + 1
-									&& m_pos.y + m_height >= block.y
-									&& m_pos.y + m_height < block.y + 1
-									&& m_pos.z >= block.z
-									&& m_pos.z < block.z + 1) ||
-									//Tete
-									(m_pos.x >= block.x
-									&& m_pos.x < block.x + 1
-									&& m_pos.y + m_height / 2 >= block.y
-									&& m_pos.y + m_height / 2 < block.y + 1
-									&& m_pos.z >= block.z
-									&& m_pos.z < block.z + 1))
-								{
-									return true; //colision
-								}
+								if ((m_pos.x - (m_width / 2) >= block.x + 1)	// trop à droite
+									|| (m_pos.x + (m_width / 2) <= block.x)		// trop à gauche
+									|| (m_pos.y >= block.y + 1)					// trop en bas
+									|| (m_pos.y + m_height <= block.y)			// trop en haut	
+									|| (m_pos.z - (m_width / 2) >= block.z + 1)	// trop derrière
+									|| (m_pos.z + (m_width / 2) <= block.z))	// trop devant
+									continue;
+
+								else
+									return true; //Sinon collision
+							
 							}
 						}
 					}

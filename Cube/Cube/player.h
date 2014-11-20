@@ -34,6 +34,7 @@ private:
 		m_vitesse; //vitesse de deplacement
 	float m_vitesseY;   //Vittesse verticale (gravité et saut)
 	float m_height;     //Position des yeux relativement aux pied
+	float m_width;     //Position des yeux relativement aux pied
 
 	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)
 	bool m_sneaked;		//Si on est penché
