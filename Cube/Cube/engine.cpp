@@ -218,7 +218,7 @@ void Engine::Render(float elapsedTime)
 	glLoadIdentity();
 
 	//Update le player
-	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_keyboard[sf::Keyboard::LShift], elapsedTime, m_Chunks);
+	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], elapsedTime, m_Chunks);
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
@@ -306,8 +306,12 @@ void Engine::KeyPressEvent(unsigned char key)
 	else if (m_keyboard[sf::Keyboard::LControl])
 		m_player.SetSneak(true);
 
+	//LSHIFT -> RUN
+	else if (m_keyboard[sf::Keyboard::LShift])
+		m_player.SetRunning(true);
+
 	//space -> jump
-	else if (m_keyboard[sf::Keyboard::Space])
+	 if (m_keyboard[sf::Keyboard::Space])
 		m_player.Jump();
 
 	//y -> toggle wireframe mode
@@ -330,6 +334,10 @@ void Engine::KeyReleaseEvent(unsigned char key)
 	//end sneak
 	if (!m_keyboard[sf::Keyboard::LControl])
 		m_player.SetSneak(false);
+
+	//end run
+	if (!m_keyboard[sf::Keyboard::LShift])
+		m_player.SetRunning(false);
 
 }
 

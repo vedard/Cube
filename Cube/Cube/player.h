@@ -14,13 +14,14 @@ public:
 	~Player();
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
-	void Move(bool front, bool back, bool left, bool right, bool shift, float elapsedTime, Array2d<Chunk>& chunks);
+	void Move(bool front, bool back, bool left, bool right, float elapsedTime, Array2d<Chunk>& chunks);
 	bool CheckCollision(Array2d<Chunk>& chunks);
 
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
 	void ToggleNoClip();
 	void SetSneak(bool sneak);
+	void SetRunning(bool running);
 	void Jump();
 	int GetHP();
 	Vector3<float> Position() const;
@@ -37,8 +38,8 @@ private:
 	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)
 	bool m_sneaked;		//Si on est penché
 	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)
-
 	int m_health;		//Vie du personnage
+	bool m_running;		//Si le joueur cour
 };
 
 #endif
