@@ -6,22 +6,22 @@
 template<class t>
 class Array3d
 {
-    public:
-    Array3d(int x, int y, int z);
-    ~Array3d();
+public:
+	Array3d(int x, int y, int z);
+	~Array3d();
 	Array3d(const Array3d<t>& array);
 
-    void Set(int x, int y, int z, t value);
-    t Get(int x, int y, int z) const;
+	void Set(int x, int y, int z, t value);
+	t Get(int x, int y, int z) const;
 
-    void Reset(t value);
+	void Reset(t value);
 
-    private:
-        int m_x, m_y, m_z;
-        t* m_data;
+private:
+	int m_x, m_y, m_z;
+	t* m_data;
 
-        t& GetElement(int x, int y, int z);
-        const t& GetElement(int x, int y, int z) const;
+	t& GetElement(int x, int y, int z);
+	const t& GetElement(int x, int y, int z) const;
 };
 
 

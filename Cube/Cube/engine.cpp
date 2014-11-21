@@ -181,7 +181,7 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_CHEST].u, m_bInfo[BTYPE_CHEST].v, m_bInfo[BTYPE_CHEST].w, m_bInfo[BTYPE_CHEST].h);
 
-
+	
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -222,7 +222,7 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
-
+	
 	//Ciel
 	glPushMatrix();
 	glRotatef(gameTime * 1.2, 0, 1, 0);

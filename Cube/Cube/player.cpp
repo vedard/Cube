@@ -42,63 +42,41 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		multiplieur *= 3;
 	else if (m_running)
 		multiplieur *= 1.7;
-	//Selon la touche appuié et l'orientation on determine la direction que le personnage avance
-	if (front)
-	{
-		//deplacement verticale si noclip
-		if (m_noClip)
-		{
-			m_pos.x -= cos(PI / 2 + orientationPlayer) * multiplieur * (cos(-m_rotY * PI / 180));
-			m_pos.z -= sin(PI / 2 + orientationPlayer) * multiplieur * (cos(-m_rotY * PI / 180));
-			m_pos.y += sin(-m_rotY * PI / 180) * multiplieur;
-		}
-		else
-		{
-			m_pos.x -= cos(PI / 2 + orientationPlayer) * multiplieur;
-			if (CheckCollision(chunks))
-				m_pos.x += cos(PI / 2 + orientationPlayer) * multiplieur;
-			m_pos.z -= sin(PI / 2 + orientationPlayer) * multiplieur;
-			if (CheckCollision(chunks))
-				m_pos.z += sin(PI / 2 + orientationPlayer) * multiplieur;
-		}
+
+
+
+	Vector3<float> direction_vector(cos(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)), sin(-m_rotY * PI / 180), sin(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)));
+	Vector3<float> right_vector = direction_vector.Cross(Vector3<float>(0, 1, 0));
+	Vector3<float> deplacement_vector(0, 0, 0);
+
+	if (front) {
+		deplacement_vector += direction_vector;
 	}
-	if (back)
-	{
-		//deplacement verticale si noclip
-		if (m_noClip)
-		{
-			m_pos.x -= cos(PI * 1.5 + orientationPlayer) * multiplieur * (cos(m_rotY * PI / 180));
-			m_pos.z -= sin(PI * 1.5 + orientationPlayer) * multiplieur * (cos(m_rotY * PI / 180));
-			m_pos.y += sin(m_rotY * PI / 180) * multiplieur;
-		}
-		else
-		{
-			m_pos.x -= cos(PI * 1.5 + orientationPlayer) * multiplieur;
-			if (CheckCollision(chunks))
-				m_pos.x += cos(PI * 1.5 + orientationPlayer) * multiplieur;
-			m_pos.z -= sin(PI * 1.5 + orientationPlayer) * multiplieur;
-			if (CheckCollision(chunks))
-				m_pos.z += sin(PI * 1.5 + orientationPlayer) * multiplieur;
-		}
+	else if (back) {
+		deplacement_vector -= direction_vector;
 	}
-	if (right)
-	{
-		m_pos.x -= cos(PI + orientationPlayer) * multiplieur;
-		if (!m_noClip && CheckCollision(chunks))
-			m_pos.x += cos(PI + orientationPlayer) * multiplieur;
-		m_pos.z -= sin(PI + orientationPlayer) * multiplieur;
-		if (!m_noClip && CheckCollision(chunks))
-			m_pos.z += sin(PI + orientationPlayer) * multiplieur;
+	if (right) {
+		deplacement_vector += right_vector;
 	}
-	if (left)
-	{
-		m_pos.x -= cos(0 + orientationPlayer) * multiplieur;
-		if (!m_noClip && CheckCollision(chunks) && !m_noClip)
-			m_pos.x += cos(0 + orientationPlayer) * multiplieur;
-		m_pos.z -= sin(0 + orientationPlayer) * multiplieur;
-		if (!m_noClip && CheckCollision(chunks) && !m_noClip)
-			m_pos.z += sin(0 + orientationPlayer) * multiplieur;
+	else if (left) {
+		deplacement_vector -= right_vector;
 	}
+	if (m_noClip)
+	{
+		m_pos.y += deplacement_vector.y * multiplieur;
+		m_pos.x += deplacement_vector.x * multiplieur;
+		m_pos.z += deplacement_vector.z * multiplieur;
+	}
+	else
+	{
+		m_pos.x += deplacement_vector.x * multiplieur;
+		if (CheckCollision(chunks))
+			m_pos.x -= deplacement_vector.x * multiplieur;
+		m_pos.z += deplacement_vector.z * multiplieur;
+		if (CheckCollision(chunks))
+			m_pos.z -= deplacement_vector.z * multiplieur;
+	}
+
 	//Gravité
 	if (!m_noClip)
 	{
@@ -115,7 +93,7 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 			m_air = true;
 
 		//Acceleration
-		m_vitesseY += 0.013 ;
+		m_vitesseY += 0.013;
 	}
 }
 
@@ -155,7 +133,7 @@ bool Player::CheckCollision(Array2d<Chunk>& chunks)
 
 								else
 									return true; //Sinon collision
-							
+
 							}
 						}
 					}
