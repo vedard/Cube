@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
-Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(5), m_Chunks(WORLD_SIZE, WORLD_SIZE)
+Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(7), m_Chunks(WORLD_SIZE, WORLD_SIZE)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -75,13 +75,14 @@ void Engine::Init()
 				{
 					for (int y = 0; y < CHUNK_SIZE_Y; ++y)	//parcours les blocks du chunk
 					{
-
-						if (y < 52 && y > 40)
-							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_STONE);
-
-						if (y < 64 && y >= 52)
+						if (y < 64 && y >= 63)
 							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
-
+						else if (y < 63 && y >= 57)
+							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_DIRT);
+						else if (y < 57 && y > 40)
+							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_STONE);
+						else if (y <= 40 && y > 38)
+							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_BED_ROCK);
 					}
 				}
 			}
@@ -138,7 +139,7 @@ void Engine::Init()
 
 
 
-	m_Chunks.Get(0, 0).SetBlock(5, 64, 5, BTYPE_TEST);
+	m_Chunks.Get(0, 0).SetBlock(3, 64, 3, BTYPE_TEST);
 	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(8, 64, 8, BTYPE_CHEST);
 
 }
@@ -175,6 +176,13 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_CHEST].u, m_bInfo[BTYPE_CHEST].v, m_bInfo[BTYPE_CHEST].w, m_bInfo[BTYPE_CHEST].h);
 
+	m_bInfo[BTYPE_BED_ROCK].Init(BTYPE_BED_ROCK, "Bed Rock");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_bed_rock.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_BED_ROCK].u, m_bInfo[BTYPE_BED_ROCK].v, m_bInfo[BTYPE_BED_ROCK].w, m_bInfo[BTYPE_BED_ROCK].h);
+
+	m_bInfo[BTYPE_DIRT].Init(BTYPE_DIRT, "Dirt");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_dirt.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_DIRT].u, m_bInfo[BTYPE_DIRT].v, m_bInfo[BTYPE_DIRT].w, m_bInfo[BTYPE_DIRT].h);
 
 
 	if (!m_textureAtlas.Generate(128, false))
@@ -203,7 +211,7 @@ void Engine::Render(float elapsedTime)
 	gameTime += elapsedTime;
 
 	//On met a jour le fps
-	if ((int)(gameTime*100) % 10 == 0)
+	if ((int)(gameTime * 100) % 10 == 0)
 		m_fps = round(1 / elapsedTime);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -18,7 +18,6 @@ public:
 
 	void SetDurabilite(int durabilite);
 	int GetDurabilite() const;
-	void SetCoordAtlas(float u, float v, float w, float h);
 
 	void Afficher() const;
 

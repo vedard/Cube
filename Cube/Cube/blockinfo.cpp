@@ -37,13 +37,6 @@ int BlockInfo::GetDurabilite() const
     return m_durabilite;
 }
 
-void BlockInfo::SetCoordAtlas(float uf, float vf, float wf, float hf) 
-{
-	u = uf;
-	v = vf;
-	w = wf;
-	h = hf;
-}
 
 void BlockInfo::Afficher() const
 {
