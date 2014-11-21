@@ -10,8 +10,9 @@ int main()
     Tool::CheckTypes();
 
 	
+
     Engine engine;
     engine.SetMaxFps(60);
-    engine.Start("Cube", 1366, 760, false);
+    engine.Start("Cube", 1366, 760, false, true);
 	
 }

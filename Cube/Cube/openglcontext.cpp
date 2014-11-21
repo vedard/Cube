@@ -9,7 +9,7 @@ OpenglContext::~OpenglContext()
 {
 }
 
-bool OpenglContext::Start(const std::string& title, int width, int height, bool fullscreen)
+bool OpenglContext::Start(const std::string& title, int width, int height, bool fullscreen, bool verticalSync)
 {
     m_title = title;
     m_fullscreen = fullscreen;
@@ -58,7 +58,7 @@ bool OpenglContext::Start(const std::string& title, int width, int height, bool 
                 break;
             }
         }
-
+		m_app.setVerticalSyncEnabled(verticalSync);
         m_app.setActive();
         Render(m_lastFrameTime);
         m_app.display();

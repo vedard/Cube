@@ -4,9 +4,6 @@
 #include <algorithm>
 #include <cmath>
 
-
-
-
 Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(5), m_Chunks(WORLD_SIZE, WORLD_SIZE)
 {
 	//Initialisation des touches
@@ -142,10 +139,6 @@ void Engine::Init()
 
 
 	m_Chunks.Get(0, 0).SetBlock(5, 64, 5, BTYPE_TEST);
-
-	m_Chunks.Get(2, 2).SetBlock(5, 64, 0, BTYPE_TEST);
-	m_Chunks.Get(2, 2).SetBlock(7, 64, 0, BTYPE_TEST);
-	m_Chunks.Get(2, 2).SetBlock(6, 64, 0, BTYPE_TEST);
 	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(8, 64, 8, BTYPE_CHEST);
 
 }
@@ -182,7 +175,7 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_CHEST].u, m_bInfo[BTYPE_CHEST].v, m_bInfo[BTYPE_CHEST].w, m_bInfo[BTYPE_CHEST].h);
 
-	
+
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -210,7 +203,8 @@ void Engine::Render(float elapsedTime)
 	gameTime += elapsedTime;
 
 	//On met a jour le fps
-	m_fps = round(1 / elapsedTime);
+	if ((int)(gameTime*100) % 10 == 0)
+		m_fps = round(1 / elapsedTime);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -223,7 +217,7 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
-	
+
 	//Ciel
 	glPushMatrix();
 	glRotatef(gameTime * 1.2, 0, 1, 0);
@@ -312,7 +306,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		m_player.SetRunning(true);
 
 	//space -> jump
-	 if (m_keyboard[sf::Keyboard::Space])
+	if (m_keyboard[sf::Keyboard::Space])
 		m_player.Jump();
 
 	//y -> toggle wireframe mode
@@ -418,7 +412,7 @@ void Engine::DrawHud()
 	//Pour chaque 10 point de vie on met un carre sinon un espace
 	for (int i = 0; i < m_player.GetHP() / 5; i++)
 	{
-		ss << (char)254; // Le carractere Û est remplacer par █ dans le texture font
+		ss << (char)254; // Le carractere ■
 	}
 	for (int i = 0; i < 100 / 5 - m_player.GetHP() / 5; i++)
 	{

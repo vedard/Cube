@@ -33,7 +33,7 @@ public:
     virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y) = 0;
 
 
-    bool Start(const std::string& title, int width, int height, bool fullscreen);
+    bool Start(const std::string& title, int width, int height, bool fullscreen, bool verticalSync);
     bool Stop();
 
     int Width() const;
