@@ -37,7 +37,6 @@ int BlockInfo::GetDurabilite() const
     return m_durabilite;
 }
 
-
 void BlockInfo::Afficher() const
 {
     std::cout << "Type: " << m_type << std::endl;

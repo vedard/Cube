@@ -29,7 +29,7 @@ typedef long long int64;
 #define CHUNK_SIZE_X 16
 #define CHUNK_SIZE_Y 128
 #define CHUNK_SIZE_Z 16
-#define WORLD_SIZE 2
+#define WORLD_SIZE 5
 
 #define PI 3.14159265358
 

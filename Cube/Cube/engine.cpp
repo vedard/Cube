@@ -206,6 +206,7 @@ void Engine::UnloadResource()
 void Engine::Render(float elapsedTime)
 {
 
+
 	static float gameTime = elapsedTime;
 
 	gameTime += elapsedTime;
@@ -213,6 +214,7 @@ void Engine::Render(float elapsedTime)
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
 		m_fps = round(1 / elapsedTime);
+	
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

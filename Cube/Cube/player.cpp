@@ -75,6 +75,10 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		deplacementVector -= rightVector;
 	}
 
+	//Normalize les vecteur
+	deplacementVector.Normalize();
+	rightVector.Normalize();
+
 	//Si no clip (pas de collision)
 	if (m_noClip)
 	{
