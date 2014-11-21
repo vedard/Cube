@@ -34,8 +34,12 @@ void Player::TurnTopBottom(float value)
 
 void Player::Move(bool front, bool back, bool left, bool right, float elapsedTime, Array2d<Chunk>& chunks)
 {
+	//Orientation du player en rad
 	float orientationPlayer = m_rotX * PI / 180;
+	//Multiplicateur de vitesse
 	float multiplieur = m_vitesse * elapsedTime;
+
+	//Change la vittesse selon l'etat du player
 	if (m_sneaked)
 		multiplieur *= 0.7;
 	else if (m_noClip)
@@ -43,38 +47,55 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 	else if (m_running)
 		multiplieur *= 1.7;
 
+	//Deplacement Avant/Arriere
+	Vector3<float> directionVector(cos(PI / 2 * 3 + orientationPlayer), 0, sin(PI / 2 * 3 + orientationPlayer));
+	Vector3<float> directionVectorNoClip(cos(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)), sin(-m_rotY * PI / 180), sin(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)));
+	//Deplacement Gauche/Droite
+	Vector3<float> rightVector = directionVector.Cross(Vector3<float>(0, 1, 0));
+	//Deplacement Total
+	Vector3<float> deplacementVector(0, 0, 0);
 
-
-	Vector3<float> direction_vector(cos(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)), sin(-m_rotY * PI / 180), sin(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)));
-	Vector3<float> right_vector = direction_vector.Cross(Vector3<float>(0, 1, 0));
-	Vector3<float> deplacement_vector(0, 0, 0);
-
+	//Selon les touches appuie on modifie le vecteur de deplacement
 	if (front) {
-		deplacement_vector += direction_vector;
+		if (m_noClip)
+			deplacementVector += directionVectorNoClip;
+		else
+		deplacementVector += directionVector;
 	}
 	else if (back) {
-		deplacement_vector -= direction_vector;
+		if (m_noClip)
+			deplacementVector -= directionVectorNoClip;
+		else
+			deplacementVector -= directionVector;
 	}
 	if (right) {
-		deplacement_vector += right_vector;
+		deplacementVector += rightVector;
 	}
 	else if (left) {
-		deplacement_vector -= right_vector;
+		deplacementVector -= rightVector;
 	}
+
+	//Si no clip (pas de collision)
 	if (m_noClip)
 	{
-		m_pos.y += deplacement_vector.y * multiplieur;
-		m_pos.x += deplacement_vector.x * multiplieur;
-		m_pos.z += deplacement_vector.z * multiplieur;
+		m_pos.y += deplacementVector.y * multiplieur;
+		m_pos.x += deplacementVector.x * multiplieur;
+		m_pos.z += deplacementVector.z * multiplieur;
 	}
+
 	else
 	{
-		m_pos.x += deplacement_vector.x * multiplieur;
+		//Deplacement en X
+		m_pos.x += deplacementVector.x * multiplieur;
+		//Si collision, on annule
+		if (CheckCollision(chunks)) 
+			m_pos.x -= deplacementVector.x * multiplieur;
+
+		//Deplacement en Z
+		m_pos.z += deplacementVector.z * multiplieur;
+		//Si collision, on annule
 		if (CheckCollision(chunks))
-			m_pos.x -= deplacement_vector.x * multiplieur;
-		m_pos.z += deplacement_vector.z * multiplieur;
-		if (CheckCollision(chunks))
-			m_pos.z -= deplacement_vector.z * multiplieur;
+			m_pos.z -= deplacementVector.z * multiplieur;
 	}
 
 	//Gravité
@@ -82,10 +103,15 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 	{
 		//Chute
 		m_pos.y -= m_vitesseY;
+
+		//Si collision
 		if (CheckCollision(chunks))
 		{
+			//Si on a touche le sol 
 			if (m_vitesseY > 0)
 				m_air = false;
+
+			//annule
 			m_pos.y += m_vitesseY;
 			m_vitesseY = 0;
 		}

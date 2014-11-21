@@ -7,7 +7,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(2), m_Chunks(WORLD_SIZE, WORLD_SIZE)
+Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(5), m_Chunks(WORLD_SIZE, WORLD_SIZE)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -146,6 +146,7 @@ void Engine::Init()
 	m_Chunks.Get(2, 2).SetBlock(5, 64, 0, BTYPE_TEST);
 	m_Chunks.Get(2, 2).SetBlock(7, 64, 0, BTYPE_TEST);
 	m_Chunks.Get(2, 2).SetBlock(6, 64, 0, BTYPE_TEST);
+	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(8, 64, 8, BTYPE_CHEST);
 
 }
 
