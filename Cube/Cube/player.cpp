@@ -60,7 +60,7 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		if (m_noClip)
 			deplacementVector += directionVectorNoClip;
 		else
-		deplacementVector += directionVector;
+			deplacementVector += directionVector;
 	}
 	else if (back) {
 		if (m_noClip)
@@ -92,7 +92,7 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		//Deplacement en X
 		m_pos.x += deplacementVector.x * multiplieur;
 		//Si collision, on annule
-		if (CheckCollision(chunks)) 
+		if (CheckCollision(chunks))
 			m_pos.x -= deplacementVector.x * multiplieur;
 
 		//Deplacement en Z
@@ -100,6 +100,7 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		//Si collision, on annule
 		if (CheckCollision(chunks))
 			m_pos.z -= deplacementVector.z * multiplieur;
+
 	}
 
 	//Gravité
@@ -129,50 +130,34 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 
 bool Player::CheckCollision(Array2d<Chunk>& chunks)
 {
-	for (int i = 0; i < WORLD_SIZE; i++)
+	//Chunk du player 
+	Vector3<float>chunk(floor(m_pos.x / CHUNK_SIZE_X) + floor(WORLD_SIZE / 2), 0, floor(m_pos.z / CHUNK_SIZE_Z) + floor(WORLD_SIZE / 2));
+
+
+	if (chunk.x >= 0 && chunk.z >= 0 && chunk.x < WORLD_SIZE && chunk.z < WORLD_SIZE)
 	{
-		for (int j = 0; j < WORLD_SIZE; j++)	//Parcours les chunks
+		//Block du player 
+		Vector3<float>block(m_pos.x - (chunk.x * CHUNK_SIZE_X) - 1, m_pos.y + CHUNK_SIZE_Y / 2 + 1, m_pos.z - (chunk.z * CHUNK_SIZE_X));
+
+		BlockType bt1 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y, block.z);
+
+		BlockType bt2 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y + m_height, block.z);
+		BlockType bt3 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y + m_height / 2, block.z);
+		/*BlockType bt4 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y, block.z);
+		BlockType bt5 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y, block.z);
+		BlockType bt6 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y, block.z + m_width / 2);
+		BlockType bt7 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y, block.z - m_width / 2);*/
+
+		if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR /*|| bt4 != BTYPE_AIR || bt5 != BTYPE_AIR || bt6 != BTYPE_AIR || bt7 != BTYPE_AIR*/)
 		{
-			Vector3<float> Chunk = chunks.Get(i, j).GetPosition();
+			return true;
 
-			//Si le player est dans le chunk
-			if (m_pos.x >= Chunk.x
-				&& m_pos.x < Chunk.x + CHUNK_SIZE_X
-				&& m_pos.y >= Chunk.y
-				&& m_pos.y < Chunk.y + CHUNK_SIZE_Y
-				&& m_pos.z >= Chunk.z
-				&& m_pos.z < Chunk.z + CHUNK_SIZE_Z)
-			{
-				for (int x = 0; x < CHUNK_SIZE_X; ++x)
-				{
-					for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-					{
-						for (int y = 0; y < CHUNK_SIZE_Y; ++y)	//parcours les blocks du chunk
-						{
-							if (chunks.Get(i, j).GetBlock(x, y, z) != BTYPE_AIR)
-							{
-								Vector3<float> block = chunks.Get(i, j).GetBlockPos(x, y, z);
-
-								if ((m_pos.x - (m_width / 2) >= block.x + 1)	// trop à droite
-									|| (m_pos.x + (m_width / 2) <= block.x)		// trop à gauche
-									|| (m_pos.y >= block.y + 1)					// trop en bas
-									|| (m_pos.y + m_height <= block.y)			// trop en haut	
-									|| (m_pos.z - (m_width / 2) >= block.z + 1)	// trop derrière
-									|| (m_pos.z + (m_width / 2) <= block.z))	// trop devant
-									continue;
-
-								else
-									return true; //Sinon collision
-
-							}
-						}
-					}
-				}
-				return false;
-			}
 		}
+
+
 	}
 	return false;
+
 }
 
 void Player::ApplyRotation() const
