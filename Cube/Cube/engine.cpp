@@ -38,7 +38,7 @@ void Engine::Init()
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(75.0f, (float)Width() / (float)Height(), 0.01f, 1000.0f);
+	gluPerspective(75.0f, (float)Width() / (float)Height(), 0.001f, 1000.0f);
 	glEnable(GL_DEPTH_TEST);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
