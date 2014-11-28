@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
-Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_textureAtlas(7), m_Chunks(WORLD_SIZE, WORLD_SIZE)
+Engine::Engine() : m_wireframe(false), m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0), m_shader01(), m_textureAtlas(7), m_Chunks(WORLD_SIZE, WORLD_SIZE)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -14,9 +14,6 @@ Engine::Engine() : m_wireframe(false), m_player(0, 0, 0, 0, 0), m_shader01(), m_
 
 	//Creation du tableau de block info
 	m_bInfo = new BlockInfo[256];
-
-
-
 }
 
 Engine::~Engine()
@@ -67,7 +64,7 @@ void Engine::Init()
 	{
 		for (int j = 0; j < WORLD_SIZE; j++)	//Parcours les chunks
 		{
-			m_Chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * (i - WORLD_SIZE / 2), -CHUNK_SIZE_Y / 2, CHUNK_SIZE_Z * (j - WORLD_SIZE / 2));
+			m_Chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i , -CHUNK_SIZE_Y / 2, CHUNK_SIZE_Z * j );
 
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			{

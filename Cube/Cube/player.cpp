@@ -131,43 +131,40 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 bool Player::CheckCollision(Array2d<Chunk>& chunks)
 {
 	//Chunk du player 
-	Vector3<float>chunk(floor(m_pos.x / CHUNK_SIZE_X) + floor(WORLD_SIZE / 2), 0, floor(m_pos.z / CHUNK_SIZE_Z) + floor(WORLD_SIZE / 2));
+	Vector3<float>chunk(floor(m_pos.x / CHUNK_SIZE_X), 0, floor(m_pos.z / CHUNK_SIZE_Z));
 
 	//Si le joueur est dans le monde
 	if (chunk.x >= 0 && chunk.z >= 0 && chunk.x < WORLD_SIZE && chunk.z < WORLD_SIZE)
 	{
 		//Block du player 
-		Vector3<float>block(m_pos.x - (chunk.x * CHUNK_SIZE_X) - 1, m_pos.y + CHUNK_SIZE_Y / 2 + 1 , m_pos.z - (chunk.z * CHUNK_SIZE_X));
+		Vector3<float>block(m_pos.x - (chunk.x * CHUNK_SIZE_X), m_pos.y + CHUNK_SIZE_Y / 2, m_pos.z - (chunk.z * CHUNK_SIZE_X));
 
-		/*BlockType bt1 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x , block.y, block.z);
-		if (bt1 != BTYPE_AIR)
-			return true;*/
+		//4 point au pieds du player
+		BlockType bt1 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y, block.z + m_width / 2);
+		BlockType bt2 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y, block.z + m_width / 2);
+		BlockType bt3 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y, block.z - m_width / 2);
+		BlockType bt4 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y, block.z - m_width / 2);
 
-		BlockType bt1 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y, block.z );
-		BlockType bt2 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y, block.z);
-		BlockType bt3 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y, block.z + m_width / 2);
-		BlockType bt4 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y, block.z - m_width / 2);
+		//4 point au milieu du player
+		BlockType bt5 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y + m_height / 2, block.z + m_width / 2);
+		BlockType bt6 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y + m_height / 2, block.z + m_width / 2);
+		BlockType bt7 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y + m_height / 2, block.z - m_width / 2);
+		BlockType bt8 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y + m_height/2, block.z - m_width / 2);
 
-		BlockType bt5 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y + m_height / 2, block.z);
-		BlockType bt6 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y + m_height / 2, block.z);
-		BlockType bt7 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y + m_height / 2, block.z + m_width / 2);
-		BlockType bt8 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y + m_height / 2, block.z - m_width / 2);
+		//4 point au yeux du player
+		BlockType bt9 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y + m_height, block.z + m_width / 2);
+		BlockType bt10 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y + m_height, block.z + m_width / 2);
+		BlockType bt11 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y + m_height, block.z - m_width / 2);
+		BlockType bt12 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y + m_height, block.z - m_width / 2);
 
-		BlockType bt9 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x + m_width / 2, block.y + m_height, block.z);
-		BlockType bt10 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x - m_width / 2, block.y + m_height, block.z);
-		BlockType bt11 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y + m_height, block.z + m_width / 2);
-		BlockType bt12 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x, block.y + m_height, block.z - m_width / 2);
-
+		//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
 		if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||
 			bt4 != BTYPE_AIR || bt5 != BTYPE_AIR || bt6 != BTYPE_AIR ||
 			bt7 != BTYPE_AIR || bt8 != BTYPE_AIR || bt9 != BTYPE_AIR ||
 			bt10 != BTYPE_AIR || bt11 != BTYPE_AIR || bt12 != BTYPE_AIR)
 			return true;
-
-		
-
 	}
-	
+
 	return false;
 
 }
