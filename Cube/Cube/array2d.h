@@ -13,6 +13,7 @@ public:
 
 	void Set(int x, int y, t value);
 	t& Get(int x, int y);
+	t& Get(int x, int y) const;
 	void Reset(t value);
 
 private:
@@ -52,7 +53,13 @@ void Array2d<t>::Set(int x, int y, t value)
 }
 
 template<class t>
-t& Array2d<t>::Get(int x, int y)  
+t& Array2d<t>::Get(int x, int y)
+{
+	return m_data[x + (y * m_x)];
+}
+
+template<class t>
+t& Array2d<t>::Get(int x, int y) const
 {
 	return m_data[x + (y * m_x)];
 }

@@ -60,7 +60,7 @@ void Array3d<t>::Set(int x, int y, int z, t value)
 template<class t>
 t Array3d<t>::Get(int x, int y, int z) const
 {
-	return GetElement(x, y, z);
+   	return GetElement(x, y, z);
 }
 
 template<class t>
