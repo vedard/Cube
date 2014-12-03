@@ -90,6 +90,7 @@
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array2d.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="textureatlas.h" />
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
+    <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

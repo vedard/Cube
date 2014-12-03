@@ -2,7 +2,7 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0), m_shader01(), m_textureAtlas(7), m_Chunks(WORLD_SIZE, WORLD_SIZE)
+Engine::Engine() : m_wireframe(false), m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 64, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0), m_shader01(), m_textureAtlas(7), m_Chunks(WORLD_SIZE, WORLD_SIZE)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -62,7 +62,7 @@ void Engine::Init()
 	{
 		for (int j = 0; j < WORLD_SIZE; j++)	//Parcours les chunks
 		{
-			m_Chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i, -CHUNK_SIZE_Y / 2, CHUNK_SIZE_Z * j);
+			m_Chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
 
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			{
@@ -364,11 +364,11 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	if (button == 1)
+	if (button == 1) 
 	{
 		Vector3<float>chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0,floor(m_currentBlock.z / CHUNK_SIZE_Z));
 
-		m_Chunks.Get(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y + CHUNK_SIZE_Y / 2, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+		m_Chunks.Get(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 	}
 }
 
@@ -507,10 +507,6 @@ void Engine::GetBlocAtCursor()
 
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-	posX += .5f;
-	posY += .5f;
-	posZ += .5f;
-
 	// Le cast vers int marche juste pour les valeurs entiere, utiliser une fonction de la libc si besoin
 	// de valeurs negatives
 	int px = (int)(posX);
@@ -537,12 +533,9 @@ void Engine::GetBlocAtCursor()
 					if (z >= 0)
 					{
 						BlockType bt = BlockAt(x, y, z, BTYPE_AIR);
+
 						if (bt == BTYPE_AIR)
 							continue;
-
-						// Skip water blocs
-						//if(bloc->Type == BT_WATER)
-						//    continue;
 
 						m_currentBlock.x = x;
 						m_currentBlock.y = y;
