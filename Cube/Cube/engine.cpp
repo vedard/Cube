@@ -2,7 +2,12 @@
 
 
 
-Engine::Engine() : m_wireframe(false), m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 64, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0), m_shader01(), m_textureAtlas(7), m_Chunks(WORLD_SIZE, WORLD_SIZE)
+Engine::Engine() :
+m_wireframe(false), 
+m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 64, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0), 
+m_shader01(), 
+m_textureAtlas(7),
+m_world()
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -62,7 +67,7 @@ void Engine::Init()
 	{
 		for (int j = 0; j < WORLD_SIZE; j++)	//Parcours les chunks
 		{
-			m_Chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
+			m_world.ChunkAt(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
 
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			{
@@ -71,13 +76,13 @@ void Engine::Init()
 					for (int y = 0; y < CHUNK_SIZE_Y; ++y)	//parcours les blocks du chunk
 					{
 						if (y < 64 && y >= 63)
-							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
+							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_GRASS);
 						else if (y < 63 && y >= 57)
-							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_DIRT);
+							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_DIRT);
 						else if (y < 57 && y > 40)
-							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_STONE);
+							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_STONE);
 						else if (y <= 40 && y > 38)
-							m_Chunks.Get(i, j).SetBlock(x, y, z, BTYPE_BED_ROCK);
+							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_BED_ROCK);
 					}
 				}
 			}
@@ -90,52 +95,52 @@ void Engine::Init()
 	//Terrain de jeux
 
 	//Arche
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 2 + 64, 5, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(6, 2 + 64, 5, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 2 + 64, 5, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 1 + 64, 5, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 1 + 64, 5, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 0 + 64, 5, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 0 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 2 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(6, 2 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 2 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 1 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 1 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 0 + 64, 5, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 0 + 64, 5, BTYPE_WOOD_PLANK);
 
 	//Mur
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 2 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 2 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 2 + 64, 14, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 2 + 64, 14, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 14, BTYPE_WOOD_PLANK);
 
 	//Mur 2
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 8, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 9, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 10, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 11, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 8, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 9, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 10, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 11, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 8, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 9, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 10, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 11, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 8, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 9, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 10, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 11, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 8, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 9, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 10, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 11, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 8, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 9, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 10, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 11, BTYPE_WOOD_PLANK);
 
 	//Esclaier
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 6, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 7, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 8, BTYPE_WOOD_PLANK);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 3 + 64, 9, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 6, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 7, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 8, BTYPE_WOOD_PLANK);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 3 + 64, 9, BTYPE_WOOD_PLANK);
 
 
 
-	m_Chunks.Get(0, 0).SetBlock(3, 64, 3, BTYPE_TEST);
-	m_Chunks.Get(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(8, 64, 8, BTYPE_CHEST);
+	m_world.ChunkAt(0, 0).SetBlock(3, 64, 3, BTYPE_TEST);
+	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(8, 64, 8, BTYPE_CHEST);
 
 }
 
@@ -220,7 +225,7 @@ void Engine::Render(float elapsedTime)
 	glLoadIdentity();
 
 	//Update le player
-	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], elapsedTime, m_Chunks);
+	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], elapsedTime, m_world);
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
@@ -268,10 +273,10 @@ void Engine::Render(float elapsedTime)
 	{
 		for (int j = 0; j < WORLD_SIZE; j++)	//Parcour les chunk
 		{
-			if (m_Chunks.Get(i, j).IsDirty())
-				m_Chunks.Get(i, j).Update(m_bInfo);
+			if (m_world.ChunkAt(i, j).IsDirty())
+				m_world.ChunkAt(i, j).Update(m_bInfo);
 			m_shader01.Use();
-			m_Chunks.Get(i, j).Render();
+			m_world.ChunkAt(i, j).Render();
 			Shader::Disable();
 		}
 	}
@@ -368,7 +373,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	{
 		Vector3<float>chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0,floor(m_currentBlock.z / CHUNK_SIZE_Z));
 
-		m_Chunks.Get(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 	}
 }
 
@@ -532,7 +537,7 @@ void Engine::GetBlocAtCursor()
 				{
 					if (z >= 0)
 					{
-						BlockType bt = BlockAt(x, y, z, BTYPE_AIR);
+						BlockType bt = m_world.BlockAt(x, y, z, BTYPE_AIR);
 
 						if (bt == BTYPE_AIR)
 							continue;

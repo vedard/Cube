@@ -4,6 +4,7 @@
 #include "vector3.h"
 #include "array2d.h"
 #include "chunk.h"
+#include "world.h"
 
 class Player
 {
@@ -14,8 +15,8 @@ public:
 	~Player();
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
-	void Move(bool front, bool back, bool left, bool right, float elapsedTime, Array2d<Chunk>& chunks);
-	bool CheckCollision(Array2d<Chunk>& chunks);
+	void Move(bool front, bool back, bool left, bool right, float elapsedTime, World &world);
+	bool CheckCollision(World &world);
 
 	void ApplyRotation() const;
 	void ApplyTranslation() const;

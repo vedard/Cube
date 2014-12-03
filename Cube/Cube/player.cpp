@@ -32,7 +32,7 @@ void Player::TurnTopBottom(float value)
 
 }
 
-void Player::Move(bool front, bool back, bool left, bool right, float elapsedTime, Array2d<Chunk>& chunks)
+void Player::Move(bool front, bool back, bool left, bool right, float elapsedTime, World &world)
 {
 	//Orientation du player en rad
 	float orientationPlayer = m_rotX * PI / 180;
@@ -92,13 +92,13 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		//Deplacement en X
 		m_pos.x += deplacementVector.x * multiplieur;
 		//Si collision, on annule
-		if (CheckCollision(chunks))
+		if (CheckCollision(world))
 			m_pos.x -= deplacementVector.x * multiplieur;
 
 		//Deplacement en Z
 		m_pos.z += deplacementVector.z * multiplieur;
 		//Si collision, on annule
-		if (CheckCollision(chunks))
+		if (CheckCollision(world))
 			m_pos.z -= deplacementVector.z * multiplieur;
 
 	}
@@ -110,7 +110,7 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		m_pos.y -= m_vitesseY;
 
 		//Si collision
-		if (CheckCollision(chunks))
+		if (CheckCollision(world))
 		{
 			//Si on a touche le sol 
 			if (m_vitesseY > 0)
@@ -128,25 +128,40 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 	}
 }
 
-bool Player::CheckCollision(Array2d<Chunk>& chunks)
+bool Player::CheckCollision(World &world)
 {
-	//Chunk du player 
-	Vector3<float>chunk(floor(m_pos.x / CHUNK_SIZE_X), 0, floor(m_pos.z / CHUNK_SIZE_Z));
 
-	//Si le joueur est dans le monde
-	if (chunk.x >= 0 && chunk.z >= 0 && chunk.x < WORLD_SIZE && chunk.z < WORLD_SIZE)
-	{
-		//Block du player 
-		Vector3<float>block(m_pos.x - (chunk.x * CHUNK_SIZE_X), m_pos.y, m_pos.z - (chunk.z * CHUNK_SIZE_X));
+		
 
-		//4 point au pieds du player
-		BlockType bt1 = chunks.Get(chunk.x, chunk.z).GetBlock(block.x , block.y, block.z );
+
+	//4 point au pieds du player
+	BlockType bt1 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z + m_width / 2, BTYPE_AIR);
+	BlockType bt2 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z + m_width / 2, BTYPE_AIR);
+	BlockType bt3 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z - m_width / 2, BTYPE_AIR);
+	BlockType bt4 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z - m_width / 2, BTYPE_AIR);
+
+	//4 point au milieu du player
+
+	BlockType bt5 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2, BTYPE_AIR);
+	BlockType bt6 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2, BTYPE_AIR);
+	BlockType bt7 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2, BTYPE_AIR);
+	BlockType bt8 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2, BTYPE_AIR);
+
+	//4 point au yeux du player
+	BlockType bt9 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2, BTYPE_AIR);
+	BlockType bt10 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2, BTYPE_AIR);
+	BlockType bt11 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2, BTYPE_AIR);
+	BlockType bt12 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2, BTYPE_AIR);
+
 	
 
 		//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
-		if (bt1 != BTYPE_AIR)
-			return true;
-	}
+	if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||
+		bt4 != BTYPE_AIR || bt5 != BTYPE_AIR || bt6 != BTYPE_AIR ||
+		bt7 != BTYPE_AIR || bt8 != BTYPE_AIR || bt9 != BTYPE_AIR ||
+		bt10 != BTYPE_AIR || bt11 != BTYPE_AIR || bt12 != BTYPE_AIR)
+		return true;
+
 
 	return false;
 

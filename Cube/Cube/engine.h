@@ -11,6 +11,7 @@
 #include "blockinfo.h"
 #include "array2d.h"
 #include "vector3.h"
+#include "world.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -34,21 +35,7 @@ public:
 	virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y);
 	void GetBlocAtCursor();
 
-	template <class T>
-	BlockType BlockAt(T x, T y, T z, BlockType defaultBlockType)
-	{
-		Vector3<float>chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
-
-		if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
-		{
-
-			Vector3<float>blockPos(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
-
-			return m_Chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x , blockPos.y, blockPos.z );
-		}
-		else
-			return defaultBlockType;
-	}
+	
 
 
 
@@ -69,7 +56,7 @@ private:
 	Texture m_textureFont;
 	Texture m_textureCrosshair;
 	Shader m_shader01;
-	Array2d<Chunk> m_Chunks;
+	World m_world;
 
 	//Indexe de la texutre dans l'atlas
 	TextureAtlas::TextureIndex m_texBlockIndex;
