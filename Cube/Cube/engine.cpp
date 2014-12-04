@@ -293,7 +293,7 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	if (button == 1 &&  m_currentBlock.x != -1)
+	if (button == 1 && m_currentBlock.x != -1)
 	{
 		Vector3<float> chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0, floor(m_currentBlock.z / CHUNK_SIZE_Z));
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
@@ -301,14 +301,15 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	}
 	else if (button == 4 && m_currentBlock.x != -1)
 	{
-		Vector3<float> playerFootPos((int)m_player.Position().x, (int)m_player.Position().y, (int)m_player.Position().z);
-		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y + 1.62), (int)m_player.Position().z);
-		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
+		Vector3<float> playerFootPos((int)m_player.Position().x, (int)m_player.Position().y, (int)m_player.Position().z); //Positio des pieds
+		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y +m_player.GetDimension().y), (int)m_player.Position().z); //Position des yeux
+		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z); //Position du nouveau block
 
+		//Si il y a pas de collision avec le player
 		if (playerFootPos != newBlocPos && playerEyePos != newBlocPos)
 		{
-			Vector3<float> chunkPos(floor((m_currentBlock.x + m_currentFaceNormal.x) / CHUNK_SIZE_X), 0, floor((m_currentBlock.z + m_currentFaceNormal.z) / CHUNK_SIZE_Z));
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(m_currentBlock.x + m_currentFaceNormal.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_WOOD_PLANK);
+			Vector3<float> chunkPos(floor((newBlocPos.x) / CHUNK_SIZE_X), 0, floor((newBlocPos.z) / CHUNK_SIZE_Z));
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_WOOD_PLANK);
 
 		}
 	}

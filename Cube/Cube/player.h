@@ -26,17 +26,18 @@ public:
 	void Jump();
 	int GetHP();
 	Vector3<float> Position() const;
+	Vector3<float> GetDimension() const;
 
 private:
 	
 	Vector3<float> m_pos;
+	Vector3<float> m_dimension;
+
 	float m_rotX,  //orientation
 		m_rotY, 
 		m_vitesse; //vitesse de deplacement
-	float m_vitesseY;   //Vittesse verticale (gravité et saut)
-	float m_height;     //Position des yeux relativement aux pied
-	float m_width;     //Position des yeux relativement aux pied
 
+	float m_vitesseY;   //Vittesse verticale (gravité et saut)
 	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)
 	bool m_sneaked;		//Si on est penché
 	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)

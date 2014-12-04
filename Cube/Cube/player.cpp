@@ -4,9 +4,8 @@
 #include <cmath>
 
 
-Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_rotX(rotX), m_rotY(rotY),
-m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0),
-m_height(1.62), m_health(100), m_running(false), m_width(0.2)
+Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_dimension(0.2, 1.62, 0.2), m_rotX(rotX), m_rotY(rotY),
+m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0), m_health(100), m_running(false)
 {
 
 }
@@ -132,23 +131,23 @@ bool Player::CheckCollision(World &world)
 {
 
 	//4 point au pieds du player
-	BlockType bt1 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z + m_width / 2);
-	BlockType bt2 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z + m_width / 2);
-	BlockType bt3 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z - m_width / 2);
-	BlockType bt4 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z - m_width / 2);
+	BlockType bt1 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y, m_pos.z + m_dimension.z / 2);
+	BlockType bt2 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y, m_pos.z + m_dimension.z / 2);
+	BlockType bt3 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y, m_pos.z - m_dimension.z / 2);
+	BlockType bt4 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y, m_pos.z - m_dimension.z / 2);
 
 	//4 point au milieu du player
 
-	BlockType bt5 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2);
-	BlockType bt6 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2);
-	BlockType bt7 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2);
-	BlockType bt8 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2);
+	BlockType bt5 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z + m_dimension.z / 2);
+	BlockType bt6 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z + m_dimension.z / 2);
+	BlockType bt7 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z - m_dimension.z / 2);
+	BlockType bt8 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z - m_dimension.z / 2);
 
 	//4 point au yeux du player
-	BlockType bt9 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2);
-	BlockType bt10 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2);
-	BlockType bt11 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2);
-	BlockType bt12 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2);
+	BlockType bt9 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z + m_dimension.z / 2);
+	BlockType bt10 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z + m_dimension.z / 2);
+	BlockType bt11 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
+	BlockType bt12 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
 
 		//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
 	if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||
@@ -174,7 +173,7 @@ void Player::ApplyTranslation() const
 {
 
 	glMatrixMode(GL_MODELVIEW);
-	glTranslatef(-m_pos.x, -(m_pos.y + m_height), -m_pos.z);
+	glTranslatef(-m_pos.x, -(m_pos.y + m_dimension.y), -m_pos.z);
 
 	//Si on est baisse 
 	if (m_sneaked)
@@ -210,6 +209,11 @@ void Player::SetRunning(bool running)
 Vector3<float> Player::Position() const
 {
 	return m_pos;
+}
+
+Vector3<float> Player::GetDimension() const
+{
+	return m_dimension;
 }
 
 void Player::Jump()

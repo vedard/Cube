@@ -68,6 +68,7 @@ void Chunk::Update(BlockInfo* binfo)
 		int maxVertexCount = (CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z) * (6 * 4);
 		ChunkMesh::VertexData * vd = new ChunkMesh::VertexData[maxVertexCount];
 		int count = 0;
+
 		for (int x = 0; x < CHUNK_SIZE_X; ++x)
 		{
 			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
