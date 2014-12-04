@@ -120,7 +120,7 @@ void Engine::LoadResource()
 	}
 
 	//Load la map
-	m_world.LoadFlatMap();
+	//m_world.LoadFlatMap();
 }
 
 void Engine::UnloadResource()
@@ -360,7 +360,7 @@ void Engine::DrawHud()
 
 
 	ss.str("");
-	ss << m_player.Position();
+	ss << "Position "<< m_player.Position();
 	PrintText(10, 30, 16, ss.str());
 
 	ss.str("");

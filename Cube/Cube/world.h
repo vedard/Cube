@@ -3,6 +3,7 @@
 
 #include "array2d.h"
 #include "chunk.h"
+#include "perlin.h"
 
 class World
 {
@@ -18,6 +19,7 @@ public:
 
 private:
 	Array2d<Chunk> m_chunks;
+	Perlin perlin;
 };
 #endif // !WORLD_H__
 

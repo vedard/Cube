@@ -36,7 +36,10 @@ void Chunk::PlaceBlock(int x, int y, int z, BlockType type)
 
 BlockType Chunk::GetBlock(int x, int y, int z)
 {
-	return m_blocks.Get(x, y, z);
+	if (x >= 0 && y >= 0 && z >= 0)
+		return m_blocks.Get(x, y, z);
+	else
+		return BTYPE_AIR;
 }
 
 Vector3<float> &Chunk::GetBlockPos(int x, int y, int z)
@@ -82,20 +85,7 @@ void Chunk::Update(BlockInfo* binfo)
 
 					if (bt != BTYPE_AIR)
 					{
-						if (x == 0 || y == 0 || z == 0 || x == CHUNK_SIZE_X - 1 || y == CHUNK_SIZE_Y - 1 || z == CHUNK_SIZE_Z - 1)
-						{
-							AddBlockToMesh(vd, count, binfo[bt], x + m_position.x, y + m_position.y, z + m_position.z);
-						}
-						//Si on block touche a de l'aire on l'affiche
-						else if (
-							GetBlock(x + 1, y, z) == BTYPE_AIR || GetBlock(x + 1, y + 1, z) == BTYPE_AIR || GetBlock(x, y + 1, z) == BTYPE_AIR || GetBlock(x - 1, y + 1, z) == BTYPE_AIR || GetBlock(x - 1, y, z) == BTYPE_AIR || GetBlock(x - 1, y - 1, z) == BTYPE_AIR || GetBlock(x, y - 1, z) == BTYPE_AIR || GetBlock(x + 1, y - 1, z) == BTYPE_AIR ||
-							GetBlock(x + 1, y, z + 1) == BTYPE_AIR || GetBlock(x + 1, y + 1, z + 1) == BTYPE_AIR || GetBlock(x, y + 1, z + 1) == BTYPE_AIR || GetBlock(x - 1, y + 1, z + 1) == BTYPE_AIR || GetBlock(x - 1, y, z + 1) == BTYPE_AIR || GetBlock(x - 1, y - 1, z + 1) == BTYPE_AIR || GetBlock(x, y - 1, z + 1) == BTYPE_AIR || GetBlock(x + 1, y - 1, z + 1) == BTYPE_AIR || GetBlock(x, y, z + 1) == BTYPE_AIR ||
-							GetBlock(x + 1, y, z - 1) == BTYPE_AIR || GetBlock(x + 1, y + 1, z - 1) == BTYPE_AIR || GetBlock(x, y + 1, z - 1) == BTYPE_AIR || GetBlock(x - 1, y + 1, z - 1) == BTYPE_AIR || GetBlock(x - 1, y, z - 1) == BTYPE_AIR || GetBlock(x - 1, y - 1, z - 1) == BTYPE_AIR || GetBlock(x, y - 1, z - 1) == BTYPE_AIR || GetBlock(x + 1, y - 1, z - 1) == BTYPE_AIR || GetBlock(x, y, z - 1) == BTYPE_AIR
-							)
-						{
-							AddBlockToMesh(vd, count, binfo[bt], x + m_position.x, y + m_position.y, z + m_position.z);
-						}
-
+						AddBlockToMesh(vd, count, binfo[bt], x + m_position.x, y + m_position.y, z + m_position.z);
 					}
 				}
 			}
@@ -114,43 +104,54 @@ void Chunk::Update(BlockInfo* binfo)
 void Chunk::AddBlockToMesh(ChunkMesh::VertexData * vd, int & count, BlockInfo binfo, int x, int y, int z)
 {
 
-
-	// face
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .750f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .0f, binfo.v + binfo.h * .750f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .0f, binfo.v + binfo.h * .50f);
-
-	// Droite
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 0.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 0.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 1.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 1.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f);
-
-	//Gauche
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f);
-
-	//Derirere
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f);
-
-	//Haut
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f);
-
-	//Bas
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f);
-	vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f);
-	vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f);
-
+	if (GetBlock(x, y, z - 1) == BTYPE_AIR)
+	{
+		// face
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .750f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .0f, binfo.v + binfo.h * .750f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .0f, binfo.v + binfo.h * .50f);
+	}
+	if (GetBlock(x + 1, y, z) == BTYPE_AIR)
+	{
+		// Droite
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 0.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 0.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 1.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 1.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f);
+	}
+	if (GetBlock(x - 1, y, z) == BTYPE_AIR)
+	{
+		//Gauche
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f);
+	}
+	if (GetBlock(x, y, z + 1) == BTYPE_AIR)
+	{
+		//Derirere
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f);
+	}
+	if (GetBlock(x, y + 1, z) == BTYPE_AIR)
+	{
+		//Haut
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 1.f, z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 1.f, z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f);
+	}
+	if (GetBlock(x, y - 1, z) == BTYPE_AIR)
+	{
+		//Bas
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f);
+		vd[count++] = ChunkMesh::VertexData(x + 1.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f);
+		vd[count++] = ChunkMesh::VertexData(x + 0.f, y + 0.f, z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f);
+	}
 }
 
 void Chunk::Render() const

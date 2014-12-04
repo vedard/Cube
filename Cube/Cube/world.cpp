@@ -1,12 +1,41 @@
 #include "world.h"
 
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), perlin(16, 1, 300, 95)
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 			m_chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
+
+
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+				{
+					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+
+					for (int y = 0; y <= 100; y++)
+					{
+						if (y == 0)
+							m_chunks.Get(i, j).SetBlock(x, val + 16 - y, z, BTYPE_GRASS);
+						else if (y >= 1 && y < 4)
+							m_chunks.Get(i, j).SetBlock(x, val + 16 - y, z, BTYPE_DIRT);
+						else if (y >= 4 )
+							m_chunks.Get(i, j).SetBlock(x, val + 16 - y, z, BTYPE_STONE);
+						
+
+					}
+					//Plancher de bedrock
+					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
+					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_BED_ROCK);
+
+
+				}
+
+
+
 }
 
 
