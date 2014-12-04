@@ -54,13 +54,15 @@ Array3d<t>::Array3d(const Array3d& array)
 template<class t>
 void Array3d<t>::Set(int x, int y, int z, t value)
 {
-	GetElement(x, y, z) = value;
+	if (x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z)
+		GetElement(x, y, z) = value;
 }
 
 template<class t>
 t Array3d<t>::Get(int x, int y, int z) const
 {
-   	return GetElement(x, y, z);
+	if (x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z)
+		return GetElement(x, y, z);
 }
 
 template<class t>

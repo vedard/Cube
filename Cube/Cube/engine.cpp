@@ -3,9 +3,9 @@
 
 
 Engine::Engine() :
-m_wireframe(false), 
-m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 64, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0), 
-m_shader01(), 
+m_wireframe(false),
+m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 64, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0),
+m_shader01(),
 m_textureAtlas(7),
 m_world()
 {
@@ -63,85 +63,6 @@ void Engine::Init()
 	CenterMouse();
 	HideCursor();
 
-	for (int i = 0; i < WORLD_SIZE; i++)
-	{
-		for (int j = 0; j < WORLD_SIZE; j++)	//Parcours les chunks
-		{
-			m_world.ChunkAt(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
-
-			for (int x = 0; x < CHUNK_SIZE_X; ++x)
-			{
-				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-				{
-					for (int y = 0; y < CHUNK_SIZE_Y; ++y)	//parcours les blocks du chunk
-					{
-						if (y < 64 && y >= 63)
-							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_GRASS);
-						else if (y < 63 && y >= 57)
-							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_DIRT);
-						else if (y < 57 && y > 40)
-							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_STONE);
-						else if (y <= 40 && y > 38)
-							m_world.ChunkAt(i, j).SetBlock(x, y, z, BTYPE_BED_ROCK);
-					}
-				}
-			}
-		}
-	}
-
-
-
-
-	//Terrain de jeux
-
-	//Arche
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 2 + 64, 5, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(6, 2 + 64, 5, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 2 + 64, 5, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 1 + 64, 5, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 1 + 64, 5, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(5, 0 + 64, 5, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(7, 0 + 64, 5, BTYPE_WOOD_PLANK);
-
-	//Mur
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(10, 2 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(11, 2 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(12, 2 + 64, 14, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 14, BTYPE_WOOD_PLANK);
-
-	//Mur 2
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 8, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 9, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 10, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 0 + 64, 11, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 8, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 9, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 10, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 1 + 64, 11, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 8, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 9, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 10, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(2, 2 + 64, 11, BTYPE_WOOD_PLANK);
-
-	//Esclaier
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 0 + 64, 6, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 1 + 64, 7, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 2 + 64, 8, BTYPE_WOOD_PLANK);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(13, 3 + 64, 9, BTYPE_WOOD_PLANK);
-
-
-
-	m_world.ChunkAt(0, 0).SetBlock(3, 64, 3, BTYPE_TEST);
-	m_world.ChunkAt(WORLD_SIZE / 2, WORLD_SIZE / 2).SetBlock(8, 64, 8, BTYPE_CHEST);
-
 }
 
 void Engine::DeInit()
@@ -197,6 +118,9 @@ void Engine::LoadResource()
 		std::cout << " Failed to load shader " << std::endl;
 		exit(1);
 	}
+
+	//Load la map
+	m_world.LoadFlatMap();
 }
 
 void Engine::UnloadResource()
@@ -369,17 +293,24 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	if (button == 1 && m_currentBlock.x != -1) 
+	if (button == 1 &&  m_currentBlock.x != -1)
 	{
-		Vector3<float>chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0,floor(m_currentBlock.z / CHUNK_SIZE_Z));
-
+		Vector3<float> chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0, floor(m_currentBlock.z / CHUNK_SIZE_Z));
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-	}
-	if (button == 4 && m_currentBlock.x != -1)
-	{
-		Vector3<float>chunkPos(floor((m_currentBlock.x + m_currentFaceNormal.x) / CHUNK_SIZE_X), 0, floor((m_currentBlock.z + m_currentFaceNormal.z) / CHUNK_SIZE_Z));
 
-		m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(m_currentBlock.x + m_currentFaceNormal.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z - (chunkPos.z * CHUNK_SIZE_X),BTYPE_WOOD_PLANK);
+	}
+	else if (button == 4 && m_currentBlock.x != -1)
+	{
+		Vector3<float> playerFootPos((int)m_player.Position().x, (int)m_player.Position().y, (int)m_player.Position().z);
+		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y + 1.62), (int)m_player.Position().z);
+		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
+
+		if (playerFootPos != newBlocPos && playerEyePos != newBlocPos)
+		{
+			Vector3<float> chunkPos(floor((m_currentBlock.x + m_currentFaceNormal.x) / CHUNK_SIZE_X), 0, floor((m_currentBlock.z + m_currentFaceNormal.z) / CHUNK_SIZE_Z));
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(m_currentBlock.x + m_currentFaceNormal.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_WOOD_PLANK);
+
+		}
 	}
 }
 
@@ -526,7 +457,7 @@ void Engine::GetBlocAtCursor()
 
 	bool found = false;
 
-	if ((m_player.Position() - Vector3<float>(posX, posY, posZ)).Length() < 218)
+	if ((m_player.Position() - Vector3<float>(posX, posY, posZ)).Length() < EDITING_DISTANCE)
 	{
 		// Apres avoir determine la position du bloc en utilisant la partie entiere du hit
 		// point retourne par opengl, on doit verifier de chaque cote du bloc trouve pour trouver
@@ -543,7 +474,7 @@ void Engine::GetBlocAtCursor()
 				{
 					if (z >= 0)
 					{
-						BlockType bt = m_world.BlockAt(x, y, z, BTYPE_AIR);
+						BlockType bt = m_world.BlockAt(x, y, z);
 
 						if (bt == BTYPE_AIR)
 							continue;

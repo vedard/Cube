@@ -10,8 +10,10 @@ public:
 	World();
 	~World();
 
-	BlockType BlockAt(float x, float y, float z, BlockType defaultBlockType);
+	BlockType BlockAt(float x, float y, float z);
 	Chunk& ChunkAt(float x, float z);
+
+	void LoadFlatMap();
 
 
 private:

@@ -132,23 +132,23 @@ bool Player::CheckCollision(World &world)
 {
 
 	//4 point au pieds du player
-	BlockType bt1 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z + m_width / 2, BTYPE_AIR);
-	BlockType bt2 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z + m_width / 2, BTYPE_AIR);
-	BlockType bt3 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z - m_width / 2, BTYPE_AIR);
-	BlockType bt4 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z - m_width / 2, BTYPE_AIR);
+	BlockType bt1 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z + m_width / 2);
+	BlockType bt2 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z + m_width / 2);
+	BlockType bt3 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y, m_pos.z - m_width / 2);
+	BlockType bt4 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z - m_width / 2);
 
 	//4 point au milieu du player
 
-	BlockType bt5 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2, BTYPE_AIR);
-	BlockType bt6 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2, BTYPE_AIR);
-	BlockType bt7 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2, BTYPE_AIR);
-	BlockType bt8 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2, BTYPE_AIR);
+	BlockType bt5 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2);
+	BlockType bt6 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z + m_width / 2);
+	BlockType bt7 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2);
+	BlockType bt8 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height / 2, m_pos.z - m_width / 2);
 
 	//4 point au yeux du player
-	BlockType bt9 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2, BTYPE_AIR);
-	BlockType bt10 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2, BTYPE_AIR);
-	BlockType bt11 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2, BTYPE_AIR);
-	BlockType bt12 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2, BTYPE_AIR);
+	BlockType bt9 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2);
+	BlockType bt10 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2);
+	BlockType bt11 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2);
+	BlockType bt12 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2);
 
 		//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
 	if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||
