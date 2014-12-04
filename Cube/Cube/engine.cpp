@@ -4,7 +4,7 @@
 
 Engine::Engine() :
 m_wireframe(false),
-m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 64, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0),
+m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 100, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0),
 m_shader01(),
 m_textureAtlas(7),
 m_world()

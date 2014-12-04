@@ -1,7 +1,7 @@
 #include "world.h"
 
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), perlin(16, 1, 300, 95)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), perlin(16, 1, 100, 95)
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -19,11 +19,11 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), perlin(16, 1, 300, 95)
 					for (int y = 0; y <= 100; y++)
 					{
 						if (y == 0)
-							m_chunks.Get(i, j).SetBlock(x, val + 16 - y, z, BTYPE_GRASS);
+							m_chunks.Get(i, j).SetBlock(x, val +64 - y, z, BTYPE_GRASS);
 						else if (y >= 1 && y < 4)
-							m_chunks.Get(i, j).SetBlock(x, val + 16 - y, z, BTYPE_DIRT);
+							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_DIRT);
 						else if (y >= 4 )
-							m_chunks.Get(i, j).SetBlock(x, val + 16 - y, z, BTYPE_STONE);
+							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_STONE);
 						
 
 					}
