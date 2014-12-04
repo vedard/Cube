@@ -128,11 +128,8 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 	}
 }
 
-bool Player::CheckCollision(World &world)
+bool Player::CheckCollision(World &world) 
 {
-
-		
-
 
 	//4 point au pieds du player
 	BlockType bt1 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y, m_pos.z + m_width / 2, BTYPE_AIR);
@@ -152,8 +149,6 @@ bool Player::CheckCollision(World &world)
 	BlockType bt10 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z + m_width / 2, BTYPE_AIR);
 	BlockType bt11 = world.BlockAt(m_pos.x + m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2, BTYPE_AIR);
 	BlockType bt12 = world.BlockAt(m_pos.x - m_width / 2, m_pos.y + m_height, m_pos.z - m_width / 2, BTYPE_AIR);
-
-	
 
 		//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
 	if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||

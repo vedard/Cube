@@ -369,11 +369,17 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	if (button == 1) 
+	if (button == 1 && m_currentBlock.x != -1) 
 	{
 		Vector3<float>chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0,floor(m_currentBlock.z / CHUNK_SIZE_Z));
 
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+	}
+	if (button == 4 && m_currentBlock.x != -1)
+	{
+		Vector3<float>chunkPos(floor((m_currentBlock.x + m_currentFaceNormal.x) / CHUNK_SIZE_X), 0, floor((m_currentBlock.z + m_currentFaceNormal.z) / CHUNK_SIZE_Z));
+
+		m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(m_currentBlock.x + m_currentFaceNormal.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z - (chunkPos.z * CHUNK_SIZE_X),BTYPE_WOOD_PLANK);
 	}
 }
 

@@ -14,7 +14,13 @@ public:
     ~Chunk();
 
     void RemoveBloc(int x, int y, int z);
+
+	//La difference entre setblock et placeblock est que cette derniere vas placer un bloc dans de l'aire seulement
+	//Un joueur vas placer un block 
+	//Tandis que quand on load une map on set le block
     void SetBlock(int x, int y, int z, BlockType type);
+	void PlaceBlock(int x, int y, int z, BlockType type);   
+
 	void SetPosition(int x, int y, int z);
 	Vector3<float> &GetPosition();
     BlockType GetBlock(int x, int y, int z);
