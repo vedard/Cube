@@ -1,41 +1,12 @@
 #include "world.h"
 
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), perlin(16, 1, 100, 95)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE) 
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 			m_chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
-
-
-	for (int i = 0; i < WORLD_SIZE; i++)
-		for (int j = 0; j < WORLD_SIZE; j++)
-			for (int x = 0; x < CHUNK_SIZE_X; ++x)
-				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-				{
-					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
-
-					for (int y = 0; y <= 100; y++)
-					{
-						if (y == 0)
-							m_chunks.Get(i, j).SetBlock(x, val +64 - y, z, BTYPE_GRASS);
-						else if (y >= 1 && y < 4)
-							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_DIRT);
-						else if (y >= 4 )
-							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_STONE);
-						
-
-					}
-					//Plancher de bedrock
-					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
-					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_BED_ROCK);
-
-
-				}
-
-
-
 }
 
 
@@ -43,7 +14,7 @@ World::~World()
 {
 }
 
-void World::LoadFlatMap()
+void World::InitFlatMap()
 {
 	//Parcous tous les bloack pour les placer et creer un terrain plat
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -59,6 +30,43 @@ void World::LoadFlatMap()
 							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_STONE);
 						else if (y <= 40 && y > 38)
 							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_BED_ROCK);
+}
+
+// - octaves: smoothness
+// - freq: Agressivité des montagnes
+// - Amp: Hauteur des montagnes
+// - Seed: seed pour le random
+void World::InitMap(int octaves, float freq, float amp, int seed)
+{
+	Perlin perlin(octaves, freq, amp, seed);
+
+
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+				{
+					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					
+					for (int y = 0; y <= 100; y++)
+					{
+						if (y == 0)
+							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_GRASS);
+						else if (y >= 1 && y < 4)
+							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_DIRT);
+						else if (y >= 4)
+							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_STONE);
+
+
+					}
+					//Plancher de bedrock
+					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
+					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_BED_ROCK);
+
+					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_STONE);
+					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_STONE);
+
+				}
 }
 
 BlockType World::BlockAt(float x, float y, float z)

@@ -12,11 +12,7 @@ class Perlin
 {
 public:
 
-	/* The first parameter is the number of octaves , this is how noisy or smooth the function is. This is valid between 1 and 16. A value of
-	4 to 8 octaves produces fairly conventional noise results.The second parameter is the noise frequency.Values betwen 1 and 8 are
-	reasonable here.You can try sampling the data and plotting it to the screen to see what numbers you like.The last parameter is
-	the amplitude.Setting this to a value of 1 will return randomized samples between - 1 and + 1. The last parameter is the random
-	number seed .*/
+	
 	Perlin(int octaves, float freq, float amp, int seed);
 
 
