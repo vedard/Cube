@@ -5,7 +5,7 @@
 
 
 Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_dimension(0.2, 1.62, 0.2), m_rotX(rotX), m_rotY(rotY),
-m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0), m_health(100), m_running(false)
+m_vitesse(30), m_noClip(true), m_sneaked(false), m_vitesseY(0), m_health(100), m_running(false)
 {
 
 }

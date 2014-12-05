@@ -39,7 +39,12 @@ void World::InitFlatMap()
 void World::InitMap(int octaves, float freq, float amp, int seed)
 {
 	Perlin perlin(octaves, freq, amp, seed);
-
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -63,8 +68,8 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
 					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_BED_ROCK);
 
-					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_STONE);
-					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_STONE);
+					m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
+					m_chunks.Get(i, j).SetBlock(x, 3, z, BTYPE_STONE);
 
 				}
 }

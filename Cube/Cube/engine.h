@@ -35,7 +35,7 @@ public:
 	virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y);
 	void GetBlocAtCursor();
 
-	
+
 
 
 
@@ -69,7 +69,10 @@ private:
 
 	int m_fps;
 
-	
+	int   mOctaves;
+	int mFrequency;
+	int mAmplitude;
+	int   mSeed;
 
 
 };

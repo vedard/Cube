@@ -4,7 +4,7 @@
 
 Engine::Engine() :
 m_wireframe(false),
-m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 100, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0),
+m_player(-16, 100, -16, 0, 0),
 m_shader01(),
 m_textureAtlas(7),
 m_world()
@@ -119,8 +119,13 @@ void Engine::LoadResource()
 		exit(1);
 	}
 
+	mOctaves = 8;
+	mFrequency = 4;
+	mAmplitude = 100;
+	mSeed = 15;
+
 	//Load la map
-	m_world.InitMap(8,4,100,15);
+	m_world.InitMap(mOctaves, mFrequency, mAmplitude, mSeed);
 }
 
 void Engine::UnloadResource()
@@ -229,31 +234,35 @@ void Engine::KeyPressEvent(unsigned char key)
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[94])
 		SetFullscreen(!IsFullscreen());
-	//V -> toogle noclip mode
-	else if (m_keyboard[sf::Keyboard::V])
-		m_player.ToggleNoClip();
 
-	//Lctr -> Sneak
-	else if (m_keyboard[sf::Keyboard::LControl])
-		m_player.SetSneak(true);
 
-	//LSHIFT -> RUN
-	else if (m_keyboard[sf::Keyboard::LShift])
-		m_player.SetRunning(true);
+	
+	else if (m_keyboard[sf::Keyboard::Num1] && m_keyboard[sf::Keyboard::Up])
+		mOctaves++;
+	else if (m_keyboard[sf::Keyboard::Num1] && m_keyboard[sf::Keyboard::Down])
+		mOctaves--;
 
-	//space -> jump
+	else if (m_keyboard[sf::Keyboard::Num2] && m_keyboard[sf::Keyboard::Up])
+		mFrequency++;
+	else if (m_keyboard[sf::Keyboard::Num2] && m_keyboard[sf::Keyboard::Down])
+		mFrequency--;
+
+	else if (m_keyboard[sf::Keyboard::Num3] && m_keyboard[sf::Keyboard::Up])
+		mAmplitude++;
+	else if (m_keyboard[sf::Keyboard::Num3] && m_keyboard[sf::Keyboard::Down])
+		mAmplitude--;
+
+	else if (m_keyboard[sf::Keyboard::Num4] && m_keyboard[sf::Keyboard::Up])
+		mSeed++;
+	else if (m_keyboard[sf::Keyboard::Num4] && m_keyboard[sf::Keyboard::Down])
+		mSeed--;
+
+
+
+	//space -> Refresh
 	if (m_keyboard[sf::Keyboard::Space])
-		m_player.Jump();
+		m_world.InitMap(mOctaves, mFrequency, mAmplitude, mSeed);
 
-	//y -> toggle wireframe mode
-	else if (m_keyboard[24])
-	{
-		m_wireframe = !m_wireframe;
-		if (m_wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
 
 }
 
@@ -302,7 +311,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	else if (button == 4 && m_currentBlock.x != -1)
 	{
 		Vector3<float> playerFootPos((int)m_player.Position().x, (int)m_player.Position().y, (int)m_player.Position().z); //Positio des pieds
-		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y +m_player.GetDimension().y), (int)m_player.Position().z); //Position des yeux
+		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y + m_player.GetDimension().y), (int)m_player.Position().z); //Position des yeux
 		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z); //Position du nouveau block
 
 		//Si il y a pas de collision avec le player
@@ -360,25 +369,23 @@ void Engine::DrawHud()
 
 
 	ss.str("");
-	ss << "Position "<< m_player.Position();
-	PrintText(10, 30, 16, ss.str());
-
-	ss.str("");
-	ss << m_currentBlock;
+	ss << "Position " << m_player.Position();
 	PrintText(10, 10, 16, ss.str());
 
+
 	ss.str("");
-	ss << "Health:";
-	//Pour chaque 10 point de vie on met un carre sinon un espace
-	for (int i = 0; i < m_player.GetHP() / 5; i++)
-	{
-		ss << (char)254; // Le carractere ■
-	}
-	for (int i = 0; i < 100 / 5 - m_player.GetHP() / 5; i++)
-	{
-		ss << " ";
-	}
+	ss << "Octaves (1): " << mOctaves;
 	PrintText((Width() - ss.str().length() * 12) - 10, Height() - 25, 16, ss.str());
+	ss.str("");
+	ss << "Frequency (2): " << mFrequency;
+	PrintText((Width() - ss.str().length() * 12) - 10, Height() - 45, 16, ss.str());
+	ss.str("");
+	ss << "Amplitude (3): " << mAmplitude;
+	PrintText((Width() - ss.str().length() * 12) - 10, Height() - 65, 16, ss.str());
+	ss.str("");
+	ss << "Seed (4): " << mSeed;
+	PrintText((Width() - ss.str().length() * 12) - 10, Height() - 85, 16, ss.str());
+
 
 	// Affichage du crosshair
 	m_textureCrosshair.Bind();
