@@ -18,13 +18,15 @@ void Chunk::RemoveBloc(int x, int y, int z)
 	m_blocks.Set(x, y, z, BTYPE_AIR);
 	m_isDirty = true;
 
+	// Si on efface un cube pres d'un chunk il faut le redender
+	// Aussi sinon cetaine face qui ne s'afficheront pas
 	if (x == 0 && m_negativeX)
 		m_negativeX->m_isDirty = true;
 
 	else if (x == CHUNK_SIZE_X - 1 && m_positiveX)
 		m_positiveX->m_isDirty = true;
 
-	else if (z == 0 && m_negativeZ)
+	if (z == 0 && m_negativeZ)
 		m_negativeZ->m_isDirty = true;
 
 	else if (z == CHUNK_SIZE_Z - 1 && m_positiveZ)
@@ -42,7 +44,7 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type)
 	else if (x == CHUNK_SIZE_X - 1 && m_positiveX)
 		m_positiveX->m_isDirty = true;
 
-	else if (z == 0 && m_negativeZ)
+	if (z == 0 && m_negativeZ)
 		m_negativeZ->m_isDirty = true;
 
 	else if (z == CHUNK_SIZE_Z - 1 && m_positiveZ)
@@ -55,6 +57,7 @@ void Chunk::PlaceBlock(int x, int y, int z, BlockType type)
 	{
 		m_blocks.Set(x, y, z, type);
 		m_isDirty = true;
+
 	}
 }
 

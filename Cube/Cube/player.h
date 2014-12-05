@@ -16,7 +16,7 @@ public:
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, float elapsedTime, World &world);
-	bool CheckCollision(World &world);
+	bool CheckCollision(World &world) const;
 
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
@@ -24,7 +24,11 @@ public:
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 	void Jump();
-	int GetHP();
+	int GetHP() const;
+	BlockType GetBlock() const;
+
+	// negative < 0 < positif
+	void SetBlock(int direction);
 	Vector3<float> Position() const;
 	Vector3<float> GetDimension() const;
 
@@ -43,6 +47,7 @@ private:
 	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)
 	int m_health;		//Vie du personnage
 	bool m_running;		//Si le joueur cour
+	BlockType m_block;   //Prochain block que le joueur peut placer
 };
 
 #endif

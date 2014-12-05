@@ -44,4 +44,7 @@ void BlockInfo::Afficher() const
     std::cout << "Durabilite: " << m_durabilite << std::endl;
 }
 
-
+std::ostream& operator<<(std::ostream& o, const BlockInfo& v)
+{
+	return o << v.m_nom;
+}

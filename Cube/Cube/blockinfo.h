@@ -21,6 +21,9 @@ public:
 
 	void Afficher() const;
 
+	
+	friend std::ostream& operator<<(std::ostream& o, const BlockInfo& v);
+
 private:
 	//Type
 	BlockType m_type;

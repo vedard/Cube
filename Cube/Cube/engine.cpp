@@ -6,7 +6,7 @@ Engine::Engine() :
 m_wireframe(false),
 m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 100, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0),
 m_shader01(),
-m_textureAtlas(7),
+m_textureAtlas(NUMBER_OF_BLOCK - 1),
 m_world()
 {
 	//Initialisation des touches
@@ -120,7 +120,7 @@ void Engine::LoadResource()
 	}
 
 	//Load la map
-	m_world.InitMap(8,5,100,15);
+	m_world.InitMap(16, 4, 80, 15);
 }
 
 void Engine::UnloadResource()
@@ -293,26 +293,44 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
+	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{
 		Vector3<float> chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0, floor(m_currentBlock.z / CHUNK_SIZE_Z));
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 
 	}
+
+	//Right Click
 	else if (button == 4 && m_currentBlock.x != -1)
 	{
 		Vector3<float> playerFootPos((int)m_player.Position().x, (int)m_player.Position().y, (int)m_player.Position().z); //Positio des pieds
-		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y +m_player.GetDimension().y), (int)m_player.Position().z); //Position des yeux
+		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y + m_player.GetDimension().y), (int)m_player.Position().z); //Position des yeux
 		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z); //Position du nouveau block
 
 		//Si il y a pas de collision avec le player
 		if (playerFootPos != newBlocPos && playerEyePos != newBlocPos)
 		{
 			Vector3<float> chunkPos(floor((newBlocPos.x) / CHUNK_SIZE_X), 0, floor((newBlocPos.z) / CHUNK_SIZE_Z));
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_WOOD_PLANK);
+
+			//Si le chunk existe on place le block
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
+				m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(
+				newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X),
+				newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),
+				m_player.GetBlock());
 
 		}
 	}
+	std::cout << button;
+	//Scroll Up
+	if (button == 8)
+		m_player.SetBlock(1);
+
+	//Scroll Down
+	else if (button == 16)
+		m_player.SetBlock(-1);
+
 }
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -360,12 +378,12 @@ void Engine::DrawHud()
 
 
 	ss.str("");
-	ss << "Position "<< m_player.Position();
-	PrintText(10, 30, 16, ss.str());
+	ss << "Position " << m_player.Position();
+	PrintText(10, 10, 16, ss.str());
 
 	ss.str("");
-	ss << m_currentBlock;
-	PrintText(10, 10, 16, ss.str());
+	ss << "Block: " << m_bInfo[m_player.GetBlock()];
+	PrintText((Width() - ss.str().length() * 12) - 10, 10, 16, ss.str());
 
 	ss.str("");
 	ss << "Health:";

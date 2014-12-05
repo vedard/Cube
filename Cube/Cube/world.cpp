@@ -87,7 +87,10 @@ BlockType World::BlockAt(float x, float y, float z)
 
 Chunk& World::ChunkAt(float x, float z)
 {
-	return m_chunks.Get(x, z);
+	if (x >= 0 && z >= 0 && x < WORLD_SIZE  && z < WORLD_SIZE)
+		return m_chunks.Get(x, z);
+
+	
 
 }
 

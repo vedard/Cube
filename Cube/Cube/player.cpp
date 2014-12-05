@@ -5,7 +5,7 @@
 
 
 Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_dimension(0.2, 1.62, 0.2), m_rotX(rotX), m_rotY(rotY),
-m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0), m_health(100), m_running(false)
+m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0), m_health(100), m_running(false), m_block(BTYPE_GRASS)
 {
 
 }
@@ -127,7 +127,7 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 	}
 }
 
-bool Player::CheckCollision(World &world) 
+bool Player::CheckCollision(World &world) const
 {
 
 	//4 point au pieds du player
@@ -206,6 +206,26 @@ void Player::SetRunning(bool running)
 		m_running = running;
 }
 
+BlockType Player::GetBlock() const
+{
+	return m_block;
+}
+
+void Player::SetBlock(int direction)
+{
+	if (direction < 0)
+		m_block--;
+
+	else if (direction > 0)
+		m_block++;
+		
+	if (m_block == 0)
+		m_block = NUMBER_OF_BLOCK - 1;
+
+	else if (m_block == NUMBER_OF_BLOCK)
+		m_block = 1;
+}
+
 Vector3<float> Player::Position() const
 {
 	return m_pos;
@@ -225,7 +245,7 @@ void Player::Jump()
 	}
 }
 
-int Player::GetHP()
+int Player::GetHP() const
 {
 	return m_health;
 }
