@@ -14,7 +14,10 @@ public:
 	BlockType BlockAt(float x, float y, float z);
 	Chunk& ChunkAt(float x, float z);
 
-	void InitFlatMap();
+	// - Octaves: Irrigulité
+	// - Freq: Agressivité des montagnes (0 for flat)
+	// - Amp: Hauteur des montagnes
+	// - Seed: seed pour le random
 	void World::InitMap(int octaves, float freq, float amp, int seed);
 
 

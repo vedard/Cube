@@ -1,12 +1,34 @@
 #include "world.h"
 
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE) 
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE)
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
+		{
 			m_chunks.Get(i, j).SetPosition(CHUNK_SIZE_X * i, 0, CHUNK_SIZE_Z * j);
+
+			//Set les pointeur sur les chunk qui est collé
+			m_chunks.Get(i, j).m_positiveX = NULL;
+			m_chunks.Get(i, j).m_negativeX = NULL;
+			m_chunks.Get(i, j).m_positiveZ = NULL;
+			m_chunks.Get(i, j).m_negativeZ = NULL;
+
+			if (i < WORLD_SIZE - 1)
+				m_chunks.Get(i, j).m_positiveX = &m_chunks.Get(i + 1, j);
+
+			if (i > 0)
+				m_chunks.Get(i, j).m_negativeX = &m_chunks.Get(i - 1, j);
+
+			if (j < WORLD_SIZE - 1)
+				m_chunks.Get(i, j).m_positiveZ = &m_chunks.Get(i, j + 1);
+
+			if (j > 0)
+				m_chunks.Get(i, j).m_negativeZ = &m_chunks.Get(i, j - 1);
+		}
+
+
 }
 
 
@@ -14,28 +36,7 @@ World::~World()
 {
 }
 
-void World::InitFlatMap()
-{
-	//Parcous tous les bloack pour les placer et creer un terrain plat
-	for (int i = 0; i < WORLD_SIZE; i++)
-		for (int j = 0; j < WORLD_SIZE; j++)
-			for (int x = 0; x < CHUNK_SIZE_X; ++x)
-				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
-						if (y < 64 && y >= 63)
-							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
-						else if (y < 63 && y >= 57)
-							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_DIRT);
-						else if (y < 57 && y > 40)
-							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_STONE);
-						else if (y <= 40 && y > 38)
-							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_BED_ROCK);
-}
 
-// - octaves: smoothness
-// - freq: Agressivité des montagnes
-// - Amp: Hauteur des montagnes
-// - Seed: seed pour le random
 void World::InitMap(int octaves, float freq, float amp, int seed)
 {
 	Perlin perlin(octaves, freq, amp, seed);
@@ -47,8 +48,8 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
 					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
-					
-					for (int y = 0; y <= 100; y++)
+
+					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
 						if (y == 0)
 							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_GRASS);
@@ -63,8 +64,8 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
 					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_BED_ROCK);
 
-					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_STONE);
-					m_chunks.Get(i, j).SetBlock(x, 1, z, BTYPE_STONE);
+					m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
+					m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
 
 				}
 }

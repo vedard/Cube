@@ -30,6 +30,11 @@ public:
 	void Render() const;
 	bool IsDirty() const;
 
+	Chunk* m_positiveX;
+	Chunk* m_negativeX;
+	Chunk* m_positiveZ;
+	Chunk* m_negativeZ;
+
 private:
 	Array3d<BlockType> m_blocks;
 	bool m_isDirty;

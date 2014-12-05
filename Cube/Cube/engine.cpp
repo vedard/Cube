@@ -120,7 +120,7 @@ void Engine::LoadResource()
 	}
 
 	//Load la map
-	m_world.InitMap(8,4,100,15);
+	m_world.InitMap(8,5,100,15);
 }
 
 void Engine::UnloadResource()

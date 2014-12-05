@@ -17,12 +17,36 @@ void Chunk::RemoveBloc(int x, int y, int z)
 {
 	m_blocks.Set(x, y, z, BTYPE_AIR);
 	m_isDirty = true;
+
+	if (x == 0 && m_negativeX)
+		m_negativeX->m_isDirty = true;
+
+	else if (x == CHUNK_SIZE_X - 1 && m_positiveX)
+		m_positiveX->m_isDirty = true;
+
+	else if (z == 0 && m_negativeZ)
+		m_negativeZ->m_isDirty = true;
+
+	else if (z == CHUNK_SIZE_Z - 1 && m_positiveZ)
+		m_positiveZ->m_isDirty = true;
 }
 
 void Chunk::SetBlock(int x, int y, int z, BlockType type)
 {
 	m_blocks.Set(x, y, z, type);
 	m_isDirty = true;
+
+	if (x == 0 && m_negativeX)
+		m_negativeX->m_isDirty = true;
+
+	else if (x == CHUNK_SIZE_X - 1 && m_positiveX)
+		m_positiveX->m_isDirty = true;
+
+	else if (z == 0 && m_negativeZ)
+		m_negativeZ->m_isDirty = true;
+
+	else if (z == CHUNK_SIZE_Z - 1 && m_positiveZ)
+		m_positiveZ->m_isDirty = true;
 }
 
 void Chunk::PlaceBlock(int x, int y, int z, BlockType type)
@@ -38,6 +62,19 @@ BlockType Chunk::GetBlock(int x, int y, int z)
 {
 	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
 		return m_blocks.Get(x, y, z);
+
+	else if (x == -1 && m_negativeX)
+		return m_negativeX->GetBlock(CHUNK_SIZE_X - 1, y, z);
+
+	else if (x == CHUNK_SIZE_X && m_positiveX)
+		return m_positiveX->GetBlock(0, y, z);
+
+	else if (z == -1 && m_negativeZ)
+		return m_negativeZ->GetBlock(x, y, CHUNK_SIZE_Z - 1);
+
+	else if (z == CHUNK_SIZE_Z && m_positiveZ)
+		return m_positiveZ->GetBlock(x, y, 0);
+
 	else
 		return BTYPE_AIR;
 }
