@@ -79,4 +79,3 @@ void Tool::CheckGLError(const char* file, int line)
 		exit(1);
 	}
 }
-

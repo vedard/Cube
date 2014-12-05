@@ -4,6 +4,11 @@
 #include "array2d.h"
 #include "chunk.h"
 #include "perlin.h"
+#include "tool.h"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
 
 class World
 {
@@ -18,7 +23,10 @@ public:
 	// - Freq: Agressivité des montagnes (0 for flat)
 	// - Amp: Hauteur des montagnes
 	// - Seed: seed pour le random
-	void World::InitMap(int octaves, float freq, float amp, int seed);
+	void InitMap(int octaves, float freq, float amp, int seed);
+
+	void LoadMap(std::string filename, BlockInfo *binfo);
+	void SaveMap(std::string filename);
 
 
 private:

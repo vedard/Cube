@@ -4,8 +4,18 @@
 #include <cmath>
 
 
-Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : m_pos(posX, posY, posZ), m_dimension(0.2, 1.62, 0.2), m_rotX(rotX), m_rotY(rotY),
-m_vitesse(4), m_noClip(false), m_sneaked(false), m_vitesseY(0), m_health(100), m_running(false), m_block(BTYPE_GRASS)
+Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : 
+m_pos(posX, posY, posZ),
+m_dimension(0.2, 1.62, 0.2), 
+m_rotX(rotX), 
+m_rotY(rotY),
+m_vitesse(4), 
+m_noClip(false), 
+m_sneaked(false), 
+m_vitesseY(0), 
+m_health(100), 
+m_running(false),
+m_block(BTYPE_GRASS)
 {
 
 }
@@ -42,9 +52,9 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 	if (m_sneaked)
 		multiplieur *= 0.7;
 	else if (m_noClip)
-		multiplieur *= 3;
+		multiplieur *= 6;
 	else if (m_running)
-		multiplieur *= 1.7;
+		multiplieur *= 1.4;
 
 	//Deplacement Avant/Arriere
 	Vector3<float> directionVector(cos(PI / 2 * 3 + orientationPlayer), 0, sin(PI / 2 * 3 + orientationPlayer));

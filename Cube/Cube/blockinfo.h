@@ -15,6 +15,7 @@ public:
 	void Init(BlockType type, const std::string& nom);
 
 	BlockType GetType() const;
+	std::string GetName() const;
 
 	void SetDurabilite(int durabilite);
 	int GetDurabilite() const;

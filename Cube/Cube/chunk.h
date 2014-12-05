@@ -30,6 +30,7 @@ public:
 	void Render() const;
 	bool IsDirty() const;
 
+
 	Chunk* m_positiveX;
 	Chunk* m_negativeX;
 	Chunk* m_positiveZ;

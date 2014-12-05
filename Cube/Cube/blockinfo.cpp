@@ -26,6 +26,10 @@ BlockType BlockInfo::GetType() const
 {
     return m_type;
 }
+std::string BlockInfo::GetName() const
+{
+	return m_nom;
+}
 
 void BlockInfo::SetDurabilite(int durabilite)
 {

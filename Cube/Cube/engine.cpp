@@ -121,6 +121,7 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.InitMap(16, 4, 80, 15);
+
 }
 
 void Engine::UnloadResource()
@@ -193,6 +194,7 @@ void Engine::Render(float elapsedTime)
 
 	m_textureAtlas.Bind();
 
+
 	for (int i = 0; i < WORLD_SIZE; i++)
 	{
 		for (int j = 0; j < WORLD_SIZE; j++)	//Parcour les chunk
@@ -254,6 +256,14 @@ void Engine::KeyPressEvent(unsigned char key)
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
+	//Lshift + O -> open map
+	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
+		m_world.LoadMap("map.sav", m_bInfo);
+
+	//Lshift + W -> Write map
+	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
+		m_world.SaveMap("map.sav", m_bInfo);
 
 }
 
@@ -373,14 +383,16 @@ void Engine::DrawHud()
 
 	std::ostringstream ss;
 
+	//Fps
 	ss << "Fps: " << m_fps;
 	PrintText(10, Height() - 25, 16, ss.str());
 
-
+	//Position du joueur
 	ss.str("");
 	ss << "Position " << m_player.Position();
 	PrintText(10, 10, 16, ss.str());
 
+	//Block a placer
 	ss.str("");
 	ss << "Block: " << m_bInfo[m_player.GetBlock()];
 	PrintText((Width() - ss.str().length() * 12) - 10, 10, 16, ss.str());

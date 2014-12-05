@@ -98,6 +98,7 @@ void Chunk::SetPosition(int x, int y, int z)
 	m_position.y = y;
 	m_position.z = z;
 }
+
 Vector3<float> &Chunk::GetPosition()
 {
 	return m_position;
@@ -203,3 +204,4 @@ bool Chunk::IsDirty() const
 {
 	return m_isDirty;
 }
+

@@ -2,6 +2,7 @@
 #define TOOL_H__
 
 #include <string>
+#include <sstream>
 
 // TODO ne pas oublier de ne pas definir DEBUGMODE en release
 #ifndef DEBUGMODE
@@ -34,6 +35,8 @@ public:
 		return (v >= vinf - epsilon && v <= vsup + epsilon);
 	}
 
+
+	
 };
 
 #endif // TOOL_H__

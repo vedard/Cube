@@ -39,8 +39,15 @@ World::~World()
 
 void World::InitMap(int octaves, float freq, float amp, int seed)
 {
-	Perlin perlin(octaves, freq, amp, seed);
+	//Erase map
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
+	Perlin perlin(octaves, freq, amp, seed);
 
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -49,6 +56,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				{
 					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 
+					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
 						if (y == 0)
@@ -90,7 +98,95 @@ Chunk& World::ChunkAt(float x, float z)
 	if (x >= 0 && z >= 0 && x < WORLD_SIZE  && z < WORLD_SIZE)
 		return m_chunks.Get(x, z);
 
-	
 
+
+}
+
+void World::LoadMap(std::string filename, BlockInfo *binfo)
+{
+	//Erase map
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+					{
+						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
+						m_chunks.Get(i, j).SetBlock(0, 0, 0, BTYPE_TEST);
+					}
+			
+		
+	
+	//Open file
+	std::ifstream file;
+	file.open(filename, std::ios::in);
+
+	//Chunk pos, block pos, blocktype
+	int i, j, x, y, z, b;
+
+	//Number of block loaded
+	int count = 1;
+	
+	std::string word;
+
+	//Read
+	while (file)
+	{
+		count++;
+		
+		//Read word and convert in int
+		file >> word;
+		std::istringstream(word) >> i;
+
+		file >> word;
+		std::istringstream(word) >> j;
+
+		file >> word;
+		std::istringstream(word) >> x;
+
+		file >> word;
+		std::istringstream(word) >> y;
+
+		file >> word;
+		std::istringstream(word) >> z;
+
+		file >> word;
+		std::istringstream(word) >> b;
+
+		m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
+		
+		if (count % 10000== 0)
+			std::cout << count << " Block loaded" << std::endl;
+
+	}
+
+	file.close();
+	std::cout << "Map Loaded" << std::endl;
+}
+
+void World::SaveMap(std::string filename)
+{
+	std::ofstream file;
+	file.open(filename);
+	int count = 1;
+
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+		{
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
+					{
+						if (m_chunks.Get(i, j).GetBlock(x, y, z) != BTYPE_AIR)
+							file << i << " " << j << " " << x << " " << y << " " << z << " " <<(int) m_chunks.Get(i, j).GetBlock(x, y, z) << std::endl;
+					}
+
+			std::cout << "Chunk " << count++ << " / " << WORLD_SIZE * WORLD_SIZE << " saved" << std::endl;
+		}
+	file << "END " << std::endl;
+	file.close();
+
+	std::cout << "Map saved" << std::endl;
 }
 
