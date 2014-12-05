@@ -263,7 +263,7 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	//Lshift + W -> Write map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
-		m_world.SaveMap("map.sav", m_bInfo);
+		m_world.SaveMap("map.sav");
 
 }
 
@@ -332,7 +332,6 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 		}
 	}
-	std::cout << button;
 	//Scroll Up
 	if (button == 8)
 		m_player.SetBlock(1);

@@ -114,9 +114,9 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 						m_chunks.Get(i, j).SetBlock(0, 0, 0, BTYPE_TEST);
 					}
-			
-		
-	
+
+
+
 	//Open file
 	std::ifstream file;
 	file.open(filename, std::ios::in);
@@ -126,14 +126,19 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 
 	//Number of block loaded
 	int count = 1;
-	
+	int total = 0;
+
+	file.seekg(0, file.end);
+	float length = file.tellg() / 1024;
+	file.seekg(0, file.beg);
+
 	std::string word;
 
 	//Read
 	while (file)
 	{
 		count++;
-		
+
 		//Read word and convert in int
 		file >> word;
 		std::istringstream(word) >> i;
@@ -153,13 +158,14 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 		file >> word;
 		std::istringstream(word) >> b;
 
-		m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
-		
-		if (count % 10000== 0)
-			std::cout << count << " Block loaded" << std::endl;
+		if (b >= 0 && b << NUMBER_OF_BLOCK)
+			m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
+
+		if (count % 10000 == 0)
+			std::cout << float(file.tellg() / 1024) << " / " << length << " KB loaded" << std::endl;
 
 	}
-
+	
 	file.close();
 	std::cout << "Map Loaded" << std::endl;
 }
@@ -179,10 +185,11 @@ void World::SaveMap(std::string filename)
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
 						if (m_chunks.Get(i, j).GetBlock(x, y, z) != BTYPE_AIR)
-							file << i << " " << j << " " << x << " " << y << " " << z << " " <<(int) m_chunks.Get(i, j).GetBlock(x, y, z) << std::endl;
+							file << i << " " << j << " " << x << " " << y << " " << z << " " << (int)m_chunks.Get(i, j).GetBlock(x, y, z) << " ";
 					}
 
 			std::cout << "Chunk " << count++ << " / " << WORLD_SIZE * WORLD_SIZE << " saved" << std::endl;
+			file << std::endl;
 		}
 	file << "END " << std::endl;
 	file.close();
