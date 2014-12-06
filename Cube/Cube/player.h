@@ -11,8 +11,9 @@ class Player
 
 public:
 
-	Player(float posX = 0, float posY = 0, float posZ = 0, float rotX = 0, float rotY = 0);
+	Player();
 	~Player();
+	void Spawn(World &world);
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, float elapsedTime, World &world);
@@ -24,6 +25,7 @@ public:
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 	void Jump();
+	void Hurt(int damage);
 	int GetHP() const;
 	BlockType GetBlock() const;
 

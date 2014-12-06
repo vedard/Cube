@@ -104,6 +104,8 @@ Chunk& World::ChunkAt(float x, float z)
 
 void World::LoadMap(std::string filename, BlockInfo *binfo)
 {
+	std::cout << "Loading "<<filename << "..." << std::endl;
+
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -115,59 +117,44 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 						m_chunks.Get(i, j).SetBlock(0, 0, 0, BTYPE_TEST);
 					}
 
-
-
 	//Open file
 	std::ifstream file;
-	file.open(filename, std::ios::in);
+	file.open(filename);
 
 	//Chunk pos, block pos, blocktype
 	int i, j, x, y, z, b;
 
-	//Number of block loaded
-	int count = 1;
-	int total = 0;
+	//Read All file
+	std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	std::stringstream ss(str);
 
-	file.seekg(0, file.end);
-	float length = file.tellg() / 1024;
-	file.seekg(0, file.beg);
+	//Close it
+	file.close();
+
+	//Get Size
+	ss.seekg(0, file.end);
+	float length = ss.tellg() / 1024;
+	ss.seekg(0, file.beg);
 
 	std::string word;
 
 	//Read
-	while (file)
+	while (ss)
 	{
-		count++;
+		//Get the value for a block
+		ss >> i >> j >> x >> y >> z >> b;
 
-		//Read word and convert in int
-		file >> word;
-		std::istringstream(word) >> i;
-
-		file >> word;
-		std::istringstream(word) >> j;
-
-		file >> word;
-		std::istringstream(word) >> x;
-
-		file >> word;
-		std::istringstream(word) >> y;
-
-		file >> word;
-		std::istringstream(word) >> z;
-
-		file >> word;
-		std::istringstream(word) >> b;
-
+		//Set block
 		if (b >= 0 && b << NUMBER_OF_BLOCK)
 			m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
 
-		if (count % 10000 == 0)
-			std::cout << float(file.tellg() / 1024) << " / " << length << " KB loaded" << std::endl;
+		//Tell Where we are
+		if (ss.tellg() % 1024 == 0)
+			std::cout << float(ss.tellg() / 1024) << " / " << length << " KB loaded" << std::endl;
 
 	}
 	
-	file.close();
-	std::cout << "Map Loaded" << std::endl;
+	std::cout << filename<< " Loaded" << std::endl;
 }
 
 void World::SaveMap(std::string filename)
@@ -194,6 +181,6 @@ void World::SaveMap(std::string filename)
 	file << "END " << std::endl;
 	file.close();
 
-	std::cout << "Map saved" << std::endl;
+	std::cout << "Map saved as " << filename << std::endl;
 }
 

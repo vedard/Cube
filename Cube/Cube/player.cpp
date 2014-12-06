@@ -4,16 +4,16 @@
 #include <cmath>
 
 
-Player::Player(float posX, float posY, float posZ, float rotX, float rotY) : 
-m_pos(posX, posY, posZ),
-m_dimension(0.2, 1.62, 0.2), 
-m_rotX(rotX), 
-m_rotY(rotY),
-m_vitesse(4), 
-m_noClip(false), 
-m_sneaked(false), 
-m_vitesseY(0), 
-m_health(100), 
+Player::Player() :
+m_pos(0, 0, 0),
+m_dimension(0.2, 1.62, 0.2),
+m_rotX(0),
+m_rotY(0),
+m_vitesse(4),
+m_noClip(false),
+m_sneaked(false),
+m_vitesseY(0),
+m_health(100),
 m_running(false),
 m_block(BTYPE_GRASS)
 {
@@ -23,6 +23,21 @@ m_block(BTYPE_GRASS)
 Player::~Player()
 {
 
+}
+
+void Player::Spawn(World &world)
+{
+	m_health = 100;
+	m_pos.x = WORLD_SIZE*CHUNK_SIZE_X / 2;
+	m_pos.y = CHUNK_SIZE_Y;
+	m_pos.z = WORLD_SIZE*CHUNK_SIZE_Z / 2;
+
+	while (!CheckCollision(world))
+	{
+		m_pos.y--;
+	}
+
+	m_pos.y++;
 }
 
 void Player::TurnLeftRight(float value)
@@ -123,8 +138,13 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		{
 			//Si on a touche le sol 
 			if (m_vitesseY > 0)
+			{
 				m_air = false;
 
+				//Degat de chute 
+				if (m_vitesseY > 0.40)
+					Hurt(exp(m_vitesseY * 6));
+			}
 			//annule
 			m_pos.y += m_vitesseY;
 			m_vitesseY = 0;
@@ -135,6 +155,13 @@ void Player::Move(bool front, bool back, bool left, bool right, float elapsedTim
 		//Acceleration
 		m_vitesseY += 0.013;
 	}
+
+	//Si le player est mort
+	if (m_health <= 0)
+	{
+		Spawn(world);
+	}
+
 }
 
 bool Player::CheckCollision(World &world) const
@@ -159,7 +186,7 @@ bool Player::CheckCollision(World &world) const
 	BlockType bt11 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
 	BlockType bt12 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
 
-		//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
+	//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
 	if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||
 		bt4 != BTYPE_AIR || bt5 != BTYPE_AIR || bt6 != BTYPE_AIR ||
 		bt7 != BTYPE_AIR || bt8 != BTYPE_AIR || bt9 != BTYPE_AIR ||
@@ -228,7 +255,7 @@ void Player::SetBlock(int direction)
 
 	else if (direction > 0)
 		m_block++;
-		
+
 	if (m_block == 0)
 		m_block = NUMBER_OF_BLOCK - 1;
 
@@ -253,6 +280,17 @@ void Player::Jump()
 		m_vitesseY = -0.20;
 		m_air = true;
 	}
+}
+
+void Player::Hurt(int damage)
+{
+	/*
+		Damage reduction (armor, spell and etc...)
+		*/
+
+	m_health -= damage;
+
+
 }
 
 int Player::GetHP() const

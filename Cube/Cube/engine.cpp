@@ -4,7 +4,7 @@
 
 Engine::Engine() :
 m_wireframe(false),
-m_player(WORLD_SIZE / 2 * CHUNK_SIZE_X, 100, WORLD_SIZE / 2 * CHUNK_SIZE_X, 0, 0),
+m_player(),
 m_shader01(),
 m_textureAtlas(NUMBER_OF_BLOCK - 1),
 m_world()
@@ -121,6 +121,7 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.InitMap(16, 4, 80, 15);
+	m_player.Spawn(m_world);
 
 }
 
@@ -381,7 +382,7 @@ void Engine::DrawHud()
 	m_textureFont.Bind();
 
 	std::ostringstream ss;
-
+	
 	//Fps
 	ss << "Fps: " << m_fps;
 	PrintText(10, Height() - 25, 16, ss.str());
