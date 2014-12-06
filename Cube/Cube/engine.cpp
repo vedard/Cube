@@ -260,12 +260,29 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	//Lshift + O -> open map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
+	{
 		m_world.LoadMap("map.sav", m_bInfo);
-
+		m_player.Spawn(m_world);
+	}
 	//Lshift + W -> Write map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
+	{
 		m_world.SaveMap("map.sav");
+	}
 
+	//Lshift + R -> Random map
+	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
+	{
+		m_world.InitMap(16, 4, 80, time(NULL));
+		m_player.Spawn(m_world);
+	}
+
+	//Lshift + F -> Flat map
+	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
+	{
+		m_world.InitMap(16, 0, 80, time(NULL));
+		m_player.Spawn(m_world);
+	}
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
@@ -382,7 +399,7 @@ void Engine::DrawHud()
 	m_textureFont.Bind();
 
 	std::ostringstream ss;
-	
+
 	//Fps
 	ss << "Fps: " << m_fps;
 	PrintText(10, Height() - 25, 16, ss.str());

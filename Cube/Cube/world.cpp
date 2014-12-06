@@ -48,9 +48,11 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
 	Perlin perlin(octaves, freq, amp, seed);
+	int count = 1;
 
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
+		{
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
@@ -76,6 +78,14 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
 
 				}
+			std::cout << "Chunk " << count++ << " / " << WORLD_SIZE * WORLD_SIZE << " Created" << std::endl;
+			
+
+		}
+	if (freq != 0)
+		std::cout << "Map created with this seed: " << seed << std::endl;
+	else
+		std::cout << "Flat map created" << std::endl;
 }
 
 BlockType World::BlockAt(float x, float y, float z)
@@ -104,7 +114,7 @@ Chunk& World::ChunkAt(float x, float z)
 
 void World::LoadMap(std::string filename, BlockInfo *binfo)
 {
-	std::cout << "Loading "<<filename << "..." << std::endl;
+	std::cout << "Loading " << filename << "..." << std::endl;
 
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -153,8 +163,8 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 			std::cout << float(ss.tellg() / 1024) << " / " << length << " KB loaded" << std::endl;
 
 	}
-	
-	std::cout << filename<< " Loaded" << std::endl;
+
+	std::cout << filename << " Loaded" << std::endl;
 }
 
 void World::SaveMap(std::string filename)
