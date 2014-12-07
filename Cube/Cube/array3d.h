@@ -12,7 +12,7 @@ public:
 	Array3d(const Array3d<t>& array);
 
 	void Set(int x, int y, int z, t value);
-	t Get(int x, int y, int z) const;
+	t& Get(int x, int y, int z);
 
 	void Reset(t value);
 
@@ -59,7 +59,7 @@ void Array3d<t>::Set(int x, int y, int z, t value)
 }
 
 template<class t>
-t Array3d<t>::Get(int x, int y, int z) const
+t& Array3d<t>::Get(int x, int y, int z)
 {
 	if (x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z)
 		return GetElement(x, y, z);

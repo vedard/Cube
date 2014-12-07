@@ -64,6 +64,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
+						
 						if (y == 0)
 							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_GRASS);
 						else if (y >= 1 && y < 4)

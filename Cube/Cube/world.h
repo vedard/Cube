@@ -28,6 +28,7 @@ public:
 	void LoadMap(std::string filename, BlockInfo *binfo);
 	void SaveMap(std::string filename);
 
+private:
 	void AddMineral(BlockType mineral, int i, int j, int x, int y, int z);
 
 
