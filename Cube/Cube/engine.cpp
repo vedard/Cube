@@ -103,6 +103,30 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_dirt.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_DIRT].u, m_bInfo[BTYPE_DIRT].v, m_bInfo[BTYPE_DIRT].w, m_bInfo[BTYPE_DIRT].h);
 
+	m_bInfo[BTYPE_IRON].Init(BTYPE_IRON, "Iron");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_iron.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_IRON].u, m_bInfo[BTYPE_IRON].v, m_bInfo[BTYPE_IRON].w, m_bInfo[BTYPE_IRON].h);
+
+	m_bInfo[BTYPE_COAL].Init(BTYPE_COAL, "Coal");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_coal.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_COAL].u, m_bInfo[BTYPE_COAL].v, m_bInfo[BTYPE_COAL].w, m_bInfo[BTYPE_COAL].h);
+
+	m_bInfo[BTYPE_DIAMOND].Init(BTYPE_DIAMOND, "Diamond");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_diamond.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_DIAMOND].u, m_bInfo[BTYPE_DIAMOND].v, m_bInfo[BTYPE_DIAMOND].w, m_bInfo[BTYPE_DIAMOND].h);
+
+	m_bInfo[BTYPE_GOLD].Init(BTYPE_GOLD, "Gold");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_gold.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_GOLD].u, m_bInfo[BTYPE_GOLD].v, m_bInfo[BTYPE_GOLD].w, m_bInfo[BTYPE_GOLD].h);
+
+	m_bInfo[BTYPE_REDSTONE].Init(BTYPE_REDSTONE, "Redstone");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_redstone.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_REDSTONE].u, m_bInfo[BTYPE_REDSTONE].v, m_bInfo[BTYPE_REDSTONE].w, m_bInfo[BTYPE_REDSTONE].h);
+
+	m_bInfo[BTYPE_LAPIS_LAZULI].Init(BTYPE_LAPIS_LAZULI, "Lapis Lazuli");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_lapis_lazuli.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LAPIS_LAZULI].u, m_bInfo[BTYPE_LAPIS_LAZULI].v, m_bInfo[BTYPE_LAPIS_LAZULI].w, m_bInfo[BTYPE_LAPIS_LAZULI].h);
+
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -118,7 +142,7 @@ void Engine::LoadResource()
 	}
 
 	//Load la map
-	m_world.InitMap(16, 4, 80, 15);
+	m_world.InitMap(16, 6, 80, 15);
 	m_player.Spawn(m_world);
 
 }
@@ -130,8 +154,6 @@ void Engine::UnloadResource()
 void Engine::Render(float elapsedTime)
 {
 	GetBlocAtCursor();
-
-
 
 	static float gameTime = elapsedTime;
 
@@ -229,9 +251,6 @@ void Engine::Render(float elapsedTime)
 	DrawHud();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-
 
 }
 

@@ -39,6 +39,7 @@ World::~World()
 
 void World::InitMap(int octaves, float freq, float amp, int seed)
 {
+	std::srand(seed);
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -47,9 +48,12 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
+
 	Perlin perlin(octaves, freq, amp, seed);
+
 	int count = 0;
 
+	//Map height
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 		{
@@ -57,7 +61,6 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
 					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
-
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
@@ -67,8 +70,6 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_DIRT);
 						else if (y >= 4)
 							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_STONE);
-
-
 					}
 					//Plancher de bedrock
 					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
@@ -78,11 +79,73 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
 
 				}
-			if (count++ % 10 == 0)
+			if (count++ % 300 == 0)
 				std::cout << "Chunk " << count << " / " << WORLD_SIZE * WORLD_SIZE << " Created" << std::endl;
 
 
 		}
+
+	//Minerals
+	/*
+	Coal:
+	layer range: 1 - 128
+	Percentage : 1.19%
+
+	Iron:
+	layer Range : 1 - 65
+	Percentage : 0.68%
+
+	Gold:
+	layer range : 1 - 33
+	Percentage : 0.13%
+
+	Redstone:
+	Layer Range : 1 - 15
+	Percentages by layer : 0.98%
+
+	Lapis Lazuli:
+	Layer Range : 1 - 33
+	Percentage : 0.13%
+
+	Diamond:
+	Layer Range : 1 - 15
+	Percentage : 0.12%
+	*/
+	std::cout << "Adding minerals..." << std::endl;
+	
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 3; y <= CHUNK_SIZE_Y; y++)
+					{
+						if (rand() % 10000 >= 9891 && m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_STONE)
+						{
+							AddMineral(BTYPE_COAL, i, j, x, y, z);
+						}
+						else if (rand() % 10000 >= 9932 && m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_STONE && y < 66)
+						{
+							AddMineral(BTYPE_IRON, i, j, x, y, z);
+						}
+						else if (rand() % 10000 >= 9987 && m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_STONE && y < 34)
+						{
+							AddMineral(BTYPE_GOLD, i, j, x, y, z);
+						}
+						else if (rand() % 10000 >= 9907 && m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_STONE && y < 16)
+						{
+							AddMineral(BTYPE_REDSTONE, i, j, x, y, z);
+						}
+						else if (rand() % 10000 >= 9987 && m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_STONE && y < 34)
+						{
+							AddMineral(BTYPE_LAPIS_LAZULI, i, j, x, y, z);
+						}
+						else if (rand() % 10000 >= 9988 && m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_STONE && y < 16)
+						{
+							AddMineral(BTYPE_DIAMOND, i, j, x, y, z);
+						}
+
+					}
+
 	if (freq != 0)
 		std::cout << "Map created with this seed: " << seed << std::endl;
 	else
@@ -190,5 +253,35 @@ void World::SaveMap(std::string filename)
 	file.close();
 
 	std::cout << "Map saved as " << filename << std::endl;
+}
+
+void  World::AddMineral(BlockType mineral, int i, int j, int x, int y, int z)
+{
+
+	m_chunks.Get(i, j).SetBlock(x, y, z, mineral);
+	if (rand() % 100 >= 60 && m_chunks.Get(i, j).GetBlock(x + 1, y, z) == BTYPE_STONE)
+	{
+		m_chunks.Get(i, j).SetBlock(x + 1, y, z, mineral);
+	}
+	if (rand() % 100 >= 60 && m_chunks.Get(i, j).GetBlock(x - 1, y, z) == BTYPE_STONE)
+	{
+		m_chunks.Get(i, j).SetBlock(x - 1, y, z, mineral);
+	}
+	if (rand() % 100 >= 60 && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_STONE)
+	{
+		m_chunks.Get(i, j).SetBlock(x, y + 1, z, mineral);
+	}
+	if (rand() % 100 >= 60 && m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_STONE)
+	{
+		m_chunks.Get(i, j).SetBlock(x, y - 1, z, mineral);
+	}
+	if (rand() % 100 >= 60 && m_chunks.Get(i, j).GetBlock(x, y, z + 1) == BTYPE_STONE)
+	{
+		m_chunks.Get(i, j).SetBlock(x, y, z + 1, mineral);
+	}
+	if (rand() % 100 >= 60 && m_chunks.Get(i, j).GetBlock(x, y, z - 1) == BTYPE_STONE)
+	{
+		m_chunks.Get(i, j).SetBlock(x, y, z - 1, mineral);
+	}
 }
 
