@@ -48,7 +48,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
 	Perlin perlin(octaves, freq, amp, seed);
-	int count = 1;
+	int count = 0;
 
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -78,8 +78,9 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
 
 				}
-			std::cout << "Chunk " << count++ << " / " << WORLD_SIZE * WORLD_SIZE << " Created" << std::endl;
-			
+			if (count++ % 10 == 0)
+				std::cout << "Chunk " << count << " / " << WORLD_SIZE * WORLD_SIZE << " Created" << std::endl;
+
 
 		}
 	if (freq != 0)
@@ -107,9 +108,6 @@ Chunk& World::ChunkAt(float x, float z)
 {
 	if (x >= 0 && z >= 0 && x < WORLD_SIZE  && z < WORLD_SIZE)
 		return m_chunks.Get(x, z);
-
-
-
 }
 
 void World::LoadMap(std::string filename, BlockInfo *binfo)

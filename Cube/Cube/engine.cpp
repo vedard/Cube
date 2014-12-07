@@ -1,7 +1,5 @@
 ﻿#include "engine.h"
 
-
-
 Engine::Engine() :
 m_wireframe(false),
 m_player(),
@@ -141,7 +139,7 @@ void Engine::Render(float elapsedTime)
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
-		m_fps = round(1 / elapsedTime);
+		m_fps = round(1.f / elapsedTime);
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -158,7 +156,10 @@ void Engine::Render(float elapsedTime)
 
 	//Ciel
 	glPushMatrix();
-	glRotatef(gameTime * 1.2, 0, 1, 0);
+	glTranslatef(WORLD_SIZE*CHUNK_SIZE_X / 2, 0, WORLD_SIZE*CHUNK_SIZE_Z / 2);
+
+	glRotatef(gameTime * 1.1, 0, 1, 0);
+
 	m_textureSky.Bind();
 
 	glBegin(GL_QUADS);
@@ -187,24 +188,38 @@ void Engine::Render(float elapsedTime)
 	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 	glEnd();
-
-
+	
 	glPopMatrix();
 
 	////Render des chunk
 
 	m_textureAtlas.Bind();
 
+	Vector3<float> chunkPos(floor((m_player.Position().x) / CHUNK_SIZE_X), 0, floor((m_player.Position().z) / CHUNK_SIZE_Z));
 
-	for (int i = 0; i < WORLD_SIZE; i++)
+	//Permet d'updater un seul chunk par frame eviantant un arrret de jeu pendans les loading
+	bool update = true;
+
+	for (int i = 0; i < RENDER_DISTANCE; i++)
 	{
-		for (int j = 0; j < WORLD_SIZE; j++)	//Parcour les chunk
+		for (int j = 0; j < RENDER_DISTANCE; j++)
 		{
-			if (m_world.ChunkAt(i, j).IsDirty())
-				m_world.ChunkAt(i, j).Update(m_bInfo);
-			m_shader01.Use();
-			m_world.ChunkAt(i, j).Render();
-			Shader::Disable();
+			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE / 2, 0, chunkPos.z + j - RENDER_DISTANCE / 2);
+
+			//Si le chunk existe on le render
+			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
+			{
+				if (m_world.ChunkAt(chunkPos2.x, chunkPos2.z).IsDirty() && update)
+				{
+					m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Update(m_bInfo);
+					update = false;
+				}
+				
+					m_shader01.Use();
+					m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render();
+					Shader::Disable();
+				
+			}
 		}
 	}
 
@@ -332,23 +347,23 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	//Right Click
 	else if (button == 4 && m_currentBlock.x != -1)
 	{
-		Vector3<float> playerFootPos((int)m_player.Position().x, (int)m_player.Position().y, (int)m_player.Position().z); //Positio des pieds
-		Vector3<float> playerEyePos((int)m_player.Position().x, (int)(m_player.Position().y + m_player.GetDimension().y), (int)m_player.Position().z); //Position des yeux
-		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z); //Position du nouveau block
+		//Position du nouveau block
+		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
+		Vector3<float> chunkPos(floor((newBlocPos.x) / CHUNK_SIZE_X), 0, floor((newBlocPos.z) / CHUNK_SIZE_Z));
 
-		//Si il y a pas de collision avec le player
-		if (playerFootPos != newBlocPos && playerEyePos != newBlocPos)
-		{
-			Vector3<float> chunkPos(floor((newBlocPos.x) / CHUNK_SIZE_X), 0, floor((newBlocPos.z) / CHUNK_SIZE_Z));
+		//Si le chunk existe on place le block
+		if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(
+			newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X),
+			newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),
+			m_player.GetBlock());
 
-			//Si le chunk existe on place le block
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
-				m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(
-				newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X),
-				newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),
-				m_player.GetBlock());
+		//Si ya collision on efface le block
+		if (m_player.CheckCollision(m_world))
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X));
 
-		}
+
+
 	}
 	//Scroll Up
 	if (button == 8)

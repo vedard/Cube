@@ -104,7 +104,7 @@ Vector3<float> &Chunk::GetPosition()
 	return m_position;
 }
 
-void Chunk::Update(BlockInfo* binfo)
+void Chunk::Update(BlockInfo* &binfo)
 {
 	// Update mesh
 	if (m_isDirty)
@@ -142,7 +142,7 @@ void Chunk::Update(BlockInfo* binfo)
 	m_isDirty = false;
 }
 
-void Chunk::AddBlockToMesh(ChunkMesh::VertexData * vd, int & count, BlockInfo binfo, int x, int y, int z)
+void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &binfo, int x, int y, int z)
 {
 
 	if (GetBlock(x - m_position.x, y - m_position.y, z - m_position.z - 1) == BTYPE_AIR)
