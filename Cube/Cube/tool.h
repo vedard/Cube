@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <math.h>
 
 // TODO ne pas oublier de ne pas definir DEBUGMODE en release
 #ifndef DEBUGMODE

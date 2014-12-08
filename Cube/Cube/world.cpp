@@ -217,7 +217,7 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 
 	//Open file
 	std::ifstream file;
-	file.open(filename);
+	file.open(filename.c_str());
 
 	//Chunk pos, block pos, blocktype
 	int i, j, x, y, z, b;
@@ -258,7 +258,7 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 void World::SaveMap(std::string filename)
 {
 	std::ofstream file;
-	file.open(filename);
+	file.open(filename.c_str());
 	int count = 1;
 
 	for (int i = 0; i < WORLD_SIZE; i++)
