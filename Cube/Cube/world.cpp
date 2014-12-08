@@ -64,7 +64,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
-						
+
 						if (y == 0)
 							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_GRASS);
 						else if (y >= 1 && y < 4)
@@ -113,7 +113,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 	Percentage : 0.12%
 	*/
 	std::cout << "Adding minerals..." << std::endl;
-	
+
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
@@ -146,6 +146,32 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 						}
 
 					}
+
+	//Tree
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; x += 2)
+				for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
+				{
+					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					if (val <= -amp/3 || val > 0)
+					{
+						int y = 128;
+						if (rand() % 100 >= 95)
+						{
+							while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
+							{
+								y--;
+
+							}
+							y++;
+							AddTree(i, j, x, y, z);
+						}
+					}
+				}
+
+	std::cout << "Adding trees..." << std::endl;
+
 
 	if (freq != 0)
 		std::cout << "Map created with this seed: " << seed << std::endl;
@@ -284,5 +310,32 @@ void  World::AddMineral(BlockType mineral, int i, int j, int x, int y, int z)
 	{
 		m_chunks.Get(i, j).SetBlock(x, y, z - 1, mineral);
 	}
+}
+
+void  World::AddTree(int i, int j, int x, int y, int z)
+{
+	int hauteur = rand() % 7 + 3;
+
+	for (int k = 0; k < hauteur; k++)
+	{
+		m_chunks.Get(i, j).SetBlock(x, y + k, z, BTYPE_WOOD);
+	}
+	
+
+	m_chunks.Get(i, j).SetBlock(x + 1, y + hauteur - 1, z, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x + 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x, y + hauteur - 1, z + 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x, y + hauteur - 1, z - 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x - 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x - 1, y + hauteur - 1, z, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x - 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x + 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
+
+	m_chunks.Get(i, j).SetBlock(x + 1, y + hauteur, z, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x, y + hauteur, z + 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x, y + hauteur, z - 1, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x - 1, y + hauteur, z, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x, y + hauteur, z, BTYPE_LEAVE);
+	m_chunks.Get(i, j).SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
 }
 

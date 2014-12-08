@@ -42,6 +42,8 @@ void Engine::Init()
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0);
 
 
 	glEnable(GL_CULL_FACE);
@@ -127,6 +129,14 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_lapis_lazuli.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LAPIS_LAZULI].u, m_bInfo[BTYPE_LAPIS_LAZULI].v, m_bInfo[BTYPE_LAPIS_LAZULI].w, m_bInfo[BTYPE_LAPIS_LAZULI].h);
 
+	m_bInfo[BTYPE_WOOD].Init(BTYPE_WOOD, "Wood");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_wood.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WOOD].u, m_bInfo[BTYPE_WOOD].v, m_bInfo[BTYPE_WOOD].w, m_bInfo[BTYPE_WOOD].h);
+
+	m_bInfo[BTYPE_LEAVE].Init(BTYPE_LEAVE, "Leave");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_leave.png");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LEAVE].u, m_bInfo[BTYPE_LEAVE].v, m_bInfo[BTYPE_LEAVE].w, m_bInfo[BTYPE_LEAVE].h);
+
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -210,7 +220,7 @@ void Engine::Render(float elapsedTime)
 	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 	glEnd();
-	
+
 	glPopMatrix();
 
 	////Render des chunk
@@ -222,28 +232,31 @@ void Engine::Render(float elapsedTime)
 	//Permet d'updater un seul chunk par frame eviantant un arrret de jeu pendans les loading
 	bool update = true;
 
-	for (int i = 0; i < RENDER_DISTANCE; i++)
+	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 	{
-		for (int j = 0; j < RENDER_DISTANCE; j++)
+		for (int j = 0; j < RENDER_DISTANCE * 2 ; j++)
 		{
-			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE / 2, 0, chunkPos.z + j - RENDER_DISTANCE / 2);
+			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE , 0, chunkPos.z + j - RENDER_DISTANCE );
 
 			//Si le chunk existe on le render
 			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
 			{
+				//Si dirty on l'update (Si cest a son tour)
 				if (m_world.ChunkAt(chunkPos2.x, chunkPos2.z).IsDirty() && update)
 				{
 					m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Update(m_bInfo);
 					update = false;
 				}
-				
-					m_shader01.Use();
-					m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render();
-					Shader::Disable();
-				
+
+				//Render
+				m_shader01.Use();
+				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render();
+				Shader::Disable();
+
 			}
 		}
 	}
+
 
 	//Render le hui
 	if (m_wireframe)

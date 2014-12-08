@@ -30,6 +30,7 @@ public:
 
 private:
 	void AddMineral(BlockType mineral, int i, int j, int x, int y, int z);
+	void AddTree(int i, int j, int x, int y, int z);
 
 
 private:

@@ -30,10 +30,10 @@ typedef long long int64;
 #define CHUNK_SIZE_X 8
 #define CHUNK_SIZE_Y 128
 #define CHUNK_SIZE_Z 8
-#define WORLD_SIZE 40
-#define RENDER_DISTANCE 24
+#define WORLD_SIZE 30
+#define RENDER_DISTANCE 7
 #define EDITING_DISTANCE 3
-#define NUMBER_OF_BLOCK 14
+#define NUMBER_OF_BLOCK 16
 #define PI 3.14159265358
 
 typedef uint8 BlockType;
@@ -51,7 +51,10 @@ enum BLOCK_TYPE {
 	BTYPE_DIAMOND, 
 	BTYPE_GOLD, 
 	BTYPE_REDSTONE, 
-	BTYPE_LAPIS_LAZULI };
+	BTYPE_LAPIS_LAZULI,
+	BTYPE_WOOD,
+	BTYPE_LEAVE
+};
 
 
 #define TEXTURE_PATH	"../Cube/media/textures/"
