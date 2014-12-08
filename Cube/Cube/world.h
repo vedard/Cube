@@ -5,6 +5,7 @@
 #include "chunk.h"
 #include "perlin.h"
 #include "tool.h"
+#include "shader.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -27,6 +28,7 @@ public:
 
 	void LoadMap(std::string filename, BlockInfo *binfo);
 	void SaveMap(std::string filename);
+	void Update(int CenterX, int CenterZ, BlockInfo* info);
 
 private:
 	void AddMineral(BlockType mineral, int i, int j, int x, int y, int z);

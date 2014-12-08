@@ -227,26 +227,21 @@ void Engine::Render(float elapsedTime)
 
 	m_textureAtlas.Bind();
 
+	
 	Vector3<float> chunkPos(floor((m_player.Position().x) / CHUNK_SIZE_X), 0, floor((m_player.Position().z) / CHUNK_SIZE_Z));
-
-	//Permet d'updater un seul chunk par frame eviantant un arrret de jeu pendans les loading
-	bool update = true;
-
+	
+	//Update les chunk autour du joueur si il sont dirty
+	m_world.Update(chunkPos.x, chunkPos.z, m_bInfo);
+		
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 	{
-		for (int j = 0; j < RENDER_DISTANCE * 2 ; j++)
+		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
-			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE , 0, chunkPos.z + j - RENDER_DISTANCE );
+			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE, 0, chunkPos.z + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
 			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
 			{
-				//Si dirty on l'update (Si cest a son tour)
-				if (m_world.ChunkAt(chunkPos2.x, chunkPos2.z).IsDirty() && update)
-				{
-					m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Update(m_bInfo);
-					update = false;
-				}
 
 				//Render
 				m_shader01.Use();

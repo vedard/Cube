@@ -154,7 +154,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
 				{
 					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
-					if (val <= -amp/3 || val > 0)
+					if (val <= -amp / 3 || val > 0)
 					{
 						int y = 128;
 						if (rand() % 100 >= 95)
@@ -320,7 +320,7 @@ void  World::AddTree(int i, int j, int x, int y, int z)
 	{
 		m_chunks.Get(i, j).SetBlock(x, y + k, z, BTYPE_WOOD);
 	}
-	
+
 
 	m_chunks.Get(i, j).SetBlock(x + 1, y + hauteur - 1, z, BTYPE_LEAVE);
 	m_chunks.Get(i, j).SetBlock(x + 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
@@ -339,3 +339,63 @@ void  World::AddTree(int i, int j, int x, int y, int z)
 	m_chunks.Get(i, j).SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
 }
 
+
+void World::Update(int CenterX, int CenterZ, BlockInfo* info)
+{
+	if (CenterX >= 0 && CenterZ >= 0 && CenterX < WORLD_SIZE && CenterZ < WORLD_SIZE)
+		if (ChunkAt(CenterX, CenterZ).IsDirty())
+			ChunkAt(CenterX, CenterZ).Update(info);
+
+	//Parcours les chunk en cercle
+	for (int x = 1; x < RENDER_DISTANCE; ++x)
+	{
+		for (int a = -x; a <= x; ++a)
+		{
+			Vector3<float> chunkPos(CenterX + a, 0, CenterZ - x);
+			//Si le chunk existe
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
+				//Si dirty
+				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
+				{
+					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
+					return;
+				}
+		}
+		for (int a = -x; a <= x; ++a)
+		{
+			Vector3<float> chunkPos(CenterX + a, 0, CenterZ + x);
+			//Si le chunk existe
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
+				//Si dirty
+				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
+				{
+					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
+					return;
+				}
+		}
+		for (int a = -x; a <= x; ++a)
+		{
+			Vector3<float> chunkPos(CenterX - x, 0, CenterZ + a);
+			//Si le chunk existe
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
+				//Si dirty
+				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
+				{
+					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
+					return;
+				}
+		}
+		for (int a = -x; a <= x; ++a)
+		{
+			Vector3<float> chunkPos(CenterX + x, 0, CenterZ + a);
+			//Si le chunk existe
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
+				//Si dirty
+				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
+				{
+					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
+					return;
+				}
+		}
+	}
+}
