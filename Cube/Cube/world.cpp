@@ -31,11 +31,9 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE)
 
 }
 
-
 World::~World()
 {
 }
-
 
 void World::InitMap(int octaves, float freq, float amp, int seed)
 {
@@ -66,11 +64,11 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 					{
 
 						if (y == 0)
-							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_GRASS);
+							m_chunks.Get(i, j).SetBlock(x, val + 80 - y, z, BTYPE_GRASS);
 						else if (y >= 1 && y < 4)
-							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_DIRT);
+							m_chunks.Get(i, j).SetBlock(x, val + 80 - y, z, BTYPE_DIRT);
 						else if (y >= 4)
-							m_chunks.Get(i, j).SetBlock(x, val + 64 - y, z, BTYPE_STONE);
+							m_chunks.Get(i, j).SetBlock(x, val + 80 - y, z, BTYPE_STONE);
 					}
 					//Plancher de bedrock
 					m_chunks.Get(i, j).SetBlock(x, 0, z, BTYPE_BED_ROCK);
@@ -147,30 +145,107 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 
 					}
 
+
+
+	//Cave
+	std::cout << "Adding caves..." << std::endl;
+
+	//Nombre de caverne
+	for (int i = 0; i < rand() % (WORLD_SIZE * 10) + (WORLD_SIZE * 2); i++)
+	{
+		Vector3<float> head(rand() % (WORLD_SIZE*CHUNK_SIZE_X), rand() % (CHUNK_SIZE_Y - 40), rand() % (WORLD_SIZE*CHUNK_SIZE_X));
+
+		//Longeur d'une tunel
+		for (int j = 0; j < rand() % 300 + 200; j++)
+		{
+			Vector3<float> chunkPos(floor((head.x) / CHUNK_SIZE_X), 0, floor((head.z) / CHUNK_SIZE_Z));
+
+			//Si on est dans la map
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
+			{
+				//Largeur du tunel
+				for (int q = 0; q < rand() % 4 + 3; q++)
+				{
+					for (int w = 0; w < rand() % 4 + 3; w++)
+					{
+						for (int e = 0; e < rand() % 4 + 3; e++)
+						{
+							Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
+
+							//On creuse dans de la stone, les minerais ou la terre 
+							if ((m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_STONE ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_COAL ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_IRON ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_GOLD ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_DIAMOND ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_LAPIS_LAZULI ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_REDSTONE ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_GRASS ||
+								m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_DIRT)
+								&& blockPos.y > rand() % 3 + 4)
+
+								//Set le bloc a air
+								m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
+						}
+					}
+				}
+
+
+			}
+
+			//On avance la tete du tunel
+			head.x += (rand() % 100 > 50) ? 1 : -1;
+			head.y += (rand() % 100 > 50) ? 1 : -1;
+			head.z += (rand() % 100 > 50) ? 1 : -1;
+		}
+	}
+
 	//Tree
+	std::cout << "Adding trees..." << std::endl;
+
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 			for (int x = 0; x < CHUNK_SIZE_X; x += 2)
 				for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
 				{
 					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+
+					//Si haut de montagne ou bas
 					if (val <= -amp / 3 || val > 0)
 					{
 						int y = 128;
 						if (rand() % 100 >= 95)
 						{
+							//Trouve le grass le plus haut et ajoute l'arbre acette position
 							while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
 							{
 								y--;
 
 							}
-							y++;
-							AddTree(i, j, x, y, z);
+							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS)
+							{
+								y++;
+								AddTree(i, j, x, y, z);
+							}
 						}
 					}
 				}
 
-	std::cout << "Adding trees..." << std::endl;
+	//Tree
+	std::cout << "Fixing..." << std::endl;
+	for (int i = 0; i < WORLD_SIZE; i++)
+		for (int j = 0; j < WORLD_SIZE; j++)
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 3; y <= CHUNK_SIZE_Y; y++)
+					{
+						if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_DIRT && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_AIR)
+						{
+							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
+						}
+					}
+
+
 
 
 	if (freq != 0)
@@ -339,7 +414,6 @@ void  World::AddTree(int i, int j, int x, int y, int z)
 	m_chunks.Get(i, j).SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
 }
 
-
 void World::Update(int CenterX, int CenterZ, BlockInfo* info)
 {
 	if (CenterX >= 0 && CenterZ >= 0 && CenterX < WORLD_SIZE && CenterZ < WORLD_SIZE)
@@ -347,7 +421,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* info)
 			ChunkAt(CenterX, CenterZ).Update(info);
 
 	//Parcours les chunk en cercle
-	for (int x = 1; x < RENDER_DISTANCE; ++x)
+	for (int x = 1; x < RENDER_DISTANCE + 1; ++x)
 	{
 		for (int a = -x; a <= x; ++a)
 		{
