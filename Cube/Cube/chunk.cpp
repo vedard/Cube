@@ -1,7 +1,7 @@
 #include "chunk.h"
 #include <iostream>
 
-Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_isDirty(true), m_chunkMesh(), m_position(0, 0, 0)
+Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_isDirty(true), m_chunkMesh(), m_position(0, 0, 0), m_save(false)
 {
 	m_blocks.Reset(BTYPE_AIR);
 
@@ -17,6 +17,7 @@ void Chunk::RemoveBloc(int x, int y, int z)
 {
 	m_blocks.Set(x, y, z, BTYPE_AIR);
 	m_isDirty = true;
+	m_save = true;
 
 	// Si on efface un cube pres d'un chunk il faut le redender
 	// Aussi sinon cetaine face qui ne s'afficheront pas
@@ -70,6 +71,7 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type)
 
 void Chunk::PlaceBlock(int x, int y, int z, BlockType type)
 {
+	m_save = true;
 	if (m_blocks.Get(x, y, z) == BTYPE_AIR)
 		SetBlock(x, y, z, type);
 
@@ -229,4 +231,6 @@ bool Chunk::IsDirty() const
 {
 	return m_isDirty;
 }
-
+bool& Chunk::GetSave(){
+	return m_save;
+}

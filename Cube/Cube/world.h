@@ -35,8 +35,13 @@ private:
 	void AddTree(int i, int j, int x, int y, int z);
 
 
+
 private:
 	Array2d<Chunk> m_chunks;
+	int		m_octaves;
+	float	m_freq;
+	float	m_amp;
+	int		m_seed;
 
 };
 #endif // !WORLD_H__

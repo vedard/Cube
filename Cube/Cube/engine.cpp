@@ -19,6 +19,7 @@ m_world()
 
 Engine::~Engine()
 {
+	m_world.SaveMap("map.sav");
 	delete[] m_bInfo;
 }
 
@@ -152,13 +153,14 @@ void Engine::LoadResource()
 	}
 
 	//Load la map
-	m_world.InitMap(16, 6, 80, 15);
+	m_world.LoadMap("map.sav",m_bInfo);
 	m_player.Spawn(m_world);
 
 }
 
 void Engine::UnloadResource()
 {
+
 }
 
 void Engine::Render(float elapsedTime)
@@ -368,7 +370,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	{
 		Vector3<float> chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0, floor(m_currentBlock.z / CHUNK_SIZE_Z));
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-
+		
 	}
 
 	//Right Click
@@ -387,7 +389,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 		//Si ya collision on efface le block
 		if (m_player.CheckCollision(m_world))
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X));
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),BTYPE_AIR);
 
 
 
