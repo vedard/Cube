@@ -327,11 +327,15 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 		ss >> i >> j >> x >> y >> z >> b;
 
 		//Set block
-		if (b >= 0 && b << NUMBER_OF_BLOCK)
-		{
+
+		if (b == 0)
+			m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
+
+		else
 			m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
-			m_chunks.Get(i, j).GetSave() = true;
-		}
+
+		m_chunks.Get(i, j).GetSave() = true;
+
 
 		//Tell Where we are
 		if (ss.tellg() % 1024 == 0)
