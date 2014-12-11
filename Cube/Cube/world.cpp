@@ -178,25 +178,11 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
 
-								//On creuse dans de la stone, les minerais ou la terre 
-								if ((m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_STONE ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_COAL ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_IRON ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_GOLD ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_DIAMOND ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_LAPIS_LAZULI ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_REDSTONE ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_GRASS ||
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) == BTYPE_DIRT)
-									&& blockPos.y > rand() % 3 + 4)
-
 									//Set le bloc a air
 									m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
 							}
 						}
 					}
-
-
 				}
 
 				//On avance la tete du tunel
@@ -326,17 +312,21 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 		//Get the value for a block
 		ss >> i >> j >> x >> y >> z >> b;
 
-		//Set block
+		if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z
+			&& j >= 0 && i >= 0 && j < WORLD_SIZE  && i < WORLD_SIZE
+			&& b >= 0 && b < NUMBER_OF_BLOCK)
+		{
+			//Set block
 
-		if (b == 0)
-			m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
+			if (b == 0)
+				m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
-		else
-			m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
+			else
+				m_chunks.Get(i, j).SetBlock(x, y, z, binfo[b].GetType());
 
-		m_chunks.Get(i, j).GetSave() = true;
+			m_chunks.Get(i, j).GetSave() = true;
 
-
+		}
 		//Tell Where we are
 		if (ss.tellg() % 1024 == 0)
 			std::cout << float(ss.tellg() / 1024) << " / " << length << " KB loaded" << std::endl;

@@ -88,6 +88,7 @@
     <ClCompile Include="perlin.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
@@ -105,6 +106,7 @@
     <ClInclude Include="perlin.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="textureatlas.h" />
     <ClInclude Include="tool.h" />

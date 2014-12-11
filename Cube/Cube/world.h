@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include "simplexnoise.h"
 
 class World
 {
@@ -44,6 +45,8 @@ private:
 	int		m_seed;
 
 };
+
+
 #endif // !WORLD_H__
 
 

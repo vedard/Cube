@@ -30,7 +30,7 @@ typedef long long int64;
 #define CHUNK_SIZE_X 8
 #define CHUNK_SIZE_Y 128
 #define CHUNK_SIZE_Z 8
-#define WORLD_SIZE 40
+#define WORLD_SIZE 20
 #define RENDER_DISTANCE 7
 #define EDITING_DISTANCE 5
 #define NUMBER_OF_BLOCK 16
