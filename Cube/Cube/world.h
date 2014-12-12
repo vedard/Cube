@@ -3,7 +3,6 @@
 
 #include "array2d.h"
 #include "chunk.h"
-#include "perlin.h"
 #include "tool.h"
 #include "shader.h"
 #include <iostream>
@@ -25,7 +24,7 @@ public:
 	// - Freq: Agressivité des montagnes (0 for flat)
 	// - Amp: Hauteur des montagnes
 	// - Seed: seed pour le random
-	void InitMap(int octaves, float freq, float amp, int seed);
+	void InitMap(int seed);
 
 	void LoadMap(std::string filename, BlockInfo *binfo);
 	void SaveMap(std::string filename);
@@ -39,9 +38,6 @@ private:
 
 private:
 	Array2d<Chunk> m_chunks;
-	int		m_octaves;
-	float	m_freq;
-	float	m_amp;
 	int		m_seed;
 
 };

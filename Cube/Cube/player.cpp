@@ -5,7 +5,7 @@
 
 
 Player::Player() :
-m_pos(0, 0, 0),
+m_pos(0, 128, 0),
 m_dimension(0.2, 1.62, 0.2),
 m_rotX(0),
 m_rotY(0),

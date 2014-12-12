@@ -5,7 +5,8 @@ m_wireframe(false),
 m_player(),
 m_shader01(),
 m_textureAtlas(NUMBER_OF_BLOCK - 1),
-m_world()
+m_world(),
+m_currentBlock(-1,-1,-1)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -154,7 +155,7 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav",m_bInfo);
-	m_player.Spawn(m_world);
+//	m_player.Spawn(m_world);
 
 }
 
@@ -317,14 +318,14 @@ void Engine::KeyPressEvent(unsigned char key)
 	//Lshift + R -> Random map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
 	{
-		m_world.InitMap(16, 4, 80, time(NULL));
+		m_world.InitMap(time(NULL));
 		m_player.Spawn(m_world);
 	}
 
 	//Lshift + F -> Flat map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
 	{
-		m_world.InitMap(16, 0, 80, time(NULL));
+		m_world.InitMap(0);
 		m_player.Spawn(m_world);
 	}
 }

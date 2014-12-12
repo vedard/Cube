@@ -1,6 +1,6 @@
 #include "world.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_octaves(16), m_freq(4), m_amp(80), m_seed(15)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(15)
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -34,14 +34,17 @@ World::~World()
 {
 }
 
-void World::InitMap(int octaves, float freq, float amp, int seed)
+void World::InitMap(int seed)
 {
-	m_octaves = octaves;
-	m_freq = freq;
-	m_amp = amp;
 	m_seed = seed;
-
 	std::srand(seed);
+
+	//seed simplex noise
+	for (int i = 0; i < 512; i++)
+	{
+		perm[i] = rand() % 256;
+	}
+
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -49,9 +52,6 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
-
-
-	Perlin perlin(octaves, freq, amp, seed);
 
 	int count = 0;
 
@@ -62,7 +62,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
-					float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					float val = scaled_octave_noise_2d(16, 0.2, (seed) ? 20 : 0, -20, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
@@ -88,7 +88,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 
 		}
 
-	if (m_freq > 0)
+	if (seed > 0)
 	{
 		//Minerals
 		/*
@@ -170,16 +170,16 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
 				{
 					//Largeur du tunel
-					for (int q = 0; q < rand() % 4 + 3; q++)
+					for (int q = 0; q < rand() % 2 + 4; q++)
 					{
-						for (int w = 0; w < rand() % 4 + 3; w++)
+						for (int w = 0; w < rand() % 2 + 4; w++)
 						{
-							for (int e = 0; e < rand() % 4 + 3; e++)
+							for (int e = 0; e < rand() % 2 + 4; e++)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
 
-									//Set le bloc a air
-									m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
+								//Set le bloc a air
+								m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
 							}
 						}
 					}
@@ -200,28 +200,28 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 				for (int x = 0; x < CHUNK_SIZE_X; x += 2)
 					for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
 					{
-						float val = perlin.Get((float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 
-						//Si haut de montagne ou bas
-						if (val <= -amp / 3 || val > 0)
+						int y = 128;
+						if (rand() % 100 >= 90)
 						{
-							int y = 128;
-							if (rand() % 100 >= 95)
+							//Trouve le grass le plus haut et ajoute l'arbre acette position
+							while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
 							{
-								//Trouve le grass le plus haut et ajoute l'arbre acette position
-								while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
-								{
-									y--;
+								y--;
 
-								}
-								if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS)
-								{
-									y++;
-									AddTree(i, j, x, y, z);
-								}
+							}
+							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS &&
+								m_chunks.Get(i, j).GetBlock(x + 1, y, z) == BTYPE_GRASS &&
+								m_chunks.Get(i, j).GetBlock(x - 1, y, z) == BTYPE_GRASS &&
+								m_chunks.Get(i, j).GetBlock(x, y, z + 1) == BTYPE_GRASS &&
+								m_chunks.Get(i, j).GetBlock(x, y, z - 1) == BTYPE_GRASS)
+							{
+								y++;
+								AddTree(i, j, x, y, z);
 							}
 						}
 					}
+
 
 		//Little fix
 		std::cout << "Fixing..." << std::endl;
@@ -240,7 +240,7 @@ void World::InitMap(int octaves, float freq, float amp, int seed)
 
 	}
 
-	if (freq != 0)
+	if (seed != 0)
 		std::cout << "Map created with this seed: " << seed << std::endl << std::endl;
 	else
 		std::cout << "Flat map created" << std::endl << std::endl;
@@ -302,9 +302,9 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 	float length = ss.tellg() / 1024;
 	ss.seekg(0, file.beg);
 
-	ss >> m_octaves >> m_freq >> m_amp >> m_seed;
+	ss >> m_seed;
 
-	InitMap(m_octaves, m_freq, m_amp, m_seed);
+	InitMap(m_seed);
 
 	//Read
 	while (ss)
@@ -336,7 +336,7 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 	std::cout << filename << " Loaded" << std::endl << std::endl;
 }
 
-void World::SaveMap(std::string filename)
+void World::SaveMap(std::string filename) 
 {
 	std::ofstream file;
 	file.open(filename.c_str());
@@ -351,9 +351,6 @@ void World::SaveMap(std::string filename)
 			if (ChunkAt(i, j).GetSave())
 				total++;
 
-	file << m_octaves << " ";
-	file << m_freq << " ";
-	file << m_amp << " ";
 	file << m_seed << std::endl;
 
 	for (int i = 0; i < WORLD_SIZE; i++)

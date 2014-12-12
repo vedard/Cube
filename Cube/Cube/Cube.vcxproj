@@ -85,7 +85,6 @@
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="openglcontext.cpp" />
-    <ClCompile Include="perlin.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
@@ -103,7 +102,6 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="openglcontext.h" />
-    <ClInclude Include="perlin.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
