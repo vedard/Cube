@@ -155,7 +155,7 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav",m_bInfo);
-//	m_player.Spawn(m_world);
+	m_player.Spawn(m_world);
 
 }
 
