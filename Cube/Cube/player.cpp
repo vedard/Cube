@@ -9,7 +9,7 @@ m_pos(0, 128, 0),
 m_dimension(0.2, 1.62, 0.2),
 m_rotX(0),
 m_rotY(0),
-m_vitesse(4),
+m_vitesse(0.1),
 m_noClip(false),
 m_sneaked(false),
 m_vitesseY(0),
@@ -56,12 +56,12 @@ void Player::TurnTopBottom(float value)
 
 }
 
-void Player::Move(bool front, bool back, bool left, bool right, float elapsedTime, World &world)
+void Player::Move(bool front, bool back, bool left, bool right, World &world)
 {
 	//Orientation du player en rad
 	float orientationPlayer = m_rotX * PI / 180;
 	//Multiplicateur de vitesse
-	float multiplieur = m_vitesse * elapsedTime;
+	float multiplieur = m_vitesse;
 
 	//Change la vittesse selon l'etat du player
 	if (m_sneaked)

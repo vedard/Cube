@@ -16,7 +16,7 @@ public:
 	void Spawn(World &world);
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
-	void Move(bool front, bool back, bool left, bool right, float elapsedTime, World &world);
+	void Move(bool front, bool back, bool left, bool right, World &world);
 	bool CheckCollision(World &world) const;
 
 	void ApplyRotation() const;

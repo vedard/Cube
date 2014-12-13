@@ -6,7 +6,7 @@ m_player(),
 m_shader01(),
 m_textureAtlas(NUMBER_OF_BLOCK - 1),
 m_world(),
-m_currentBlock(-1,-1,-1)
+m_currentBlock(-1, -1, -1)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -154,7 +154,7 @@ void Engine::LoadResource()
 	}
 
 	//Load la map
-	m_world.LoadMap("map.sav",m_bInfo);
+	m_world.LoadMap("map.sav", m_bInfo);
 	m_player.Spawn(m_world);
 
 }
@@ -166,9 +166,11 @@ void Engine::UnloadResource()
 
 void Engine::Render(float elapsedTime)
 {
-	GetBlocAtCursor();
+	
 
 	static float gameTime = elapsedTime;
+	static float nextGameUpdate = gameTime;
+
 
 	gameTime += elapsedTime;
 
@@ -183,8 +185,20 @@ void Engine::Render(float elapsedTime)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//Update le player
-	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], elapsedTime, m_world);
+	int loops = 0;
+
+	//Lock les mouvements a 50 fps
+	while (gameTime > nextGameUpdate && loops < 10) {
+
+
+		//Update le player
+		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+
+		//1 / 0.02 = 50 fps
+		nextGameUpdate += 0.02;
+		loops++;
+
+	}
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
@@ -230,12 +244,12 @@ void Engine::Render(float elapsedTime)
 
 	m_textureAtlas.Bind();
 
-	
+
 	Vector3<float> chunkPos(floor((m_player.Position().x) / CHUNK_SIZE_X), 0, floor((m_player.Position().z) / CHUNK_SIZE_Z));
-	
+
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(chunkPos.x, chunkPos.z, m_bInfo);
-		
+
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 	{
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
@@ -366,12 +380,13 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
+	GetBlocAtCursor();
 	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{
 		Vector3<float> chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0, floor(m_currentBlock.z / CHUNK_SIZE_Z));
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-		
+
 	}
 
 	//Right Click
@@ -390,7 +405,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 		//Si ya collision on efface le block
 		if (m_player.CheckCollision(m_world))
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),BTYPE_AIR);
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
 
 
 

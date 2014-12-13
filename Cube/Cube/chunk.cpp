@@ -231,6 +231,7 @@ bool Chunk::IsDirty() const
 {
 	return m_isDirty;
 }
+
 bool& Chunk::GetSave(){
 	return m_save;
 }
