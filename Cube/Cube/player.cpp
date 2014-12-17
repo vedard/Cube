@@ -186,12 +186,23 @@ bool Player::CheckCollision(World &world) const
 	BlockType bt11 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
 	BlockType bt12 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
 
+
+
 	//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
-	if (bt1 != BTYPE_AIR || bt2 != BTYPE_AIR || bt3 != BTYPE_AIR ||
-		bt4 != BTYPE_AIR || bt5 != BTYPE_AIR || bt6 != BTYPE_AIR ||
-		bt7 != BTYPE_AIR || bt8 != BTYPE_AIR || bt9 != BTYPE_AIR ||
-		bt10 != BTYPE_AIR || bt11 != BTYPE_AIR || bt12 != BTYPE_AIR)
+	if ((bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)||
+		(bt2 != BTYPE_AIR && bt2 != BTYPE_WATER) || 
+		(bt3 != BTYPE_AIR && bt3 != BTYPE_WATER) || 
+		(bt4 != BTYPE_AIR && bt4 != BTYPE_WATER) || 
+		(bt5 != BTYPE_AIR && bt5 != BTYPE_WATER) || 
+		(bt6 != BTYPE_AIR && bt6 != BTYPE_WATER) || 
+		(bt7 != BTYPE_AIR && bt7 != BTYPE_WATER) || 
+		(bt8 != BTYPE_AIR && bt8 != BTYPE_WATER) || 
+		(bt9 != BTYPE_AIR && bt9 != BTYPE_WATER) || 
+		(bt10 != BTYPE_AIR && bt10 != BTYPE_WATER) || 
+		(bt11 != BTYPE_AIR && bt11 != BTYPE_WATER) || 
+		(bt12 != BTYPE_AIR && bt12 != BTYPE_WATER))
 		return true;
+		
 
 
 	return false;

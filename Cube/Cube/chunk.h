@@ -7,6 +7,7 @@
 
 
 
+
 class Chunk 
 {
 public:
@@ -25,7 +26,7 @@ public:
 	Vector3<float> &GetBlockPos(int x, int y, int z);
 	void Update(BlockInfo* &binfo);
 	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &binfo, int x, int y, int z);
-	void Render() const;
+	void Render(GLenum &m_program) const;
 	bool IsDirty() const;
 	bool& GetSave();
 

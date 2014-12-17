@@ -139,6 +139,10 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_leave.png");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LEAVE].u, m_bInfo[BTYPE_LEAVE].v, m_bInfo[BTYPE_LEAVE].w, m_bInfo[BTYPE_LEAVE].h);
 
+	m_bInfo[BTYPE_WATER].Init(BTYPE_WATER, "Water");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_water.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WATER].u, m_bInfo[BTYPE_WATER].v, m_bInfo[BTYPE_WATER].w, m_bInfo[BTYPE_WATER].h);
+
 
 	if (!m_textureAtlas.Generate(128, false))
 	{
@@ -250,6 +254,11 @@ void Engine::Render(float elapsedTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(chunkPos.x, chunkPos.z, m_bInfo);
 
+	//Render
+	m_shader01.Use();
+
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 	{
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
@@ -257,18 +266,14 @@ void Engine::Render(float elapsedTime)
 			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE, 0, chunkPos.z + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
-			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
-			{
+			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)						
+				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render(m_shader01.m_program);
+				
 
-				//Render
-				m_shader01.Use();
-				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render();
-				Shader::Disable();
-
-			}
+		
 		}
 	}
-
+	Shader::Disable();
 
 	//Render le hui
 	if (m_wireframe)
