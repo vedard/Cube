@@ -19,6 +19,7 @@ public:
 	void Move(bool front, bool back, bool left, bool right, World &world);
 	bool CheckCollision(World &world) const;
 
+
 	void ApplyRotation() const;
 	void ApplyTranslation() const;
 	void ToggleNoClip();
@@ -27,12 +28,16 @@ public:
 	void Jump();
 	void Hurt(int damage);
 	int GetHP() const;
+	bool Underwater() const;
 	BlockType GetBlock() const;
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
 	Vector3<float> Position() const;
 	Vector3<float> GetDimension() const;
+
+private:
+	bool CheckUnderwater(World &world) const;
 
 private:
 	
@@ -44,11 +49,13 @@ private:
 		m_vitesse; //vitesse de deplacement
 
 	float m_vitesseY;   //Vittesse verticale (gravité et saut)
+	int m_health;		//Vie du personnage
+
 	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)
 	bool m_sneaked;		//Si on est penché
 	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)
-	int m_health;		//Vie du personnage
 	bool m_running;		//Si le joueur cour
+	bool m_underwater;  // Si le joueur est sous l'eau
 	BlockType m_block;   //Prochain block que le joueur peut placer
 };
 

@@ -45,14 +45,21 @@ void World::InitMap(int seed)
 		perm[i] = rand() % 256;
 	}
 
+	std::cout << "Cleaning..." << std::endl;
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
+		{
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
-						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
+					{
+						if (m_chunks.Get(i, j).GetBlock(x, y, z) != BTYPE_AIR)
+							m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
+					}
+			m_chunks.Get(i, j).GetSave() = false;
+		}
 	int count = 0;
 
 	//Map height
@@ -151,9 +158,28 @@ void World::InitMap(int seed)
 							}
 
 						}
+		//Water
+		std::cout << "Adding ocean..." << std::endl;
+
+		for (int i = 0; i < WORLD_SIZE; i++)
+			for (int j = 0; j < WORLD_SIZE; j++)
+				for (int x = 0; x < CHUNK_SIZE_X; x++)
+					for (int z = 0; z < CHUNK_SIZE_Z; z++)
+						for (int y = 0; y < 60; y++)
+						{
+
+							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR &&
+								(m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_GRASS ||
+								m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_DIRT ||
+								m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_WATER))
+							{
+								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_WATER);
+							}
+
+						}
+
 
 		//Cave
-
 		std::cout << "Adding caves..." << std::endl;
 
 		//Nombre de caverne
@@ -178,8 +204,9 @@ void World::InitMap(int seed)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
 
-								//Set le bloc a air
-								m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
+								if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER)
+									//Set le bloc a air
+									m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
 							}
 						}
 					}
@@ -191,25 +218,6 @@ void World::InitMap(int seed)
 				head.z += (rand() % 100 > 50) ? 1 : -1;
 			}
 		}
-		//Water
-		std::cout << "Adding ocean..." << std::endl;
-
-		for (int i = 0; i < WORLD_SIZE; i++)
-			for (int j = 0; j < WORLD_SIZE; j++)
-				for (int x = 0; x < CHUNK_SIZE_X; x++)
-					for (int z = 0; z < CHUNK_SIZE_Z; z++)
-						for (int y = 0; y < 60; y++)
-						{
-
-							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR &&
-								(m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_GRASS ||
-								m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_DIRT ||
-								m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_WATER))
-							{
-								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_WATER);
-							}
-
-						}
 
 		//Tree
 		std::cout << "Adding trees..." << std::endl;
@@ -240,7 +248,7 @@ void World::InitMap(int seed)
 							}
 						}
 					}
-		
+
 
 
 		//Little fix
@@ -255,14 +263,14 @@ void World::InitMap(int seed)
 							{
 								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
 							}
-							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && y < 65)
+							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && y < 65)
 							{
 								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
 								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
 								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
 								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
 							}
-							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && m_chunks.Get(i, j).GetBlock(x, y +1, z) == BTYPE_WATER)
+							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_WATER)
 							{
 								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
 								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
@@ -280,7 +288,7 @@ void World::InitMap(int seed)
 		std::cout << "Flat map created" << std::endl << std::endl;
 }
 
-BlockType World::BlockAt(float x, float y, float z)
+BlockType World::BlockAt(float x, float y, float z) const
 {
 	Vector3<float>chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
 
@@ -304,18 +312,6 @@ Chunk& World::ChunkAt(float x, float z)
 void World::LoadMap(std::string filename, BlockInfo *binfo)
 {
 	std::cout << "Loading " << filename << "..." << std::endl;
-
-	//Erase map
-	for (int i = 0; i < WORLD_SIZE; i++)
-		for (int j = 0; j < WORLD_SIZE; j++)
-			for (int x = 0; x < CHUNK_SIZE_X; ++x)
-				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
-					{
-						m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
-						m_chunks.Get(i, j).SetBlock(0, 0, 0, BTYPE_TEST);
-						m_chunks.Get(i, j).GetSave() = false;
-					}
 
 	//Open file
 	std::ifstream file;

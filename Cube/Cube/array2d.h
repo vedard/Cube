@@ -13,7 +13,7 @@ public:
 
 	void Set(int x, int y, t value);
 	t& Get(int x, int y);
-	t& Get(int x, int y) const;
+	const t& Get(int x, int y) const;
 	void Reset(t value);
 
 private:
@@ -61,7 +61,7 @@ t& Array2d<t>::Get(int x, int y)
 }
 
 template<class t>
-t& Array2d<t>::Get(int x, int y) const
+const t& Array2d<t>::Get(int x, int y) const
 {
 	if (x >= 0 && y >= 0 && x < m_x && y < m_y)
 		return m_data[x + (y * m_x)];

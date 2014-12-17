@@ -15,7 +15,8 @@ m_sneaked(false),
 m_vitesseY(0),
 m_health(100),
 m_running(false),
-m_block(BTYPE_GRASS)
+m_block(BTYPE_GRASS),
+m_underwater(false)
 {
 
 }
@@ -162,6 +163,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		Spawn(world);
 	}
 
+	//Si le player est dans l'eau
+	m_underwater = CheckUnderwater(world);
 }
 
 bool Player::CheckCollision(World &world) const
@@ -188,7 +191,7 @@ bool Player::CheckCollision(World &world) const
 
 
 
-	//Si un des block qui touche au joeur n'est pas BTYPE_AIR -> il y a collision
+	//Si un des block qui touche au joeur n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
 	if ((bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)||
 		(bt2 != BTYPE_AIR && bt2 != BTYPE_WATER) || 
 		(bt3 != BTYPE_AIR && bt3 != BTYPE_WATER) || 
@@ -207,6 +210,16 @@ bool Player::CheckCollision(World &world) const
 
 	return false;
 
+}
+
+bool Player::CheckUnderwater(World &world) const
+{
+	BlockType bt1 = world.BlockAt(m_pos.x , m_pos.y + m_dimension.y, m_pos.z );
+
+	if (bt1 == BTYPE_WATER )
+		return true;
+	else
+		return false;
 }
 
 void Player::ApplyRotation() const
@@ -307,4 +320,9 @@ void Player::Hurt(int damage)
 int Player::GetHP() const
 {
 	return m_health;
+}
+
+bool Player::Underwater() const
+{
+	return m_underwater;
 }

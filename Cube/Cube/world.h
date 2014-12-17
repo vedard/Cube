@@ -17,7 +17,7 @@ public:
 	World();
 	~World();
 
-	BlockType BlockAt(float x, float y, float z);
+	BlockType BlockAt(float x, float y, float z) const;
 	Chunk& ChunkAt(float x, float z);
 
 	// - Octaves: Irrigulité

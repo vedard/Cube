@@ -44,8 +44,7 @@ void Engine::Init()
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0);
+	
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	
@@ -212,6 +211,7 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
+	m_shader01.Use();
 
 	//Ciel
 	glPushMatrix();
@@ -255,32 +255,42 @@ void Engine::Render(float elapsedTime)
 	m_textureAtlas.Bind();
 
 
-	Vector3<float> chunkPos(floor((m_player.Position().x) / CHUNK_SIZE_X), 0, floor((m_player.Position().z) / CHUNK_SIZE_Z));
+	Vector3<float> playerPos(floor((m_player.Position().x) / CHUNK_SIZE_X), 0, floor((m_player.Position().z) / CHUNK_SIZE_Z));
 
 	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(chunkPos.x, chunkPos.z, m_bInfo);
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Render
-	m_shader01.Use();
+	//Render les chunks
+	
 
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
 
+	//Render les blocks
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-	{
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
-			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE, 0, chunkPos.z + j - RENDER_DISTANCE);
+			Vector3<float> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
 			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
-				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render(m_shader01.m_program);
-
-
-
+				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).RenderSolidBuffer(m_shader01.m_program);
 		}
-	}
+	
+	//Render le transparent (ex: BTYPE_WATER)
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
+		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+		{
+			Vector3<float> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
+
+			//Si le chunk existe on le render
+			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
+				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).RenderTransparentBuffer(m_shader01.m_program);
+		}
+	glDisable(GL_BLEND);
+	
 	Shader::Disable();
 
 	//Render le hui
