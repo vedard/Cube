@@ -239,6 +239,12 @@ void Chunk::RenderTransparentBuffer(GLenum &m_program) const
 	m_transparentMesh.Render(m_program);
 }
 
+void Chunk::DeleteCache()
+{
+	m_chunkMesh.DeleteBuffer();
+	m_transparentMesh.DeleteBuffer();
+}
+
 bool Chunk::IsDirty() const
 {
 	return m_isDirty;

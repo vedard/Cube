@@ -27,6 +27,7 @@ public:
 	bool IsValid() const;
 	void SetMeshData(VertexData* vd, int vertexCount);
 	void Render(GLenum &m_program) const;
+	void DeleteBuffer();
 
 	int Count() const;
 

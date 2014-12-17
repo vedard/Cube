@@ -59,6 +59,7 @@ void World::InitMap(int seed)
 
 					}
 			m_chunks.Get(i, j).GetSave() = false;
+			m_chunks.Get(i, j).DeleteCache();
 		}
 	int count = 0;
 
@@ -69,7 +70,8 @@ void World::InitMap(int seed)
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
-					float val = scaled_octave_noise_2d(8, 0.1f, (seed) ? 20 : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					float scale = scaled_octave_noise_2d(8, 0.01f, 20, 10, 20, (float)(i * CHUNK_SIZE_X + x) / 5000.f, (float)(j * CHUNK_SIZE_Z + z) / 5000.f);
+					float val = scaled_octave_noise_2d(8, 0.1f, (seed) ? scale : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
@@ -183,7 +185,7 @@ void World::InitMap(int seed)
 		std::cout << "Adding caves..." << std::endl;
 
 		//Nombre de caverne
-		for (int i = 0; i < rand() % (WORLD_SIZE * 10) + (WORLD_SIZE * 2); i++)
+		for (int i = 0; i < rand() % (WORLD_SIZE * 8) + (WORLD_SIZE * 2); i++)
 		{
 			Vector3<float> head(rand() % (WORLD_SIZE*CHUNK_SIZE_X), rand() % (CHUNK_SIZE_Y - 40), rand() % (WORLD_SIZE*CHUNK_SIZE_X));
 

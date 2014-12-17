@@ -44,7 +44,8 @@ void Engine::Init()
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
-	
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	
@@ -488,7 +489,7 @@ void Engine::DrawHud()
 	//Position du joueur
 	ss.str("");
 	ss << "Position " << m_player.Position();
-	PrintText(10, 10, 8, ss.str());
+	PrintText(10, 10, 16, ss.str());
 
 	//Block a placer
 	ss.str("");

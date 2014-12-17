@@ -28,6 +28,7 @@ public:
 	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &binfo, Vector3<float> &Blockpos);
 	void RenderSolidBuffer(GLenum &m_program) const;
 	void RenderTransparentBuffer(GLenum &m_program) const;
+	void DeleteCache();
 	bool IsDirty() const;
 	bool& GetSave();
 
