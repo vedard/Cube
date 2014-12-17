@@ -34,7 +34,7 @@ typedef long long int64;
 #define RENDER_DISTANCE 14
 #define EDITING_DISTANCE 5
 #define NUMBER_OF_BLOCK 18
-#define PI 3.14159265358
+#define PI 3.14159265358f
 
 
 typedef uint8 BlockType;

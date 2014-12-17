@@ -69,7 +69,7 @@ void World::InitMap(int seed)
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
-					float val = scaled_octave_noise_2d(8, 0.1, (seed) ? 20 : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					float val = scaled_octave_noise_2d(8, 0.1f, (seed) ? 20 : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
@@ -203,10 +203,9 @@ void World::InitMap(int seed)
 							for (int e = 0; e < rand() % 2 + 4; e++)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
-
-								if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER)
-									//Set le bloc a air
-									m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
+									if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER)
+										//Set le bloc a air
+										m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
 							}
 						}
 					}
@@ -305,8 +304,7 @@ BlockType World::BlockAt(float x, float y, float z) const
 
 Chunk& World::ChunkAt(float x, float z)
 {
-	if (x >= 0 && z >= 0 && x < WORLD_SIZE  && z < WORLD_SIZE)
-		return m_chunks.Get(x, z);
+	return m_chunks.Get(x, z);
 }
 
 void World::LoadMap(std::string filename, BlockInfo *binfo)

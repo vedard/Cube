@@ -2,6 +2,7 @@
 #define ARRAY2D_H__
 
 #include "define.h"
+#include <cassert>
 
 template<class t>
 class Array2d
@@ -49,21 +50,21 @@ Array2d<t>::Array2d(const Array2d<t>& array)
 template<class t>
 void Array2d<t>::Set(int x, int y, t value)
 {
-	if (x >= 0 && y >= 0  && x < m_x && y < m_y )
+	if(x >= 0 && y >= 0 && x < m_x && y < m_y);
 		m_data[x + (y * m_x)] = value;
 }
 
 template<class t>
 t& Array2d<t>::Get(int x, int y)
 {
-	if (x >= 0 && y >= 0 && x < m_x && y < m_y)
+	assert(x >= 0 && y >= 0 && x < m_x && y < m_y);
 		return m_data[x + (y * m_x)];
 }
 
 template<class t>
 const t& Array2d<t>::Get(int x, int y) const
 {
-	if (x >= 0 && y >= 0 && x < m_x && y < m_y)
+	assert(x >= 0 && y >= 0 && x < m_x && y < m_y);
 		return m_data[x + (y * m_x)];
 }
 

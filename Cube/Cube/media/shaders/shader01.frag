@@ -7,7 +7,7 @@ void main()
     vec4 texel;
     texel = texture2D(tex,gl_TexCoord[0].st);
 
-    texel *= light;
+    texel *= light * 0.9;
 
 	if(underwater)
 	{

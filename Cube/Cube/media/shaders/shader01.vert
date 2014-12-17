@@ -19,7 +19,7 @@ void main()
 			float waterSpeed = 0.5;
 			vec4 newWaterPos = vec4(gl_Vertex.x, gl_Vertex.y, gl_Vertex.z, gl_Vertex.w);
 
-			newWaterPos.y += (sin(gameTime * waterSpeed) * waterHeight) + (sin(gameTime*1.14159 * waterSpeed) * waterHeight * sin(gl_Vertex.x * gl_Vertex.z)) - 0.2;
+			newWaterPos.y += (sin(gameTime * waterSpeed) * waterHeight) + (sin(gameTime*1.14159 * waterSpeed) * waterHeight * 1.5 * sin(gl_Vertex.x )) - 0.2;
 		
 			gl_Position = gl_ModelViewProjectionMatrix * newWaterPos;
 	

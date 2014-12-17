@@ -189,26 +189,26 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &
 	// Droite
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(1, 0, 0)))
 	{		
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.9, 0.9, 0.9, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
 	}
 	//Gauche
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(-1, 0, 0)))
 	{		
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
 	}
 	//Derirere
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, 1)))
 	{		
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
 	}
 	//Haut
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 1, 0)))
@@ -221,10 +221,10 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &
 	//Bas
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, -1, 0)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8, 0.8, 0.8, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
 	}
 
 }
@@ -252,7 +252,9 @@ bool Chunk::CheckFace(BlockType type, Vector3<float> &Blockpos, Vector3<float> &
 {
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
-	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER))
+
+
+	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER ))
 		return true;
 
 	return false;

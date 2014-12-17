@@ -42,7 +42,7 @@ public:
 private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawHud();
-	void PrintText(unsigned int x, unsigned int y, int size, const std::string & t);
+	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t);
 
 private:
 	bool m_wireframe;
@@ -63,8 +63,8 @@ private:
 	BlockInfo* m_bInfo;
 
 	//Block qui a le focus
-	Vector3<float> m_currentBlock;
-	Vector3<float> m_currentFaceNormal;
+	Vector3<int> m_currentBlock;
+	Vector3<int> m_currentFaceNormal;
 
 
 	int m_fps;

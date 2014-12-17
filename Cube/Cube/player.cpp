@@ -6,17 +6,18 @@
 
 Player::Player() :
 m_pos(0, 128, 0),
-m_dimension(0.2, 1.62, 0.2),
+m_dimension(0.2f, 1.62f, 0.2f),
 m_rotX(0),
 m_rotY(0),
-m_vitesse(0.1),
+m_vitesse(0.1f),
 m_noClip(false),
 m_sneaked(false),
 m_vitesseY(0),
 m_health(100),
 m_running(false),
 m_block(BTYPE_GRASS),
-m_underwater(false)
+m_footUnderwater(false),
+m_headUnderwater(false)
 {
 
 }
@@ -65,16 +66,23 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	float multiplieur = m_vitesse;
 
 	//Change la vittesse selon l'etat du player
-	if (m_sneaked)
-		multiplieur *= 0.7;
-	else if (m_noClip)
+
+	if (m_noClip)
 		multiplieur *= 6;
-	else if (m_running)
-		multiplieur *= 1.4;
+	else
+	{
+		if (m_sneaked)
+			multiplieur *= 0.7f;
+		else if (m_running)
+			multiplieur *= 1.4f;
+
+		if (m_footUnderwater)
+			multiplieur *= 0.6f;
+	}
 
 	//Deplacement Avant/Arriere
-	Vector3<float> directionVector(cos(PI / 2 * 3 + orientationPlayer), 0, sin(PI / 2 * 3 + orientationPlayer));
-	Vector3<float> directionVectorNoClip(cos(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)), sin(-m_rotY * PI / 180), sin(PI / 2 * 3 + orientationPlayer) * (cos(-m_rotY * PI / 180)));
+	Vector3<float> directionVector(cosf(PI / 2.f * 3.f + orientationPlayer), 0.f, sinf(PI / 2.f * 3.f + orientationPlayer));
+	Vector3<float> directionVectorNoClip(cosf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_rotY * PI / 180)), sinf(-m_rotY * PI / 180), sinf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_rotY * PI / 180)));
 	//Deplacement Gauche/Droite
 	Vector3<float> rightVector = directionVector.Cross(Vector3<float>(0, 1, 0));
 	//Deplacement Total
@@ -143,8 +151,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 				m_air = false;
 
 				//Degat de chute 
-				if (m_vitesseY > 0.40)
-					Hurt(exp(m_vitesseY * 6));
+				if (m_vitesseY > 0.40f)
+					Hurt((int) exp(m_vitesseY * 6));
 			}
 			//annule
 			m_pos.y += m_vitesseY;
@@ -154,7 +162,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_air = true;
 
 		//Acceleration
-		m_vitesseY += 0.013;
+		m_vitesseY += (m_footUnderwater)? 0.002f : 0.013f;
+		
 	}
 
 	//Si le player est mort
@@ -164,7 +173,15 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	}
 
 	//Si le player est dans l'eau
-	m_underwater = CheckUnderwater(world);
+	CheckUnderwater(world);
+
+	if (m_footUnderwater)
+	{
+		
+
+		if (m_vitesseY > 0.08f)
+			m_vitesseY = 0.08f;
+	}
 }
 
 bool Player::CheckCollision(World &world) const
@@ -212,14 +229,21 @@ bool Player::CheckCollision(World &world) const
 
 }
 
-bool Player::CheckUnderwater(World &world) const
+void Player::CheckUnderwater(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x , m_pos.y + m_dimension.y, m_pos.z );
 
 	if (bt1 == BTYPE_WATER )
-		return true;
+		m_headUnderwater = true;
 	else
-		return false;
+		m_headUnderwater = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5f, m_pos.z);
+
+	if (bt1 == BTYPE_WATER)
+		m_footUnderwater = true;
+	else
+		m_footUnderwater = false;
 }
 
 void Player::ApplyRotation() const
@@ -238,7 +262,7 @@ void Player::ApplyTranslation() const
 
 	//Si on est baisse 
 	if (m_sneaked)
-		glTranslatef(0, +0.2, 0);
+		glTranslatef(0.f, 0.2f, 0.f);
 }
 
 void Player::ToggleNoClip()
@@ -299,11 +323,15 @@ Vector3<float> Player::GetDimension() const
 
 void Player::Jump()
 {
-	if (!m_air)
+	if (!m_air && !m_footUnderwater)
 	{
-		m_vitesseY = -0.20;
+		m_vitesseY = -0.20f;
 		m_air = true;
 	}
+	else if (m_footUnderwater && !m_headUnderwater)
+		m_vitesseY = -0.002f;
+	else if (m_footUnderwater)
+		m_vitesseY = -0.09f;
 }
 
 void Player::Hurt(int damage)
@@ -324,5 +352,5 @@ int Player::GetHP() const
 
 bool Player::Underwater() const
 {
-	return m_underwater;
+	return m_headUnderwater;
 }

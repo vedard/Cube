@@ -185,7 +185,7 @@ void Engine::Render(float elapsedTime)
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
-		m_fps = round(1.f / elapsedTime);
+		m_fps = (int)round(1.f / elapsedTime);
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -197,17 +197,17 @@ void Engine::Render(float elapsedTime)
 	int loops = 0;
 
 	//Lock les mouvements a 50 fps
-	while (gameTime > nextGameUpdate && loops < 10) {
-
-
+	while (gameTime > nextGameUpdate && loops < 10) 
+	{
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
 		//1 / 0.02 = 50 fps
-		nextGameUpdate += 0.02;
+		nextGameUpdate += 0.02f;
 		loops++;
-
 	}
+
+	//Place le joueur au centre du monde
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
@@ -217,7 +217,7 @@ void Engine::Render(float elapsedTime)
 	glPushMatrix();
 	glTranslatef(WORLD_SIZE*CHUNK_SIZE_X / 2, 0, WORLD_SIZE*CHUNK_SIZE_Z / 2);
 
-	glRotatef(gameTime * 1.1, 0, 1, 0);
+	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
 
 	m_textureSky.Bind();
 
@@ -255,12 +255,12 @@ void Engine::Render(float elapsedTime)
 	m_textureAtlas.Bind();
 
 
-	Vector3<float> playerPos(floor((m_player.Position().x) / CHUNK_SIZE_X), 0, floor((m_player.Position().z) / CHUNK_SIZE_Z));
+	Vector3<int> playerPos((int)m_player.Position().x / CHUNK_SIZE_X, 0, (int)m_player.Position().z / CHUNK_SIZE_Z);
 
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Render les chunks
+	//Render les chunks 
 	
 
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
@@ -270,7 +270,7 @@ void Engine::Render(float elapsedTime)
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
-			Vector3<float> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
+			Vector3<int> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
 			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
@@ -283,7 +283,7 @@ void Engine::Render(float elapsedTime)
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
-			Vector3<float> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
+			Vector3<int> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
 			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
@@ -407,7 +407,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{
-		Vector3<float> chunkPos(floor(m_currentBlock.x / CHUNK_SIZE_X), 0, floor(m_currentBlock.z / CHUNK_SIZE_Z));
+		Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
 		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 
 	}
@@ -416,20 +416,18 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	else if (button == 4 && m_currentBlock.x != -1)
 	{
 		//Position du nouveau block
-		Vector3<float> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
-		Vector3<float> chunkPos(floor((newBlocPos.x) / CHUNK_SIZE_X), 0, floor((newBlocPos.z) / CHUNK_SIZE_Z));
+		Vector3<int> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
+		Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
 
 		//Si le chunk existe on place le block
-		if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(
-			newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X),
-			newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),
-			m_player.GetBlock());
+		if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+		{
+			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
 
-		//Si ya collision on efface le block
-		if (m_player.CheckCollision(m_world))
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
-
+			//Si ya collision on efface le block
+			if (m_player.CheckCollision(m_world))
+				m_world.ChunkAt(chunkPos.x, chunkPos.z).SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+		}
 
 
 	}
@@ -490,7 +488,7 @@ void Engine::DrawHud()
 	//Position du joueur
 	ss.str("");
 	ss << "Position " << m_player.Position();
-	PrintText(10, 10, 16, ss.str());
+	PrintText(10, 10, 8, ss.str());
 
 	//Block a placer
 	ss.str("");
@@ -535,7 +533,7 @@ void Engine::DrawHud()
 	glPopMatrix();
 }
 
-void Engine::PrintText(unsigned int x, unsigned int y, int size, const std::string & t)
+void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t)
 {
 	glLoadIdentity();
 	glTranslated(x, y, 0);
@@ -614,7 +612,7 @@ void Engine::GetBlocAtCursor()
 						m_currentBlock.y = y;
 						m_currentBlock.z = z;
 
-						if (Tool::InRangeWithEpsilon<float>(posX, x, x + 1, 0.05) && Tool::InRangeWithEpsilon<float>(posY, y, y + 1, 0.05) && Tool::InRangeWithEpsilon<float>(posZ, z, z + 1, 0.05))
+						if (Tool::InRangeWithEpsilon<float>(posX, x, x + 1, 0.05f) && Tool::InRangeWithEpsilon<float>(posY, y, y + 1, 0.05f) && Tool::InRangeWithEpsilon<float>(posZ, z, z + 1, 0.05f))
 						{
 							found = true;
 						}

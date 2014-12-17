@@ -37,7 +37,7 @@ public:
 	Vector3<float> GetDimension() const;
 
 private:
-	bool CheckUnderwater(World &world) const;
+	void CheckUnderwater(World &world);
 
 private:
 	
@@ -55,7 +55,8 @@ private:
 	bool m_sneaked;		//Si on est penché
 	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)
 	bool m_running;		//Si le joueur cour
-	bool m_underwater;  // Si le joueur est sous l'eau
+	bool m_headUnderwater;  // Si le joueur est sous l'eau
+	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	BlockType m_block;   //Prochain block que le joueur peut placer
 };
 
