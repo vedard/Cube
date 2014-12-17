@@ -30,10 +30,10 @@ typedef long long int64;
 #define CHUNK_SIZE_X 8
 #define CHUNK_SIZE_Y 128
 #define CHUNK_SIZE_Z 8
-#define WORLD_SIZE 10
+#define WORLD_SIZE 50
 #define RENDER_DISTANCE 7
 #define EDITING_DISTANCE 5
-#define NUMBER_OF_BLOCK 17
+#define NUMBER_OF_BLOCK 18
 #define PI 3.14159265358
 
 
@@ -55,7 +55,8 @@ enum BLOCK_TYPE {
 	BTYPE_LAPIS_LAZULI,
 	BTYPE_WOOD,
 	BTYPE_LEAVE,
-	BTYPE_WATER
+	BTYPE_WATER,
+	BTYPE_SAND
 };
 
 

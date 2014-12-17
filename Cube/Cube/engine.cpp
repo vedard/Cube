@@ -145,6 +145,10 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_water.png");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WATER].u, m_bInfo[BTYPE_WATER].v, m_bInfo[BTYPE_WATER].w, m_bInfo[BTYPE_WATER].h);
 
+	m_bInfo[BTYPE_SAND].Init(BTYPE_SAND, "Sand");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_sand.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_SAND].u, m_bInfo[BTYPE_SAND].v, m_bInfo[BTYPE_SAND].w, m_bInfo[BTYPE_SAND].h);
+
 
 	if (!m_textureAtlas.Generate(128, false))
 	{

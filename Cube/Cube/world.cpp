@@ -62,7 +62,7 @@ void World::InitMap(int seed)
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
-					float val = scaled_octave_noise_2d(16, 0.2, (seed) ? 20 : 0, -20, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					float val = scaled_octave_noise_2d(8, 0.1, (seed) ? 20 : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
@@ -191,6 +191,25 @@ void World::InitMap(int seed)
 				head.z += (rand() % 100 > 50) ? 1 : -1;
 			}
 		}
+		//Water
+		std::cout << "Adding ocean..." << std::endl;
+
+		for (int i = 0; i < WORLD_SIZE; i++)
+			for (int j = 0; j < WORLD_SIZE; j++)
+				for (int x = 0; x < CHUNK_SIZE_X; x++)
+					for (int z = 0; z < CHUNK_SIZE_Z; z++)
+						for (int y = 0; y < 60; y++)
+						{
+
+							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR &&
+								(m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_GRASS ||
+								m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_DIRT ||
+								m_chunks.Get(i, j).GetBlock(x, y - 1, z) == BTYPE_WATER))
+							{
+								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_WATER);
+							}
+
+						}
 
 		//Tree
 		std::cout << "Adding trees..." << std::endl;
@@ -221,6 +240,7 @@ void World::InitMap(int seed)
 							}
 						}
 					}
+		
 
 
 		//Little fix
@@ -234,6 +254,20 @@ void World::InitMap(int seed)
 							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_DIRT && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_AIR)
 							{
 								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
+							}
+							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && y < 65)
+							{
+								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
+							}
+							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && m_chunks.Get(i, j).GetBlock(x, y +1, z) == BTYPE_WATER)
+							{
+								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
 							}
 						}
 
@@ -336,7 +370,7 @@ void World::LoadMap(std::string filename, BlockInfo *binfo)
 	std::cout << filename << " Loaded" << std::endl << std::endl;
 }
 
-void World::SaveMap(std::string filename) 
+void World::SaveMap(std::string filename)
 {
 	std::ofstream file;
 	file.open(filename.c_str());
