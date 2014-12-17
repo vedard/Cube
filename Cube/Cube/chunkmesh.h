@@ -17,7 +17,7 @@ public:
 		float type;
 
 		VertexData() {}
-		VertexData(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v,float _type) : x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), u(_u), v(_v), type(_type) {}
+		VertexData(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v, float _type) : x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), u(_u), v(_v), type(_type) {}
 	};
 
 public:

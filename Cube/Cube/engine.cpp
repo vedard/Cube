@@ -47,6 +47,8 @@ void Engine::Init()
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0);
 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	
 
 	glEnable(GL_CULL_FACE);
 
@@ -140,7 +142,7 @@ void Engine::LoadResource()
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LEAVE].u, m_bInfo[BTYPE_LEAVE].v, m_bInfo[BTYPE_LEAVE].w, m_bInfo[BTYPE_LEAVE].h);
 
 	m_bInfo[BTYPE_WATER].Init(BTYPE_WATER, "Water");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_water.bmp");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_water.png");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WATER].u, m_bInfo[BTYPE_WATER].v, m_bInfo[BTYPE_WATER].w, m_bInfo[BTYPE_WATER].h);
 
 
@@ -170,7 +172,7 @@ void Engine::UnloadResource()
 
 void Engine::Render(float elapsedTime)
 {
-	
+
 
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
@@ -258,6 +260,8 @@ void Engine::Render(float elapsedTime)
 	m_shader01.Use();
 
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 	{
@@ -266,11 +270,11 @@ void Engine::Render(float elapsedTime)
 			Vector3<float> chunkPos2(chunkPos.x + i - RENDER_DISTANCE, 0, chunkPos.z + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
-			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)						
+			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
 				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).Render(m_shader01.m_program);
-				
 
-		
+
+
 		}
 	}
 	Shader::Disable();

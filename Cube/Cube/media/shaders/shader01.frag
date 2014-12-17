@@ -8,5 +8,8 @@ void main()
 
     texel *= light;
 
+	if(texel.a < 0.5)
+		discard;
+
     gl_FragColor = texel;
 }

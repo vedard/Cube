@@ -65,13 +65,11 @@ void ChunkMesh::Render(GLenum &m_program) const
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(3, GL_FLOAT, sizeof(VertexData), (char*)12);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(VertexData), (char*)24);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(VertexData), (char*)24);		
 
 		int index = glGetAttribLocation(m_program, "type");
-
 		glEnableVertexAttribArray(index);
 		glVertexAttribPointer(index, 1, GL_FLOAT, false, sizeof(VertexData), (char*)32);
-
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVboId);
 		glDrawElements(GL_QUADS, m_vertexCount, GL_UNSIGNED_SHORT, (char*)0);
