@@ -36,14 +36,10 @@ World::~World()
 
 void World::InitMap(int seed)
 {
+
 	m_seed = seed;
 	std::srand(seed);
-
-	//seed simplex noise
-	for (int i = 0; i < 512; i++)
-	{
-		perm[i] = rand() % 256;
-	}
+	randomize();
 
 	std::cout << "Cleaning..." << std::endl;
 	//Erase map
@@ -60,6 +56,7 @@ void World::InitMap(int seed)
 					}
 			m_chunks.Get(i, j).GetSave() = false;
 			m_chunks.Get(i, j).DeleteCache();
+
 		}
 	int count = 0;
 
@@ -70,8 +67,8 @@ void World::InitMap(int seed)
 			for (int x = 0; x < CHUNK_SIZE_X; ++x)
 				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				{
-					float scale = scaled_octave_noise_2d(8, 0.01f, 20, 10, 20, (float)(i * CHUNK_SIZE_X + x) / 5000.f, (float)(j * CHUNK_SIZE_Z + z) / 5000.f);
-					float val = scaled_octave_noise_2d(8, 0.1f, (seed) ? scale : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
+					float scale = scaled_octave_noise_2d(8, 0.03f, 20, 10, 20, (float)(i * CHUNK_SIZE_X + x) / 5000.f, (float)(j * CHUNK_SIZE_Z + z) / 5000.f);
+					float val = scaled_octave_noise_2d(8, 0.3f, (seed) ? scale : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 2000.f, (float)(j * CHUNK_SIZE_Z + z) / 2000.f);
 					//Couche
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
@@ -205,9 +202,9 @@ void World::InitMap(int seed)
 							for (int e = 0; e < rand() % 2 + 4; e++)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
-									if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER)
-										//Set le bloc a air
-										m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
+								if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER)
+									//Set le bloc a air
+									m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
 							}
 						}
 					}
@@ -309,7 +306,7 @@ Chunk& World::ChunkAt(float x, float z)
 	return m_chunks.Get(x, z);
 }
 
-void World::LoadMap(std::string filename, BlockInfo *binfo)
+void World::LoadMap(std::string filename, BlockInfo* &binfo)
 {
 	std::cout << "Loading " << filename << "..." << std::endl;
 
@@ -465,7 +462,7 @@ void World::AddTree(int i, int j, int x, int y, int z)
 	m_chunks.Get(i, j).SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
 }
 
-void World::Update(int CenterX, int CenterZ, BlockInfo* info)
+void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 {
 	if (CenterX >= 0 && CenterZ >= 0 && CenterX < WORLD_SIZE && CenterZ < WORLD_SIZE)
 		if (ChunkAt(CenterX, CenterZ).IsDirty())
@@ -523,4 +520,55 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* info)
 				}
 		}
 	}
+
+
+}
+
+int World::ChunkNotUpdated(int CenterX, int CenterZ)
+{
+	int chunkNotUpdated = 0;
+	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
+		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+		{
+			Vector3<int> chunkPos(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
+				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
+					chunkNotUpdated++;
+
+		}
+	return chunkNotUpdated;
+}
+
+void World::Render(int CenterX, int CenterZ, GLenum &m_program)
+{
+
+	//Render les blocks
+	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
+		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+		{
+			Vector3<int> chunkPos(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
+
+			//Si le chunk existe on le render
+			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
+			{
+				ChunkAt(chunkPos.x, chunkPos.z).RenderSolidBuffer(m_program);
+
+			}
+
+		}
+
+	//Render le transparent (ex: BTYPE_WATER)
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
+		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+		{
+			Vector3<int> chunkPos2(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
+
+
+			//Si le chunk existe on le render
+			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
+				ChunkAt(chunkPos2.x, chunkPos2.z).RenderTransparentBuffer(m_program);
+		}
+	glDisable(GL_BLEND);
 }

@@ -243,6 +243,7 @@ void Chunk::DeleteCache()
 {
 	m_chunkMesh.DeleteBuffer();
 	m_transparentMesh.DeleteBuffer();
+	m_isDirty = true;
 }
 
 bool Chunk::IsDirty() const

@@ -5,9 +5,12 @@ uniform bool underwater;
 void main()
 {
     vec4 texel;
-    texel = texture2D(tex,gl_TexCoord[0].st);
+    
+	texel = texture2D(tex,gl_TexCoord[0].st);
+    texel.rgb *= light.rgb * 0.9;
+	texel.a *= light.a * 0.9;
 
-    texel *= light * 0.9;
+	
 
 	if(underwater)
 	{

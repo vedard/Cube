@@ -177,7 +177,6 @@ void Engine::UnloadResource()
 void Engine::Render(float elapsedTime)
 {
 
-
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 
@@ -212,7 +211,10 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
+	//Activation des shaders
 	m_shader01.Use();
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
 
 	//Ciel
 	glPushMatrix();
@@ -222,6 +224,7 @@ void Engine::Render(float elapsedTime)
 
 	m_textureSky.Bind();
 
+#pragma region skybox
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
 	glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
@@ -248,50 +251,26 @@ void Engine::Render(float elapsedTime)
 	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 	glEnd();
-
 	glPopMatrix();
+#pragma endregion
 
-	////Render des chunk
 
+
+	////Chunk
 	m_textureAtlas.Bind();
-
-
+	
+	//Chunk du joueur
 	Vector3<int> playerPos((int)m_player.Position().x / CHUNK_SIZE_X, 0, (int)m_player.Position().z / CHUNK_SIZE_Z);
 
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Render les chunks 
-	
+	//std::thread t(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
+	//t.detach();
 
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
+	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
+	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-	//Render les blocks
-	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
-		{
-			Vector3<int> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
-
-			//Si le chunk existe on le render
-			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
-				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).RenderSolidBuffer(m_shader01.m_program);
-		}
-	
-	//Render le transparent (ex: BTYPE_WATER)
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
-		{
-			Vector3<int> chunkPos2(playerPos.x + i - RENDER_DISTANCE, 0, playerPos.z + j - RENDER_DISTANCE);
-
-			//Si le chunk existe on le render
-			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
-				m_world.ChunkAt(chunkPos2.x, chunkPos2.z).RenderTransparentBuffer(m_shader01.m_program);
-		}
-	glDisable(GL_BLEND);
-	
 	Shader::Disable();
 
 	//Render le hui
@@ -340,31 +319,46 @@ void Engine::KeyPressEvent(unsigned char key)
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+	//Lshift + F5 -> delete Cache
+	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
+	{
+		for (int i = 0; i < WORLD_SIZE; i++)
+			for (int j = 0; j < WORLD_SIZE; j++)
+				m_world.ChunkAt(i, j).DeleteCache();
 
+	}
 	//Lshift + O -> open map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
 	{
-		m_world.LoadMap("map.sav", m_bInfo);
-		m_player.Spawn(m_world);
+		//m_world.LoadMap("map.sav", m_bInfo);
+		std::thread t(&World::LoadMap, &m_world, "map.sav", m_bInfo);
+		t.detach();
+		//m_player.Spawn(m_world);
 	}
 	//Lshift + W -> Write map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
 	{
-		m_world.SaveMap("map.sav");
+		//m_world.SaveMap("map.sav");
+		std::thread t(&World::SaveMap, &m_world, "map.sav");
+		t.detach();
 	}
 
 	//Lshift + R -> Random map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
 	{
-		m_world.InitMap(time(NULL));
-		m_player.Spawn(m_world);
+		//m_world.InitMap();
+		std::thread t(&World::InitMap,&m_world,time(NULL));
+		t.detach();
+		//m_player.Spawn(m_world);
 	}
 
 	//Lshift + F -> Flat map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
 	{
-		m_world.InitMap(0);
-		m_player.Spawn(m_world);
+		//m_world.InitMap(0);
+		std::thread t(&World::InitMap, &m_world, 0);
+		t.detach();
+		//m_player.Spawn(m_world);
 	}
 }
 
@@ -485,6 +479,11 @@ void Engine::DrawHud()
 	//Fps
 	ss << "Fps: " << m_fps;
 	PrintText(10, Height() - 25, 16, ss.str());
+
+	//Chunk dirty
+	ss.str("");
+	ss << "Chunk not updated: " << m_chunkToUpdate;
+	PrintText(10, Height() - 45, 16, ss.str());
 
 	//Position du joueur
 	ss.str("");

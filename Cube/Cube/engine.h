@@ -16,6 +16,8 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <thread>
+#include <memory>
 
 
 class Engine : public OpenglContext
@@ -66,8 +68,9 @@ private:
 	Vector3<int> m_currentBlock;
 	Vector3<int> m_currentFaceNormal;
 
-
+	//Hui
 	int m_fps;
+	int m_chunkToUpdate;
 
 	
 

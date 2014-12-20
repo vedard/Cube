@@ -1,21 +1,33 @@
 * Cube
 Minecraft Clone in c++
 
-* Touche
+* Todo
+- Multithreading 
+  - Update chunks
+  - Not fall when loading a map
+  
 
-|---------------------+---------------|
-| Deplacement         | w / a / s / d |
-| Supprimer block     | Left Click    |
-| Ajouter block       | Right Click   |
-| Changer de block    | Roullette     |
-| Se pencher          | Ctr           |
-| Courrir             | Shift         |
-| Sauter              | space         |
-| Fly / NoClip Mode   | v             |
-| Wireframe Mode      | y             |
-| Fullscreen Mode     | f10           |
-| Ouvire Map          | LShift-o      |
-| Sauvegarder         | LShift-w      |
-| Creer Map Aléatoire | LShift-r      |
-| Creer Map plat      | LShift-f      |
-|---------------------+---------------|
+* Bugs
+- Other thread can't read/write opengl buffer
+- We can't see water surface when underwater
+- Water do not fall and cavern hole are created in ocean
+
+* Controls
+
+|-------------------+---------------|
+| Moving            | w / a / s / d |
+| Delete block      | Left Click    |
+| Add block         | Right Click   |
+| Select a block    | Roullette     |
+| Sneaking          | Ctr           |
+| Run               | Shift         |
+| Jump              | space         |
+| Fly / NoClip Mode | v             |
+| Wireframe Mode    | y             |
+| Fullscreen Mode   | f10           |
+| Open Map          | LShift-o      |
+| Sauvegarder       | LShift-w      |
+| Create Random Map | LShift-r      |
+| Creer Flat Map    | LShift-f      |
+| Delete Cache      | LShift-f5     |
+|-------------------+---------------|

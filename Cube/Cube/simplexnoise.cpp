@@ -46,6 +46,16 @@ dimension, you can ensure that each gets a unique noise value and they don't
 all look identical.
 */
 
+
+void randomize()
+{
+
+	//seed simplex noise
+	for (int i = 0; i < 512; i++)
+	{
+		perm[i] = rand() % 256;
+	}
+}
 // 2D Multi-octave Simplex noise.
 //
 // For each octave, a higher frequency/lower amplitude function will be added to the original.
