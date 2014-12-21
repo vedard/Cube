@@ -19,13 +19,13 @@ public:
 	~World();
 
 	BlockType BlockAt(float x, float y, float z) const;
-	Chunk& ChunkAt(float x, float z);
+	Chunk* ChunkAt(float x, float z);
 
 	void InitMap(int seed = 0);
 
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
-	void Update(int CenterX, int CenterZ, BlockInfo* &info);
+	void Update(int CenterX, int CenterZ,  BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &m_program);
 

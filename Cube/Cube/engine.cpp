@@ -180,6 +180,7 @@ void Engine::Render(float elapsedTime)
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 
+	GetBlocAtCursor();
 
 	gameTime += elapsedTime;
 
@@ -218,13 +219,13 @@ void Engine::Render(float elapsedTime)
 
 	//Ciel
 	glPushMatrix();
-	glTranslatef(WORLD_SIZE*CHUNK_SIZE_X / 2, 0, WORLD_SIZE*CHUNK_SIZE_Z / 2);
+	glTranslatef( m_player.Position().x, 0,  m_player.Position().z);
 
 	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
 
 	m_textureSky.Bind();
 
-#pragma region skybox
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
 	glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
@@ -252,7 +253,7 @@ void Engine::Render(float elapsedTime)
 	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 	glEnd();
 	glPopMatrix();
-#pragma endregion
+
 
 
 
@@ -324,7 +325,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	{
 		for (int i = 0; i < WORLD_SIZE; i++)
 			for (int j = 0; j < WORLD_SIZE; j++)
-				m_world.ChunkAt(i, j).DeleteCache();
+				m_world.ChunkAt(i, j)->DeleteCache();
 
 	}
 	//Lshift + O -> open map
@@ -398,12 +399,12 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	GetBlocAtCursor();
+	
 	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{
 		Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
-		m_world.ChunkAt(chunkPos.x, chunkPos.z).RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+		m_world.ChunkAt(chunkPos.x, chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 
 	}
 
@@ -415,13 +416,13 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
 
 		//Si le chunk existe on place le block
-		if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+		if (m_world.ChunkAt(chunkPos.x, chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 		{
-			m_world.ChunkAt(chunkPos.x, chunkPos.z).PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
+			m_world.ChunkAt(chunkPos.x, chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
 
 			//Si ya collision on efface le block
 			if (m_player.CheckCollision(m_world))
-				m_world.ChunkAt(chunkPos.x, chunkPos.z).SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+				m_world.ChunkAt(chunkPos.x, chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
 		}
 
 
@@ -496,7 +497,6 @@ void Engine::DrawHud()
 	PrintText((Width() - ss.str().length() * 12) - 10, 10, 16, ss.str());
 
 	ss.str("");
-	ss << "Health:";
 	//Pour chaque 10 point de vie on met un carre sinon un espace
 	for (int i = 0; i < m_player.GetHP() / 5; i++)
 	{
@@ -506,7 +506,7 @@ void Engine::DrawHud()
 	{
 		ss << " ";
 	}
-	PrintText((Width() - ss.str().length() * 12) - 10, Height() - 25, 16, ss.str());
+	PrintText((Width()/2 - (ss.str().length() * 12)/2) - 10, Height() - 25, 16, ss.str());
 
 	// Affichage du crosshair
 	m_textureCrosshair.Bind();
@@ -632,17 +632,17 @@ void Engine::GetBlocAtCursor()
 		m_currentFaceNormal.Zero();
 
 		// Front et back:
-		if (Tool::EqualWithEpsilon<float>(posZ, m_currentBlock.z, 0.005f))
+		if (Tool::EqualWithEpsilon<float>(posZ, m_currentBlock.z, 0.05f))
 			m_currentFaceNormal.z = -1;
-		else if (Tool::EqualWithEpsilon<float>(posZ, m_currentBlock.z + 1, 0.005f))
+		else if (Tool::EqualWithEpsilon<float>(posZ, m_currentBlock.z + 1, 0.05f))
 			m_currentFaceNormal.z = 1;
-		else if (Tool::EqualWithEpsilon<float>(posX, m_currentBlock.x, 0.005f))
+		else if (Tool::EqualWithEpsilon<float>(posX, m_currentBlock.x, 0.05f))
 			m_currentFaceNormal.x = -1;
-		else if (Tool::EqualWithEpsilon<float>(posX, m_currentBlock.x + 1, 0.005f))
+		else if (Tool::EqualWithEpsilon<float>(posX, m_currentBlock.x + 1, 0.05f))
 			m_currentFaceNormal.x = 1;
-		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y, 0.005f))
+		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y, 0.05f))
 			m_currentFaceNormal.y = -1;
-		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y + 1, 0.005f))
+		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y + 1, 0.05f))
 			m_currentFaceNormal.y = 1;
 	}
 }

@@ -26,7 +26,7 @@ Minecraft Clone in c++
 | Wireframe Mode    | y             |
 | Fullscreen Mode   | f10           |
 | Open Map          | LShift-o      |
-| Sauvegarder       | LShift-w      |
+| Save    | LShift-w      |
 | Create Random Map | LShift-r      |
 | Creer Flat Map    | LShift-f      |
 | Delete Cache      | LShift-f5     |

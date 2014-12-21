@@ -173,9 +173,9 @@ void Chunk::Update(BlockInfo* &binfo)
 	m_isDirty = false;
 }
 
-void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &binfo, Vector3<float> &Blockpos)
+void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockInfo &binfo, const Vector3<float> &Blockpos)
 {
-	float type = (float)binfo.GetType();
+	BlockType type = binfo.GetType();
 
 	// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
@@ -255,7 +255,7 @@ bool& Chunk::GetSave(){
 	return m_save;
 }
 
-bool Chunk::CheckFace(BlockType type, Vector3<float> &Blockpos, Vector3<float> &face) const
+bool Chunk::CheckFace(BlockType &type, const Vector3<float> &Blockpos, const Vector3<float> &face) const
 {
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 

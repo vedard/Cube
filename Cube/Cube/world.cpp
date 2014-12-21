@@ -1,6 +1,6 @@
 #include "world.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(15)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(1)
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -301,9 +301,12 @@ BlockType World::BlockAt(float x, float y, float z) const
 		return BTYPE_AIR;
 }
 
-Chunk& World::ChunkAt(float x, float z)
+Chunk* World::ChunkAt(float x, float z)
 {
-	return m_chunks.Get(x, z);
+	if (x >= 0 && z >= 0 && x < WORLD_SIZE && z < WORLD_SIZE)
+		return &m_chunks.Get(x, z);
+	else
+		return NULL;
 }
 
 void World::LoadMap(std::string filename, BlockInfo* &binfo)
@@ -375,7 +378,7 @@ void World::SaveMap(std::string filename)
 	//Compte combien de chunk a besoin d'etre sauvegarder
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
-			if (ChunkAt(i, j).GetSave())
+			if (ChunkAt(i, j)->GetSave())
 				total++;
 
 	file << m_seed << std::endl;
@@ -384,7 +387,7 @@ void World::SaveMap(std::string filename)
 		for (int j = 0; j < WORLD_SIZE; j++)
 		{
 			//Si le chunk a besoin d'etre sauvegarder
-			if (ChunkAt(i, j).GetSave())
+			if (ChunkAt(i, j)->GetSave())
 			{
 				for (int x = 0; x < CHUNK_SIZE_X; ++x)
 
@@ -464,9 +467,8 @@ void World::AddTree(int i, int j, int x, int y, int z)
 
 void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 {
-	if (CenterX >= 0 && CenterZ >= 0 && CenterX < WORLD_SIZE && CenterZ < WORLD_SIZE)
-		if (ChunkAt(CenterX, CenterZ).IsDirty())
-			ChunkAt(CenterX, CenterZ).Update(info);
+	if (ChunkAt(CenterX, CenterZ) && ChunkAt(CenterX, CenterZ)->IsDirty())
+		ChunkAt(CenterX, CenterZ)->Update(info);
 
 	//Parcours les chunk en cercle
 	for (int x = 1; x < RENDER_DISTANCE + 1; ++x)
@@ -474,50 +476,42 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX + a, 0, CenterZ - x);
-			//Si le chunk existe
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
-				//Si dirty
-				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
-				{
-					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
-					return;
-				}
+			//Si dirty
+			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->IsDirty())
+			{
+				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
+				return;
+			}
 		}
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX + a, 0, CenterZ + x);
-			//Si le chunk existe
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
-				//Si dirty
-				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
-				{
-					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
-					return;
-				}
+			//Si dirty
+			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->IsDirty())
+			{
+				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
+				return;
+			}
 		}
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX - x, 0, CenterZ + a);
-			//Si le chunk existe
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
-				//Si dirty
-				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
-				{
-					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
-					return;
-				}
+			//Si dirty
+			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->IsDirty())
+			{
+				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
+				return;
+			}
 		}
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX + x, 0, CenterZ + a);
-			//Si le chunk existe
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE && chunkPos.z < WORLD_SIZE)
-				//Si dirty
-				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
-				{
-					ChunkAt(chunkPos.x, chunkPos.z).Update(info);
-					return;
-				}
+			//Si dirty
+			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->IsDirty())
+			{
+				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
+				return;
+			}
 		}
 	}
 
@@ -531,9 +525,9 @@ int World::ChunkNotUpdated(int CenterX, int CenterZ)
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
 			Vector3<int> chunkPos(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
-				if (ChunkAt(chunkPos.x, chunkPos.z).IsDirty())
-					chunkNotUpdated++;
+
+			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->IsDirty())
+				chunkNotUpdated++;
 
 		}
 	return chunkNotUpdated;
@@ -549,9 +543,9 @@ void World::Render(int CenterX, int CenterZ, GLenum &m_program)
 			Vector3<int> chunkPos(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
-			if (chunkPos.x >= 0 && chunkPos.z >= 0 && chunkPos.x < WORLD_SIZE  && chunkPos.z < WORLD_SIZE)
+			if (ChunkAt(chunkPos.x, chunkPos.z))
 			{
-				ChunkAt(chunkPos.x, chunkPos.z).RenderSolidBuffer(m_program);
+				ChunkAt(chunkPos.x, chunkPos.z)->RenderSolidBuffer(m_program);
 
 			}
 
@@ -563,12 +557,11 @@ void World::Render(int CenterX, int CenterZ, GLenum &m_program)
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
-			Vector3<int> chunkPos2(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
-
+			Vector3<int> chunkPos(CenterX + i - RENDER_DISTANCE, 0, CenterZ + j - RENDER_DISTANCE);
 
 			//Si le chunk existe on le render
-			if (chunkPos2.x >= 0 && chunkPos2.z >= 0 && chunkPos2.x < WORLD_SIZE  && chunkPos2.z < WORLD_SIZE)
-				ChunkAt(chunkPos2.x, chunkPos2.z).RenderTransparentBuffer(m_program);
+			if (ChunkAt(chunkPos.x, chunkPos.z))
+				ChunkAt(chunkPos.x, chunkPos.z)->RenderTransparentBuffer(m_program);
 		}
 	glDisable(GL_BLEND);
 }

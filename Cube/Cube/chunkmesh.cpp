@@ -20,7 +20,7 @@ bool ChunkMesh::IsValid() const
 	return m_isValid;
 }
 
-void ChunkMesh::SetMeshData(VertexData* vd, int vertexCount)
+void ChunkMesh::SetMeshData(VertexData* &vd, int vertexCount)
 {
 	assert(vertexCount <= USHRT_MAX);
 	if (vertexCount == 0)

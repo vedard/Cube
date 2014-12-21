@@ -5,9 +5,6 @@
 #include "vector3.h"
 #include "blockinfo.h"
 
-
-
-
 class Chunk
 {
 public:
@@ -25,7 +22,7 @@ public:
 	BlockType GetBlock(int x, int y, int z) const;
 	const Vector3<float> &GetBlockPos(int x, int y, int z) const;
 	void Update(BlockInfo* &binfo);
-	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int & count, BlockInfo &binfo, Vector3<float> &Blockpos);
+	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockInfo &binfo, const Vector3<float> &Blockpos);
 	void RenderSolidBuffer(GLenum &m_program) const;
 	void RenderTransparentBuffer(GLenum &m_program) const;
 	void DeleteCache();
@@ -38,7 +35,7 @@ public:
 	Chunk* m_positiveZ;
 	Chunk* m_negativeZ;
 private:
-	bool CheckFace(BlockType type, Vector3<float> &Blockpos, Vector3<float> &face) const;
+	bool CheckFace(BlockType &type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
 
 private:
 	Array3d<BlockType> m_blocks;

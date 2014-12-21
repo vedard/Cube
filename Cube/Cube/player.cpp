@@ -68,7 +68,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	//Change la vittesse selon l'etat du player
 
 	if (m_noClip)
-		multiplieur *= 6;
+		multiplieur *= 12;
 	else
 	{
 		if (m_sneaked)
