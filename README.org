@@ -1,16 +1,6 @@
 * Cube
 Minecraft Clone in c++
 
-* Todo
-- Multithreading 
-  - Update chunks
-  - Not fall when loading a map
-  
-
-* Bugs
-- Other thread can't read/write opengl buffer
-- We can't see water surface when underwater
-- Water do not fall and cavern hole are created in ocean
 
 * Controls
 
@@ -26,8 +16,26 @@ Minecraft Clone in c++
 | Wireframe Mode    | y             |
 | Fullscreen Mode   | f10           |
 | Open Map          | LShift-o      |
-| Save    | LShift-w      |
+| Save              | LShift-w      |
 | Create Random Map | LShift-r      |
 | Creer Flat Map    | LShift-f      |
 | Delete Cache      | LShift-f5     |
 |-------------------+---------------|
+  
+
+* Bugs
+- Other thread can't read/write opengl buffer
+- We can't see water surface when underwater
+- Water do not fall and cavern hole are created in ocean
+- Can't compile with g++
+
+
+* Todo
+- Multithreading 
+  - Update chunks
+  - Not fall when loading a map (loading screen ???)
+- Real infinite world 
+- Adding lighning
+- Adding IA
+- Collect of ressource (wood, mineral)
+- Crafting

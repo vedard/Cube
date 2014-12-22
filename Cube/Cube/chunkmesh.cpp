@@ -34,6 +34,7 @@ void ChunkMesh::SetMeshData(VertexData* &vd, int vertexCount)
 
 	m_vertexCount = vertexCount;
 
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexVboId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData) * vertexCount, vd, GL_STATIC_DRAW);
 
