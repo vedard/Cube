@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <cmath>
 #include <thread>
-#include <memory>
 
 
 class Engine : public OpenglContext
@@ -71,8 +70,6 @@ private:
 	//Hui
 	int m_fps;
 	int m_chunkToUpdate;
-
-	
 
 
 };
