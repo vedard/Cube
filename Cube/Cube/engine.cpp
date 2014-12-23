@@ -6,7 +6,8 @@ m_player(),
 m_shader01(),
 m_textureAtlas(NUMBER_OF_BLOCK - 1),
 m_world(),
-m_currentBlock(-1, -1, -1)
+m_currentBlock(-1, -1, -1),
+displayInfo(false)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -36,6 +37,7 @@ void Engine::Init()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(75.0f, (float)Width() / (float)Height(), 0.001f, 1000.0f);
@@ -48,7 +50,7 @@ void Engine::Init()
 	glAlphaFunc(GL_GREATER, 0);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	
+
 
 	glEnable(GL_CULL_FACE);
 
@@ -67,13 +69,14 @@ void Engine::Init()
 	CenterMouse();
 	HideCursor();
 
-	
-	
+
+
 
 }
 
 void Engine::DeInit()
 {
+
 }
 
 void Engine::LoadResource()
@@ -201,7 +204,7 @@ void Engine::Render(float elapsedTime)
 	int loops = 0;
 
 	//Lock les mouvements a 50 fps
-	while (gameTime > nextGameUpdate && loops < 10) 
+	while (gameTime > nextGameUpdate && loops < 10)
 	{
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
@@ -222,7 +225,7 @@ void Engine::Render(float elapsedTime)
 
 	//Ciel
 	glPushMatrix();
-	glTranslatef( m_player.Position().x, 0,  m_player.Position().z);
+	glTranslatef(m_player.Position().x, 0, m_player.Position().z);
 
 	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
 
@@ -262,7 +265,7 @@ void Engine::Render(float elapsedTime)
 
 	////Chunk
 	m_textureAtlas.Bind();
-	
+
 	//Chunk du joueur
 	Vector3<int> playerPos((int)m_player.Position().x / CHUNK_SIZE_X, 0, (int)m_player.Position().z / CHUNK_SIZE_Z);
 
@@ -272,7 +275,7 @@ void Engine::Render(float elapsedTime)
 	//std::thread t(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
 	//t.detach();
 
-	
+
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
@@ -301,7 +304,10 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[94])
+	{
 		SetFullscreen(!IsFullscreen());
+
+	}
 	//V -> toogle noclip mode
 	else if (m_keyboard[sf::Keyboard::V])
 		m_player.ToggleNoClip();
@@ -321,11 +327,18 @@ void Engine::KeyPressEvent(unsigned char key)
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
 	{
+
 		m_wireframe = !m_wireframe;
 		if (m_wireframe)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	//F3 -> toggle info
+	else if (m_keyboard[sf::Keyboard::F3])
+	{
+		displayInfo = !displayInfo;
+
 	}
 	//Lshift + F5 -> delete Cache
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
@@ -355,7 +368,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
 	{
 		//m_world.InitMap();
-		std::thread t(&World::InitMap,&m_world,time(NULL));
+		std::thread t(&World::InitMap, &m_world, time(NULL));
 		t.detach();
 		//m_player.Spawn(m_world);
 	}
@@ -406,7 +419,7 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	
+
 	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{
@@ -483,26 +496,22 @@ void Engine::DrawHud()
 	m_textureFont.Bind();
 
 	std::ostringstream ss;
+	if (displayInfo)
+	{
+		//Fps
+		ss << "Fps: " << m_fps;
+		PrintText(10, Height() - 25, 12, ss.str());
 
-	//Fps
-	ss << "Fps: " << m_fps;
-	PrintText(10, Height() - 25, 16, ss.str());
+		//Chunk dirty
+		ss.str("");
+		ss << "Chunk not updated: " << m_chunkToUpdate;
+		PrintText(10, Height() - 45, 12, ss.str());
 
-	//Chunk dirty
-	ss.str("");
-	ss << "Chunk not updated: " << m_chunkToUpdate;
-	PrintText(10, Height() - 45, 16, ss.str());
-
-	//Position du joueur
-	ss.str("");
-	ss << "Position " << m_player.Position();
-	PrintText(10, 10, 16, ss.str());
-
-	//Block a placer
-	ss.str("");
-	ss << "Block: " << m_bInfo[m_player.GetBlock()];
-	PrintText((Width() - ss.str().length() * 12) - 10, 10, 16, ss.str());
-
+		//Position du joueur
+		ss.str("");
+		ss << "Position " << m_player.Position();
+		PrintText(10, 10, 12, ss.str());
+	}
 	ss.str("");
 	//Pour chaque 10 point de vie on met un carre sinon un espace
 	for (int i = 0; i < m_player.GetHP() / 5; i++)
@@ -513,7 +522,7 @@ void Engine::DrawHud()
 	{
 		ss << " ";
 	}
-	PrintText((Width()/2 - (ss.str().length() * 12)/2) - 10, Height() - 25, 16, ss.str());
+	PrintText((Width() / 2 - (ss.str().length() * 12) / 2) - 10, Height() - 25, 16, ss.str());
 
 	// Affichage du crosshair
 	m_textureCrosshair.Bind();
@@ -531,8 +540,37 @@ void Engine::DrawHud()
 	glVertex2i(0, crossSize);
 	glEnd();
 
-	glEnable(GL_LIGHTING);
 	glDisable(GL_BLEND);
+
+	//Block selectionne
+	glLoadIdentity();
+	glTranslated(Width() - 64, 16, 0);
+
+	glBegin(GL_QUADS);
+
+	glVertex2i(-2, -2);
+	glVertex2i(50, -2);
+	glVertex2i(50, 50);
+	glVertex2i(-2, 50);
+	glEnd();
+
+	m_textureAtlas.Bind();
+	glColor3f(1.f, 1.f, 1.f);
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+	glVertex2i(0, 0);
+	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+	glVertex2i(48, 0);
+	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+	glVertex2i(48, 48);
+	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+	glVertex2i(0, 48);
+
+	glEnd();
+
+	
+	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();

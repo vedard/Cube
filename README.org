@@ -14,6 +14,7 @@ Minecraft Clone in c++
 | Jump              | space         |
 | Fly / NoClip Mode | v             |
 | Wireframe Mode    | y             |
+| Display info      | f3            |
 | Fullscreen Mode   | f10           |
 | Open Map          | LShift-o      |
 | Save              | LShift-w      |
@@ -28,6 +29,7 @@ Minecraft Clone in c++
 - We can't see water surface when underwater
 - Water do not fall and cavern hole are created in ocean
 - Can't compile with g++ (std::thread)
+- Player can spawn in water 
 
 
 * Todo

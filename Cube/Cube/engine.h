@@ -70,6 +70,7 @@ private:
 	//Hui
 	int m_fps;
 	int m_chunkToUpdate;
+	bool displayInfo;
 
 
 };

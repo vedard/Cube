@@ -15,6 +15,7 @@ public:
 	void Set(int x, int y, t value);
 	t& Get(int x, int y);
 	const t& Get(int x, int y) const;
+	int GetIndex(t value) const;
 	void Reset(t value);
 
 private:
@@ -25,9 +26,7 @@ private:
 template<class t>
 Array2d<t>::Array2d(int x, int y) : m_x(x), m_y(y)
 {
-	m_data = new t[m_x * m_y ];
-
-	
+	m_data = new t[m_x * m_y ];	
 }
 
 template<class t>
@@ -65,9 +64,18 @@ template<class t>
 const t& Array2d<t>::Get(int x, int y) const
 {
 	assert(x >= 0 && y >= 0 && x < m_x && y < m_y);
-		return m_data[x + (y * m_x)];
+	return m_data[x + (y * m_x)];
 }
-
+template<class t>
+int Array2d<t>::GetIndex(t value) const
+{
+	for (int i = 0; i <m_x; i++)
+	{
+		if (Get(i, 0) == value)
+			return i;
+	}
+	return -1;
+}
 template<class t>
 void Array2d<t>::Reset(t value)
 {

@@ -5,6 +5,11 @@
 
 #include <string>
 #include <SFML/Window.hpp>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include "array2d.h"
+
 
 // Documentation de SFML: http://www.sfml-dev.org/documentation/index-fr.php
 class OpenglContext
@@ -33,7 +38,7 @@ public:
     virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y) = 0;
 
 
-    bool Start(const std::string& title, int width, int height, bool fullscreen, bool verticalSync);
+    bool Start(const std::string& title, int width, int height);
     bool Stop();
 
     int Width() const;
@@ -53,16 +58,22 @@ protected:
     void HideCursor();
     void ShowCrossCursor() const;
 
-private:
-    void InitWindow(int width, int height);
-    MOUSE_BUTTON ConvertMouseButton(sf::Mouse::Button button) const;
 
 private:
-    sf::Window	m_app;
+    MOUSE_BUTTON ConvertMouseButton(sf::Mouse::Button button) const;
+	void InitWindow(int width, int height);
+
+
+protected:
+	sf::Window	m_app;
+
+private:
     int			m_maxFps;
     bool		m_fullscreen;
     std::string m_title;
 	float m_lastFrameTime;
+
+
 };
 
 #endif // OPENGLCONTEXT_H__

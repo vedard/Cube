@@ -103,7 +103,7 @@ bool TextureAtlas::Generate(int textureSize, bool mipmap)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
-
+	
 	int level = textureSize;
 	int oglLevel = 0;
 	int mipmapSize = textureSize * m_nbTexturePerSide;

@@ -1,6 +1,6 @@
 #include "world.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(1)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6)
 {
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
