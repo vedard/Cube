@@ -28,7 +28,6 @@ Minecraft Clone in c++
 - Other thread can't read/write opengl buffer
 - We can't see water surface when underwater
 - Water do not fall and cavern hole are created in ocean
-- Can't compile with g++ (std::thread)
 - Player can spawn in water 
 
 

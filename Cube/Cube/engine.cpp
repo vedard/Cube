@@ -352,7 +352,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
 	{
 		//m_world.LoadMap("map.sav", m_bInfo);
-		std::thread t(&World::LoadMap, &m_world, "map.sav", m_bInfo);
+		std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
 		t.detach();
 		//m_player.Spawn(m_world);
 	}

@@ -1,7 +1,7 @@
 # Declaration of variables
 CC = g++
-CC_FLAGS = -g 
-LD_FLAGS = -g -lIL -lILUT -lILU -lGLU -lGL -lglut -lGLEW -lsfml-graphics -lsfml-window -lsfml-system
+CC_FLAGS = -g -std=c++11
+LD_FLAGS = -g -lIL -lILUT -lILU -lGLU -lGL -lglut -lGLEW -lsfml-graphics -lsfml-window -lsfml-system 
 
 # File names
 EXEC = Cube
