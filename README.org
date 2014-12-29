@@ -1,6 +1,9 @@
 * Cube
 Minecraft Clone in c++
 
+* Compilation
+Pacman -S sfml devil
+make 
 
 * Controls
 
