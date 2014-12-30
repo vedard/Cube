@@ -2,9 +2,9 @@
 Minecraft Clone in c++
 
 * Compilation
-Pacman -S sfml devil
-make 
-
+$ Pacman -S sfml devil
+$ make 
+$ ./Cube
 * Controls
 
 |-------------------+---------------|
@@ -30,7 +30,6 @@ make
 * Bugs
 - Other thread can't read/write opengl buffer
 - We can't see water surface when underwater
-- Water do not fall and cavern hole are created in ocean
 - Player can spawn in water 
 
 
@@ -43,3 +42,4 @@ make
 - Adding IA
 - Collect of ressource (wood, mineral)
 - Crafting
+- Gravity for liquid

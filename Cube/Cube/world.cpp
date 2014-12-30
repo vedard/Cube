@@ -177,6 +177,30 @@ void World::InitMap(int seed)
 
 						}
 
+		//Sand
+		std::cout << "Adding beach..." << std::endl;
+		for (int i = 0; i < WORLD_SIZE; i++)
+			for (int j = 0; j < WORLD_SIZE; j++)
+				for (int x = 0; x < CHUNK_SIZE_X; ++x)
+					for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+						for (int y = 3; y <= CHUNK_SIZE_Y; y++)
+						{
+							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && y < 65)
+							{
+								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
+							}
+							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_WATER)
+							{
+								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
+								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
+							}
+						}
+
 
 		//Cave
 		std::cout << "Adding caves..." << std::endl;
@@ -202,7 +226,9 @@ void World::InitMap(int seed)
 							for (int e = 0; e < rand() % 2 + 4; e++)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
-								if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER)
+								if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER &&
+										m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_SAND
+										)
 									//Set le bloc a air
 									m_chunks.Get(chunkPos.x, chunkPos.z).SetBlock(blockPos.x, blockPos.y, blockPos.z, BTYPE_AIR);
 							}
@@ -227,7 +253,7 @@ void World::InitMap(int seed)
 					{
 
 						int y = 128;
-						if (rand() % 100 >= 90)
+						if (rand() % 100 >= 75)
 						{
 							//Trouve le grass le plus haut et ajoute l'arbre acette position
 							while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
@@ -249,34 +275,7 @@ void World::InitMap(int seed)
 
 
 
-		//Little fix
-		std::cout << "Fixing..." << std::endl;
-		for (int i = 0; i < WORLD_SIZE; i++)
-			for (int j = 0; j < WORLD_SIZE; j++)
-				for (int x = 0; x < CHUNK_SIZE_X; ++x)
-					for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-						for (int y = 3; y <= CHUNK_SIZE_Y; y++)
-						{
-							if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_DIRT && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_AIR)
-							{
-								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_GRASS);
-							}
-							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && y < 65)
-							{
-								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
-								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
-								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
-								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
-							}
-							else if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS && m_chunks.Get(i, j).GetBlock(x, y + 1, z) == BTYPE_WATER)
-							{
-								m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_SAND);
-								m_chunks.Get(i, j).SetBlock(x, y - 1, z, BTYPE_SAND);
-								m_chunks.Get(i, j).SetBlock(x, y - 2, z, BTYPE_SAND);
-								m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
-							}
-						}
-
+	
 
 	}
 
