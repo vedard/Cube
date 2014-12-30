@@ -2,9 +2,9 @@
 Minecraft Clone in c++
 
 * Compilation
-$ Pacman -S sfml devil
-$ make 
-$ ./Cube
+ - $ Pacman -S sfml devil
+ - $ make 
+ - $ ./Cube
 * Controls
 
 |-------------------+---------------|
