@@ -275,11 +275,10 @@ void Engine::Render(float elapsedTime)
 	//std::thread t(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
 	//t.detach();
 
-
-
-	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
+	
+	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);	
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
+	
 	Shader::Disable();
 
 	//Render le hui

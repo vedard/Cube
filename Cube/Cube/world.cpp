@@ -73,13 +73,12 @@ void World::InitChunk(float i, float j)
 					m_chunks.Get(i, j).SetBlock(x, y, z, BTYPE_AIR);
 
 			}
-
 	//Height
-	for (int x = 0; x < CHUNK_SIZE_X; ++x)
-		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+	for (int x = 0; x < CHUNK_SIZE_X; x++)
+		for (int z = 0; z < CHUNK_SIZE_Z; z++)
 		{
-			float scale = scaled_octave_noise_2d(8, 0.03f, 20, 10, 10, (float)(i * CHUNK_SIZE_X + x) / 5000.f, (float)(j * CHUNK_SIZE_Z + z) / 5000.f);
-			float val = scaled_octave_noise_2d(8, 0.3f, (m_seed) ? scale : 0, -50, 20, (float)(i * CHUNK_SIZE_X + x) / 1000.f, (float)(j * CHUNK_SIZE_Z + z) / 1000.f);
+			
+			float val = scaled_octave_noise_2d(8, 0.3f, (m_seed) ? 15 : 0, -50, 40, (float)(i * CHUNK_SIZE_X + x) / 4000, (float)(j * CHUNK_SIZE_Z + z) / 4000);
 			//Couche
 			for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 			{
