@@ -22,10 +22,11 @@ public:
 	Chunk* ChunkAt(float x, float z);
 
 	void InitMap(int seed = 0);
+	void InitChunk(float i, float j);
 
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
-	void Update(int CenterX, int CenterZ,  BlockInfo* &info);
+	void Update(int CenterX, int CenterZ, BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &m_program);
 
@@ -37,6 +38,7 @@ private:
 
 private:
 	Array2d<Chunk> m_chunks;
+
 	int		m_seed;
 
 };

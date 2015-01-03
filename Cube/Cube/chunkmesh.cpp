@@ -86,8 +86,8 @@ void ChunkMesh::Render(GLenum &m_program) const
 
 void ChunkMesh::DeleteBuffer()
 {
-	glDeleteBuffers(1, &m_vertexVboId);
-	glDeleteBuffers(1, &m_indexVboId);
+	
+	m_isValid = false;
 }
 
 int ChunkMesh::Count() const

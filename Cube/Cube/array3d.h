@@ -62,7 +62,7 @@ t& Array3d<t>::Get(int x, int y, int z)
 {
 	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
 
-		return m_data[x + (z * m_x) + (y * m_z * m_x)];
+	return m_data[x + (z * m_x) + (y * m_z * m_x)];
 }
 
 template<class t>

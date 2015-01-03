@@ -26,7 +26,7 @@ public:
 	void RenderSolidBuffer(GLenum &m_program) const;
 	void RenderTransparentBuffer(GLenum &m_program) const;
 	void DeleteCache();
-	bool IsDirty() const;
+	bool NeedUpdate() const;
 	bool& GetSave();
 
 
@@ -35,10 +35,16 @@ public:
 	Chunk* m_positiveZ;
 	Chunk* m_negativeZ;
 private:
-	bool CheckFace(BlockType &type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
+	bool CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
+
+
+	//Todo - rendre private
+public:
+	bool m_iscreated;               //Si le chunk a été init selon le seed de la map
 
 private:
 	Array3d<BlockType> m_blocks;
+	
 	bool m_isDirty;					//Si il faut le reajouter au mesh
 	bool m_save;					//Si faut le sauvegarder
 	ChunkMesh m_chunkMesh;

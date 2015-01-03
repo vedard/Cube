@@ -37,6 +37,14 @@ void Player::Spawn(World &world)
 	while (!CheckCollision(world))
 	{
 		m_pos.y--;
+
+		if (m_pos.y < -100)
+		{
+			m_pos.x = WORLD_SIZE*CHUNK_SIZE_X / 2;
+			m_pos.y = CHUNK_SIZE_Y;
+			m_pos.z = WORLD_SIZE*CHUNK_SIZE_Z / 2;
+			break;
+		}
 	}
 
 	m_pos.y++;

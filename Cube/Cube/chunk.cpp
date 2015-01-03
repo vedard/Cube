@@ -1,7 +1,7 @@
 #include "chunk.h"
 #include <iostream>
 
-Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_isDirty(true), m_chunkMesh(), m_transparentMesh(), m_position(0, 0, 0), m_save(false)
+Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_iscreated(false), m_isDirty(true), m_chunkMesh(), m_transparentMesh(), m_position(0, 0, 0), m_save(false)
 {
 	m_blocks.Reset(BTYPE_AIR);
 
@@ -124,7 +124,7 @@ const Vector3<float> &Chunk::GetPosition() const
 void Chunk::Update(BlockInfo* &binfo)
 {
 	// Update mesh
-	if (m_isDirty)
+	if (m_isDirty )
 	{
 		int maxVertexCount = (CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z) * (6 * 4);
 
@@ -179,7 +179,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 
 	// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
-	{		
+	{
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
@@ -188,7 +188,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 	}
 	// Droite
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(1, 0, 0)))
-	{		
+	{
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
@@ -196,7 +196,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 	}
 	//Gauche
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(-1, 0, 0)))
-	{		
+	{
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
@@ -204,7 +204,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 	}
 	//Derirere
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, 1)))
-	{		
+	{
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
@@ -231,12 +231,14 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 
 void Chunk::RenderSolidBuffer(GLenum &m_program) const
 {
-	m_chunkMesh.Render(m_program);
+	
+		m_chunkMesh.Render(m_program);
 }
 
 void Chunk::RenderTransparentBuffer(GLenum &m_program) const
 {
-	m_transparentMesh.Render(m_program);
+	
+		m_transparentMesh.Render(m_program);
 }
 
 void Chunk::DeleteCache()
@@ -246,22 +248,30 @@ void Chunk::DeleteCache()
 	m_isDirty = true;
 }
 
-bool Chunk::IsDirty() const
+bool Chunk::NeedUpdate() const
 {
-	return m_isDirty;
+	//Si le chunk est dirty et que tous ses voisin on été creer
+	if (m_isDirty
+		&& (m_negativeX == NULL || m_negativeX->m_iscreated)
+		&& (m_negativeZ == NULL || m_negativeZ->m_iscreated)
+		&& (m_positiveX == NULL || m_positiveX->m_iscreated)
+		&& (m_positiveZ == NULL || m_positiveZ->m_iscreated))
+		return m_isDirty;
+
+	else
+		return false;
 }
 
 bool& Chunk::GetSave(){
 	return m_save;
 }
 
-bool Chunk::CheckFace(BlockType &type, const Vector3<float> &Blockpos, const Vector3<float> &face) const
+bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const
 {
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-
-	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER ))
+	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER))
 		return true;
 
 	return false;
