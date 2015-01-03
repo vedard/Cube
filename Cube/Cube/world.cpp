@@ -169,32 +169,7 @@ void World::InitChunk(float i, float j)
 						m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
 					}
 				}
-		//Tree
-		for (int x = 0; x < CHUNK_SIZE_X; x += 2)
-			for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
-			{
-
-				int y = 128;
-				if (rand() % 100 >= 75)
-				{
-					//Trouve le grass le plus haut et ajoute l'arbre acette position
-					while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
-					{
-						y--;
-
-					}
-					if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS &&
-						m_chunks.Get(i, j).GetBlock(x + 1, y, z) == BTYPE_GRASS &&
-						m_chunks.Get(i, j).GetBlock(x - 1, y, z) == BTYPE_GRASS &&
-						m_chunks.Get(i, j).GetBlock(x, y, z + 1) == BTYPE_GRASS &&
-						m_chunks.Get(i, j).GetBlock(x, y, z - 1) == BTYPE_GRASS)
-					{
-						y++;
-						AddTree(i, j, x, y, z);
-					}
-				}
-			}
-
+		
 		//Cave
 		if (rand() % 100 > 90)
 		{
@@ -233,6 +208,33 @@ void World::InitChunk(float i, float j)
 				head.z += (rand() % 100 > 50) ? 1 : -1;
 			}
 		}
+		
+		//Tree
+		for (int x = 0; x < CHUNK_SIZE_X; x += 2)
+			for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
+			{
+
+				int y = 128;
+				if (rand() % 100 >= 75)
+				{
+					//Trouve le grass le plus haut et ajoute l'arbre acette position
+					while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
+					{
+						y--;
+
+					}
+					if (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_GRASS &&
+						m_chunks.Get(i, j).GetBlock(x + 1, y, z) == BTYPE_GRASS &&
+						m_chunks.Get(i, j).GetBlock(x - 1, y, z) == BTYPE_GRASS &&
+						m_chunks.Get(i, j).GetBlock(x, y, z + 1) == BTYPE_GRASS &&
+						m_chunks.Get(i, j).GetBlock(x, y, z - 1) == BTYPE_GRASS)
+					{
+						y++;
+						AddTree(i, j, x, y, z);
+					}
+				}
+			}
+
 
 	}
 }
