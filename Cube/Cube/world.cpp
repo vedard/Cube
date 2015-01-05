@@ -39,9 +39,9 @@ void World::InitMap(int seed)
 
 	m_seed = seed;
 	std::srand(seed);
-	randomize();
+	randomize(seed);
 
-	
+
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -52,7 +52,7 @@ void World::InitMap(int seed)
 			m_chunks.Get(i, j).m_iscreated = false;
 
 		}
-	
+
 
 	if (seed != 0)
 		std::cout << "Map created with this seed: " << seed << std::endl << std::endl;
@@ -78,7 +78,11 @@ void World::InitChunk(float i, float j)
 		for (int z = 0; z < CHUNK_SIZE_Z; z++)
 		{
 			
-			float val = scaled_octave_noise_2d(8, 0.3f, (m_seed) ? 15 : 0, -50, 40, (float)(i * CHUNK_SIZE_X + x) / 4000, (float)(j * CHUNK_SIZE_Z + z) / 4000);
+			float biome = scaled_octave_noise_2d(14, 0.3f, 5, 0.001, 1, (float)(i * CHUNK_SIZE_X + x) / 40000, (float)(j * CHUNK_SIZE_Z + z) / 40000);
+			float val;
+			
+			val = scaled_octave_noise_2d(16, 0.3f, (m_seed) ? 7 : 0, -50, 40, (float)(i * CHUNK_SIZE_X + x) / (5000 * biome), (float)(j * CHUNK_SIZE_Z + z) / (5000 * biome));
+
 			//Couche
 			for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 			{
@@ -98,6 +102,7 @@ void World::InitChunk(float i, float j)
 			m_chunks.Get(i, j).SetBlock(x, 2, z, BTYPE_STONE);
 
 		}
+
 	if (m_seed > 0)
 	{
 		//Minerals
@@ -168,7 +173,7 @@ void World::InitChunk(float i, float j)
 						m_chunks.Get(i, j).SetBlock(x, y - 3, z, BTYPE_SAND);
 					}
 				}
-		
+
 		//Cave
 		if (rand() % 100 > 90)
 		{
@@ -191,7 +196,7 @@ void World::InitChunk(float i, float j)
 							{
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
 								if (m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER &&
-									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_SAND && 
+									m_chunks.Get(chunkPos.x, chunkPos.z).GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_SAND &&
 									!m_chunks.Get(chunkPos.x, chunkPos.z).GetSave()
 									)
 									//Set le bloc a air
@@ -207,14 +212,16 @@ void World::InitChunk(float i, float j)
 				head.z += (rand() % 100 > 50) ? 1 : -1;
 			}
 		}
-		
+
 		//Tree
 		for (int x = 0; x < CHUNK_SIZE_X; x += 2)
 			for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
 			{
 
 				int y = 128;
-				if (rand() % 100 >= 75)
+
+				
+				if (scaled_octave_noise_2d(1, 0.4f, 6, 0, 100, (float)(i * CHUNK_SIZE_X + x) / (5000), (float)(j * CHUNK_SIZE_Z + z) / (5000)) >= 30 && std::rand() % 100 > 90)
 				{
 					//Trouve le grass le plus haut et ajoute l'arbre acette position
 					while (m_chunks.Get(i, j).GetBlock(x, y, z) == BTYPE_AIR)
@@ -236,6 +243,7 @@ void World::InitChunk(float i, float j)
 
 
 	}
+
 }
 
 BlockType World::BlockAt(float x, float y, float z) const
@@ -285,7 +293,7 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 
 	//Read
 	while (ss)
-	{	
+	{
 		i = -1;
 		j = -1;
 		std::string line;
@@ -305,11 +313,11 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
 					{
 						ssline >> b;
-						if (b >= 0 && b < NUMBER_OF_BLOCK)				
+						if (b >= 0 && b < NUMBER_OF_BLOCK)
 							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType());
 
 					}
-		}	
+		}
 	}
 
 	std::cout << filename << " Loaded" << std::endl << std::endl;
@@ -413,14 +421,12 @@ void World::AddTree(int i, int j, int x, int y, int z)
 	m_chunks.Get(i, j).SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
 }
 
-void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
+void World::InitChunks(int CenterX, int CenterZ)
 {
+	Chunk * chunk = ChunkAt(CenterX, CenterZ);
 	//Si n'est pas creer
-	if (ChunkAt(CenterX, CenterZ) && !ChunkAt(CenterX, CenterZ)->m_iscreated)
+	if (chunk && !chunk->m_iscreated)
 		InitChunk(CenterX, CenterZ);
-	//Si dirty
-	if (ChunkAt(CenterX, CenterZ) && ChunkAt(CenterX, CenterZ)->NeedUpdate())
-		ChunkAt(CenterX, CenterZ)->Update(info);
 
 	//Parcours les chunk en cercle
 	for (int x = 1; x < RENDER_DISTANCE + 1; ++x)
@@ -428,56 +434,93 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX + a, 0, CenterZ - x);
+			chunk = ChunkAt(chunkPos.x, chunkPos.z);
 			//Si n'est pas creer
-			if (ChunkAt(chunkPos.x, chunkPos.z) && !ChunkAt(chunkPos.x, chunkPos.z)->m_iscreated)
+			if (chunk && !chunk->m_iscreated)
 				InitChunk(chunkPos.x, chunkPos.z);
-			//Si dirty
-			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->NeedUpdate())
-			{
-				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
-				return;
-			}
+			
 		}
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX + a, 0, CenterZ + x);
+			chunk = ChunkAt(chunkPos.x, chunkPos.z);
 			//Si n'est pas creer
-			if (ChunkAt(chunkPos.x, chunkPos.z) && !ChunkAt(chunkPos.x, chunkPos.z)->m_iscreated)
+			if (chunk && !chunk->m_iscreated)
 				InitChunk(chunkPos.x, chunkPos.z);
-			//Si dirty
-			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->NeedUpdate())
-			{
-				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
-				return;
-			}
+			
 		}
 		for (int a = -x; a <= x; ++a)
 		{
 			Vector3<float> chunkPos(CenterX - x, 0, CenterZ + a);
+			chunk = ChunkAt(chunkPos.x, chunkPos.z);
 			//Si n'est pas creer
-			if (ChunkAt(chunkPos.x, chunkPos.z) && !ChunkAt(chunkPos.x, chunkPos.z)->m_iscreated)
+			if (chunk && !chunk->m_iscreated)
 				InitChunk(chunkPos.x, chunkPos.z);
+			
+		}
+		for (int a = -x; a <= x; ++a)
+		{
+			Vector3<float> chunkPos(CenterX + x, 0, CenterZ + a);
+			chunk = ChunkAt(chunkPos.x, chunkPos.z);
+			//Si n'est pas creer
+			if (chunk && !chunk->m_iscreated)
+				InitChunk(chunkPos.x, chunkPos.z);		
+		}
+	}
+}
+
+void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
+{
+	Chunk * chunk = ChunkAt(CenterX, CenterZ);
+	//Si dirty
+	if (chunk && chunk->NeedUpdate())
+		chunk->Update(info);
+
+	//Parcours les chunk en cercle
+	for (int x = 1; x < RENDER_DISTANCE + 1; ++x)
+	{
+		for (int a = -x; a <= x; ++a)
+		{
+			chunk = ChunkAt(CenterX + a, CenterZ - x);
 			//Si dirty
-			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->NeedUpdate())
+			if (chunk && chunk->NeedUpdate())
 			{
-				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
+				chunk->Update(info);
 				return;
 			}
 		}
 		for (int a = -x; a <= x; ++a)
 		{
-			Vector3<float> chunkPos(CenterX + x, 0, CenterZ + a);
-			//Si n'est pas creer
-			if (ChunkAt(chunkPos.x, chunkPos.z) && !ChunkAt(chunkPos.x, chunkPos.z)->m_iscreated)
-				InitChunk(chunkPos.x, chunkPos.z);
+			chunk = ChunkAt(CenterX + a, CenterZ + x);
 			//Si dirty
-			if (ChunkAt(chunkPos.x, chunkPos.z) && ChunkAt(chunkPos.x, chunkPos.z)->NeedUpdate())
+			if (chunk && chunk->NeedUpdate())
 			{
-				ChunkAt(chunkPos.x, chunkPos.z)->Update(info);
+				chunk->Update(info);
+				return;
+			}
+		}
+		for (int a = -x; a <= x; ++a)
+		{
+			chunk = ChunkAt(CenterX - x, CenterZ + a);
+			//Si dirty
+			if (chunk && chunk->NeedUpdate())
+			{
+				chunk->Update(info);
+				return;
+			}
+		}
+		for (int a = -x; a <= x; ++a)
+		{
+			chunk = ChunkAt(CenterX + x, CenterZ + a);
+			//Si dirty
+			if (chunk && chunk->NeedUpdate())
+			{
+				chunk->Update(info);
 				return;
 			}
 		}
 	}
+
 
 
 }

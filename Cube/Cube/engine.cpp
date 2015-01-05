@@ -269,11 +269,15 @@ void Engine::Render(float elapsedTime)
 	//Chunk du joueur
 	Vector3<int> playerPos((int)m_player.Position().x / CHUNK_SIZE_X, 0, (int)m_player.Position().z / CHUNK_SIZE_Z);
 
-	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+	//m_world.InitChunks(playerPos.x, playerPos.z);
+	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+	t.detach();
 
-	//std::thread t(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
-	//t.detach();
+	//Update les chunk autour du joueur si il sont dirty
+    m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+
+	//std::thread a(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
+	//a.join();
 
 	
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);	
@@ -366,7 +370,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	//Lshift + R -> Random map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
 	{
-		//m_world.InitMap();
+		//m_world.InitMap(time(NULL));
 		std::thread t(&World::InitMap, &m_world, time(NULL));
 		t.detach();
 		//m_player.Spawn(m_world);
@@ -454,7 +458,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	else if (button == 16)
 		m_player.SetBlock(-1);
 
-}
+} 
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
 {

@@ -26,6 +26,7 @@ public:
 
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
+	void InitChunks(int CenterX, int CenterZ);
 	void Update(int CenterX, int CenterZ, BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &m_program);

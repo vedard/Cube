@@ -47,9 +47,9 @@ all look identical.
 */
 
 
-void randomize()
+void randomize(int seed)
 {
-
+	srand(seed);
 	//seed simplex noise
 	for (int i = 0; i < 512; i++)
 	{

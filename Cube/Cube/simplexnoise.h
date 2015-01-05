@@ -45,7 +45,7 @@ all look identical.
 */
 
 //Seed the permutation table
-void randomize();
+void randomize(int seed);
 
 // Multi-octave Simplex noise
 // For each octave, a higher frequency/lower amplitude function will be added to the original.
