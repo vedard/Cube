@@ -18,23 +18,21 @@ public:
 	World();
 	~World();
 
-	BlockType BlockAt(float x, float y, float z) const;
+	BlockType BlockAt(float x, float y, float z);
 	Chunk* ChunkAt(float x, float z);
 
 	void InitMap(int seed = 0);
-	void InitChunk(float i, float j);
-
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
 	void InitChunks(int CenterX, int CenterZ);
 	void Update(int CenterX, int CenterZ, BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
-	void Render(int CenterX, int CenterZ, GLenum &m_program);
+	void Render(int CenterX, int CenterZ, GLenum &program);
 
 private:
-	void AddMineral(BlockType mineral, int i, int j, int x, int y, int z);
-	void AddTree(int i, int j, int x, int y, int z);
-
+	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
+	void World::AddTree(Chunk * &chunk, int x, int y, int z);
+	void InitChunk(float i, float j);
 
 
 private:
