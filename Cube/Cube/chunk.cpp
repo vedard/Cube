@@ -217,6 +217,15 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
+
+		if (type == BTYPE_WATER) ///Lorsque sous l'eau on peut voir le haut de locean
+		{
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
+
+		}
 	}
 	//Bas
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, -1, 0)))
@@ -225,6 +234,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
+		
 	}
 
 }
