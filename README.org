@@ -34,11 +34,8 @@ Minecraft Clone in c++
 
 
 * Todo
-- Multithreading 
-  - Update chunks
-  - Not fall when loading a map (loading screen ???)
 - Real infinite world 
-- Adding lighning
+- Adding light
 - Adding IA
 - Collect of ressource (wood, mineral)
 - Crafting
