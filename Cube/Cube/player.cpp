@@ -9,10 +9,10 @@ m_pos(0, 128, 0),
 m_dimension(0.2f, 1.62f, 0.2f),
 m_rotX(0),
 m_rotY(0),
-m_vitesse(0.1f),
+m_vitesse(0.1f,0,0),
 m_noClip(false),
 m_sneaked(false),
-m_vitesseY(0),
+
 m_health(100),
 m_running(false),
 m_block(BTYPE_GRASS),
@@ -71,21 +71,36 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	//Orientation du player en rad
 	float orientationPlayer = m_rotX * PI / 180;
 	//Multiplicateur de vitesse
-	float multiplieur = m_vitesse;
+	m_vitesse.x = 0.1;
+	m_vitesse.z = 0.1;
 
 	//Change la vittesse selon l'etat du player
 
 	if (m_noClip)
-		multiplieur *= 12;
+	{
+		m_vitesse.x = 1.2;
+		m_vitesse.z = 1.2;
+		m_vitesse.y = 1.2;
+	}
 	else
 	{
 		if (m_sneaked)
-			multiplieur *= 0.7f;
+		{
+			m_vitesse.x *= 0.7f;
+			m_vitesse.z *= 0.7f;
+		
+		}
 		else if (m_running)
-			multiplieur *= 1.4f;
+		{
+			m_vitesse.x *= 1.4f;
+			m_vitesse.z *= 1.4f;
 
+		}
 		if (m_footUnderwater)
-			multiplieur *= 0.6f;
+		{
+			m_vitesse.x *= 0.6f;
+			m_vitesse.z *= 0.6f;
+		}
 	}
 
 	//Deplacement Avant/Arriere
@@ -123,54 +138,50 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	//Si no clip (pas de collision)
 	if (m_noClip)
 	{
-		m_pos.y += deplacementVector.y * multiplieur;
-		m_pos.x += deplacementVector.x * multiplieur;
-		m_pos.z += deplacementVector.z * multiplieur;
+		m_pos.y += deplacementVector.y * m_vitesse.y;
+		m_pos.x += deplacementVector.x * m_vitesse.x;
+		m_pos.z += deplacementVector.z * m_vitesse.z;
 	}
 
 	else
 	{
 		//Deplacement en X
-		m_pos.x += deplacementVector.x * multiplieur;
+		m_pos.x += deplacementVector.x * m_vitesse.x;
 		//Si collision, on annule
 		if (CheckCollision(world))
-			m_pos.x -= deplacementVector.x * multiplieur;
+			m_pos.x -= deplacementVector.x * m_vitesse.x;
 
 		//Deplacement en Z
-		m_pos.z += deplacementVector.z * multiplieur;
+		m_pos.z += deplacementVector.z * m_vitesse.z;
 		//Si collision, on annule
 		if (CheckCollision(world))
-			m_pos.z -= deplacementVector.z * multiplieur;
+			m_pos.z -= deplacementVector.z * m_vitesse.z;
 
-	}
-
-	//Gravité
-	if (!m_noClip)
-	{
-		//Chute
-		m_pos.y -= m_vitesseY;
+	
+		//Deplacement en Y (Gravité)
+		m_pos.y -= m_vitesse.y;
 
 		//Si collision
 		if (CheckCollision(world))
 		{
 			//Si on a touche le sol 
-			if (m_vitesseY > 0)
+			if (m_vitesse.y > 0)
 			{
 				m_air = false;
 
 				//Degat de chute 
-				if (m_vitesseY > 0.40f)
-					Hurt((int) exp(m_vitesseY * 6));
+				if (m_vitesse.y > 0.40f)
+					Hurt((int) exp(m_vitesse.y * 6));
 			}
 			//annule
-			m_pos.y += m_vitesseY;
-			m_vitesseY = 0;
+			m_pos.y += m_vitesse.y;
+			m_vitesse.y = 0;
 		}
 		else
 			m_air = true;
 
 		//Acceleration
-		m_vitesseY += (m_footUnderwater)? 0.002f : 0.013f;
+		m_vitesse.y += (m_footUnderwater)? 0.002f : 0.013f;
 		
 	}
 
@@ -187,8 +198,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	{
 		
 
-		if (m_vitesseY > 0.08f)
-			m_vitesseY = 0.08f;
+		if (m_vitesse.y > 0.08f)
+			m_vitesse.y = 0.08f;
 	}
 }
 
@@ -278,11 +289,12 @@ void Player::ToggleNoClip()
 	if (m_noClip)
 	{
 		m_noClip = false;
+		m_vitesse.y = 0;
 	}
 	else
 	{
 		m_noClip = true;
-		m_vitesseY = 0;
+		m_vitesse.y = 0;
 	}
 }
 
@@ -333,13 +345,13 @@ void Player::Jump()
 {
 	if (!m_air && !m_footUnderwater)
 	{
-		m_vitesseY = -0.20f;
+		m_vitesse.y = -0.20f;
 		m_air = true;
 	}
 	else if (m_footUnderwater && !m_headUnderwater)
-		m_vitesseY = -0.002f;
+		m_vitesse.y = -0.002f;
 	else if (m_footUnderwater)
-		m_vitesseY = -0.09f;
+		m_vitesse.y = -0.09f;
 }
 
 void Player::Hurt(int damage)

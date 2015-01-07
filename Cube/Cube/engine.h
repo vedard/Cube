@@ -12,6 +12,7 @@
 #include "array2d.h"
 #include "vector3.h"
 #include "world.h"
+#include "entity.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -49,6 +50,7 @@ private:
 	bool m_wireframe;
 
 	Player m_player;
+	Entity m_monster;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 

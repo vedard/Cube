@@ -43,12 +43,11 @@ private:
 	
 	Vector3<float> m_pos;
 	Vector3<float> m_dimension;
+	Vector3<float> m_vitesse;
 
 	float m_rotX,  //orientation
-		m_rotY, 
-		m_vitesse; //vitesse de deplacement
-
-	float m_vitesseY;   //Vittesse verticale (gravité et saut)
+		m_rotY;
+	
 	int m_health;		//Vie du personnage
 
 	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)

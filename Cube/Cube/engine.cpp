@@ -172,6 +172,7 @@ void Engine::LoadResource()
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
 	m_player.Spawn(m_world);
+	//m_monster.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2) + 3);
 
 }
 
@@ -261,8 +262,8 @@ void Engine::Render(float elapsedTime)
 	glPopMatrix();
 
 
-
-
+	/*m_monster.Move(m_world);
+	m_monster.Draw();*/
 	////Chunk
 	m_textureAtlas.Bind();
 

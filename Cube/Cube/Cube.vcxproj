@@ -92,6 +92,7 @@
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="entity.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="chunkmesh.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
+    <ClInclude Include="entity.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="shader.h" />
