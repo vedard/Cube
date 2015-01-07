@@ -31,7 +31,7 @@ public:
 
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
-	void World::AddTree(Chunk * &chunk, int x, int y, int z);
+	void AddTree(Chunk * &chunk, int x, int y, int z);
 	void InitChunk(float i, float j);
 
 

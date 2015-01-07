@@ -61,7 +61,7 @@ enum BLOCK_TYPE {
 
 
 #define TEXTURE_PATH	"../Cube/media/textures/"
-#define SHADER_PATH		"../Cube/media/shaders/"
+#define SHADER_PATH	"../Cube/media/shaders/"
 #define MOUSE_SENSIBILITY 1/4
 
 #endif // DEFINE_H__
