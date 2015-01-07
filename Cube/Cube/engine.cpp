@@ -156,7 +156,7 @@ void Engine::LoadResource()
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_SAND].u, m_bInfo[BTYPE_SAND].v, m_bInfo[BTYPE_SAND].w, m_bInfo[BTYPE_SAND].h);
 
 
-	if (!m_textureAtlas.Generate(128, false))
+	if (!m_textureAtlas.Generate(64, false))
 	{
 		std::cout << " Unable to generate texture atlas ..." << std::endl;
 		abort();
