@@ -19,6 +19,7 @@ public:
 	void Draw() const;
 	void Attack(Character * character, int damage) const;
 	void GetDamage(int damage);
+	void Jump();
 
 	//Get
 	const Vector3<float>& GetPosition() const;
@@ -37,7 +38,8 @@ protected:
 	float m_VerticalRot;
 
 	int m_health;
-
+	int m_AttackRange;
+	bool m_isInAir;
 
 
 

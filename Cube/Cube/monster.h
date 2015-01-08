@@ -10,12 +10,13 @@ class Monster : public Character
 public:
 	Monster();
 	~Monster();
-	void Move(World &world, Player &player);
-	void Draw() const;
+	void Move(World &world);
+	void Draw(bool debugRange) const;
+	void SetTarget(Character* target);
 
 private:
 	Texture m_texture;
-	Vector3<float> m_target;
+	Character* m_target;
 
 };
 #endif // !MONSTER_H__

@@ -5,6 +5,7 @@ Character::Character() :
 m_pos(0, 128, 0),
 m_dimension(1.3, 2.2, 0.7),
 m_health(100),
+m_AttackRange(2),
 m_HorizontalRot(0.f),
 m_VerticalRot(90.f),
 m_vitesse(0, 0, 0)
@@ -47,10 +48,17 @@ void Character::Move(World &world)
 	//Si collision
 	if (CheckCollision(world))
 	{
+
+		//Si on a touche le sol 
+		if (m_vitesse.y > 0)
+			m_isInAir = false;
+
 		//annule
 		m_pos.y += m_vitesse.y;
 		m_vitesse.y = 0;
 	}
+	else
+		m_isInAir = true;
 
 	//Acceleration
 	m_vitesse.y += 0.013f;
@@ -58,43 +66,50 @@ void Character::Move(World &world)
 
 bool Character::CheckCollision(World &world) const
 {
-	//4 point au pieds du player
-	BlockType bt1 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt2 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt3 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y, m_pos.z - m_dimension.z / 2);
-	BlockType bt4 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y, m_pos.z - m_dimension.z / 2);
-
-	//4 point au milieu du player
-
-	BlockType bt5 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z + m_dimension.z / 2);
-	BlockType bt6 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z + m_dimension.z / 2);
-	BlockType bt7 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z - m_dimension.z / 2);
-	BlockType bt8 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z - m_dimension.z / 2);
-
-	//4 point au yeux du player
-	BlockType bt9 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt10 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt11 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
-	BlockType bt12 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
+	//Todo	-> simplifier cette fonction
+	//		-> plus le character est gros plus il y a besoins de point
+	int nbrEtage = ceil(m_dimension.y);
+	BlockType * bt1 = new BlockType[nbrEtage + 1];
+	BlockType * bt2 = new BlockType[nbrEtage + 1];
+	BlockType * bt3 = new BlockType[nbrEtage + 1];
+	BlockType * bt4 = new BlockType[nbrEtage + 1];
+	BlockType * bt5 = new BlockType[nbrEtage + 1];
+	BlockType * bt6 = new BlockType[nbrEtage + 1];
+	BlockType * bt7 = new BlockType[nbrEtage + 1];
+	BlockType * bt8 = new BlockType[nbrEtage + 1];
+	BlockType * bt9 = new BlockType[nbrEtage + 1];
 
 
+	for (int i = 0; i <= nbrEtage; i++)
+	{
+		//4 coin
+		bt1[i] = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z + m_dimension.z / 2);
+		bt2[i] = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i) , m_pos.z + m_dimension.z / 2);
+		bt3[i] = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i) , m_pos.z - m_dimension.z / 2);
+		bt4[i] = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i) , m_pos.z - m_dimension.z / 2);
 
-	//Si un des block qui touche au joeur n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
-	if ((bt1 != BTYPE_AIR && bt1 != BTYPE_WATER) ||
-		(bt2 != BTYPE_AIR && bt2 != BTYPE_WATER) ||
-		(bt3 != BTYPE_AIR && bt3 != BTYPE_WATER) ||
-		(bt4 != BTYPE_AIR && bt4 != BTYPE_WATER) ||
-		(bt5 != BTYPE_AIR && bt5 != BTYPE_WATER) ||
-		(bt6 != BTYPE_AIR && bt6 != BTYPE_WATER) ||
-		(bt7 != BTYPE_AIR && bt7 != BTYPE_WATER) ||
-		(bt8 != BTYPE_AIR && bt8 != BTYPE_WATER) ||
-		(bt9 != BTYPE_AIR && bt9 != BTYPE_WATER) ||
-		(bt10 != BTYPE_AIR && bt10 != BTYPE_WATER) ||
-		(bt11 != BTYPE_AIR && bt11 != BTYPE_WATER) ||
-		(bt12 != BTYPE_AIR && bt12 != BTYPE_WATER))
-		return true;
+		//4 point entre les coins 
+		bt5[i] = world.BlockAt(m_pos.x, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z - m_dimension.z / 2);
+		bt6[i] = world.BlockAt(m_pos.x, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z - m_dimension.z / 2);
+		bt7[i] = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z);
+		bt8[i] = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z);
+
+		//1 point au milieu
+		bt9[i] = world.BlockAt(m_pos.x, m_pos.y + (m_dimension.y / nbrEtage) * i, m_pos.z);
 
 
+		//Si un des block qui touche au joeur n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
+		if ((bt1[i] != BTYPE_AIR && bt1[i] != BTYPE_WATER) ||
+			(bt2[i] != BTYPE_AIR && bt2[i] != BTYPE_WATER) ||
+			(bt3[i] != BTYPE_AIR && bt3[i] != BTYPE_WATER) ||
+			(bt4[i] != BTYPE_AIR && bt4[i] != BTYPE_WATER) ||
+			(bt5[i] != BTYPE_AIR && bt5[i] != BTYPE_WATER) ||
+			(bt6[i] != BTYPE_AIR && bt6[i] != BTYPE_WATER) ||
+			(bt7[i] != BTYPE_AIR && bt7[i] != BTYPE_WATER) ||
+			(bt8[i] != BTYPE_AIR && bt8[i] != BTYPE_WATER) ||
+			(bt9[i] != BTYPE_AIR && bt9[i] != BTYPE_WATER))
+			return true;
+	}
 
 	return false;
 }
@@ -191,4 +206,11 @@ float Character::GetVerticalRotation() const
 {
 	return m_VerticalRot;
 }
-
+void Character::Jump()
+{
+	if (!m_isInAir)
+	{
+		m_vitesse.y = -0.20f;
+		m_isInAir = true;
+	}
+}

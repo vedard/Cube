@@ -137,7 +137,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			//Si on a touche le sol 
 			if (m_vitesse.y > 0)
 			{
-				m_air = false;
+				m_isInAir = false;
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
@@ -148,7 +148,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_vitesse.y = 0;
 		}
 		else
-			m_air = true;
+			m_isInAir = true;
 
 		//Acceleration
 		m_vitesse.y += (m_footUnderwater) ? 0.002f : 0.013f;
@@ -232,7 +232,7 @@ void Player::SetSneak(bool sneak)
 
 void Player::SetRunning(bool running)
 {
-	if (!m_noClip && !m_air)
+	if (!m_noClip && !m_isInAir)
 		m_running = running;
 }
 
@@ -258,10 +258,10 @@ void Player::SetBlock(int direction)
 
 void Player::Jump()
 {
-	if (!m_air && !m_footUnderwater)
+	if (!m_isInAir && !m_footUnderwater)
 	{
 		m_vitesse.y = -0.20f;
-		m_air = true;
+		m_isInAir = true;
 	}
 	else if (m_footUnderwater && !m_headUnderwater)
 		m_vitesse.y = -0.002f;

@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 10
+#define NBR_MONSTER 4
 
 
 Engine::Engine() :
@@ -180,8 +180,10 @@ void Engine::LoadResource()
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2));
 
 	for (int i = 0; i < NBR_MONSTER; i++)
-		m_monster[i].Spawn(m_world, (WORLD_SIZE*CHUNK_SIZE_X / 2) -50 + rand() % 100, (WORLD_SIZE*CHUNK_SIZE_X / 2) -50 + rand() % 100);
-	
+	{
+		m_monster[i].Spawn(m_world, (WORLD_SIZE*CHUNK_SIZE_X / 2) - 50 + rand() % 100, (WORLD_SIZE*CHUNK_SIZE_X / 2) - 50 + rand() % 100);
+		m_monster[i].SetTarget(&m_player);
+	}
 	
 
 }
@@ -221,11 +223,8 @@ void Engine::Render(float elapsedTime)
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
 		for (int i = 0; i < NBR_MONSTER; i++)
-			m_monster[i].Move(m_world, m_player);
+			m_monster[i].Move(m_world);
 		
-		for (int i = 0; i < NBR_MONSTER; i++)
-			if (m_monster[i].CheckCollision(m_player))
-				m_monster[i].Attack(&m_player, 2);
 		
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -303,7 +302,7 @@ void Engine::Render(float elapsedTime)
 
 	//Monstre
 	for (int i = 0; i < NBR_MONSTER; i++)
-		m_monster[i].Draw();
+		m_monster[i].Draw(false);
 
 
 	

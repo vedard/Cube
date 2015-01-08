@@ -38,7 +38,6 @@ private:
 
 	bool m_noClip;		//Si on est en noclip mode (sans collision et vol)
 	bool m_sneaked;		//Si on est penché
-	bool m_air;			//Si on est dans les airs (ex: pendans un saut ou une chute)
 	bool m_running;		//Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
