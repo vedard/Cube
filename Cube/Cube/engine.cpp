@@ -1,4 +1,6 @@
 ﻿#include "engine.h"
+#define NBR_MONSTER 10
+
 
 Engine::Engine() :
 m_wireframe(false),
@@ -17,12 +19,16 @@ displayInfo(false)
 
 	//Creation du tableau de block info
 	m_bInfo = new BlockInfo[256];
+
+	m_monster = new Monster[NBR_MONSTER];
+
 }
 
 Engine::~Engine()
 {
 	m_world.SaveMap("map.sav");
 	delete[] m_bInfo;
+	delete[] m_monster;
 }
 
 void Engine::Init()
@@ -171,8 +177,12 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
-	m_player.Spawn(m_world);
-	//m_monster.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2) + 3);
+	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2));
+
+	for (int i = 0; i < NBR_MONSTER; i++)
+		m_monster[i].Spawn(m_world, (WORLD_SIZE*CHUNK_SIZE_X / 2) -50 + rand() % 100, (WORLD_SIZE*CHUNK_SIZE_X / 2) -50 + rand() % 100);
+	
+	
 
 }
 
@@ -210,6 +220,13 @@ void Engine::Render(float elapsedTime)
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
+		for (int i = 0; i < NBR_MONSTER; i++)
+			m_monster[i].Move(m_world, m_player);
+		
+		for (int i = 0; i < NBR_MONSTER; i++)
+			if (m_monster[i].CheckCollision(m_player))
+				m_monster[i].Attack(&m_player, 2);
+		
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
 		loops++;
@@ -226,7 +243,7 @@ void Engine::Render(float elapsedTime)
 
 	//Ciel
 	glPushMatrix();
-	glTranslatef(m_player.Position().x, 0, m_player.Position().z);
+	glTranslatef(m_player.GetPosition().x, 0, m_player.GetPosition().z);
 
 	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
 
@@ -262,13 +279,12 @@ void Engine::Render(float elapsedTime)
 	glPopMatrix();
 
 
-	/*m_monster.Move(m_world);
-	m_monster.Draw();*/
+
 	////Chunk
 	m_textureAtlas.Bind();
 
 	//Chunk du joueur
-	Vector3<int> playerPos((int)m_player.Position().x / CHUNK_SIZE_X, 0, (int)m_player.Position().z / CHUNK_SIZE_Z);
+	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
 
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
@@ -283,6 +299,13 @@ void Engine::Render(float elapsedTime)
 	
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);	
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+
+
+	//Monstre
+	for (int i = 0; i < NBR_MONSTER; i++)
+		m_monster[i].Draw();
+
+
 	
 	Shader::Disable();
 
@@ -513,7 +536,7 @@ void Engine::DrawHud()
 
 		//Position du joueur
 		ss.str("");
-		ss << "Position " << m_player.Position();
+		ss << "Position " << m_player.GetPosition();
 		PrintText(10, 10, 12, ss.str());
 	}
 	ss.str("");
@@ -635,7 +658,7 @@ void Engine::GetBlocAtCursor()
 
 	bool found = false;
 
-	if ((m_player.Position() - Vector3<float>(posX, posY, posZ)).Length() < EDITING_DISTANCE)
+	if ((m_player.GetPosition() - Vector3<float>(posX, posY, posZ)).Length() < EDITING_DISTANCE)
 	{
 		// Apres avoir determine la position du bloc en utilisant la partie entiere du hit
 		// point retourne par opengl, on doit verifier de chaque cote du bloc trouve pour trouver

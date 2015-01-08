@@ -99,16 +99,6 @@ BlockType Chunk::GetBlock(int x, int y, int z) const
 		return BTYPE_AIR;
 }
 
-const Vector3<float> &Chunk::GetBlockPos(int x, int y, int z) const
-{
-	Vector3<float> posblock;
-	posblock.x = m_position.x + x;
-	posblock.y = m_position.y + y;
-	posblock.z = m_position.z + z;
-
-	return posblock;
-}
-
 void Chunk::SetPosition(int x, int y, int z)
 {
 	m_position.x = x;

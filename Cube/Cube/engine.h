@@ -12,7 +12,7 @@
 #include "array2d.h"
 #include "vector3.h"
 #include "world.h"
-#include "entity.h"
+#include "monster.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -50,7 +50,7 @@ private:
 	bool m_wireframe;
 
 	Player m_player;
-	Entity m_monster;
+	Monster* m_monster;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 
@@ -58,6 +58,7 @@ private:
 	Texture m_textureSky;
 	Texture m_textureFont;
 	Texture m_textureCrosshair;
+	
 	Shader m_shader01;
 	World m_world;
 

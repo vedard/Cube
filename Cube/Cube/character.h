@@ -1,28 +1,33 @@
-#ifndef ENTITY_H__
-#define ENTITY_H__
+#ifndef CHARACTER_H__
+#define CHARACTER_H__
 
 #include "define.h"
 #include "vector3.h"
 #include "world.h"
 
-class Entity
+class Character
 {
 public:
-	Entity();
-	~Entity();
+	Character();
+	~Character();
 
 	//Action
 	void Spawn(World &world, int x, int z);
 	void Move(World &world);
 	bool CheckCollision(World &world) const;
+	bool CheckCollision(Character & character) const;
 	void Draw() const;
+	void Attack(Character * character, int damage) const;
+	void GetDamage(int damage);
 
 	//Get
-	Vector3<float> GetPosition() const;
-	Vector3<float> GetDimension() const;
+	const Vector3<float>& GetPosition() const;
+	const Vector3<float>& GetDimension() const;
 	int GetHP() const;
+	float GetHorizontalRotation() const;
+	float GetVerticalRotation() const;
 
-private:
+protected:
 	
 	Vector3<float> m_pos;
 	Vector3<float> m_dimension;

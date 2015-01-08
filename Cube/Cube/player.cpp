@@ -5,71 +5,41 @@
 
 
 Player::Player() :
-m_pos(0, 128, 0),
-m_dimension(0.2f, 1.62f, 0.2f),
-m_rotX(0),
-m_rotY(0),
-m_vitesse(0.1f,0,0),
+Character(),
 m_noClip(false),
 m_sneaked(false),
-
-m_health(100),
 m_running(false),
 m_block(BTYPE_GRASS),
 m_footUnderwater(false),
 m_headUnderwater(false)
 {
-
+	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
+	m_health = 100;
 }
 
 Player::~Player()
 {
-
 }
 
-void Player::Spawn(World &world)
-{
-	m_health = 100;
-	m_pos.x = WORLD_SIZE*CHUNK_SIZE_X / 2;
-	m_pos.y = CHUNK_SIZE_Y;
-	m_pos.z = WORLD_SIZE*CHUNK_SIZE_Z / 2;
-
-	while (!CheckCollision(world))
-	{
-		m_pos.y--;
-
-		if (m_pos.y < -100)
-		{
-			m_pos.x = WORLD_SIZE*CHUNK_SIZE_X / 2;
-			m_pos.y = CHUNK_SIZE_Y;
-			m_pos.z = WORLD_SIZE*CHUNK_SIZE_Z / 2;
-			break;
-		}
-	}
-
-	m_pos.y++;
-}
 
 void Player::TurnLeftRight(float value)
 {
-	m_rotX += value;
+	m_HorizontalRot += value;
 }
 
 void Player::TurnTopBottom(float value)
 {
-	m_rotY += value;
-	if (m_rotY > 90)
-		m_rotY = 90;
-	if (m_rotY < -90)
-		m_rotY = -90;
-
-
+	m_VerticalRot += value;
+	if (m_VerticalRot > 90)
+		m_VerticalRot = 90;
+	if (m_VerticalRot < -90)
+		m_VerticalRot = -90;
 }
 
 void Player::Move(bool front, bool back, bool left, bool right, World &world)
 {
 	//Orientation du player en rad
-	float orientationPlayer = m_rotX * PI / 180;
+	float orientationPlayer = m_HorizontalRot * PI / 180;
 	//Multiplicateur de vitesse
 	m_vitesse.x = 0.1;
 	m_vitesse.z = 0.1;
@@ -88,7 +58,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		{
 			m_vitesse.x *= 0.7f;
 			m_vitesse.z *= 0.7f;
-		
+
 		}
 		else if (m_running)
 		{
@@ -105,7 +75,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 	//Deplacement Avant/Arriere
 	Vector3<float> directionVector(cosf(PI / 2.f * 3.f + orientationPlayer), 0.f, sinf(PI / 2.f * 3.f + orientationPlayer));
-	Vector3<float> directionVectorNoClip(cosf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_rotY * PI / 180)), sinf(-m_rotY * PI / 180), sinf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_rotY * PI / 180)));
+	Vector3<float> directionVectorNoClip(cosf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_VerticalRot * PI / 180)), sinf(-m_VerticalRot * PI / 180), sinf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_VerticalRot * PI / 180)));
 	//Deplacement Gauche/Droite
 	Vector3<float> rightVector = directionVector.Cross(Vector3<float>(0, 1, 0));
 	//Deplacement Total
@@ -133,7 +103,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 	//Normalize les vecteur
 	deplacementVector.Normalize();
-	rightVector.Normalize();
+
 
 	//Si no clip (pas de collision)
 	if (m_noClip)
@@ -157,7 +127,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		if (CheckCollision(world))
 			m_pos.z -= deplacementVector.z * m_vitesse.z;
 
-	
+
 		//Deplacement en Y (Gravité)
 		m_pos.y -= m_vitesse.y;
 
@@ -171,7 +141,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					Hurt((int) exp(m_vitesse.y * 6));
+					GetDamage((int)exp(m_vitesse.y * 6));
 			}
 			//annule
 			m_pos.y += m_vitesse.y;
@@ -181,14 +151,14 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_air = true;
 
 		//Acceleration
-		m_vitesse.y += (m_footUnderwater)? 0.002f : 0.013f;
-		
+		m_vitesse.y += (m_footUnderwater) ? 0.002f : 0.013f;
+
 	}
 
 	//Si le player est mort
 	if (m_health <= 0)
 	{
-		Spawn(world);
+		Spawn(world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2) + 3);
 	}
 
 	//Si le player est dans l'eau
@@ -196,68 +166,23 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 	if (m_footUnderwater)
 	{
-		
+
 
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
 	}
 }
 
-bool Player::CheckCollision(World &world) const
-{
-
-	//4 point au pieds du player
-	BlockType bt1 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt2 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt3 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y, m_pos.z - m_dimension.z / 2);
-	BlockType bt4 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y, m_pos.z - m_dimension.z / 2);
-
-	//4 point au milieu du player
-
-	BlockType bt5 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z + m_dimension.z / 2);
-	BlockType bt6 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z + m_dimension.z / 2);
-	BlockType bt7 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z - m_dimension.z / 2);
-	BlockType bt8 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y / 2, m_pos.z - m_dimension.z / 2);
-
-	//4 point au yeux du player
-	BlockType bt9 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt10 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z + m_dimension.z / 2);
-	BlockType bt11 = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
-	BlockType bt12 = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + m_dimension.y, m_pos.z - m_dimension.z / 2);
-
-
-
-	//Si un des block qui touche au joeur n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
-	if ((bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)||
-		(bt2 != BTYPE_AIR && bt2 != BTYPE_WATER) || 
-		(bt3 != BTYPE_AIR && bt3 != BTYPE_WATER) || 
-		(bt4 != BTYPE_AIR && bt4 != BTYPE_WATER) || 
-		(bt5 != BTYPE_AIR && bt5 != BTYPE_WATER) || 
-		(bt6 != BTYPE_AIR && bt6 != BTYPE_WATER) || 
-		(bt7 != BTYPE_AIR && bt7 != BTYPE_WATER) || 
-		(bt8 != BTYPE_AIR && bt8 != BTYPE_WATER) || 
-		(bt9 != BTYPE_AIR && bt9 != BTYPE_WATER) || 
-		(bt10 != BTYPE_AIR && bt10 != BTYPE_WATER) || 
-		(bt11 != BTYPE_AIR && bt11 != BTYPE_WATER) || 
-		(bt12 != BTYPE_AIR && bt12 != BTYPE_WATER))
-		return true;
-		
-
-
-	return false;
-
-}
-
 void Player::CheckUnderwater(World &world)
 {
-	BlockType bt1 = world.BlockAt(m_pos.x , m_pos.y + m_dimension.y, m_pos.z );
+	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
 
-	if (bt1 == BTYPE_WATER )
+	if (bt1 == BTYPE_WATER)
 		m_headUnderwater = true;
 	else
 		m_headUnderwater = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5f, m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 1.5f, m_pos.z);
 
 	if (bt1 == BTYPE_WATER)
 		m_footUnderwater = true;
@@ -268,8 +193,8 @@ void Player::CheckUnderwater(World &world)
 void Player::ApplyRotation() const
 {
 	glMatrixMode(GL_MODELVIEW);
-	glRotatef(m_rotY, 1, 0, 0);
-	glRotatef(m_rotX, 0, 1, 0);
+	glRotatef(m_VerticalRot, 1, 0, 0);
+	glRotatef(m_HorizontalRot, 0, 1, 0);
 
 }
 
@@ -331,16 +256,6 @@ void Player::SetBlock(int direction)
 		m_block = 1;
 }
 
-Vector3<float> Player::Position() const
-{
-	return m_pos;
-}
-
-Vector3<float> Player::GetDimension() const
-{
-	return m_dimension;
-}
-
 void Player::Jump()
 {
 	if (!m_air && !m_footUnderwater)
@@ -352,22 +267,6 @@ void Player::Jump()
 		m_vitesse.y = -0.002f;
 	else if (m_footUnderwater)
 		m_vitesse.y = -0.09f;
-}
-
-void Player::Hurt(int damage)
-{
-	/*
-		Damage reduction (armor, spell and etc...)
-		*/
-
-	m_health -= damage;
-
-
-}
-
-int Player::GetHP() const
-{
-	return m_health;
 }
 
 bool Player::Underwater() const

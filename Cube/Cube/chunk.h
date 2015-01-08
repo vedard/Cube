@@ -20,7 +20,6 @@ public:
 	void SetPosition(int x, int y, int z);
 	const Vector3<float> &GetPosition() const;
 	BlockType GetBlock(int x, int y, int z) const;
-	const Vector3<float> &GetBlockPos(int x, int y, int z) const;
 	void Update(BlockInfo* &binfo);
 	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockInfo &binfo, const Vector3<float> &Blockpos);
 	void RenderSolidBuffer(GLenum &m_program) const;
