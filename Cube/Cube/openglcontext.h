@@ -38,7 +38,7 @@ public:
     virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y) = 0;
 
 
-    bool Start(const std::string& title, int width, int height);
+    bool Start(const std::string& title, int width = 0, int height = 0);
     bool Stop();
 
     int Width() const;
@@ -61,7 +61,7 @@ protected:
 
 private:
     MOUSE_BUTTON ConvertMouseButton(sf::Mouse::Button button) const;
-	void InitWindow(int width, int height);
+	void InitWindow(int width = 0, int height = 0);
 
 
 protected:

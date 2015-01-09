@@ -12,6 +12,6 @@ int main()
 
     Engine engine;
     engine.SetMaxFps(0);
-    engine.Start("Cube", 1366, 760);
+    engine.Start("Cube");
 	
 }

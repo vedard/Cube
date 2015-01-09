@@ -180,10 +180,10 @@ void OpenglContext::InitWindow(int width, int height)
 	std::string a = setting.Get(2, 1);
 	//Convert string into int
 	if (setting.Get(0, 1) != "null")
-		width = atoi(setting.Get(0, 1).c_str());
+		width = (width == 0) ? atoi(setting.Get(0, 1).c_str()) : width;
 
 	if (setting.Get(1, 1) != "null")
-		height = atoi(setting.Get(1, 1).c_str());
+		height = (height == 0) ? atoi(setting.Get(1, 1).c_str()) : height;
 
 	if (setting.Get(2, 1) != "null")
 		AntiAliasing = atoi(setting.Get(2, 1).c_str());
@@ -199,7 +199,7 @@ void OpenglContext::InitWindow(int width, int height)
 		vsync = false;
 
 	//Create windows
-	m_app.create(sf::VideoMode(width, height, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Resize | sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));
+	m_app.create(sf::VideoMode((width != 0) ? width : 800, (height != 0) ? height : 600, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Resize | sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));
 	m_app.setVerticalSyncEnabled(vsync);
 }
 
