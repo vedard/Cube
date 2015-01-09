@@ -17,29 +17,51 @@ public:
 	bool CheckCollision(World &world) const;
 	bool CheckCollision(Character & character) const;
 	void Draw() const;
-	void Attack(Character * character, int damage) const;
-	void GetDamage(int damage);
+	bool Attack(Character * character, float damage);
+	bool Attack(Character * character);
+	void GetDamage(float damage);
 	void Jump();
+
+	//Set
+	void SetName(std::string name);
 
 	//Get
 	const Vector3<float>& GetPosition() const;
 	const Vector3<float>& GetDimension() const;
-	int GetHP() const;
+	float GetHP() const;
 	float GetHorizontalRotation() const;
 	float GetVerticalRotation() const;
+	int GetAttackRange() const;
+	float GetAttackSpeed() const;
+	float GetArmor() const;
+	float GetAttackDamage() const;
+	const std::string& GetName() const;
+
+	
 
 protected:
-	
+
+	//Positionnement
 	Vector3<float> m_pos;
 	Vector3<float> m_dimension;
 	Vector3<float> m_vitesse;
-
 	float m_HorizontalRot;
 	float m_VerticalRot;
 
-	int m_health;
+	//Stat
+	std::string m_Name;
+	float m_health;
 	int m_AttackRange;
+	float m_AttackSpeed;
+	float m_Armor;
+	float m_AttackDamage;
+
+	//État
 	bool m_isInAir;
+
+	//Timer
+	sf::Clock m_cooldownAttackTimer;
+
 
 
 

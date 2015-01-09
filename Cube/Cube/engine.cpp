@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 4
+#define NBR_MONSTER 2
 
 
 Engine::Engine() :
@@ -21,7 +21,6 @@ displayInfo(false)
 	m_bInfo = new BlockInfo[256];
 
 	m_monster = new Monster[NBR_MONSTER];
-
 }
 
 Engine::~Engine()
@@ -177,14 +176,16 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
+
+	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2));
 
 	for (int i = 0; i < NBR_MONSTER; i++)
 	{
+		m_monster[i].SetName("Monster " + std::to_string(i + 1));
 		m_monster[i].Spawn(m_world, (WORLD_SIZE*CHUNK_SIZE_X / 2) - 50 + rand() % 100, (WORLD_SIZE*CHUNK_SIZE_X / 2) - 50 + rand() % 100);
 		m_monster[i].SetTarget(&m_player);
 	}
-	
 
 }
 
@@ -278,7 +279,6 @@ void Engine::Render(float elapsedTime)
 	glPopMatrix();
 
 
-
 	////Chunk
 	m_textureAtlas.Bind();
 
@@ -294,17 +294,13 @@ void Engine::Render(float elapsedTime)
 
 	//std::thread a(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
 	//a.join();
-
 	
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);	
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-
 	//Monstre
 	for (int i = 0; i < NBR_MONSTER; i++)
 		m_monster[i].Draw(false);
-
-
 	
 	Shader::Disable();
 
@@ -533,10 +529,41 @@ void Engine::DrawHud()
 		ss << "Chunk not updated: " << m_chunkToUpdate;
 		PrintText(10, Height() - 45, 12, ss.str());
 
+		//vie du joueur
+		ss.str("");
+		ss << "Health: " << m_player.GetHP();
+		PrintText(10, 130, 12, ss.str());
+
+		//Armur du joueur
+		ss.str("");
+		ss << "Armor: " << m_player.GetArmor();
+		PrintText(10, 110, 12, ss.str());
+
+		//force du joueur
+		ss.str("");
+		ss << "A.Damage: " << m_player.GetAttackDamage();
+		PrintText(10, 90, 12, ss.str());
+
+		//Attack speed du joueur
+		ss.str("");
+		ss << "A.Speed: " << m_player.GetAttackSpeed();
+		PrintText(10, 70, 12, ss.str());
+
+		//Range du joueur
+		ss.str("");
+		ss << "A.Range: " << m_player.GetAttackRange();
+		PrintText(10, 50, 12, ss.str());
+
+		//Rotation du joueur
+		ss.str("");
+		ss << "Orientation: " << m_player.GetHorizontalRotation();
+		PrintText(10, 30, 12, ss.str());
+
 		//Position du joueur
 		ss.str("");
 		ss << "Position " << m_player.GetPosition();
 		PrintText(10, 10, 12, ss.str());
+
 	}
 	ss.str("");
 	//Pour chaque 10 point de vie on met un carre sinon un espace

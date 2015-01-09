@@ -7,11 +7,20 @@ m_dimension(1.3, 2.2, 0.7),
 m_health(100),
 m_AttackRange(2),
 m_HorizontalRot(0.f),
-m_VerticalRot(90.f),
-m_vitesse(0, 0, 0)
+m_VerticalRot(45.f),
+m_vitesse(0, 0, 0),
+m_AttackSpeed(0),
+m_Armor(1),
+m_cooldownAttackTimer(),
+m_AttackDamage(30)
 {
-}
 
+	m_Name = "Character ";
+	for (int i = 0; i < 5; i++)
+		m_Name += std::to_string(std::rand() % 10);
+	
+
+}
 
 Character::~Character()
 {
@@ -38,6 +47,8 @@ void Character::Spawn(World &world, int x, int z)
 	}
 
 	m_pos.y++;
+
+	std::cout << m_Name <<  " spawned." << std::endl;
 }
 
 void Character::Move(World &world)
@@ -66,50 +77,30 @@ void Character::Move(World &world)
 
 bool Character::CheckCollision(World &world) const
 {
-	//Todo	-> simplifier cette fonction
-	//		-> plus le character est gros plus il y a besoins de point
-	int nbrEtage = ceil(m_dimension.y);
-	BlockType * bt1 = new BlockType[nbrEtage + 1];
-	BlockType * bt2 = new BlockType[nbrEtage + 1];
-	BlockType * bt3 = new BlockType[nbrEtage + 1];
-	BlockType * bt4 = new BlockType[nbrEtage + 1];
-	BlockType * bt5 = new BlockType[nbrEtage + 1];
-	BlockType * bt6 = new BlockType[nbrEtage + 1];
-	BlockType * bt7 = new BlockType[nbrEtage + 1];
-	BlockType * bt8 = new BlockType[nbrEtage + 1];
-	BlockType * bt9 = new BlockType[nbrEtage + 1];
 
+	int h = ceil(m_dimension.y);
+	int w = ceil(m_dimension.x);
+	int d = ceil(m_dimension.z);
 
-	for (int i = 0; i <= nbrEtage; i++)
-	{
-		//4 coin
-		bt1[i] = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z + m_dimension.z / 2);
-		bt2[i] = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i) , m_pos.z + m_dimension.z / 2);
-		bt3[i] = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i) , m_pos.z - m_dimension.z / 2);
-		bt4[i] = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i) , m_pos.z - m_dimension.z / 2);
+	/*
+		dependament de la grandeur du personnage
+		ont calcul un certain nombre de points
+		et on vérifie si il n'y pas de block
+		solide qui y touche
+		*/
+	for (int y = 0; y <= h; y++)
+		for (int x = 0; x <= w; x++)
+			for (int z = 0; z <= d; z++)
+			{
+				BlockType bt1 = world.BlockAt(
+					m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+					m_pos.y + (m_dimension.y / h * y),
+					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 
-		//4 point entre les coins 
-		bt5[i] = world.BlockAt(m_pos.x, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z - m_dimension.z / 2);
-		bt6[i] = world.BlockAt(m_pos.x, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z - m_dimension.z / 2);
-		bt7[i] = world.BlockAt(m_pos.x + m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z);
-		bt8[i] = world.BlockAt(m_pos.x - m_dimension.x / 2, m_pos.y + (m_dimension.y / nbrEtage * i), m_pos.z);
-
-		//1 point au milieu
-		bt9[i] = world.BlockAt(m_pos.x, m_pos.y + (m_dimension.y / nbrEtage) * i, m_pos.z);
-
-
-		//Si un des block qui touche au joeur n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
-		if ((bt1[i] != BTYPE_AIR && bt1[i] != BTYPE_WATER) ||
-			(bt2[i] != BTYPE_AIR && bt2[i] != BTYPE_WATER) ||
-			(bt3[i] != BTYPE_AIR && bt3[i] != BTYPE_WATER) ||
-			(bt4[i] != BTYPE_AIR && bt4[i] != BTYPE_WATER) ||
-			(bt5[i] != BTYPE_AIR && bt5[i] != BTYPE_WATER) ||
-			(bt6[i] != BTYPE_AIR && bt6[i] != BTYPE_WATER) ||
-			(bt7[i] != BTYPE_AIR && bt7[i] != BTYPE_WATER) ||
-			(bt8[i] != BTYPE_AIR && bt8[i] != BTYPE_WATER) ||
-			(bt9[i] != BTYPE_AIR && bt9[i] != BTYPE_WATER))
-			return true;
-	}
+				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
+				if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)
+					return true;
+			}
 
 	return false;
 }
@@ -171,41 +162,50 @@ void Character::Draw() const
 
 	glPopMatrix();
 }
-void Character::Attack(Character * character, int damage) const
+
+bool Character::Attack(Character * character, float damage)
 {
 	if (character != NULL)
-		character->GetDamage(damage);
+
+		//Si on a la vitesse pour attaquer tout de suite
+		if ((m_AttackSpeed == 0) ? true : (m_cooldownAttackTimer.getElapsedTime().asMilliseconds() > 1000 / m_AttackSpeed))
+
+			//Si on est asser proche de la victime
+			if (sqrtf(pow(character->GetPosition().x - m_pos.x, 2)
+				+ pow((character->GetPosition().y + character->GetDimension().y / 2) - (m_pos.y + m_dimension.y / 2), 2)
+				+ pow(character->GetPosition().z - m_pos.z, 2)) < m_AttackRange)
+			{
+				std::cout << m_Name << " attack " << character->GetName() << "." << std::endl;
+				character->GetDamage(damage);
+				m_cooldownAttackTimer.restart();
+				return true;
+			}
+
+	return false;
 }
 
-void Character::GetDamage(int damage)
+bool Character::Attack(Character * character)
 {
+	return Attack(character, m_AttackDamage);
+}
+
+void Character::GetDamage(float damage)
+{
+	//Reduction par l'armur
+	if (m_Armor > 0)
+		damage /= m_Armor;
+
+	//Toujours un minimun de 1 damange
+	damage = (damage < 1) ? 1 : damage;
+
 	m_health -= damage;
+
+	std::cout << m_Name << " received " << damage << " damage." << std::endl;
+
+	if (m_health <= 0)
+		std::cout << m_Name << " died." << std::endl;
 }
 
-const Vector3<float>& Character::GetPosition() const
-{
-	return m_pos;
-}
-
-const Vector3<float>& Character::GetDimension() const
-{
-	return m_dimension;
-}
-
-int Character::GetHP() const
-{
-	return m_health;
-}
-
-float Character::GetHorizontalRotation() const
-{
-	return m_HorizontalRot;
-}
-
-float Character::GetVerticalRotation() const
-{
-	return m_VerticalRot;
-}
 void Character::Jump()
 {
 	if (!m_isInAir)
@@ -214,3 +214,35 @@ void Character::Jump()
 		m_isInAir = true;
 	}
 }
+
+//Set
+
+void Character::SetName(std::string name)
+{
+	m_Name = name;
+}
+
+//Get
+
+const Vector3<float>& Character::GetPosition() const { return m_pos; }
+
+const Vector3<float>& Character::GetDimension() const { return m_dimension; }
+
+float Character::GetHP() const { return m_health; }
+
+float Character::GetHorizontalRotation() const { return m_HorizontalRot; }
+
+float Character::GetVerticalRotation() const { return m_VerticalRot; }
+
+int Character::GetAttackRange() const { return m_AttackRange; }
+
+float Character::GetAttackSpeed() const { return m_AttackSpeed; }
+
+float Character::GetArmor() const { return m_Armor;  }
+
+float  Character::GetAttackDamage() const{ return m_AttackDamage; }
+
+const std::string& Character::GetName() const{ return m_Name; }
+
+
+

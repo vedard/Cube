@@ -13,6 +13,8 @@ public:
 	void Move(World &world);
 	void Draw(bool debugRange) const;
 	void SetTarget(Character* target);
+	
+
 
 private:
 	Texture m_texture;

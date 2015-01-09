@@ -15,6 +15,7 @@ m_headUnderwater(false)
 {
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_health = 100;
+	m_Armor = 1.1;
 }
 
 Player::~Player()
