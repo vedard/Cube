@@ -554,9 +554,29 @@ void Engine::DrawHud()
 		ss << "A.Range: " << m_player.GetAttackRange();
 		PrintText(10, 50, 12, ss.str());
 
+		int orientation =  (int)m_player.GetHorizontalRotation() % 360;
+		
+		if(orientation < 0)
+			orientation = 360 + orientation;
+
+		std::string direction = "";
+
+		if(orientation >= 315 || orientation <= 45)
+			direction = "Negative Z";
+
+		if(orientation >= 45 && orientation <= 135)
+			direction = "Positive X";
+
+		if(orientation >= 135 && orientation <= 225)
+			direction = "Positive Z";
+
+		if(orientation >= 225 && orientation <= 315)
+			direction = "Negative X";
+
+
 		//Rotation du joueur
 		ss.str("");
-		ss << "Orientation: " << m_player.GetHorizontalRotation();
+		ss << "Orientation: " << orientation << " toward: " << direction;
 		PrintText(10, 30, 12, ss.str());
 
 		//Position du joueur
