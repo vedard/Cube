@@ -35,6 +35,7 @@ public:
 	Chunk* m_negativeZ;
 private:
 	bool CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
+	float CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const;
 
 
 	//Todo - rendre private

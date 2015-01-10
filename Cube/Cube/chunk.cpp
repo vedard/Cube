@@ -114,7 +114,7 @@ const Vector3<float> &Chunk::GetPosition() const
 void Chunk::Update(BlockInfo* &binfo)
 {
 	// Update mesh
-	if (m_isDirty )
+	if (m_isDirty)
 	{
 		int maxVertexCount = (CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z) * (6 * 4);
 
@@ -170,75 +170,87 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 	// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
+		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, 0, -1));
+
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
 
 	}
 	// Droite
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(1, 0, 0)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.9f, 0.9f, 0.9f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
+		float light = CheckLightning(Blockpos - m_position, Vector3<float>(1, 0, 0));
+
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
 	}
 	//Gauche
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(-1, 0, 0)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
+		float light = CheckLightning(Blockpos - m_position, Vector3<float>(-1, 0, 0));
+
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .25f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
 	}
 	//Derirere
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, 1)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, 0, 1));
+
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .50f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
 	}
 	//Haut
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 1, 0)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
+		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, 1, 0));
+
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
 
 		if (type == BTYPE_WATER) ///Lorsque sous l'eau on peut voir le haut de locean
 		{
-			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
-			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
-			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
-			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, 1.f, 1.f, 1.f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
+			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
 
 		}
 	}
 	//Bas
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, -1, 0)))
 	{
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f, type);
-		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, 0.8f, 0.8f, 0.8f, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
-		
+		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, -1, 0));
+
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f, type);
+		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
+
 	}
 
 }
 
 void Chunk::RenderSolidBuffer(GLenum &m_program) const
 {
-	
-		m_chunkMesh.Render(m_program);
+
+	m_chunkMesh.Render(m_program);
 }
 
 void Chunk::RenderTransparentBuffer(GLenum &m_program) const
 {
-	
-		m_transparentMesh.Render(m_program);
+
+	m_transparentMesh.Render(m_program);
 }
 
 void Chunk::DeleteCache()
@@ -275,4 +287,28 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 		return true;
 
 	return false;
+}
+
+float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const
+{
+	
+	if (face.y == -1)
+		return 0.5f;
+
+	for (int i = 1; true; i++)
+	{
+		BlockType block = GetBlock(Blockpos.x + face.x, Blockpos.y + i, Blockpos.z + face.z);
+		if (block == BTYPE_AIR )
+		{
+			if (Blockpos.y + i > CHUNK_SIZE_Y)
+				return 0.9f;
+			
+		}
+		else if (block == BTYPE_LEAVE)
+			return 0.74f;
+		else if (block == BTYPE_WATER)
+			return 0.64f;
+		else
+			return  0.57f;
+	}
 }

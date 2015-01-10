@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 2
+#define NBR_MONSTER 0
 
 
 Engine::Engine() :
@@ -42,7 +42,7 @@ void Engine::Init()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
-
+	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(75.0f, (float)Width() / (float)Height(), 0.01f, 1000.0f);
