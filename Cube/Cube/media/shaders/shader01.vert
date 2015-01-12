@@ -11,7 +11,7 @@ void main()
     light = gl_Color;
     gl_TexCoord[0] = gl_MultiTexCoord0;
 
-	//Si le vertex est un BTYPE_WATER on fait des vague
+	//Si le vertex est un BTYPE_WATER ou BTYPE_LAVA on fait des vague
 	if(type == 16.0 )
 	{
 		

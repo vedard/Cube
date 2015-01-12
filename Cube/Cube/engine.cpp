@@ -160,6 +160,13 @@ void Engine::LoadResource()
 	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_sand.bmp");
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_SAND].u, m_bInfo[BTYPE_SAND].v, m_bInfo[BTYPE_SAND].w, m_bInfo[BTYPE_SAND].h);
 
+	m_bInfo[BTYPE_NETHEREACK].Init(BTYPE_NETHEREACK, "Netherrack");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_netherrack.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_NETHEREACK].u, m_bInfo[BTYPE_NETHEREACK].v, m_bInfo[BTYPE_NETHEREACK].w, m_bInfo[BTYPE_NETHEREACK].h);
+
+	m_bInfo[BTYPE_LAVA].Init(BTYPE_LAVA, "Lava");
+	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_lava.bmp");
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LAVA].u, m_bInfo[BTYPE_LAVA].v, m_bInfo[BTYPE_LAVA].w, m_bInfo[BTYPE_LAVA].h);
 
 	if (!m_textureAtlas.Generate(64, false))
 	{
@@ -242,42 +249,44 @@ void Engine::Render(float elapsedTime)
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
 
 	//Ciel
-	glPushMatrix();
-	glTranslatef(m_player.GetPosition().x, 0, m_player.GetPosition().z);
+	if (m_player.GetPosition().y > 64)
+	{
+		glPushMatrix();
+		glTranslatef(m_player.GetPosition().x, 0, m_player.GetPosition().z);
 
-	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
+		glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
 
-	m_textureSky.Bind();
+		m_textureSky.Bind();
 
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
-	glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
-	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-	glTexCoord2f(0, 0.25);			glVertex3f(-512, 512, -512);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
+		glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
+		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+		glTexCoord2f(0, 0.25);			glVertex3f(-512, 512, -512);
 
-	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-	glTexCoord2f(0.25, 0.5);		glVertex3f(512, -512, -512);
-	glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+		glTexCoord2f(0.25, 0.5);		glVertex3f(512, -512, -512);
+		glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
+		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
 
-	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
-	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-	glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
+		glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+		glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
+		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+		glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
 
-	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
-	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
-	glTexCoord2f(1, 0.50);			glVertex3f(-512, -512, -512);
-	glTexCoord2f(1, 0.25);			glVertex3f(-512, 512, -512);
+		glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
+		glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+		glTexCoord2f(1, 0.50);			glVertex3f(-512, -512, -512);
+		glTexCoord2f(1, 0.25);			glVertex3f(-512, 512, -512);
 
-	glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
-	glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
-	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-	glEnd();
-	glPopMatrix();
-
+		glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
+		glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
+		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+		glEnd();
+		glPopMatrix();
+	}
 
 	////Chunk
 	m_textureAtlas.Bind();

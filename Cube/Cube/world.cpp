@@ -80,29 +80,42 @@ void World::InitChunk(float i, float j)
 	for (int x = 0; x < CHUNK_SIZE_X; x++)
 		for (int z = 0; z < CHUNK_SIZE_Z; z++)
 		{
-			
+
 			float biome = scaled_octave_noise_2d(14, 0.3f, 5, 0.001, 1, (float)(i * CHUNK_SIZE_X + x) / 40000, (float)(j * CHUNK_SIZE_Z + z) / 40000);
 			float val;
-			
+
 			val = scaled_octave_noise_2d(16, 0.3f, (m_seed) ? 7 : 0, -50, 40, (float)(i * CHUNK_SIZE_X + x) / (5000 * biome), (float)(j * CHUNK_SIZE_Z + z) / (5000 * biome));
 
 			//Couche
-			for (int y = 0; y <= CHUNK_SIZE_Y; y++)
+			for (int y = 0; y <= 200; y++)
 			{
+				int height = val + 160 - y;
 
-				if (y == 0)
-					chunk->SetBlock(x, val + 80 - y, z, BTYPE_GRASS);
-				else if (y >= 1 && y < 4)
-					chunk->SetBlock(x, val + 80 - y, z, BTYPE_DIRT);
-				else if (y >= 4)
-					chunk->SetBlock(x, val + 80 - y, z, BTYPE_STONE);
+				if (height > 64)
+				{
+
+					if (y == 0)
+						chunk->SetBlock(x, height, z, BTYPE_GRASS);
+					else if (y >= 1 && y < 4)
+						chunk->SetBlock(x, height, z, BTYPE_DIRT);
+					else if (y >= 4)
+						chunk->SetBlock(x, height, z, BTYPE_STONE);
+				}
+			}
+			val = scaled_octave_noise_2d(16, 0.3f, (m_seed) ? 7 : 0, -1, 1, (float)(i * CHUNK_SIZE_X + x) / (5000 * biome), (float)(j * CHUNK_SIZE_Z + z) / (5000 * biome));
+
+			chunk->SetBlock(x, val + 65, z, BTYPE_NETHEREACK);
+
+			val = scaled_octave_noise_2d(15, 0.4f, (m_seed) ? 8 : 0, -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
+
+
+			for (int y = 0; y <= 55; y++)
+			{
+				chunk->SetBlock(x, val + 20 - y, z, BTYPE_NETHEREACK);
 			}
 			//Plancher de bedrock
 			chunk->SetBlock(x, 0, z, BTYPE_BED_ROCK);
 			chunk->SetBlock(x, 1, z, BTYPE_BED_ROCK);
-
-			chunk->SetBlock(x, 2, z, BTYPE_STONE);
-			chunk->SetBlock(x, 2, z, BTYPE_STONE);
 
 		}
 
@@ -117,23 +130,23 @@ void World::InitChunk(float i, float j)
 					{
 						AddMineral(BTYPE_COAL, chunk, x, y, z);
 					}
-					else if (rand() % 10000 >= 9932 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 66)
+					else if (rand() % 10000 >= 9932 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 66 + 64)
 					{
 						AddMineral(BTYPE_IRON, chunk, x, y, z);
 					}
-					else if (rand() % 10000 >= 9987 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 34)
+					else if (rand() % 10000 >= 9987 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 34 + 64)
 					{
 						AddMineral(BTYPE_GOLD, chunk, x, y, z);
 					}
-					else if (rand() % 10000 >= 9907 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 16)
+					else if (rand() % 10000 >= 9907 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 16 + 64)
 					{
 						AddMineral(BTYPE_REDSTONE, chunk, x, y, z);
 					}
-					else if (rand() % 10000 >= 9987 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 34)
+					else if (rand() % 10000 >= 9987 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 34 + 64)
 					{
 						AddMineral(BTYPE_LAPIS_LAZULI, chunk, x, y, z);
 					}
-					else if (rand() % 10000 >= 9988 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 16)
+					else if (rand() % 10000 >= 9988 && chunk->GetBlock(x, y, z) == BTYPE_STONE && y < 16 + 64)
 					{
 						AddMineral(BTYPE_DIAMOND, chunk, x, y, z);
 					}
@@ -144,7 +157,7 @@ void World::InitChunk(float i, float j)
 		//Water
 		for (int x = 0; x < CHUNK_SIZE_X; x++)
 			for (int z = 0; z < CHUNK_SIZE_Z; z++)
-				for (int y = 0; y < 60; y++)
+				for (int y = 0; y < 140; y++)
 				{
 					if (chunk->GetBlock(x, y, z) == BTYPE_AIR &&
 						(chunk->GetBlock(x, y - 1, z) == BTYPE_GRASS ||
@@ -156,31 +169,41 @@ void World::InitChunk(float i, float j)
 
 				}
 
+		//Lava
+		for (int x = 0; x < CHUNK_SIZE_X; x++)
+			for (int z = 0; z < CHUNK_SIZE_Z; z++)
+				for (int y = 0; y < 7; y++)
+				{
+					if (chunk->GetBlock(x, y, z) == BTYPE_AIR &&
+						(chunk->GetBlock(x, y - 1, z) == BTYPE_NETHEREACK ||
+						chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
+						chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
+					{
+						chunk->SetBlock(x, y, z, BTYPE_LAVA);
+					}
+
+				}
+
 		//Sand
 		for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
-				for (int y = 3; y <= CHUNK_SIZE_Y; y++)
+				for (int y = 64; y <= CHUNK_SIZE_Y; y++)
 				{
-					if (chunk->GetBlock(x, y, z) == BTYPE_GRASS && y < 65)
+				
+					if (chunk->GetBlock(x, y, z) == BTYPE_GRASS && chunk->GetBlock(x, y + 1, z) == BTYPE_WATER)
 					{
 						chunk->SetBlock(x, y, z, BTYPE_SAND);
 						chunk->SetBlock(x, y - 1, z, BTYPE_SAND);
 						chunk->SetBlock(x, y - 2, z, BTYPE_SAND);
 						chunk->SetBlock(x, y - 3, z, BTYPE_SAND);
-					}
-					else if (chunk->GetBlock(x, y, z) == BTYPE_GRASS && chunk->GetBlock(x, y + 1, z) == BTYPE_WATER)
-					{
-						chunk->SetBlock(x, y, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 1, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 2, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 3, z, BTYPE_SAND);
+						break;
 					}
 				}
 
 		//Cave
 		if (rand() % 100 > 90)
 		{
-			Vector3<float> head(rand() % (CHUNK_SIZE_X)+(i * CHUNK_SIZE_X), rand() % (CHUNK_SIZE_Y - 40), rand() % (CHUNK_SIZE_Z)+(j * CHUNK_SIZE_Z));
+			Vector3<float> head(rand() % (CHUNK_SIZE_X)+(i * CHUNK_SIZE_X), rand() % (CHUNK_SIZE_Y -100) + 50, rand() % (CHUNK_SIZE_Z)+(j * CHUNK_SIZE_Z));
 
 			//Longeur d'une tunel
 			for (int g = 0; g < rand() % 300 + 200; g++)
@@ -201,6 +224,7 @@ void World::InitChunk(float i, float j)
 								Vector3<float> blockPos(head.x - (chunkPos.x * CHUNK_SIZE_X) + q, head.y + w, head.z - (chunkPos.z * CHUNK_SIZE_X) + e);
 								if (chunkTemp->GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_WATER &&
 									chunkTemp->GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_SAND &&
+									chunkTemp->GetBlock(blockPos.x, blockPos.y, blockPos.z) != BTYPE_BED_ROCK &&
 									!chunkTemp->GetSave()
 									)
 									//Set le bloc a air
@@ -221,7 +245,7 @@ void World::InitChunk(float i, float j)
 		for (int x = 0; x < CHUNK_SIZE_X; x += 2)
 			for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
 			{
-				int y = 128;
+				int y = CHUNK_SIZE_Y;
 
 				if (scaled_octave_noise_2d(1, 0.4f, 6, 0, 100, (float)(i * CHUNK_SIZE_X + x) / (5000), (float)(j * CHUNK_SIZE_Z + z) / (5000)) >= 30 && std::rand() % 100 > 90)
 				{
@@ -245,12 +269,12 @@ void World::InitChunk(float i, float j)
 
 BlockType World::BlockAt(float x, float y, float z)
 {
-	Vector3<float> chunkPos(floor(x / CHUNK_SIZE_X),0, floor(z / CHUNK_SIZE_Z));
+	Vector3<float> chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
 	Chunk * chunk = ChunkAt(chunkPos.x, chunkPos.z);
 
 	if (chunk)
 		return chunk->GetBlock(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
-	
+
 	else
 		return BTYPE_AIR;
 }
@@ -406,7 +430,7 @@ void World::AddTree(Chunk * &chunk, int x, int y, int z)
 	chunk->SetBlock(x - 1, y + hauteur - 1, z, BTYPE_LEAVE);
 	chunk->SetBlock(x - 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
 	chunk->SetBlock(x + 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
-	
+
 	chunk->SetBlock(x + 1, y + hauteur, z, BTYPE_LEAVE);
 	chunk->SetBlock(x, y + hauteur, z + 1, BTYPE_LEAVE);
 	chunk->SetBlock(x, y + hauteur, z - 1, BTYPE_LEAVE);
@@ -421,7 +445,7 @@ void World::InitChunks(int CenterX, int CenterZ)
 	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
 		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
 		{
-			Chunk * chunk = ChunkAt(CenterX + i - RENDER_DISTANCE,CenterZ + j - RENDER_DISTANCE);
+			Chunk * chunk = ChunkAt(CenterX + i - RENDER_DISTANCE, CenterZ + j - RENDER_DISTANCE);
 
 			//Si n'est pas creer
 			if (chunk && !chunk->m_iscreated)
@@ -442,14 +466,14 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 		for (int a = 0; a <= x; ++a)
 		{
 			//
-			chunk = ChunkAt(CenterX + a, CenterZ - x);	
+			chunk = ChunkAt(CenterX + a, CenterZ - x);
 			if (chunk && chunk->NeedUpdate())
 			{
 				chunk->Update(info);
 				return;
 			}
 
-			chunk = ChunkAt(CenterX - a, CenterZ - x);			
+			chunk = ChunkAt(CenterX - a, CenterZ - x);
 			if (chunk && chunk->NeedUpdate())
 			{
 				chunk->Update(info);
@@ -482,7 +506,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 			chunk = ChunkAt(CenterX - x, CenterZ - a);
 			if (chunk && chunk->NeedUpdate())
 			{
-				chunk->Update(info);	
+				chunk->Update(info);
 				return;
 			}
 
@@ -501,7 +525,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 				return;
 			}
 		}
-	
+
 }
 
 int World::ChunkNotUpdated(int CenterX, int CenterZ)
