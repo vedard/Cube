@@ -1,10 +1,13 @@
 * Cube
 Minecraft Clone in c++
 
+
 * Compilation
  - $ pacman -S sfml devil
  - $ make 
  - $ ./Cube
+
+
 * Controls
 
 |-------------------+---------------|
@@ -28,9 +31,7 @@ Minecraft Clone in c++
   
 
 * Bugs
-- Other thread can't read/write opengl buffer
-- We can't see water surface when underwater
-- Player can spawn in water 
+- spwan is buggy
 
 
 * Todo
