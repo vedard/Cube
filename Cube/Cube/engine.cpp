@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 0
+#define NBR_MONSTER 3
 
 
 Engine::Engine() :
@@ -183,9 +183,10 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
+	m_world.InitChunks(WORLD_SIZE/ 2, WORLD_SIZE / 2);
 
 	m_player.SetName("Player 1");
-	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2));
+	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 
 	for (int i = 0; i < NBR_MONSTER; i++)
 	{
@@ -207,7 +208,7 @@ void Engine::Render(float elapsedTime)
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 
-	GetBlocAtCursor();
+	
 
 	gameTime += elapsedTime;
 
@@ -450,7 +451,7 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-
+	GetBlocAtCursor();
 	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{

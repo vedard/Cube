@@ -78,7 +78,7 @@ void Chunk::PlaceBlock(int x, int y, int z, BlockType type)
 
 }
 
-BlockType Chunk::GetBlock(int x, int y, int z) const
+const BlockType& Chunk::GetBlock(int x, int y, int z) const
 {
 	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
 		return m_blocks.Get(x, y, z);
@@ -243,13 +243,11 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockI
 
 void Chunk::RenderSolidBuffer(GLenum &m_program) const
 {
-
 	m_chunkMesh.Render(m_program);
 }
 
 void Chunk::RenderTransparentBuffer(GLenum &m_program) const
 {
-
 	m_transparentMesh.Render(m_program);
 }
 
@@ -283,7 +281,7 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER))
+	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER) || faceType == BTYPE_LAVA)
 		return true;
 
 	return false;
@@ -291,18 +289,18 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 
 float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const
 {
-	
+
 	if (face.y == -1)
 		return 0.5f;
 
 	for (int i = 1; true; i++)
 	{
 		BlockType block = GetBlock(Blockpos.x + face.x, Blockpos.y + i, Blockpos.z + face.z);
-		if (block == BTYPE_AIR )
+		if (block == BTYPE_AIR)
 		{
 			if (Blockpos.y + i > CHUNK_SIZE_Y)
 				return 0.9f;
-			
+
 		}
 		else if (block == BTYPE_LEAVE)
 			return 0.74f;

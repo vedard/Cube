@@ -66,7 +66,7 @@ void World::InitChunk(float i, float j)
 {
 	Chunk* chunk = ChunkAt(i, j);
 	chunk->m_iscreated = true;
-	std::srand(m_seed * i * j);
+	std::srand(m_seed * (i + 1) * (j + 1));
 
 	for (int x = 0; x < CHUNK_SIZE_X; ++x)
 		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
@@ -163,7 +163,7 @@ void World::InitChunk(float i, float j)
 						(chunk->GetBlock(x, y - 1, z) == BTYPE_GRASS ||
 						chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
 						chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
-					{	
+					{
 						chunk->SetBlock(x, y, z, BTYPE_WATER);
 					}
 
@@ -189,7 +189,7 @@ void World::InitChunk(float i, float j)
 			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				for (int y = 64; y <= CHUNK_SIZE_Y; y++)
 				{
-				
+
 					if (chunk->GetBlock(x, y, z) == BTYPE_GRASS && chunk->GetBlock(x, y + 1, z) == BTYPE_WATER)
 					{
 						chunk->SetBlock(x, y, z, BTYPE_SAND);
@@ -203,7 +203,7 @@ void World::InitChunk(float i, float j)
 		//Cave
 		if (rand() % 100 > 90)
 		{
-			Vector3<float> head(rand() % (CHUNK_SIZE_X)+(i * CHUNK_SIZE_X), rand() % (CHUNK_SIZE_Y -100) + 50, rand() % (CHUNK_SIZE_Z)+(j * CHUNK_SIZE_Z));
+			Vector3<float> head(rand() % (CHUNK_SIZE_X)+(i * CHUNK_SIZE_X), rand() % (CHUNK_SIZE_Y - 100) + 50, rand() % (CHUNK_SIZE_Z)+(j * CHUNK_SIZE_Z));
 
 			//Longeur d'une tunel
 			for (int g = 0; g < rand() % 300 + 200; g++)
@@ -240,7 +240,7 @@ void World::InitChunk(float i, float j)
 				head.z += (rand() % 100 > 50) ? 1 : -1;
 			}
 		}
-		
+
 		//Tree
 		for (int x = 0; x < CHUNK_SIZE_X; x += 2)
 			for (int z = 0; z < CHUNK_SIZE_Z; z += 2)
@@ -252,7 +252,7 @@ void World::InitChunk(float i, float j)
 					//Trouve le grass le plus haut et ajoute l'arbre a cette position
 					while (chunk->GetBlock(x, y, z) == BTYPE_AIR)
 						y--;
-			
+
 					if (chunk->GetBlock(x, y, z) == BTYPE_GRASS &&
 						chunk->GetBlock(x + 1, y, z) == BTYPE_GRASS &&
 						chunk->GetBlock(x - 1, y, z) == BTYPE_GRASS &&
