@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 3
+#define NBR_MONSTER 0
 
 
 Engine::Engine() :
@@ -42,7 +42,7 @@ void Engine::Init()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
-	
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(75.0f, (float)Width() / (float)Height(), 0.01f, 1000.0f);
@@ -183,7 +183,7 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
-	m_world.InitChunks(WORLD_SIZE/ 2, WORLD_SIZE / 2);
+	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
 	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
@@ -208,7 +208,7 @@ void Engine::Render(float elapsedTime)
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 
-	
+	GetBlocAtCursor();
 
 	gameTime += elapsedTime;
 
@@ -233,8 +233,8 @@ void Engine::Render(float elapsedTime)
 
 		for (int i = 0; i < NBR_MONSTER; i++)
 			m_monster[i].Move(m_world);
-		
-		
+
+
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
 		loops++;
@@ -300,18 +300,76 @@ void Engine::Render(float elapsedTime)
 	t.detach();
 
 	//Update les chunk autour du joueur si il sont dirty
-    m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
 	//std::thread a(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
 	//a.join();
-	
-	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);	
+
+	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
 	//Monstre
 	for (int i = 0; i < NBR_MONSTER; i++)
 		m_monster[i].Draw(false);
-	
+
+
+
+	//Block focused
+	glDisable(GL_TEXTURE_2D);
+	glPushMatrix();
+	glTranslatef(m_currentBlock.x , m_currentBlock.y , m_currentBlock.z );
+
+
+	glBegin(GL_LINE_LOOP);
+	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+	glNormal3f(0.f, 1.f, 0.f);
+
+	if (m_currentFaceNormal.z == -1)
+	{
+		glVertex3f(0, 0, 0 - 0.01);
+		glVertex3f(0, 0.99, 0 - 0.01);
+		glVertex3f(0.99, 0.99, 0 - 0.01);
+		glVertex3f(0.99, 0, 0 - 0.01);
+	}
+	else if (m_currentFaceNormal.x == 1)
+	{
+		glVertex3f(1 + 0.01, 0.99, 0);
+		glVertex3f(1 + 0.01, 0.99, 0.99);
+		glVertex3f(1 + 0.01, 0, 0.99);
+		glVertex3f(1 + 0.01, 0, 0);
+	}
+	else if (m_currentFaceNormal.z == 1)
+	{
+		glVertex3f(0, 0, 1 + 0.01 + 0.01);
+		glVertex3f(0.99, 0, 1 + 0.01 + 0.01);
+		glVertex3f(0.99, 0.99, 1 + 0.01 + 0.01);
+		glVertex3f(0, 0.99, 1 + 0.01 + 0.01);
+	}
+	else if (m_currentFaceNormal.x == -1)
+	{
+		glVertex3f(0 - 0.01, 0.99, 0.99);
+		glVertex3f(0 - 0.01, 0.99, 0);
+		glVertex3f(0 - 0.01, 0, 0);
+		glVertex3f(0 - 0.01, 0, 0.99);
+	}
+	else if (m_currentFaceNormal.y == 1)
+	{
+		glVertex3f(0, 1 + 0.01, 0.99);
+		glVertex3f(0.99, 1 + 0.01, 0.99);
+		glVertex3f(0.99, 1 + 0.01, 0);
+		glVertex3f(0, 1 + 0.01, 0);
+	}
+	else if (m_currentFaceNormal.y == -1)
+	{
+		glVertex3f(0, 0 - 0.01, 0.99);
+		glVertex3f(0, 0 - 0.01, 0);
+		glVertex3f(0.99, 0 - 0.01, 0);
+		glVertex3f(0.99, 0 - 0.01, 0.99);
+		
+	}
+	glEnd();
+	glPopMatrix();
+
 	Shader::Disable();
 
 	//Render le hui
@@ -451,7 +509,7 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	GetBlocAtCursor();
+
 	//Left Click
 	if (button == 1 && m_currentBlock.x != -1)
 	{
@@ -487,7 +545,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	else if (button == 16)
 		m_player.SetBlock(-1);
 
-} 
+}
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
 {
@@ -510,6 +568,8 @@ bool Engine::LoadTexture(Texture& texture, const std::string& filename, bool sto
 
 void Engine::DrawHud()
 {
+	glEnable(GL_TEXTURE_2D);
+
 	// Setter le blend function , tout ce qui sera noir sera transparent
 	glDisable(GL_LIGHTING);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -564,23 +624,23 @@ void Engine::DrawHud()
 		ss << "A.Range: " << m_player.GetAttackRange();
 		PrintText(10, 50, 12, ss.str());
 
-		int orientation =  (int)m_player.GetHorizontalRotation() % 360;
-		
-		if(orientation < 0)
+		int orientation = (int)m_player.GetHorizontalRotation() % 360;
+
+		if (orientation < 0)
 			orientation = 360 + orientation;
 
 		std::string direction = "";
 
-		if(orientation >= 315 || orientation <= 45)
+		if (orientation >= 315 || orientation <= 45)
 			direction = "Negative Z";
 
-		if(orientation >= 45 && orientation <= 135)
+		if (orientation >= 45 && orientation <= 135)
 			direction = "Positive X";
 
-		if(orientation >= 135 && orientation <= 225)
+		if (orientation >= 135 && orientation <= 225)
 			direction = "Positive Z";
 
-		if(orientation >= 225 && orientation <= 315)
+		if (orientation >= 225 && orientation <= 315)
 			direction = "Negative X";
 
 
@@ -593,7 +653,6 @@ void Engine::DrawHud()
 		ss.str("");
 		ss << "Position " << m_player.GetPosition();
 		PrintText(10, 10, 12, ss.str());
-
 	}
 	ss.str("");
 	//Pour chaque 10 point de vie on met un carre sinon un espace
@@ -652,7 +711,7 @@ void Engine::DrawHud()
 
 	glEnd();
 
-	
+
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);

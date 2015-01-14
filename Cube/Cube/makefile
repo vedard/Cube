@@ -1,5 +1,5 @@
 # Declaration of variables
-CC = g++ 
+CC = g++
 CC_FLAGS = -g -std=c++11 -O2
 LD_FLAGS = -g -lIL -lILU -lGLU -lGL -lglut -lGLEW -lsfml-graphics -lsfml-window -lsfml-system 
 
