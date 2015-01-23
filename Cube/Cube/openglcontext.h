@@ -66,10 +66,12 @@ private:
 
 protected:
 	sf::Window	m_app;
+	int			m_renderDistance;
 
 private:
     int			m_maxFps;
     bool		m_fullscreen;
+	
     std::string m_title;
 	float m_lastFrameTime;
 

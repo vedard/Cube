@@ -183,7 +183,9 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
+	m_world.SetUpdateDistance(m_renderDistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
+	
 
 	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);

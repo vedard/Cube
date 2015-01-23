@@ -150,9 +150,11 @@ void OpenglContext::InitWindow(int width, int height)
 	setting.Get(2, 0) = "antialiasing";
 	setting.Get(3, 0) = "fullscreen";
 	setting.Get(4, 0) = "vsync";
-
+	setting.Get(5, 0) = "render_distance";
+	
 	int AntiAliasing = 0;
 	bool vsync = true;
+	m_renderDistance = 5;
 
 	std::cout << "Reading " << "Cube.conf" << "..." << std::endl;
 
@@ -197,6 +199,9 @@ void OpenglContext::InitWindow(int width, int height)
 		vsync = true;
 	else
 		vsync = false;
+
+	if (setting.Get(2, 1) != "null")
+		m_renderDistance = atoi(setting.Get(5, 1).c_str());
 
 	//Create windows
 	m_app.create(sf::VideoMode((width != 0) ? width : 800, (height != 0) ? height : 600, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Resize | sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));

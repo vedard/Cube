@@ -1,7 +1,8 @@
 #include "world.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
 {
+	
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -28,8 +29,6 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6)
 			if (j > 0)
 				chunk->m_negativeZ = ChunkAt(i, j - 1);
 		}
-
-
 }
 
 World::~World()
@@ -442,14 +441,14 @@ void World::AddTree(Chunk * &chunk, int x, int y, int z)
 void World::InitChunks(int CenterX, int CenterZ)
 {
 	//Init les blocks
-	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
 		{
-			Chunk * chunk = ChunkAt(CenterX + i - RENDER_DISTANCE, CenterZ + j - RENDER_DISTANCE);
+			Chunk * chunk = ChunkAt(CenterX + i - UpdateDistance, CenterZ + j - UpdateDistance);
 
 			//Si n'est pas creer
 			if (chunk && !chunk->m_iscreated)
-				InitChunk(CenterX + i - RENDER_DISTANCE, CenterZ + j - RENDER_DISTANCE);
+				InitChunk(CenterX + i - UpdateDistance, CenterZ + j - UpdateDistance);
 
 		}
 }
@@ -462,7 +461,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 		chunk->Update(info);
 
 	//Parcours les chunk en cercle
-	for (int x = 1; x < RENDER_DISTANCE; ++x)
+	for (int x = 1; x < UpdateDistance; ++x)
 		for (int a = 0; a <= x; ++a)
 		{
 			//
@@ -531,10 +530,10 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 int World::ChunkNotUpdated(int CenterX, int CenterZ)
 {
 	int chunkNotUpdated = 0;
-	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
 		{
-			Chunk * chunk = ChunkAt(CenterX + i - RENDER_DISTANCE, CenterZ + j - RENDER_DISTANCE);
+			Chunk * chunk = ChunkAt(CenterX + i - UpdateDistance, CenterZ + j - UpdateDistance);
 
 			if (chunk && chunk->NeedUpdate())
 				chunkNotUpdated++;
@@ -547,10 +546,10 @@ void World::Render(int CenterX, int CenterZ, GLenum &program)
 {
 
 	//Render les blocks
-	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
 		{
-			Chunk * chunk = ChunkAt(CenterX + i - RENDER_DISTANCE, CenterZ + j - RENDER_DISTANCE);
+			Chunk * chunk = ChunkAt(CenterX + i - UpdateDistance, CenterZ + j - UpdateDistance);
 
 			//Si le chunk existe on le render
 			if (chunk)
@@ -564,14 +563,20 @@ void World::Render(int CenterX, int CenterZ, GLenum &program)
 	//Render le transparent (ex: BTYPE_WATER)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	for (int i = 0; i < RENDER_DISTANCE * 2; i++)
-		for (int j = 0; j < RENDER_DISTANCE * 2; j++)
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
 		{
-			Chunk * chunk = ChunkAt(CenterX + i - RENDER_DISTANCE, CenterZ + j - RENDER_DISTANCE);
+			Chunk * chunk = ChunkAt(CenterX + i - UpdateDistance, CenterZ + j - UpdateDistance);
 
 			//Si le chunk existe on le render
 			if (chunk)
 				chunk->RenderTransparentBuffer(program);
 		}
 	glDisable(GL_BLEND);
+}
+
+void World::SetUpdateDistance(int updateDist)
+{
+	if (updateDist > 0)
+		UpdateDistance = updateDist;
 }

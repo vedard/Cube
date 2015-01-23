@@ -28,6 +28,7 @@ public:
 	void Update(int CenterX, int CenterZ, BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
+	void SetUpdateDistance(int updateDist);
 
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
@@ -38,7 +39,8 @@ private:
 private:
 	Array2d<Chunk> m_chunks;
 
-	int		m_seed;
+	int UpdateDistance;
+	int	m_seed;
 
 };
 
