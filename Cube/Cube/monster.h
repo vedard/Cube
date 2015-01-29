@@ -19,6 +19,7 @@ public:
 private:
 	Texture m_texture;
 	Character* m_target;
+	
 
 };
 #endif // !MONSTER_H__

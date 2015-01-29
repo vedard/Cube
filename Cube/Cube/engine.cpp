@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 0
+#define NBR_MONSTER 4
 
 
 Engine::Engine() :
@@ -21,6 +21,8 @@ displayInfo(false)
 	m_bInfo = new BlockInfo[256];
 
 	m_monster = new Monster[NBR_MONSTER];
+
+	m_textureGun = new Texture[3];
 }
 
 Engine::~Engine()
@@ -90,6 +92,9 @@ void Engine::LoadResource()
 	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 	LoadTexture(m_textureCrosshair, TEXTURE_PATH "cross.bmp");
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.bmp");
+	LoadTexture(m_textureGun[0], TEXTURE_PATH "hand.png");
+	LoadTexture(m_textureGun[1], TEXTURE_PATH "pistol.png");
+	LoadTexture(m_textureGun[2], TEXTURE_PATH "gun.png");
 
 	//Load texture dans l'atlas
 	m_bInfo[BTYPE_GRASS].Init(BTYPE_GRASS, "Grass");
@@ -233,9 +238,18 @@ void Engine::Render(float elapsedTime)
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
-		for (int i = 0; i < NBR_MONSTER; i++)
-			m_monster[i].Move(m_world);
+		m_player.m_bullet.Update();
+		m_player.m_bullet.CheckCollision(m_world);
+		
 
+		for (int i = 0; i < NBR_MONSTER; i++)
+		{
+			m_monster[i].Move(m_world);
+			m_player.m_bullet.CheckCollision(m_monster[i]);
+		}
+		
+
+		
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -310,17 +324,20 @@ void Engine::Render(float elapsedTime)
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
+	m_player.m_bullet.Draw();
+
 	//Monstre
 	for (int i = 0; i < NBR_MONSTER; i++)
 		m_monster[i].Draw(false);
 
+
+	
 
 
 	//Block focused
 	glDisable(GL_TEXTURE_2D);
 	glPushMatrix();
 	glTranslatef(m_currentBlock.x , m_currentBlock.y , m_currentBlock.z );
-
 
 	glBegin(GL_LINE_LOOP);
 	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
@@ -415,6 +432,18 @@ void Engine::KeyPressEvent(unsigned char key)
 	//space -> jump
 	if (m_keyboard[sf::Keyboard::Space])
 		m_player.Jump();
+
+	//1 -> W_BLOCK 
+	if (m_keyboard[sf::Keyboard::Num1])
+		m_player.SetWeapon(W_BLOCK);
+
+	//2 ->  W_PISTOL
+	if (m_keyboard[sf::Keyboard::Num2])
+		m_player.SetWeapon(W_PISTOL);
+
+	//3 ->  W_DOUBLE_BARREL_SHOTGUN
+	if (m_keyboard[sf::Keyboard::Num3])
+		m_player.SetWeapon(W_DOUBLE_BARREL_SHOTGUN);
 
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
@@ -511,41 +540,52 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-
-	//Left Click
-	if (button == 1 && m_currentBlock.x != -1)
+	if (m_player.GetWeapon() == W_BLOCK)
 	{
-		Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
-		m_world.ChunkAt(chunkPos.x, chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-
-	}
-
-	//Right Click
-	else if (button == 4 && m_currentBlock.x != -1)
-	{
-		//Position du nouveau block
-		Vector3<int> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
-		Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
-
-		//Si le chunk existe on place le block
-		if (m_world.ChunkAt(chunkPos.x, chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+		//Left Click
+		if (button == 1 && m_currentBlock.x != -1)
 		{
-			m_world.ChunkAt(chunkPos.x, chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
+			Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
+			m_world.ChunkAt(chunkPos.x, chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 
-			//Si ya collision on efface le block
-			if (m_player.CheckCollision(m_world))
-				m_world.ChunkAt(chunkPos.x, chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
 		}
 
+		//Right Click
+		else if (button == 4 && m_currentBlock.x != -1)
+		{
+			//Position du nouveau block
+			Vector3<int> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
+			Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
+
+			//Si le chunk existe on place le block
+			if (m_world.ChunkAt(chunkPos.x, chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+			{
+				m_world.ChunkAt(chunkPos.x, chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
+
+				//Si ya collision on efface le block
+				if (m_player.CheckCollision(m_world))
+					m_world.ChunkAt(chunkPos.x, chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+			}
+
+
+		}
+		//Scroll Up
+		if (button == 8)
+			m_player.SetBlock(1);
+
+		//Scroll Down
+		else if (button == 16)
+			m_player.SetBlock(-1);
+	}
+	else
+	{
+		//Left Click
+		if (button == 1)
+		{
+			m_player.Shoot();
+		}
 
 	}
-	//Scroll Up
-	if (button == 8)
-		m_player.SetBlock(1);
-
-	//Scroll Down
-	else if (button == 16)
-		m_player.SetBlock(-1);
 
 }
 
@@ -686,33 +726,55 @@ void Engine::DrawHud()
 
 	glDisable(GL_BLEND);
 
-	//Block selectionne
-	glLoadIdentity();
-	glTranslated(Width() - 64, 16, 0);
+	
+		// Affichage du Gun
+		m_textureGun[m_player.GetWeapon()].Bind();
+		static const int gunSize = 250;
+		glLoadIdentity();
+		glTranslated(Width() / 2 - gunSize / 2, 0, 0);
 
-	glBegin(GL_QUADS);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0, 0.01);
+		glVertex2i(gunSize, gunSize);
+		glTexCoord2f(1, 0.01);
+		glVertex2i(0, gunSize);
+		glTexCoord2f(1, 1);
+		glVertex2i(0, 0);
+		glTexCoord2f(0, 1);
+		glVertex2i(gunSize, 0);
+		glEnd();
+	
+	
+	if (m_player.GetWeapon() == W_BLOCK)
+	{
+		//Block selectionne
+		glLoadIdentity();
+		glTranslated(Width() - 64, 16, 0);
 
-	glVertex2i(-2, -2);
-	glVertex2i(50, -2);
-	glVertex2i(50, 50);
-	glVertex2i(-2, 50);
-	glEnd();
+		//contour noir
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
 
-	m_textureAtlas.Bind();
-	glColor3f(1.f, 1.f, 1.f);
+		//block
+		m_textureAtlas.Bind();
+		glColor3f(1.f, 1.f, 1.f);
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
-	glVertex2i(0, 0);
-	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
-	glVertex2i(48, 0);
-	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
-	glVertex2i(48, 48);
-	glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
-	glVertex2i(0, 48);
+		glBegin(GL_QUADS);
+		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+		glVertex2i(0, 0);
+		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+		glVertex2i(48, 0);
+		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+		glVertex2i(48, 48);
+		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+		glVertex2i(0, 48);
 
-	glEnd();
-
+		glEnd();
+	}
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);

@@ -25,7 +25,7 @@ public:
 	//Set
 	void SetName(std::string name);
 
-	//Get
+	//Get   
 	const Vector3<float>& GetPosition() const;
 	const Vector3<float>& GetDimension() const;
 	float GetHP() const;
@@ -36,7 +36,7 @@ public:
 	float GetArmor() const;
 	float GetAttackDamage() const;
 	const std::string& GetName() const;
-
+	bool GetisAlive() const;
 	
 
 protected:
@@ -58,6 +58,7 @@ protected:
 
 	//État
 	bool m_isInAir;
+	bool m_isAlive;
 
 	//Timer
 	sf::Clock m_cooldownAttackTimer;

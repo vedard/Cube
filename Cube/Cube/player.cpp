@@ -11,12 +11,14 @@ m_sneaked(false),
 m_running(false),
 m_block(BTYPE_GRASS),
 m_footUnderwater(false),
-m_headUnderwater(false)
+m_headUnderwater(false),
+m_bullet()
 {
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
 	m_health = 100;
 	m_Armor = 1.1;
+	m_weapon = W_BLOCK;
 }
 
 Player::~Player()
@@ -243,6 +245,11 @@ BlockType Player::GetBlock() const
 	return m_block;
 }
 
+int Player::GetWeapon() const
+{
+	return m_weapon;
+}
+
 void Player::SetBlock(int direction)
 {
 	if (direction < 0)
@@ -258,6 +265,12 @@ void Player::SetBlock(int direction)
 		m_block = 1;
 }
 
+void Player::SetWeapon(int mode)
+{
+	if (mode >= 0 && mode <= 2)
+		m_weapon = mode;
+}
+
 void Player::Jump()
 {
 	if (!m_isInAir && !m_footUnderwater)
@@ -270,6 +283,12 @@ void Player::Jump()
 	else if (m_footUnderwater)
 		m_vitesse.y = -0.09f;
 }
+
+void Player::Shoot()
+{
+	m_bullet.Init(m_pos.x, m_pos.y + m_dimension.y-0.4, m_pos.z, m_VerticalRot, m_HorizontalRot);
+}
+
 
 bool Player::Underwater() const
 {

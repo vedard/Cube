@@ -58,6 +58,7 @@ private:
 	Texture m_textureSky;
 	Texture m_textureFont;
 	Texture m_textureCrosshair;
+	Texture* m_textureGun;
 	
 	Shader m_shader01;
 	World m_world;

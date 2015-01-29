@@ -30,7 +30,7 @@ typedef long long int64;
 #define CHUNK_SIZE_X 16
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
-#define WORLD_SIZE 90
+#define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 20
 #define PI 3.14159265358f
@@ -58,6 +58,12 @@ enum BLOCK_TYPE {
 	BTYPE_LAVA,
 	BTYPE_SAND,
 	BTYPE_NETHEREACK
+};
+
+enum WEAPONS {
+	W_BLOCK,
+	W_PISTOL,
+	W_DOUBLE_BARREL_SHOTGUN
 };
 
 

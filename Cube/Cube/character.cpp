@@ -12,7 +12,8 @@ m_vitesse(0, 0, 0),
 m_AttackSpeed(0),
 m_Armor(1),
 m_cooldownAttackTimer(),
-m_AttackDamage(30)
+m_AttackDamage(30),
+m_isAlive(true)
 {
 
 	m_Name = "Character ";
@@ -244,5 +245,5 @@ float  Character::GetAttackDamage() const{ return m_AttackDamage; }
 
 const std::string& Character::GetName() const{ return m_Name; }
 
-
+bool Character::GetisAlive() const { return m_isAlive; }
 
