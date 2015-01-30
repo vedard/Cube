@@ -18,7 +18,7 @@ public:
 	void Update();
 	void CheckCollision(Character &character);
 	void CheckCollision(World &world);
-	void Draw();
+	void Draw() const;
 
 	const Vector3<float>& GetPosition() const;
 	float GetDamage() const;

@@ -9,7 +9,7 @@ Bullet::Bullet()
 	m_vitesse.y = 2;
 	m_vitesse.z = 2;
 	m_distance = 0;
-	
+
 }
 
 Bullet::~Bullet()
@@ -22,8 +22,8 @@ void Bullet::Update()
 	if (m_isActive)
 	{
 		Vector3<float> directionVector(
-			cosf(PI / 2 * 3 + m_HorizontalRot * PI / 180) * (cosf(-m_VerticalRot * PI / 180)), 
-			sinf(-m_VerticalRot * PI / 180), 
+			cosf(PI / 2 * 3 + m_HorizontalRot * PI / 180) * (cosf(-m_VerticalRot * PI / 180)),
+			sinf(-m_VerticalRot * PI / 180),
 			sinf(PI / 2 * 3 + m_HorizontalRot * PI / 180) * (cosf(-m_VerticalRot * PI / 180)));
 
 		directionVector.Normalize();
@@ -32,9 +32,15 @@ void Bullet::Update()
 		m_pos.x += directionVector.x * m_vitesse.x;
 		m_pos.z += directionVector.z * m_vitesse.z;
 
+		//Si la balle est trop loin, elle est detruite
 		m_distance += directionVector.Length() * m_vitesse.y;
 		if (m_distance > CHUNK_SIZE_X * 10)
 			m_isActive = false;
+
+		//Si ya collision elle est detruite
+		/*CheckCollision(world);
+		for (int i = 0; i < 2; i++)
+			CheckCollision(characters[i]);*/
 
 	}
 
@@ -44,12 +50,12 @@ void Bullet::CheckCollision(Character &character)
 {
 	if (m_isActive && character.GetisAlive())
 	{
-		if (m_pos.x >= character.GetPosition().x
-			&& m_pos.x < character.GetPosition().x + character.GetDimension().x
-			&& m_pos.y >= character.GetPosition().y
+		if (m_pos.x >= character.GetPosition().x - character.GetDimension().x / 2
+			&& m_pos.x < character.GetPosition().x + character.GetDimension().x / 2
+			&& m_pos.y >= character.GetPosition().y - character.GetDimension().y
 			&& m_pos.y < character.GetPosition().y + character.GetDimension().y
-			&& m_pos.z >= character.GetPosition().z
-			&& m_pos.z < character.GetPosition().z + character.GetDimension().z)
+			&& m_pos.z >= character.GetPosition().z - character.GetDimension().z / 2
+			&& m_pos.z < character.GetPosition().z + character.GetDimension().z / 2)
 		{
 			character.GetDamage(m_damage);
 			m_isActive = false;
@@ -71,19 +77,19 @@ void Bullet::CheckCollision(World &world)
 			Chunk * chunk = world.ChunkAt(chunkPos.x, chunkPos.z);
 
 			if (chunk)
-				 chunk->RemoveBloc(m_pos.x - (chunkPos.x * CHUNK_SIZE_X), m_pos.y, m_pos.z - (chunkPos.z * CHUNK_SIZE_X));*/
+			chunk->RemoveBloc(m_pos.x - (chunkPos.x * CHUNK_SIZE_X), m_pos.y, m_pos.z - (chunkPos.z * CHUNK_SIZE_X));*/
 			m_isActive = false;
-			
+
 		}
 	}
 
 }
 
-void Bullet::Draw()
+void Bullet::Draw() const
 {
 	if (m_isActive)
 	{
-	
+
 		float width = 0.03;
 
 		glPushMatrix();

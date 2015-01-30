@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 1
+
 
 
 Engine::Engine() :
@@ -20,7 +20,7 @@ displayInfo(false)
 	//Creation du tableau de block info
 	m_bInfo = new BlockInfo[256];
 
-	m_monster = new Monster[NBR_MONSTER];
+	m_monster = new Monster[MAX_MONSTER];
 
 	m_textureGun = new Texture[3];
 }
@@ -30,6 +30,7 @@ Engine::~Engine()
 	m_world.SaveMap("map.sav");
 	delete[] m_bInfo;
 	delete[] m_monster;
+	delete[] m_textureGun;
 }
 
 void Engine::Init()
@@ -194,10 +195,9 @@ void Engine::LoadResource()
 	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 
-	for (int i = 0; i < NBR_MONSTER; i++)
+	for (int i = 0; i < MAX_MONSTER; i++)
 	{
 		m_monster[i].SetName("Monster " + std::to_string(i + 1));
-		m_monster[i].Spawn(m_world, (WORLD_SIZE*CHUNK_SIZE_X / 2) - 50 + rand() % 100, (WORLD_SIZE*CHUNK_SIZE_X / 2) - 50 + rand() % 100);
 		m_monster[i].SetTarget(&m_player);
 	}
 
@@ -238,23 +238,22 @@ void Engine::Render(float elapsedTime)
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
-		for (int i = 0; i < 100; i++)
-		{
-			m_player.m_bullet[i].Update();
-			m_player.m_bullet[i].CheckCollision(m_world);
+		//Update les balles
+		for (int i = 0; i < MAX_BULLET; i++)
+		{		
+			m_player.GetBullets()[i].Update();
+
+			//Check si y a collision
+			m_player.GetBullets()[i].CheckCollision(m_world);
+				for (int j = 0; j < MAX_MONSTER; j++)
+					m_player.GetBullets()[i].CheckCollision(m_monster[j]);
+			
 		}
 
-
-		for (int i = 0; i < NBR_MONSTER; i++)
-		{
+		//Update les monstres
+		for (int i = 0; i < MAX_MONSTER; i++)
 			m_monster[i].Move(m_world);
-
-			for (int j = 0; j < 100; j++)
-				m_player.m_bullet[j].CheckCollision(m_monster[i]);
-		}
-
-
-
+		
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -327,74 +326,80 @@ void Engine::Render(float elapsedTime)
 	//a.join();
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
+
+	//Draw le world
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-	
+
 	glDisable(GL_TEXTURE_2D);
-	//Bullet
-	for (int i = 0; i < 100; i++)
-		m_player.m_bullet[i].Draw();
 
-	//Block focused
-	glPushMatrix();
-	glTranslatef(m_currentBlock.x, m_currentBlock.y, m_currentBlock.z);
+	//Draw Bullets
+	for (int i = 0; i < MAX_BULLET; i++)
+		m_player.GetBullets()[i].Draw();
 
-	glBegin(GL_LINE_LOOP);
-	glColor3f(0.0f, 0.0f, 0.0f);
+	//Draw Block focused
+	if (m_player.GetWeapon() == W_BLOCK)
+	{
+		
+		glPushMatrix();
+		glTranslatef(m_currentBlock.x, m_currentBlock.y, m_currentBlock.z);
+
+		glBegin(GL_LINE_LOOP);
+		glColor3f(0.0f, 0.0f, 0.0f);
 		glNormal3f(0.f, 1.f, 0.f);
 
-	if (m_currentFaceNormal.z == -1)
-	{
-		glVertex3f(0, 0, 0 - 0.01);
-		glVertex3f(0, 0.99, 0 - 0.01);
-		glVertex3f(0.99, 0.99, 0 - 0.01);
-		glVertex3f(0.99, 0, 0 - 0.01);
-	}
-	else if (m_currentFaceNormal.x == 1)
-	{
-		glVertex3f(1 + 0.01, 0.99, 0);
-		glVertex3f(1 + 0.01, 0.99, 0.99);
-		glVertex3f(1 + 0.01, 0, 0.99);
-		glVertex3f(1 + 0.01, 0, 0);
-	}
-	else if (m_currentFaceNormal.z == 1)
-	{
-		glVertex3f(0, 0, 1 + 0.01 + 0.01);
-		glVertex3f(0.99, 0, 1 + 0.01 + 0.01);
-		glVertex3f(0.99, 0.99, 1 + 0.01 + 0.01);
-		glVertex3f(0, 0.99, 1 + 0.01 + 0.01);
-	}
-	else if (m_currentFaceNormal.x == -1)
-	{
-		glVertex3f(0 - 0.01, 0.99, 0.99);
-		glVertex3f(0 - 0.01, 0.99, 0);
-		glVertex3f(0 - 0.01, 0, 0);
-		glVertex3f(0 - 0.01, 0, 0.99);
-	}
-	else if (m_currentFaceNormal.y == 1)
-	{
-		glVertex3f(0, 1 + 0.01, 0.99);
-		glVertex3f(0.99, 1 + 0.01, 0.99);
-		glVertex3f(0.99, 1 + 0.01, 0);
-		glVertex3f(0, 1 + 0.01, 0);
-	}
-	else if (m_currentFaceNormal.y == -1)
-	{
-		glVertex3f(0, 0 - 0.01, 0.99);
-		glVertex3f(0, 0 - 0.01, 0);
-		glVertex3f(0.99, 0 - 0.01, 0);
-		glVertex3f(0.99, 0 - 0.01, 0.99);
+		if (m_currentFaceNormal.z == -1)
+		{
+			glVertex3f(0, 0, 0 - 0.01);
+			glVertex3f(0, 0.99, 0 - 0.01);
+			glVertex3f(0.99, 0.99, 0 - 0.01);
+			glVertex3f(0.99, 0, 0 - 0.01);
+		}
+		else if (m_currentFaceNormal.x == 1)
+		{
+			glVertex3f(1 + 0.01, 0.99, 0);
+			glVertex3f(1 + 0.01, 0.99, 0.99);
+			glVertex3f(1 + 0.01, 0, 0.99);
+			glVertex3f(1 + 0.01, 0, 0);
+		}
+		else if (m_currentFaceNormal.z == 1)
+		{
+			glVertex3f(0, 0, 1 + 0.01 + 0.01);
+			glVertex3f(0.99, 0, 1 + 0.01 + 0.01);
+			glVertex3f(0.99, 0.99, 1 + 0.01 + 0.01);
+			glVertex3f(0, 0.99, 1 + 0.01 + 0.01);
+		}
+		else if (m_currentFaceNormal.x == -1)
+		{
+			glVertex3f(0 - 0.01, 0.99, 0.99);
+			glVertex3f(0 - 0.01, 0.99, 0);
+			glVertex3f(0 - 0.01, 0, 0);
+			glVertex3f(0 - 0.01, 0, 0.99);
+		}
+		else if (m_currentFaceNormal.y == 1)
+		{
+			glVertex3f(0, 1 + 0.01, 0.99);
+			glVertex3f(0.99, 1 + 0.01, 0.99);
+			glVertex3f(0.99, 1 + 0.01, 0);
+			glVertex3f(0, 1 + 0.01, 0);
+		}
+		else if (m_currentFaceNormal.y == -1)
+		{
+			glVertex3f(0, 0 - 0.01, 0.99);
+			glVertex3f(0, 0 - 0.01, 0);
+			glVertex3f(0.99, 0 - 0.01, 0);
+			glVertex3f(0.99, 0 - 0.01, 0.99);
 
+		}
+		glEnd();
+		glPopMatrix();
 	}
-	glEnd();
-	glPopMatrix();	
-
-	//Monstre
-	for (int i = 0; i < NBR_MONSTER; i++)
+	//Draw Monstre
+	for (int i = 0; i < MAX_MONSTER; i++)
 		m_monster[i].Draw(false);
 
 	Shader::Disable();
 
-	//Render le hui
+	//Draw le hui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	DrawHud();
@@ -447,6 +452,19 @@ void Engine::KeyPressEvent(unsigned char key)
 	//3 ->  W_DOUBLE_BARREL_SHOTGUN
 	if (m_keyboard[sf::Keyboard::Num3])
 		m_player.SetWeapon(W_DOUBLE_BARREL_SHOTGUN);
+
+	//M -> spawn monster
+	else if (m_keyboard[sf::Keyboard::M])
+	{
+		for (int i = 0; i < MAX_MONSTER; i++)
+			if (!m_monster[i].GetisAlive())
+			{
+				m_monster[i].Spawn(m_world, (m_player.GetPosition().x) - 50 + rand() % 100, (m_player.GetPosition().z) - 50 + rand() % 100);
+				break;
+			}
+		
+	}
+		
 
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
@@ -536,8 +554,8 @@ void Engine::MouseMoveEvent(int x, int y)
 	float relativeX = x - Width() / 2;
 	float relativeY = y - Height() / 2;
 
-	m_player.TurnLeftRight(relativeX * MOUSE_SENSIBILITY);
-	m_player.TurnTopBottom(relativeY * MOUSE_SENSIBILITY);
+	m_player.TurnLeftRight(relativeX * m_mouse_sensibility);
+	m_player.TurnTopBottom(relativeY * m_mouse_sensibility);
 
 }
 
@@ -611,7 +629,7 @@ bool Engine::LoadTexture(Texture& texture, const std::string& filename, bool sto
 	return true;
 }
 
-void Engine::DrawHud()
+void Engine::DrawHud() const
 {
 	glEnable(GL_TEXTURE_2D);
 
@@ -714,7 +732,7 @@ void Engine::DrawHud()
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	// Affichage du crosshair
-	DrawCross();
+	DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
 
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
@@ -733,7 +751,7 @@ void Engine::DrawHud()
 
 
 		//block
-		m_textureAtlas.Bind();	
+		m_textureAtlas.Bind();
 		glEnable(GL_TEXTURE_2D);
 		glColor3f(1.f, 1.f, 1.f);
 
@@ -752,7 +770,7 @@ void Engine::DrawHud()
 
 
 	glEnable(GL_TEXTURE_2D);
-	
+
 	// Affichage du Gun
 	m_textureGun[m_player.GetWeapon()].Bind();
 	static const int gunSize = 270;
@@ -781,7 +799,7 @@ void Engine::DrawHud()
 	glPopMatrix();
 }
 
-void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t)
+void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const
 {
 	glLoadIdentity();
 	glTranslated(x, y, 0);
@@ -894,30 +912,30 @@ void Engine::GetBlocAtCursor()
 			m_currentFaceNormal.y = 1;
 	}
 }
-void Engine::DrawCross()
+void Engine::DrawCross(float r, float g, float b) const
 {
 	glLoadIdentity();
 	glTranslated(Width() / 2, Height() / 2, 0);
-	glColor3f(0.f, 0.8f, 0.f);
+	glColor3f(r,g,b);
 	glBegin(GL_QUADS);
 
 	glVertex2i(-1, -10);
-	glVertex2i(1,-10);
+	glVertex2i(1, -10);
 	glVertex2i(1, -3);
 	glVertex2i(-1, -3);
 
 	glVertex2i(-1, 10);
 	glVertex2i(-1, 3);
 	glVertex2i(1, 3);
-	glVertex2i(1,10);
+	glVertex2i(1, 10);
 
 	glVertex2i(-10, 1);
 	glVertex2i(-10, -1);
 	glVertex2i(-3, -1);
-	glVertex2i(-3,1);
+	glVertex2i(-3, 1);
 
 	glVertex2i(10, 1);
-	glVertex2i(3,1);
+	glVertex2i(3, 1);
 	glVertex2i(3, -1);
 	glVertex2i(10, -1);
 

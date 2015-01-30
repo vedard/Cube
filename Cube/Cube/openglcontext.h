@@ -67,6 +67,8 @@ private:
 protected:
 	sf::Window	m_app;
 	int			m_renderDistance;
+	float		m_cross_color_r, m_cross_color_g, m_cross_color_b;
+	float		m_mouse_sensibility;
 
 private:
     int			m_maxFps;

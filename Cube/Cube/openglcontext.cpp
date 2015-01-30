@@ -142,7 +142,8 @@ void OpenglContext::ShowCrossCursor() const
 
 void OpenglContext::InitWindow(int width, int height)
 {
-
+	
+	
 	Array2d<std::string> setting(10, 2);
 	setting.Reset("null");
 	setting.Get(0, 0) = "width";
@@ -151,10 +152,18 @@ void OpenglContext::InitWindow(int width, int height)
 	setting.Get(3, 0) = "fullscreen";
 	setting.Get(4, 0) = "vsync";
 	setting.Get(5, 0) = "render_distance";
+	setting.Get(6, 0) = "cross_color_r";
+	setting.Get(7, 0) = "cross_color_g";
+	setting.Get(8, 0) = "cross_color_b";
+	setting.Get(9, 0) = "mouse_sensibility";
 	
 	int AntiAliasing = 0;
 	bool vsync = true;
 	m_renderDistance = 5;
+	m_mouse_sensibility = 0.2f;
+	m_cross_color_r = 0.f;
+	m_cross_color_g = 0.f;
+	m_cross_color_b = 0.f;
 
 	std::cout << "Reading " << "Cube.conf" << "..." << std::endl;
 
@@ -200,8 +209,16 @@ void OpenglContext::InitWindow(int width, int height)
 	else
 		vsync = false;
 
-	if (setting.Get(2, 1) != "null")
+	if (setting.Get(5, 1) != "null")
 		m_renderDistance = atoi(setting.Get(5, 1).c_str());
+	if (setting.Get(6, 1) != "null")
+		m_cross_color_r = atof(setting.Get(6, 1).c_str());
+	if (setting.Get(7, 1) != "null")
+		m_cross_color_g = atof(setting.Get(7, 1).c_str());
+	if (setting.Get(8, 1) != "null")
+		m_cross_color_b = atof(setting.Get(8, 1).c_str());
+	if (setting.Get(9, 1) != "null")
+		m_mouse_sensibility = atof(setting.Get(9, 1).c_str());
 
 	//Create windows
 	m_app.create(sf::VideoMode((width != 0) ? width : 800, (height != 0) ? height : 600, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Resize | sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));

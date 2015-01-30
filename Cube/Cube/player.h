@@ -28,6 +28,7 @@ public:
 
 	BlockType GetBlock() const;
 	int GetWeapon() const;
+	Bullet* &GetBullets();
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
@@ -50,8 +51,7 @@ private:
 	
 	int m_weapon;
 
-public:
-	Bullet* m_bullet;
+	Bullet* m_bullets;
 };
 
 #endif

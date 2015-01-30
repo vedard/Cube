@@ -43,16 +43,16 @@ public:
 
 private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
-	void DrawHud();
-	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t);
-	void DrawCross();
+	void DrawHud() const;
+	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
+	void DrawCross(float r, float g, float b) const;
 
 private:
 	bool m_wireframe;
 
 	Player m_player;
 	Monster* m_monster;
-
+	
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 
 	TextureAtlas m_textureAtlas;

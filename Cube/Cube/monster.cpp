@@ -14,7 +14,8 @@ Monster::Monster() : Character()
 	m_AttackDamage = 7;
 	m_Armor = 1.1;
 	m_target = NULL;
-	
+	m_isAlive = false;
+
 }
 
 Monster::~Monster()
@@ -85,7 +86,7 @@ void Monster::Move(World &world)
 
 		//Acceleration
 		m_vitesse.y += 0.013f;
-			
+
 	}
 }
 
@@ -103,7 +104,7 @@ void Monster::Draw(bool debugRange) const
 		if (debugRange)
 		{
 			glDisable(GL_TEXTURE_2D);
-glColor3f(1.f, 0.0f, 0.5f);
+			glColor3f(1.f, 0.0f, 0.5f);
 
 			glBegin(GL_QUADS);
 

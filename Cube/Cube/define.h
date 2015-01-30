@@ -33,7 +33,11 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 20
+#define MAX_MONSTER 40
 #define PI 3.14159265358f
+#define MAX_BULLET 100
+#define TEXTURE_PATH	"../Cube/media/textures/"
+#define SHADER_PATH	"../Cube/media/shaders/"
 
 
 typedef uint8 BlockType;
@@ -67,8 +71,6 @@ enum WEAPONS {
 };
 
 
-#define TEXTURE_PATH	"../Cube/media/textures/"
-#define SHADER_PATH	"../Cube/media/shaders/"
-#define MOUSE_SENSIBILITY 1/4
+
 
 #endif // DEFINE_H__

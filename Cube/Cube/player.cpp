@@ -18,7 +18,7 @@ m_headUnderwater(false)
 	m_health = 100;
 	m_Armor = 1.1;
 	m_weapon = W_BLOCK;
-	m_bullet = new Bullet[100];
+	m_bullets = new Bullet[MAX_BULLET];
 }
 
 Player::~Player()
@@ -256,6 +256,11 @@ int Player::GetWeapon() const
 	return m_weapon;
 }
 
+Bullet* &Player::GetBullets()
+{
+	return m_bullets;
+}
+
 void Player::SetBlock(int direction)
 {
 	if (direction < 0)
@@ -293,27 +298,27 @@ void Player::Jump()
 void Player::Shoot()
 {
 	int nbrBullet = 0;
-	for (int i = 0; i < 100; i++)
-		if (!m_bullet[i].GetIsActive())
+	for (int i = 0; i < MAX_BULLET; i++)
+		if (!m_bullets[i].GetIsActive())
 		{
 			if (m_weapon == W_PISTOL)
 			{
-				m_bullet[i].Init(m_pos.x, m_pos.y + m_dimension.y - 0.4, m_pos.z, m_VerticalRot, m_HorizontalRot);
+				m_bullets[i].Init(m_pos.x, m_pos.y + m_dimension.y - 0.4, m_pos.z, m_VerticalRot, m_HorizontalRot);
 				break;
 			}
 			else if (m_weapon == W_DOUBLE_BARREL_SHOTGUN)
 			{
 				if (nbrBullet == 0)
-					m_bullet[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+					m_bullets[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
 
 				if (nbrBullet == 1)
-					m_bullet[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+					m_bullets[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
 
 				if (nbrBullet == 2)
-					m_bullet[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+					m_bullets[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
 
 				if (nbrBullet == 3)
-					m_bullet[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+					m_bullets[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
 
 				nbrBullet++;
 				if (nbrBullet == 4)
