@@ -3,11 +3,12 @@
 
 Bullet::Bullet()
 {
-	m_damage = 70;
+	m_damage = 50;
 	m_isActive = false;
-	m_vitesse.x = 0.2;
-	m_vitesse.y = 0.2;
-	m_vitesse.z = 0.2;
+	m_vitesse.x = 2;
+	m_vitesse.y = 2;
+	m_vitesse.z = 2;
+	m_distance = 0;
 	
 }
 
@@ -31,7 +32,12 @@ void Bullet::Update()
 		m_pos.x += directionVector.x * m_vitesse.x;
 		m_pos.z += directionVector.z * m_vitesse.z;
 
+		m_distance += directionVector.Length() * m_vitesse.y;
+		if (m_distance > CHUNK_SIZE_X * 10)
+			m_isActive = false;
+
 	}
+
 }
 
 void Bullet::CheckCollision(Character &character)
@@ -125,6 +131,7 @@ void Bullet::Init(float x, float y, float z, float rotationVertical, float rotat
 	m_pos = Vector3<float>(x, y, z);
 	m_HorizontalRot = rotationHorizontal;
 	m_VerticalRot = rotationVertical;
+	m_distance = 0;
 	m_isActive = true;
 }
 

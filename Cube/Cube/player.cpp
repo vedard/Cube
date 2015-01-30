@@ -11,14 +11,14 @@ m_sneaked(false),
 m_running(false),
 m_block(BTYPE_GRASS),
 m_footUnderwater(false),
-m_headUnderwater(false),
-m_bullet()
+m_headUnderwater(false)
 {
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
 	m_health = 100;
 	m_Armor = 1.1;
 	m_weapon = W_BLOCK;
+	m_bullet = new Bullet[100];
 }
 
 Player::~Player()
@@ -103,6 +103,12 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	}
 	else if (left) {
 		deplacementVector -= rightVector;
+	}
+	//Si on bouge pas -> vitesse = 0
+	if (!left && !right && !front && !back)
+	{
+		m_vitesse.x = 0;
+		m_vitesse.z = 0;
 	}
 
 	//Normalize les vecteur
@@ -286,9 +292,36 @@ void Player::Jump()
 
 void Player::Shoot()
 {
-	m_bullet.Init(m_pos.x, m_pos.y + m_dimension.y-0.4, m_pos.z, m_VerticalRot, m_HorizontalRot);
-}
+	int nbrBullet = 0;
+	for (int i = 0; i < 100; i++)
+		if (!m_bullet[i].GetIsActive())
+		{
+			if (m_weapon == W_PISTOL)
+			{
+				m_bullet[i].Init(m_pos.x, m_pos.y + m_dimension.y - 0.4, m_pos.z, m_VerticalRot, m_HorizontalRot);
+				break;
+			}
+			else if (m_weapon == W_DOUBLE_BARREL_SHOTGUN)
+			{
+				if (nbrBullet == 0)
+					m_bullet[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
 
+				if (nbrBullet == 1)
+					m_bullet[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+
+				if (nbrBullet == 2)
+					m_bullet[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+
+				if (nbrBullet == 3)
+					m_bullet[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+
+				nbrBullet++;
+				if (nbrBullet == 4)
+					break;
+			}
+
+		}
+}
 
 bool Player::Underwater() const
 {

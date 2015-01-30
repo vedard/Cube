@@ -1,5 +1,5 @@
 ﻿#include "engine.h"
-#define NBR_MONSTER 4
+#define NBR_MONSTER 1
 
 
 Engine::Engine() :
@@ -54,7 +54,7 @@ void Engine::Init()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0);
+	glAlphaFunc(GL_GREATER, 0.6);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
@@ -91,7 +91,7 @@ void Engine::LoadResource()
 	//Load texture qui ne sont pas dans l'atlas
 	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 	LoadTexture(m_textureCrosshair, TEXTURE_PATH "cross.bmp");
-	LoadTexture(m_textureFont, TEXTURE_PATH "font.bmp");
+	LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
 	LoadTexture(m_textureGun[0], TEXTURE_PATH "hand.png");
 	LoadTexture(m_textureGun[1], TEXTURE_PATH "pistol.png");
 	LoadTexture(m_textureGun[2], TEXTURE_PATH "gun.png");
@@ -190,7 +190,7 @@ void Engine::LoadResource()
 	m_world.LoadMap("map.sav", m_bInfo);
 	m_world.SetUpdateDistance(m_renderDistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
-	
+
 
 	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
@@ -238,18 +238,23 @@ void Engine::Render(float elapsedTime)
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
-		m_player.m_bullet.Update();
-		m_player.m_bullet.CheckCollision(m_world);
-		
+		for (int i = 0; i < 100; i++)
+		{
+			m_player.m_bullet[i].Update();
+			m_player.m_bullet[i].CheckCollision(m_world);
+		}
+
 
 		for (int i = 0; i < NBR_MONSTER; i++)
 		{
 			m_monster[i].Move(m_world);
-			m_player.m_bullet.CheckCollision(m_monster[i]);
-		}
-		
 
-		
+			for (int j = 0; j < 100; j++)
+				m_player.m_bullet[j].CheckCollision(m_monster[i]);
+		}
+
+
+
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -324,20 +329,21 @@ void Engine::Render(float elapsedTime)
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-	m_player.m_bullet.Draw();
+	for (int i = 0; i < 100; i++)
+		m_player.m_bullet[i].Draw();
 
 	//Monstre
 	for (int i = 0; i < NBR_MONSTER; i++)
 		m_monster[i].Draw(false);
 
 
-	
+
 
 
 	//Block focused
 	glDisable(GL_TEXTURE_2D);
 	glPushMatrix();
-	glTranslatef(m_currentBlock.x , m_currentBlock.y , m_currentBlock.z );
+	glTranslatef(m_currentBlock.x, m_currentBlock.y, m_currentBlock.z);
 
 	glBegin(GL_LINE_LOOP);
 	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
@@ -384,7 +390,7 @@ void Engine::Render(float elapsedTime)
 		glVertex3f(0, 0 - 0.01, 0);
 		glVertex3f(0.99, 0 - 0.01, 0);
 		glVertex3f(0.99, 0 - 0.01, 0.99);
-		
+
 	}
 	glEnd();
 	glPopMatrix();
@@ -726,32 +732,33 @@ void Engine::DrawHud()
 
 	glDisable(GL_BLEND);
 
-	
-		// Affichage du Gun
-		m_textureGun[m_player.GetWeapon()].Bind();
-		static const int gunSize = 250;
-		glLoadIdentity();
-		glTranslated(Width() / 2 - gunSize / 2, 0, 0);
 
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0.01);
-		glVertex2i(gunSize, gunSize);
-		glTexCoord2f(1, 0.01);
-		glVertex2i(0, gunSize);
-		glTexCoord2f(1, 1);
-		glVertex2i(0, 0);
-		glTexCoord2f(0, 1);
-		glVertex2i(gunSize, 0);
-		glEnd();
-	
-	
+	// Affichage du Gun
+	m_textureGun[m_player.GetWeapon()].Bind();
+	static const int gunSize = 270;
+	glLoadIdentity();
+	glTranslated(Width() / 2 - gunSize / 2, 0, 0);
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0);
+	glVertex2i(gunSize, gunSize);
+	glTexCoord2f(1, 0);
+	glVertex2i(0, gunSize);
+	glTexCoord2f(1, 1);
+	glVertex2i(0, 0);
+	glTexCoord2f(0, 1);
+	glVertex2i(gunSize, 0);
+	glEnd();
+
+
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
 		//Block selectionne
 		glLoadIdentity();
 		glTranslated(Width() - 64, 16, 0);
 
-		//contour noir
+		//contour 	
+		glColor3f(0.f, 0.f, 0.f);
 		glBegin(GL_QUADS);
 		glVertex2i(-2, -2);
 		glVertex2i(50, -2);

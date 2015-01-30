@@ -12,6 +12,7 @@ Monster::Monster() : Character()
 	m_AttackRange = 2.2;
 	m_AttackSpeed = 1.3;
 	m_AttackDamage = 7;
+	m_Armor = 1.1;
 	m_target = NULL;
 	
 }
@@ -84,10 +85,7 @@ void Monster::Move(World &world)
 
 		//Acceleration
 		m_vitesse.y += 0.013f;
-
-
-		if (m_health < 0)
-			m_isAlive = false;
+			
 	}
 }
 

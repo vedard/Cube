@@ -51,7 +51,7 @@ private:
 	int m_weapon;
 
 public:
-	Bullet m_bullet;
+	Bullet* m_bullet;
 };
 
 #endif

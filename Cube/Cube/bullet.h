@@ -36,6 +36,7 @@ private:
 	bool m_isActive;
 
 	float m_damage;
+	float m_distance;
 };
 
 #endif //BULLET_H__

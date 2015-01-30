@@ -29,6 +29,7 @@ Character::~Character()
 
 void Character::Spawn(World &world, int x, int z)
 {
+	m_isAlive = true;
 	m_health = 100;
 	m_pos.x = x;
 	m_pos.y = CHUNK_SIZE_Y;
@@ -204,7 +205,10 @@ void Character::GetDamage(float damage)
 	std::cout << m_Name << " received " << damage << " damage." << std::endl;
 
 	if (m_health <= 0)
+	{
+		m_isAlive = false;
 		std::cout << m_Name << " died." << std::endl;
+	}
 }
 
 void Character::Jump()
