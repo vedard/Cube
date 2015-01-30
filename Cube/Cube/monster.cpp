@@ -102,7 +102,8 @@ void Monster::Draw(bool debugRange) const
 
 		if (debugRange)
 		{
-			glColor3f(1.f, 0.0f, 0.5f);
+			glDisable(GL_TEXTURE_2D);
+glColor3f(1.f, 0.0f, 0.5f);
 
 			glBegin(GL_QUADS);
 
@@ -140,6 +141,7 @@ void Monster::Draw(bool debugRange) const
 			glEnd();
 		}
 
+		glEnable(GL_TEXTURE_2D);
 		glColor3f(1.f, 1.0f, 1.0f);
 		glBegin(GL_QUADS);
 

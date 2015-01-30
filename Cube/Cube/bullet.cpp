@@ -83,12 +83,13 @@ void Bullet::Draw()
 {
 	if (m_isActive)
 	{
-		float width = 0.05;
+	
+		float width = 0.03;
 
 		glPushMatrix();
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
-
-		glColor3f(1.f, 0.0f, 0.5f);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(0.f, 0.f, 0.f);
 
 		glBegin(GL_QUADS);
 		glVertex3f(-width / 2, 0, -width / 2);

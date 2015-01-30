@@ -90,7 +90,6 @@ void Engine::LoadResource()
 {
 	//Load texture qui ne sont pas dans l'atlas
 	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
-	LoadTexture(m_textureCrosshair, TEXTURE_PATH "cross.bmp");
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
 	LoadTexture(m_textureGun[0], TEXTURE_PATH "hand.png");
 	LoadTexture(m_textureGun[1], TEXTURE_PATH "pistol.png");
@@ -225,6 +224,7 @@ void Engine::Render(float elapsedTime)
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(1.f, 1.f, 1.f);
 
 	// Transformations initiales
 	glMatrixMode(GL_MODELVIEW);
@@ -328,26 +328,19 @@ void Engine::Render(float elapsedTime)
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
+	
+	glDisable(GL_TEXTURE_2D);
+	//Bullet
 	for (int i = 0; i < 100; i++)
 		m_player.m_bullet[i].Draw();
 
-	//Monstre
-	for (int i = 0; i < NBR_MONSTER; i++)
-		m_monster[i].Draw(false);
-
-
-
-
-
 	//Block focused
-	glDisable(GL_TEXTURE_2D);
 	glPushMatrix();
 	glTranslatef(m_currentBlock.x, m_currentBlock.y, m_currentBlock.z);
 
 	glBegin(GL_LINE_LOOP);
-	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-	glNormal3f(0.f, 1.f, 0.f);
+	glColor3f(0.0f, 0.0f, 0.0f);
+		glNormal3f(0.f, 1.f, 0.f);
 
 	if (m_currentFaceNormal.z == -1)
 	{
@@ -393,7 +386,11 @@ void Engine::Render(float elapsedTime)
 
 	}
 	glEnd();
-	glPopMatrix();
+	glPopMatrix();	
+
+	//Monstre
+	for (int i = 0; i < NBR_MONSTER; i++)
+		m_monster[i].Draw(false);
 
 	Shader::Disable();
 
@@ -714,42 +711,10 @@ void Engine::DrawHud()
 	}
 	PrintText((Width() / 2 - (ss.str().length() * 12) / 2) - 10, Height() - 25, 16, ss.str());
 
-	// Affichage du crosshair
-	m_textureCrosshair.Bind();
-	static const int crossSize = 32;
-	glLoadIdentity();
-	glTranslated(Width() / 2 - crossSize / 2, Height() / 2 - crossSize / 2, 0);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2i(0, 0);
-	glTexCoord2f(1, 0);
-	glVertex2i(crossSize, 0);
-	glTexCoord2f(1, 1);
-	glVertex2i(crossSize, crossSize);
-	glTexCoord2f(0, 1);
-	glVertex2i(0, crossSize);
-	glEnd();
-
 	glDisable(GL_BLEND);
-
-
-	// Affichage du Gun
-	m_textureGun[m_player.GetWeapon()].Bind();
-	static const int gunSize = 270;
-	glLoadIdentity();
-	glTranslated(Width() / 2 - gunSize / 2, 0, 0);
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2i(gunSize, gunSize);
-	glTexCoord2f(1, 0);
-	glVertex2i(0, gunSize);
-	glTexCoord2f(1, 1);
-	glVertex2i(0, 0);
-	glTexCoord2f(0, 1);
-	glVertex2i(gunSize, 0);
-	glEnd();
-
+	glDisable(GL_TEXTURE_2D);
+	// Affichage du crosshair
+	DrawCross();
 
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
@@ -766,8 +731,10 @@ void Engine::DrawHud()
 		glVertex2i(-2, 50);
 		glEnd();
 
+
 		//block
-		m_textureAtlas.Bind();
+		m_textureAtlas.Bind();	
+		glEnable(GL_TEXTURE_2D);
 		glColor3f(1.f, 1.f, 1.f);
 
 		glBegin(GL_QUADS);
@@ -782,6 +749,29 @@ void Engine::DrawHud()
 
 		glEnd();
 	}
+
+
+	glEnable(GL_TEXTURE_2D);
+	
+	// Affichage du Gun
+	m_textureGun[m_player.GetWeapon()].Bind();
+	static const int gunSize = 270;
+	glLoadIdentity();
+	glTranslated(Width() / 2 - gunSize / 2, 0, 0);
+
+	glColor3f(1.f, 1.f, 1.f);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0);
+	glVertex2i(gunSize, gunSize);
+	glTexCoord2f(1, 0);
+	glVertex2i(0, gunSize);
+	glTexCoord2f(1, 1);
+	glVertex2i(0, 0);
+	glTexCoord2f(0, 1);
+	glVertex2i(gunSize, 0);
+	glEnd();
+
+
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
@@ -903,5 +893,35 @@ void Engine::GetBlocAtCursor()
 		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y + 1, 0.05f))
 			m_currentFaceNormal.y = 1;
 	}
+}
+void Engine::DrawCross()
+{
+	glLoadIdentity();
+	glTranslated(Width() / 2, Height() / 2, 0);
+	glColor3f(0.f, 0.8f, 0.f);
+	glBegin(GL_QUADS);
+
+	glVertex2i(-1, -10);
+	glVertex2i(1,-10);
+	glVertex2i(1, -3);
+	glVertex2i(-1, -3);
+
+	glVertex2i(-1, 10);
+	glVertex2i(-1, 3);
+	glVertex2i(1, 3);
+	glVertex2i(1,10);
+
+	glVertex2i(-10, 1);
+	glVertex2i(-10, -1);
+	glVertex2i(-3, -1);
+	glVertex2i(-3,1);
+
+	glVertex2i(10, 1);
+	glVertex2i(3,1);
+	glVertex2i(3, -1);
+	glVertex2i(10, -1);
+
+	glEnd();
+
 }
 

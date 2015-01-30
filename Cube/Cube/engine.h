@@ -45,6 +45,7 @@ private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawHud();
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t);
+	void DrawCross();
 
 private:
 	bool m_wireframe;
@@ -57,7 +58,6 @@ private:
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
-	Texture m_textureCrosshair;
 	Texture* m_textureGun;
 	
 	Shader m_shader01;
