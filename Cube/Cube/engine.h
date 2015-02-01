@@ -37,10 +37,6 @@ public:
 	virtual void MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y);
 	void GetBlocAtCursor();
 
-	
-
-
-
 private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawHud() const;

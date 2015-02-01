@@ -218,6 +218,16 @@ void Engine::Render(float elapsedTime)
 
 	gameTime += elapsedTime;
 
+	//Spawn des monstre aleatoirement
+	//std::cout << gameTime << std::endl;
+	if ((int)(gameTime * 100) % 1000 == 0)
+		for (int i = 0; i < MAX_MONSTER; i++)
+			if (!m_monster[i].GetisAlive())
+			{
+				m_monster[i].Spawn(m_world, (m_player.GetPosition().x) - 50 + rand() % 100, (m_player.GetPosition().z) - 50 + rand() % 100);
+				break;
+			}
+
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
 		m_fps = (int)round(1.f / elapsedTime);
@@ -240,20 +250,20 @@ void Engine::Render(float elapsedTime)
 
 		//Update les balles
 		for (int i = 0; i < MAX_BULLET; i++)
-		{		
+		{
 			m_player.GetBullets()[i].Update();
 
 			//Check si y a collision
 			m_player.GetBullets()[i].CheckCollision(m_world);
-				for (int j = 0; j < MAX_MONSTER; j++)
-					m_player.GetBullets()[i].CheckCollision(m_monster[j]);
-			
+			for (int j = 0; j < MAX_MONSTER; j++)
+				m_player.GetBullets()[i].CheckCollision(m_monster[j]);
+
 		}
 
 		//Update les monstres
 		for (int i = 0; i < MAX_MONSTER; i++)
 			m_monster[i].Move(m_world);
-		
+
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -339,7 +349,7 @@ void Engine::Render(float elapsedTime)
 	//Draw Block focused
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
-		
+
 		glPushMatrix();
 		glTranslatef(m_currentBlock.x, m_currentBlock.y, m_currentBlock.z);
 
@@ -462,9 +472,9 @@ void Engine::KeyPressEvent(unsigned char key)
 				m_monster[i].Spawn(m_world, (m_player.GetPosition().x) - 50 + rand() % 100, (m_player.GetPosition().z) - 50 + rand() % 100);
 				break;
 			}
-		
+
 	}
-		
+
 
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
@@ -916,7 +926,7 @@ void Engine::DrawCross(float r, float g, float b) const
 {
 	glLoadIdentity();
 	glTranslated(Width() / 2, Height() / 2, 0);
-	glColor3f(r,g,b);
+	glColor3f(r, g, b);
 	glBegin(GL_QUADS);
 
 	glVertex2i(-1, -10);

@@ -11,7 +11,7 @@ Monster::Monster() : Character()
 	m_dimension = Vector3<float>(2, 2.67, 2);
 	m_AttackRange = 2.2;
 	m_AttackSpeed = 1.3;
-	m_AttackDamage = 7;
+	m_AttackDamage = 20;
 	m_Armor = 1.1;
 	m_target = NULL;
 	m_isAlive = false;

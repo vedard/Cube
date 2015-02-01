@@ -11,12 +11,13 @@ m_sneaked(false),
 m_running(false),
 m_block(BTYPE_GRASS),
 m_footUnderwater(false),
-m_headUnderwater(false)
+m_headUnderwater(false),
+m_HeadShake(0)
 {
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
 	m_health = 100;
-	m_Armor = 1.1;
+	m_Armor = 1.3;
 	m_weapon = W_BLOCK;
 	m_bullets = new Bullet[MAX_BULLET];
 }
@@ -24,7 +25,6 @@ m_headUnderwater(false)
 Player::~Player()
 {
 }
-
 
 void Player::TurnLeftRight(float value)
 {
@@ -109,7 +109,13 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	{
 		m_vitesse.x = 0;
 		m_vitesse.z = 0;
+
+		
+		//m_HeadShake -= 0.01;
+		//if (m_HeadShake <= 0)
+			m_HeadShake = 0;
 	}
+
 
 	//Normalize les vecteur
 	deplacementVector.Normalize();
@@ -208,11 +214,19 @@ void Player::ApplyRotation() const
 
 }
 
-void Player::ApplyTranslation() const
+void Player::ApplyTranslation()
 {
 
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(-m_pos.x, -(m_pos.y + m_dimension.y), -m_pos.z);
+
+	//Head shake a chaque pas
+	if (m_vitesse.x != 0 && !m_noClip)
+	{
+		glTranslatef(0.f, m_vitesse.x/2.2*sin(m_HeadShake), 0.f);
+		if (!m_isInAir)
+			m_HeadShake += 2.07 * m_vitesse.x ;
+	}
 
 	//Si on est baisse 
 	if (m_sneaked)

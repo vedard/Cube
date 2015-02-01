@@ -17,7 +17,7 @@ public:
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, World &world);
 	void ApplyRotation() const;
-	void ApplyTranslation() const;
+	void ApplyTranslation();
 	void ToggleNoClip();
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
@@ -49,9 +49,11 @@ private:
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	BlockType m_block;		// Prochain block que le joueur peut placer
 	
-	int m_weapon;
+	int m_weapon;			// current weapon
 
-	Bullet* m_bullets;
+	Bullet* m_bullets;		// Tableau de toutes les balles tirées
+	
+	float m_HeadShake;			// Shake la camera a chaque pas
 };
 
 #endif

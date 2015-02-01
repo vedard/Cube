@@ -36,12 +36,6 @@ void Bullet::Update()
 		m_distance += directionVector.Length() * m_vitesse.y;
 		if (m_distance > CHUNK_SIZE_X * 10)
 			m_isActive = false;
-
-		//Si ya collision elle est detruite
-		/*CheckCollision(world);
-		for (int i = 0; i < 2; i++)
-			CheckCollision(characters[i]);*/
-
 	}
 
 }
@@ -57,7 +51,8 @@ void Bullet::CheckCollision(Character &character)
 			&& m_pos.z >= character.GetPosition().z - character.GetDimension().z / 2
 			&& m_pos.z < character.GetPosition().z + character.GetDimension().z / 2)
 		{
-			character.GetDamage(m_damage);
+			//f(x) = -1 * 1.08 ^ (x + 10) + 50
+			character.GetDamage(-1 * pow(1.08, m_distance + 10) + 50);
 			m_isActive = false;
 		}
 
