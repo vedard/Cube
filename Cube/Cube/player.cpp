@@ -115,6 +115,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		//if (m_HeadShake <= 0)
 			m_HeadShake = 0;
 	}
+	else if (!m_isInAir)
+			m_HeadShake += 2.2 * m_vitesse.x;
 
 
 	//Normalize les vecteur
@@ -127,6 +129,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		m_pos.y += deplacementVector.y * m_vitesse.y;
 		m_pos.x += deplacementVector.x * m_vitesse.x;
 		m_pos.z += deplacementVector.z * m_vitesse.z;
+		m_isInAir = true;
 	}
 
 	else
@@ -224,8 +227,7 @@ void Player::ApplyTranslation()
 	if (m_vitesse.x != 0 && !m_noClip)
 	{
 		glTranslatef(0.f, m_vitesse.x/2.2*sin(m_HeadShake), 0.f);
-		if (!m_isInAir)
-			m_HeadShake += 2.07 * m_vitesse.x ;
+		
 	}
 
 	//Si on est baisse 

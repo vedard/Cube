@@ -19,7 +19,7 @@ m_isAlive(true)
 	m_Name = "Character ";
 	for (int i = 0; i < 5; i++)
 		m_Name += std::to_string(std::rand() % 10);
-	
+
 
 }
 
@@ -50,7 +50,7 @@ void Character::Spawn(World &world, int x, int z)
 
 	m_pos.y++;
 
-	std::cout << m_Name <<  " spawned." << std::endl;
+	std::cout << m_Name << " spawned." << std::endl;
 }
 
 void Character::Move(World &world)
@@ -243,7 +243,7 @@ int Character::GetAttackRange() const { return m_AttackRange; }
 
 float Character::GetAttackSpeed() const { return m_AttackSpeed; }
 
-float Character::GetArmor() const { return m_Armor;  }
+float Character::GetArmor() const { return m_Armor; }
 
 float  Character::GetAttackDamage() const{ return m_AttackDamage; }
 
@@ -251,3 +251,4 @@ const std::string& Character::GetName() const{ return m_Name; }
 
 bool Character::GetisAlive() const { return m_isAlive; }
 
+bool Character::GetisInAir() const{ return m_isInAir; }

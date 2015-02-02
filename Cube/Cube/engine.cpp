@@ -23,6 +23,10 @@ displayInfo(false)
 	m_monster = new Monster[MAX_MONSTER];
 
 	m_textureGun = new Texture[3];
+
+	m_SoundStep = new sf::SoundBuffer[6];
+
+	sound = new sf::Sound[200];
 }
 
 Engine::~Engine()
@@ -179,6 +183,19 @@ void Engine::LoadResource()
 		abort();
 	}
 
+	//Audio
+	std::cout << " Loading audio ..." << std::endl;
+	m_SoundGunShot.loadFromFile(AUDIO_PATH "glock18-1.wav");
+	m_SoundGunShot2.loadFromFile(AUDIO_PATH "xm1014-1.wav");
+	m_SoundGunDraw.loadFromFile(AUDIO_PATH "glock_draw.wav");
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_SoundStep[i].loadFromFile(AUDIO_PATH"tile" + std::to_string(i + 1) + ".wav");
+	}
+
+
+	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
 	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
 	{
@@ -191,10 +208,12 @@ void Engine::LoadResource()
 	m_world.SetUpdateDistance(m_renderDistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-
+	//Player
 	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 
+
+	//Monster
 	for (int i = 0; i < MAX_MONSTER; i++)
 	{
 		m_monster[i].SetName("Monster " + std::to_string(i + 1));
@@ -218,8 +237,9 @@ void Engine::Render(float elapsedTime)
 
 	gameTime += elapsedTime;
 
+
+
 	//Spawn des monstre aleatoirement
-	//std::cout << gameTime << std::endl;
 	if ((int)(gameTime * 100) % 1000 == 0)
 		for (int i = 0; i < MAX_MONSTER; i++)
 			if (!m_monster[i].GetisAlive())
@@ -247,6 +267,14 @@ void Engine::Render(float elapsedTime)
 	{
 		//Update le player
 		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+
+		//Footstep
+		static Vector3<float> lastpos = m_player.GetPosition();
+		if (sqrtf(pow(lastpos.x - m_player.GetPosition().x, 2) + pow(lastpos.z - m_player.GetPosition().z, 2)) > 1.8f && !m_player.GetisInAir())
+		{
+			Play(m_SoundStep[rand() % 6], 12);
+			lastpos = m_player.GetPosition();
+		}
 
 		//Update les balles
 		for (int i = 0; i < MAX_BULLET; i++)
@@ -457,12 +485,17 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	//2 ->  W_PISTOL
 	if (m_keyboard[sf::Keyboard::Num2])
+	{
 		m_player.SetWeapon(W_PISTOL);
+		Play(m_SoundGunDraw);
 
+	}
 	//3 ->  W_DOUBLE_BARREL_SHOTGUN
 	if (m_keyboard[sf::Keyboard::Num3])
+	{
 		m_player.SetWeapon(W_DOUBLE_BARREL_SHOTGUN);
-
+		Play(m_SoundGunDraw);
+	}
 	//M -> spawn monster
 	else if (m_keyboard[sf::Keyboard::M])
 	{
@@ -614,6 +647,13 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		if (button == 1)
 		{
 			m_player.Shoot();
+
+			if (m_player.GetWeapon() == W_PISTOL)
+				Play(m_SoundGunShot);
+			else if (m_player.GetWeapon() == W_DOUBLE_BARREL_SHOTGUN)
+				Play(m_SoundGunShot2);
+
+
 		}
 
 	}
@@ -922,6 +962,7 @@ void Engine::GetBlocAtCursor()
 			m_currentFaceNormal.y = 1;
 	}
 }
+
 void Engine::DrawCross(float r, float g, float b) const
 {
 	glLoadIdentity();
@@ -951,5 +992,19 @@ void Engine::DrawCross(float r, float g, float b) const
 
 	glEnd();
 
+}
+
+void Engine::Play(sf::SoundBuffer &soundBuffer, int volume)
+{
+	for (int i = 0; i < 200; i++)
+	{
+		if (sound[i].getStatus() == sf::Sound::Status::Stopped)
+		{
+			sound[i].setBuffer(soundBuffer);
+			sound[i].setVolume(volume);
+			sound[i].play();
+			break;
+		}
+	}
 }
 

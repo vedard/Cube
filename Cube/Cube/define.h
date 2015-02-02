@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
 
 
 #ifdef _WIN32
@@ -38,6 +39,8 @@ typedef long long int64;
 #define MAX_BULLET 100
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
+#define AUDIO_PATH	"../Cube/media/audio/"
+
 
 
 typedef uint8 BlockType;

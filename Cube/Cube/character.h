@@ -37,6 +37,7 @@ public:
 	float GetAttackDamage() const;
 	const std::string& GetName() const;
 	bool GetisAlive() const;
+	bool GetisInAir() const;
 	
 
 protected:

@@ -42,6 +42,7 @@ private:
 	void DrawHud() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
+	void Play(sf::SoundBuffer &soundBuffer, int volume = 15);
 
 private:
 	bool m_wireframe;
@@ -71,6 +72,14 @@ private:
 	int m_fps;
 	int m_chunkToUpdate;
 	bool displayInfo;
+
+	sf::SoundBuffer m_SoundGunShot;
+	sf::SoundBuffer m_SoundGunShot2;
+	sf::SoundBuffer m_SoundGunDraw;
+
+	sf::SoundBuffer * m_SoundStep;
+
+	sf::Sound* sound;
 
 
 };
