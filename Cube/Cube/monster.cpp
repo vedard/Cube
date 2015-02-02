@@ -92,21 +92,21 @@ void Monster::Move(World &world)
 
 void Monster::Draw(bool debugRange) const
 {
+
 	if (m_isAlive)
 	{
 		m_texture.Bind();
-
+		
 		glPushMatrix();
 
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
 		glRotatef(m_HorizontalRot, 0.f, 1.f, 0.f);
-
 		if (debugRange)
 		{
 			glDisable(GL_TEXTURE_2D);
 			glColor3f(1.f, 0.0f, 0.5f);
 
-			glBegin(GL_QUADS);
+			glBegin(GL_TRIANGLES);
 
 			glVertex3f(-m_dimension.x / 2, m_dimension.y, m_dimension.z / 2);
 			glVertex3f(m_dimension.x / 2, m_dimension.y, m_dimension.z / 2);

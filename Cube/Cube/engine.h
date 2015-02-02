@@ -77,6 +77,8 @@ private:
 	sf::SoundBuffer m_SoundGunShot2;
 	sf::SoundBuffer m_SoundGunDraw;
 
+	sf::SoundBuffer m_SoundFleshImpact;
+	
 	sf::SoundBuffer * m_SoundStep;
 
 	sf::Sound* sound;

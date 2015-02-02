@@ -188,10 +188,11 @@ void Engine::LoadResource()
 	m_SoundGunShot.loadFromFile(AUDIO_PATH "glock18-1.wav");
 	m_SoundGunShot2.loadFromFile(AUDIO_PATH "xm1014-1.wav");
 	m_SoundGunDraw.loadFromFile(AUDIO_PATH "glock_draw.wav");
+	m_SoundFleshImpact.loadFromFile(AUDIO_PATH "flesh_impact_bullet3.wav");
 
 	for (int i = 0; i < 6; i++)
 	{
-		m_SoundStep[i].loadFromFile(AUDIO_PATH"tile" + std::to_string(i + 1) + ".wav");
+		m_SoundStep[i].loadFromFile(AUDIO_PATH"grass" + std::to_string(i + 1) + ".wav");
 	}
 
 
@@ -284,7 +285,8 @@ void Engine::Render(float elapsedTime)
 			//Check si y a collision
 			m_player.GetBullets()[i].CheckCollision(m_world);
 			for (int j = 0; j < MAX_MONSTER; j++)
-				m_player.GetBullets()[i].CheckCollision(m_monster[j]);
+				if (m_player.GetBullets()[i].CheckCollision(m_monster[j]))
+					Play(m_SoundFleshImpact,0);
 
 		}
 
@@ -1002,6 +1004,7 @@ void Engine::Play(sf::SoundBuffer &soundBuffer, int volume)
 		{
 			sound[i].setBuffer(soundBuffer);
 			sound[i].setVolume(volume);
+			sound[i].setPosition(0, 0, 0);
 			sound[i].play();
 			break;
 		}

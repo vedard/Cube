@@ -16,8 +16,8 @@ public:
 	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal);
 
 	void Update();
-	void CheckCollision(Character &character);
-	void CheckCollision(World &world);
+	bool CheckCollision(Character &character);
+	bool CheckCollision(World &world);
 	void Draw() const;
 
 	const Vector3<float>& GetPosition() const;

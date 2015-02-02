@@ -40,7 +40,7 @@ void Bullet::Update()
 
 }
 
-void Bullet::CheckCollision(Character &character)
+bool Bullet::CheckCollision(Character &character)
 {
 	if (m_isActive && character.GetisAlive())
 	{
@@ -54,12 +54,12 @@ void Bullet::CheckCollision(Character &character)
 			//f(x) = -1 * 1.08 ^ (x + 10) + 50
 			character.GetDamage(-1 * pow(1.08, m_distance + 10) + 50);
 			m_isActive = false;
+			return true;
 		}
-
-
 	}
+	return false;
 }
-void Bullet::CheckCollision(World &world)
+bool Bullet::CheckCollision(World &world)
 {
 	if (m_isActive)
 	{
@@ -74,9 +74,11 @@ void Bullet::CheckCollision(World &world)
 			if (chunk)
 			chunk->RemoveBloc(m_pos.x - (chunkPos.x * CHUNK_SIZE_X), m_pos.y, m_pos.z - (chunkPos.z * CHUNK_SIZE_X));*/
 			m_isActive = false;
+			return true;
 
 		}
 	}
+	return false;
 
 }
 
