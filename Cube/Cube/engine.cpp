@@ -22,6 +22,7 @@ displayInfo(false)
 
 	m_monster = new Monster[MAX_MONSTER];
 
+
 	m_textureGun = new Texture[3];
 
 	m_SoundStep = new sf::SoundBuffer[6];
@@ -195,6 +196,8 @@ void Engine::LoadResource()
 		m_SoundStep[i].loadFromFile(AUDIO_PATH"grass" + std::to_string(i + 1) + ".wav");
 	}
 
+	//Model 3d
+
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -286,7 +289,7 @@ void Engine::Render(float elapsedTime)
 			m_player.GetBullets()[i].CheckCollision(m_world);
 			for (int j = 0; j < MAX_MONSTER; j++)
 				if (m_player.GetBullets()[i].CheckCollision(m_monster[j]))
-					Play(m_SoundFleshImpact,0);
+					Play(m_SoundFleshImpact, 0);
 
 		}
 
@@ -436,6 +439,7 @@ void Engine::Render(float elapsedTime)
 	//Draw Monstre
 	for (int i = 0; i < MAX_MONSTER; i++)
 		m_monster[i].Draw(false);
+
 
 	Shader::Disable();
 
@@ -1010,4 +1014,6 @@ void Engine::Play(sf::SoundBuffer &soundBuffer, int volume)
 		}
 	}
 }
+
+
 

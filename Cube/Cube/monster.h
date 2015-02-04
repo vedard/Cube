@@ -4,6 +4,7 @@
 #include "character.h"
 #include "player.h"
 #include "texture.h"
+#include "model3d.h"
 
 class Monster : public Character
 {
@@ -19,7 +20,7 @@ public:
 private:
 	Texture m_texture;
 	Character* m_target;
-	
+	Model3d box;
 
 };
 #endif // !MONSTER_H__

@@ -41,13 +41,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(IncludePath)</IncludePath>
-    <LibraryPath>external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>external\assimp311\include;external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(IncludePath)</IncludePath>
+    <LibraryPath>external/glew vstudio2k10/lib;external\assimp311\lib;external\devil178\lib;external\sfml20\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,6 +97,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="monster.cpp" />
+    <ClCompile Include="model3d.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
     <ClInclude Include="monster.h" />
+    <ClInclude Include="model3d.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="shader.h" />

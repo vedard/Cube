@@ -13,6 +13,7 @@
 #include "vector3.h"
 #include "world.h"
 #include "monster.h"
+#include "model3d.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -73,6 +74,7 @@ private:
 	int m_chunkToUpdate;
 	bool displayInfo;
 
+	//Sound
 	sf::SoundBuffer m_SoundGunShot;
 	sf::SoundBuffer m_SoundGunShot2;
 	sf::SoundBuffer m_SoundGunDraw;
@@ -82,7 +84,6 @@ private:
 	sf::SoundBuffer * m_SoundStep;
 
 	sf::Sound* sound;
-
 
 };
 

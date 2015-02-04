@@ -1,6 +1,5 @@
 #include "monster.h"
 
-
 Monster::Monster() : Character()
 {
 	m_texture.Load(TEXTURE_PATH "monster.png");
@@ -8,13 +7,15 @@ Monster::Monster() : Character()
 	if (!m_texture.IsValid())
 		std::cerr << "Unable to load texture (" << TEXTURE_PATH "monster.png" << ")" << std::endl;
 
-	m_dimension = Vector3<float>(2, 2.67, 2);
+	m_dimension = Vector3<float>(2, 3.4, 2);
 	m_AttackRange = 2.2;
 	m_AttackSpeed = 1.3;
 	m_AttackDamage = 20;
 	m_Armor = 1.1;
 	m_target = NULL;
 	m_isAlive = false;
+
+	box.LoadOBJ(MODEL_PATH "box.obj");
 
 }
 
@@ -92,15 +93,19 @@ void Monster::Move(World &world)
 
 void Monster::Draw(bool debugRange) const
 {
-
+	
 	if (m_isAlive)
 	{
-		m_texture.Bind();
+		
+
+		box.Render(m_pos.x, m_pos.y, m_pos.z,m_HorizontalRot,m_VerticalRot);
 		
 		glPushMatrix();
 
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
 		glRotatef(m_HorizontalRot, 0.f, 1.f, 0.f);
+		
+		
 		if (debugRange)
 		{
 			glDisable(GL_TEXTURE_2D);
@@ -142,7 +147,8 @@ void Monster::Draw(bool debugRange) const
 			glEnd();
 		}
 
-		glEnable(GL_TEXTURE_2D);
+		m_texture.Bind();
+		/*glEnable(GL_TEXTURE_2D);
 		glColor3f(1.f, 1.0f, 1.0f);
 		glBegin(GL_QUADS);
 
@@ -151,7 +157,7 @@ void Monster::Draw(bool debugRange) const
 		glTexCoord2f(0, 0); glVertex3f(m_dimension.x / 2, m_dimension.y, 0);
 		glTexCoord2f(1, 0); glVertex3f(-m_dimension.x / 2, m_dimension.y, 0);
 
-		glEnd();
+		glEnd();*/
 
 		glPopMatrix();
 	}
