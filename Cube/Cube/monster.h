@@ -12,16 +12,15 @@ public:
 	Monster();
 	~Monster();
 	void Move(World &world);
-	void Draw(bool debugRange) const;
-	void SetTarget(Character* target);
-	
+	void Draw(Model3d &model, bool debugRange) const;
+	void SetTarget( Character* target);
+	void GetDamage(float damage);
+
 
 
 private:
-	Texture m_texture;
 	Character* m_target;
-	Model3d box;
-
+	sf::Clock m_ClockAnimationDmg;
 };
 #endif // !MONSTER_H__
 

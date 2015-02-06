@@ -19,7 +19,7 @@ public:
 	void Draw() const;
 	bool Attack(Character * character, float damage);
 	bool Attack(Character * character);
-	void GetDamage(float damage);
+	virtual void GetDamage(float damage);
 	void Jump();
 
 	//Set

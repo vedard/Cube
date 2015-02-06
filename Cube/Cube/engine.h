@@ -14,6 +14,8 @@
 #include "world.h"
 #include "monster.h"
 #include "model3d.h"
+#include "animal.h"
+#include "vector3.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -43,13 +45,15 @@ private:
 	void DrawHud() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
-	void Play(sf::SoundBuffer &soundBuffer, int volume = 15);
+	void Play(sf::SoundBuffer &soundBuffer, int volume = 15, const Vector3<float> pos = Vector3<float>(0,0,0));
+	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
 
 private:
 	bool m_wireframe;
 
 	Player m_player;
 	Monster* m_monster;
+	Animal* m_cow;
 	
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 
@@ -78,12 +82,17 @@ private:
 	sf::SoundBuffer m_SoundGunShot;
 	sf::SoundBuffer m_SoundGunShot2;
 	sf::SoundBuffer m_SoundGunDraw;
-
 	sf::SoundBuffer m_SoundFleshImpact;
-	
 	sf::SoundBuffer * m_SoundStep;
 
-	sf::Sound* sound;
+	sf::Sound * m_sound;
+	sf::Music m_music;
+
+	//Model
+	Model3d m_modelM9;
+	Model3d m_modelMp5k;
+	Model3d m_modelCow;
+	Model3d m_modelRaptor;
 
 };
 

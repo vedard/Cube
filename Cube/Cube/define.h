@@ -36,6 +36,7 @@ typedef long long int64;
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 20
 #define MAX_MONSTER 20
+#define MAX_COW 50
 #define PI 3.14159265358f
 #define MAX_BULLET 100
 #define TEXTURE_PATH	"../Cube/media/textures/"

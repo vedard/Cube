@@ -51,8 +51,8 @@ bool Bullet::CheckCollision(Character &character)
 			&& m_pos.z >= character.GetPosition().z - character.GetDimension().z / 2
 			&& m_pos.z < character.GetPosition().z + character.GetDimension().z / 2)
 		{
-			//f(x) = -1 * 1.08 ^ (x + 10) + 50
-			character.GetDamage(-1 * pow(1.08, m_distance + 10) + 50);
+			//f(x) = -1 * 1.04 ^ (x + 10) + 50
+			character.GetDamage(-1 * pow(1.04, m_distance + 10) + 50);
 			m_isActive = false;
 			return true;
 		}
@@ -91,7 +91,6 @@ void Bullet::Draw() const
 
 		glPushMatrix();
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
-		glDisable(GL_TEXTURE_2D);
 		glColor3f(0.f, 0.f, 0.f);
 
 		glBegin(GL_QUADS);

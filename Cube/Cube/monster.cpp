@@ -2,21 +2,15 @@
 
 Monster::Monster() : Character()
 {
-	m_texture.Load(TEXTURE_PATH "monster.png");
 
-	if (!m_texture.IsValid())
-		std::cerr << "Unable to load texture (" << TEXTURE_PATH "monster.png" << ")" << std::endl;
-
-	m_dimension = Vector3<float>(2, 3.4, 2);
+	m_dimension = Vector3<float>(2, 2.7, 3.5);
 	m_AttackRange = 2.2;
 	m_AttackSpeed = 1.3;
 	m_AttackDamage = 20;
+	m_VerticalRot = 0;
 	m_Armor = 1.1;
 	m_target = NULL;
 	m_isAlive = false;
-
-	box.LoadOBJ(MODEL_PATH "box.obj");
-
 }
 
 Monster::~Monster()
@@ -91,27 +85,25 @@ void Monster::Move(World &world)
 	}
 }
 
-void Monster::Draw(bool debugRange) const
+void Monster::Draw(Model3d &model, bool debugRange) const
 {
-	
 	if (m_isAlive)
 	{
-		
+		if (m_ClockAnimationDmg.getElapsedTime().asSeconds() < 0.1)
+			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 0.5f, 0.5f);
+		else
+			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		box.Render(m_pos.x, m_pos.y, m_pos.z,m_HorizontalRot,m_VerticalRot);
-		
-		glPushMatrix();
-
-		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
-		glRotatef(m_HorizontalRot, 0.f, 1.f, 0.f);
-		
-		
 		if (debugRange)
 		{
-			glDisable(GL_TEXTURE_2D);
-			glColor3f(1.f, 0.0f, 0.5f);
+			glPushMatrix();
 
-			glBegin(GL_TRIANGLES);
+			glTranslatef(m_pos.x, m_pos.y, m_pos.z);
+			glRotatef(m_HorizontalRot, 0.f, 1.f, 0.f);
+
+			glColor3f(1.f, 0.0f, 0.f);
+
+			glBegin(GL_QUADS);
 
 			glVertex3f(-m_dimension.x / 2, m_dimension.y, m_dimension.z / 2);
 			glVertex3f(m_dimension.x / 2, m_dimension.y, m_dimension.z / 2);
@@ -145,25 +137,20 @@ void Monster::Draw(bool debugRange) const
 			}
 
 			glEnd();
+			glPopMatrix();
 		}
 
-		m_texture.Bind();
-		/*glEnable(GL_TEXTURE_2D);
-		glColor3f(1.f, 1.0f, 1.0f);
-		glBegin(GL_QUADS);
-
-		glTexCoord2f(1, 1); glVertex3f(-m_dimension.x / 2, 0, 0);
-		glTexCoord2f(0, 1); glVertex3f(m_dimension.x / 2, 0, 0);
-		glTexCoord2f(0, 0); glVertex3f(m_dimension.x / 2, m_dimension.y, 0);
-		glTexCoord2f(1, 0); glVertex3f(-m_dimension.x / 2, m_dimension.y, 0);
-
-		glEnd();*/
-
-		glPopMatrix();
 	}
 }
 
 void Monster::SetTarget(Character* target)
 {
 	m_target = target;
+}
+
+void Monster::GetDamage(float damage)
+{
+	m_ClockAnimationDmg.restart();
+
+	Character::GetDamage(damage);
 }

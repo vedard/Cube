@@ -17,17 +17,13 @@ displayInfo(false)
 		m_keyboard[i] = false;
 	}
 
-	//Creation du tableau de block info
+	//Creation du tableau des tableaux;
 	m_bInfo = new BlockInfo[256];
-
+	m_cow = new Animal[MAX_COW];
 	m_monster = new Monster[MAX_MONSTER];
-
-
-	m_textureGun = new Texture[3];
-
 	m_SoundStep = new sf::SoundBuffer[6];
-
-	sound = new sf::Sound[200];
+	m_sound = new sf::Sound[200];
+	m_textureGun = new Texture[3];
 }
 
 Engine::~Engine()
@@ -49,7 +45,6 @@ void Engine::Init()
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
-
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -102,81 +97,25 @@ void Engine::LoadResource()
 	LoadTexture(m_textureGun[2], TEXTURE_PATH "gun.png");
 
 	//Load texture dans l'atlas
-	m_bInfo[BTYPE_GRASS].Init(BTYPE_GRASS, "Grass");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_grass.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_GRASS].u, m_bInfo[BTYPE_GRASS].v, m_bInfo[BTYPE_GRASS].w, m_bInfo[BTYPE_GRASS].h);
-
-	m_bInfo[BTYPE_TEST].Init(BTYPE_TEST, "Test");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_test.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_TEST].u, m_bInfo[BTYPE_TEST].v, m_bInfo[BTYPE_TEST].w, m_bInfo[BTYPE_TEST].h);
-
-	m_bInfo[BTYPE_STONE].Init(BTYPE_STONE, "Stone");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_stone.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_STONE].u, m_bInfo[BTYPE_STONE].v, m_bInfo[BTYPE_STONE].w, m_bInfo[BTYPE_STONE].h);
-
-	m_bInfo[BTYPE_WOOD_PLANK].Init(BTYPE_WOOD_PLANK, "Wood Plank");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_wood_plank.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WOOD_PLANK].u, m_bInfo[BTYPE_WOOD_PLANK].v, m_bInfo[BTYPE_WOOD_PLANK].w, m_bInfo[BTYPE_WOOD_PLANK].h);
-
-	m_bInfo[BTYPE_CHEST].Init(BTYPE_CHEST, "Chest");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_chest.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_CHEST].u, m_bInfo[BTYPE_CHEST].v, m_bInfo[BTYPE_CHEST].w, m_bInfo[BTYPE_CHEST].h);
-
-	m_bInfo[BTYPE_BED_ROCK].Init(BTYPE_BED_ROCK, "Bed Rock");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_bed_rock.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_BED_ROCK].u, m_bInfo[BTYPE_BED_ROCK].v, m_bInfo[BTYPE_BED_ROCK].w, m_bInfo[BTYPE_BED_ROCK].h);
-
-	m_bInfo[BTYPE_DIRT].Init(BTYPE_DIRT, "Dirt");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_dirt.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_DIRT].u, m_bInfo[BTYPE_DIRT].v, m_bInfo[BTYPE_DIRT].w, m_bInfo[BTYPE_DIRT].h);
-
-	m_bInfo[BTYPE_IRON].Init(BTYPE_IRON, "Iron");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_iron.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_IRON].u, m_bInfo[BTYPE_IRON].v, m_bInfo[BTYPE_IRON].w, m_bInfo[BTYPE_IRON].h);
-
-	m_bInfo[BTYPE_COAL].Init(BTYPE_COAL, "Coal");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_coal.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_COAL].u, m_bInfo[BTYPE_COAL].v, m_bInfo[BTYPE_COAL].w, m_bInfo[BTYPE_COAL].h);
-
-	m_bInfo[BTYPE_DIAMOND].Init(BTYPE_DIAMOND, "Diamond");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_diamond.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_DIAMOND].u, m_bInfo[BTYPE_DIAMOND].v, m_bInfo[BTYPE_DIAMOND].w, m_bInfo[BTYPE_DIAMOND].h);
-
-	m_bInfo[BTYPE_GOLD].Init(BTYPE_GOLD, "Gold");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_gold.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_GOLD].u, m_bInfo[BTYPE_GOLD].v, m_bInfo[BTYPE_GOLD].w, m_bInfo[BTYPE_GOLD].h);
-
-	m_bInfo[BTYPE_REDSTONE].Init(BTYPE_REDSTONE, "Redstone");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_redstone.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_REDSTONE].u, m_bInfo[BTYPE_REDSTONE].v, m_bInfo[BTYPE_REDSTONE].w, m_bInfo[BTYPE_REDSTONE].h);
-
-	m_bInfo[BTYPE_LAPIS_LAZULI].Init(BTYPE_LAPIS_LAZULI, "Lapis Lazuli");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_lapis_lazuli.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LAPIS_LAZULI].u, m_bInfo[BTYPE_LAPIS_LAZULI].v, m_bInfo[BTYPE_LAPIS_LAZULI].w, m_bInfo[BTYPE_LAPIS_LAZULI].h);
-
-	m_bInfo[BTYPE_WOOD].Init(BTYPE_WOOD, "Wood");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_wood.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WOOD].u, m_bInfo[BTYPE_WOOD].v, m_bInfo[BTYPE_WOOD].w, m_bInfo[BTYPE_WOOD].h);
-
-	m_bInfo[BTYPE_LEAVE].Init(BTYPE_LEAVE, "Leave");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_leave.png");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LEAVE].u, m_bInfo[BTYPE_LEAVE].v, m_bInfo[BTYPE_LEAVE].w, m_bInfo[BTYPE_LEAVE].h);
-
-	m_bInfo[BTYPE_WATER].Init(BTYPE_WATER, "Water");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_water.png");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_WATER].u, m_bInfo[BTYPE_WATER].v, m_bInfo[BTYPE_WATER].w, m_bInfo[BTYPE_WATER].h);
-
-	m_bInfo[BTYPE_SAND].Init(BTYPE_SAND, "Sand");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_sand.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_SAND].u, m_bInfo[BTYPE_SAND].v, m_bInfo[BTYPE_SAND].w, m_bInfo[BTYPE_SAND].h);
-
-	m_bInfo[BTYPE_NETHEREACK].Init(BTYPE_NETHEREACK, "Netherrack");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_netherrack.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_NETHEREACK].u, m_bInfo[BTYPE_NETHEREACK].v, m_bInfo[BTYPE_NETHEREACK].w, m_bInfo[BTYPE_NETHEREACK].h);
-
-	m_bInfo[BTYPE_LAVA].Init(BTYPE_LAVA, "Lava");
-	m_texBlockIndex = m_textureAtlas.AddTexture(TEXTURE_PATH "block_lava.bmp");
-	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[BTYPE_LAVA].u, m_bInfo[BTYPE_LAVA].v, m_bInfo[BTYPE_LAVA].w, m_bInfo[BTYPE_LAVA].h);
+	AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp");
+	AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp");
+	AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp");
+	AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp");
+	AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp");
+	AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp");
+	AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp");
+	AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp");
+	AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp");
+	AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp");
+	AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp");
+	AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp");
+	AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp");
+	AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp");
+	AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png");
+	AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png");
+	AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp");
+	AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp");
+	AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp");
 
 	if (!m_textureAtlas.Generate(64, false))
 	{
@@ -189,15 +128,21 @@ void Engine::LoadResource()
 	m_SoundGunShot.loadFromFile(AUDIO_PATH "glock18-1.wav");
 	m_SoundGunShot2.loadFromFile(AUDIO_PATH "xm1014-1.wav");
 	m_SoundGunDraw.loadFromFile(AUDIO_PATH "glock_draw.wav");
-	m_SoundFleshImpact.loadFromFile(AUDIO_PATH "flesh_impact_bullet3.wav");
+	m_SoundFleshImpact.loadFromFile(AUDIO_PATH "cowhurt3.ogg");
+	if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
+		abort();
+	m_music.setLoop(true);
+	m_music.setVolume(0);
+	m_music.play();
 
 	for (int i = 0; i < 6; i++)
-	{
-		m_SoundStep[i].loadFromFile(AUDIO_PATH"grass" + std::to_string(i + 1) + ".wav");
-	}
+		m_SoundStep[i].loadFromFile(AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
 	//Model 3d
-
+	m_modelCow.LoadOBJ(MODEL_PATH "cow.obj", TEXTURE_PATH "cow.png");
+	m_modelM9.LoadOBJ(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg");
+	m_modelMp5k.LoadOBJ(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png");
+	m_modelRaptor.LoadOBJ(MODEL_PATH "creeper.obj", TEXTURE_PATH "creeper.png");
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -212,17 +157,24 @@ void Engine::LoadResource()
 	m_world.SetUpdateDistance(m_renderDistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-	//Player
+	//Entity
+
+	// -- Player
 	m_player.SetName("Player 1");
 	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 
 
-	//Monster
+	//  -- Monster
 	for (int i = 0; i < MAX_MONSTER; i++)
 	{
 		m_monster[i].SetName("Monster " + std::to_string(i + 1));
 		m_monster[i].SetTarget(&m_player);
 	}
+
+	//  -- Cow
+	for (int i = 0; i < MAX_COW; i++)
+		m_cow[i].SetName("Cow " + std::to_string(i + 1));
+
 
 }
 
@@ -241,8 +193,6 @@ void Engine::Render(float elapsedTime)
 
 	gameTime += elapsedTime;
 
-
-
 	//Spawn des monstre aleatoirement
 	if ((int)(gameTime * 100) % 1000 == 0)
 		for (int i = 0; i < MAX_MONSTER; i++)
@@ -252,17 +202,17 @@ void Engine::Render(float elapsedTime)
 				break;
 			}
 
+	if ((int)(gameTime * 100) % 100 == 0)
+		for (int i = 0; i < MAX_COW; i++)
+			if (!m_cow[i].GetisAlive())
+			{
+				m_cow[i].Spawn(m_world, (m_player.GetPosition().x) - 100 + rand() % 200, (m_player.GetPosition().z) - 100 + rand() % 200);
+				break;
+			}
+
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
 		m_fps = (int)round(1.f / elapsedTime);
-
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3f(1.f, 1.f, 1.f);
-
-	// Transformations initiales
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 
 	int loops = 0;
 
@@ -290,6 +240,12 @@ void Engine::Render(float elapsedTime)
 			for (int j = 0; j < MAX_MONSTER; j++)
 				if (m_player.GetBullets()[i].CheckCollision(m_monster[j]))
 					Play(m_SoundFleshImpact, 0);
+			for (int j = 0; j < MAX_COW; j++)
+			{
+				if (m_player.GetBullets()[i].CheckCollision(m_cow[j]))
+					if (rand() % 3 >= 2)
+						Play(m_SoundFleshImpact, 100);
+			}
 
 		}
 
@@ -297,15 +253,29 @@ void Engine::Render(float elapsedTime)
 		for (int i = 0; i < MAX_MONSTER; i++)
 			m_monster[i].Move(m_world);
 
+		//Update les monstres
+		for (int i = 0; i < MAX_COW; i++)
+			m_cow[i].Move(m_world);
+
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(1.f, 1.f, 1.f);
+
+	// Transformations initiales
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+
 	//Place le joueur au centre du monde
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
+
+
 
 	//Activation des shaders
 	m_shader01.Use();
@@ -352,8 +322,7 @@ void Engine::Render(float elapsedTime)
 		glPopMatrix();
 	}
 
-	////Chunk
-	m_textureAtlas.Bind();
+
 
 	//Chunk du joueur
 	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
@@ -365,19 +334,58 @@ void Engine::Render(float elapsedTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//std::thread a(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
-	//a.join();
+	/*
+	std::thread a(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
+	a.join();
+	*/
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
-	//Draw le world
+	//Draw Monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_monster[i].Draw(m_modelRaptor, false);
+
+	for (int i = 0; i < MAX_COW; i++)
+		m_cow[i].Draw(m_modelCow);
+
+	//Draw guns
+	if (m_player.GetWeapon() == W_PISTOL)
+		m_modelM9.Render(
+		m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
+		m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
+		m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
+		-m_player.GetHorizontalRotation(),
+		-m_player.GetVerticalRotation(), 1, 1, 1);
+
+	else if (m_player.GetWeapon() == W_DOUBLE_BARREL_SHOTGUN)
+	{
+		m_modelMp5k.Render(
+			m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
+			m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
+			m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
+			-m_player.GetHorizontalRotation(),
+			-m_player.GetVerticalRotation(), 1, 1, 1);
+		m_modelMp5k.Render(
+			m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) - cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
+			m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
+			m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) - sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
+			-m_player.GetHorizontalRotation(),
+			-m_player.GetVerticalRotation(), 1, 1, 1);
+	}
+
+	//Draw Chunks
+	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
+
+
+	Shader::Disable();
+	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	//Draw Bullets
-	for (int i = 0; i < MAX_BULLET; i++)
-		m_player.GetBullets()[i].Draw();
+	//for (int i = 0; i < MAX_BULLET; i++)
+	//m_player.GetBullets()[i].Draw();
 
 	//Draw Block focused
 	if (m_player.GetWeapon() == W_BLOCK)
@@ -436,12 +444,6 @@ void Engine::Render(float elapsedTime)
 		glEnd();
 		glPopMatrix();
 	}
-	//Draw Monstre
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_monster[i].Draw(false);
-
-
-	Shader::Disable();
 
 	//Draw le hui
 	if (m_wireframe)
@@ -449,8 +451,6 @@ void Engine::Render(float elapsedTime)
 	DrawHud();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
 
 }
 
@@ -828,6 +828,9 @@ void Engine::DrawHud() const
 	glEnable(GL_TEXTURE_2D);
 
 	// Affichage du Gun
+	/*if (m_player.GetWeapon() != W_PISTOL)
+	{
+
 	m_textureGun[m_player.GetWeapon()].Bind();
 	static const int gunSize = 270;
 	glLoadIdentity();
@@ -844,7 +847,7 @@ void Engine::DrawHud() const
 	glTexCoord2f(0, 1);
 	glVertex2i(gunSize, 0);
 	glEnd();
-
+	}*/
 
 
 	glEnable(GL_LIGHTING);
@@ -1000,20 +1003,24 @@ void Engine::DrawCross(float r, float g, float b) const
 
 }
 
-void Engine::Play(sf::SoundBuffer &soundBuffer, int volume)
+void Engine::Play(sf::SoundBuffer &soundBuffer, int volume, const Vector3<float> pos)
 {
 	for (int i = 0; i < 200; i++)
 	{
-		if (sound[i].getStatus() == sf::Sound::Status::Stopped)
+		if (m_sound[i].getStatus() == sf::Sound::Status::Stopped)
 		{
-			sound[i].setBuffer(soundBuffer);
-			sound[i].setVolume(volume);
-			sound[i].setPosition(0, 0, 0);
-			sound[i].play();
+			m_sound[i].setBuffer(soundBuffer);
+			m_sound[i].setVolume(volume);
+			m_sound[i].setPosition(pos.x, pos.y, pos.z);
+			m_sound[i].play();
 			break;
 		}
 	}
 }
 
-
-
+void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path)
+{
+	m_bInfo[type].Init(type, name);
+	m_texBlockIndex = m_textureAtlas.AddTexture(path);
+	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
+}

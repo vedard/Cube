@@ -319,7 +319,7 @@ void Player::Shoot()
 		{
 			if (m_weapon == W_PISTOL)
 			{
-				m_bullets[i].Init(m_pos.x, m_pos.y + m_dimension.y - 0.4, m_pos.z, m_VerticalRot, m_HorizontalRot);
+				m_bullets[i].Init(m_pos.x, m_pos.y + m_dimension.y, m_pos.z, m_VerticalRot, m_HorizontalRot);
 				break;
 			}
 			else if (m_weapon == W_DOUBLE_BARREL_SHOTGUN)
