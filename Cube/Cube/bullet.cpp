@@ -1,14 +1,15 @@
 #include "bullet.h"
 
 
-Bullet::Bullet()
+Bullet::Bullet() : m_LastPos(0, 0, 0)
 {
 	m_damage = 50;
 	m_isActive = false;
-	m_vitesse.x = 2;
-	m_vitesse.y = 2;
-	m_vitesse.z = 2;
+	m_vitesse.x = 20;
+	m_vitesse.y = 20;
+	m_vitesse.z = 20;
 	m_distance = 0;
+
 
 }
 
@@ -21,19 +22,14 @@ void Bullet::Update()
 {
 	if (m_isActive)
 	{
-		Vector3<float> directionVector(
-			cosf(PI / 2 * 3 + m_HorizontalRot * PI / 180) * (cosf(-m_VerticalRot * PI / 180)),
-			sinf(-m_VerticalRot * PI / 180),
-			sinf(PI / 2 * 3 + m_HorizontalRot * PI / 180) * (cosf(-m_VerticalRot * PI / 180)));
+		m_LastPos = m_pos;
 
-		directionVector.Normalize();
-
-		m_pos.y += directionVector.y * m_vitesse.y;
-		m_pos.x += directionVector.x * m_vitesse.x;
-		m_pos.z += directionVector.z * m_vitesse.z;
+		m_pos.y += directionVector.y;
+		m_pos.x += directionVector.x;
+		m_pos.z += directionVector.z;
 
 		//Si la balle est trop loin, elle est detruite
-		m_distance += directionVector.Length() * m_vitesse.y;
+		m_distance += directionVector.Length();
 		if (m_distance > CHUNK_SIZE_X * 10)
 			m_isActive = false;
 	}
@@ -44,17 +40,29 @@ bool Bullet::CheckCollision(Character &character)
 {
 	if (m_isActive && character.GetisAlive())
 	{
-		if (m_pos.x >= character.GetPosition().x - character.GetDimension().x / 2
-			&& m_pos.x < character.GetPosition().x + character.GetDimension().x / 2
-			&& m_pos.y >= character.GetPosition().y - character.GetDimension().y
-			&& m_pos.y < character.GetPosition().y + character.GetDimension().y
-			&& m_pos.z >= character.GetPosition().z - character.GetDimension().z / 2
-			&& m_pos.z < character.GetPosition().z + character.GetDimension().z / 2)
+		int nbrIteration = 10;
+		if (character.GetDimension().x <= character.GetDimension().y && character.GetDimension().x <= character.GetDimension().z)
+			nbrIteration = ceil(m_vitesse.x / character.GetDimension().x);
+		if (character.GetDimension().y <= character.GetDimension().x && character.GetDimension().y <= character.GetDimension().z)
+			nbrIteration = ceil(m_vitesse.y / character.GetDimension().y);
+		if (character.GetDimension().z <= character.GetDimension().y && character.GetDimension().z <= character.GetDimension().x)
+			nbrIteration = ceil(m_vitesse.z / character.GetDimension().z);
+
+		for (int i = 0; i < nbrIteration; i++)
 		{
-			//f(x) = -1 * 1.04 ^ (x + 10) + 50
-			character.GetDamage(-1 * pow(1.04, m_distance + 10) + 50);
-			m_isActive = false;
-			return true;
+			if (m_LastPos.x + directionVector.x / nbrIteration * i >= character.GetPosition().x - character.GetDimension().x / 2
+				&& m_LastPos.x + directionVector.x / nbrIteration * i < character.GetPosition().x + character.GetDimension().x / 2
+				&& m_LastPos.y + directionVector.y / nbrIteration * i >= character.GetPosition().y
+				&& m_LastPos.y + directionVector.y / nbrIteration * i < character.GetPosition().y + character.GetDimension().y
+				&& m_LastPos.z + directionVector.z / nbrIteration * i >= character.GetPosition().z - character.GetDimension().z / 2
+				&& m_LastPos.z + directionVector.z / nbrIteration * i < character.GetPosition().z + character.GetDimension().z / 2)
+			{
+
+				//f(x) = -1 * 1.04 ^ (x + 10) + 50
+				character.GetDamage(-1 * pow(1.04, m_distance + 10) + 50);
+				m_isActive = false;
+				return true;
+			}
 		}
 	}
 	return false;
@@ -132,8 +140,15 @@ void Bullet::Draw() const
 void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal)
 {
 	m_pos = Vector3<float>(x, y, z);
-	m_HorizontalRot = rotationHorizontal;
-	m_VerticalRot = rotationVertical;
+	directionVector = Vector3<float>(
+		cosf(PI / 2 * 3 + rotationHorizontal * PI / 180) * (cosf(-rotationVertical * PI / 180)),
+		sinf(-rotationVertical * PI / 180),
+		sinf(PI / 2 * 3 + rotationHorizontal * PI / 180) * (cosf(-rotationVertical * PI / 180)));
+
+	directionVector.Normalize();
+	directionVector.y *= m_vitesse.y;
+	directionVector.x *= m_vitesse.x;
+	directionVector.z *= m_vitesse.z;
 	m_distance = 0;
 	m_isActive = true;
 }

@@ -3,7 +3,7 @@
 
 Animal::Animal()
 {
-	m_dimension = Vector3<float>(2, 2, 2);
+	m_dimension = Vector3<float>(1.5, 2.3, 2.4);
 	m_AttackRange = 5.2;
 	m_AttackSpeed = 1.1;
 	m_AttackDamage = 10;
@@ -11,7 +11,8 @@ Animal::Animal()
 	m_Armor = 0.5;
 	m_HorizontalRot = rand() % 180;
 	m_isAlive = false;
-	m_target.x = 0;
+	m_timeNextTarget = 3;
+
 }
 
 Animal::~Animal()
@@ -25,16 +26,9 @@ void Animal::Move(World &world)
 		m_vitesse.x = 0.05;
 		m_vitesse.z = 0.05;
 
-		//Distance entre le monstre et sa cible
-		Vector3<float> DeltaTarget(m_target.x - m_pos.x, 0, m_target.z - m_pos.z);
-
-		//On le place face a la cible
-		m_HorizontalRot = ((atan2(DeltaTarget.x, DeltaTarget.z) * 180 / PI));
-
-		//On avance pas si on est assez proche de la cible
-		if (sqrtf(pow(DeltaTarget.x, 2) + pow(DeltaTarget.z, 2)) > m_AttackRange && m_target.x != 0)
+		if (m_ClockTarget.getElapsedTime().asSeconds() < m_timeNextTarget)
 		{
-			Vector3<float> deplacementVector = Vector3<float>(DeltaTarget.x, 0, DeltaTarget.z);
+			Vector3<float> deplacementVector = Vector3<float>(sin(m_HorizontalRot / 180 * PI), 0.f, cos(m_HorizontalRot / 180 * PI));
 			deplacementVector.Normalize();
 
 			//Avance en x
@@ -54,7 +48,9 @@ void Animal::Move(World &world)
 		}
 		else
 		{
-			m_target = Vector3<float>(m_pos.x - 15 + rand() % 30, m_pos.y - 15 + rand() % 30, m_pos.z - 15 + rand() % 30);
+			m_HorizontalRot += rand() % 200 - 100;
+			m_timeNextTarget = rand() % 10;
+			m_ClockTarget.restart();
 		}
 
 
@@ -92,7 +88,7 @@ void Animal::Draw(Model3d &model) const
 		else
 			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		if (false)
+		if (true)
 		{
 			glPushMatrix();
 

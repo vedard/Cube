@@ -16,7 +16,8 @@ public:
 
 	 
 private:
-	Vector3<float> m_target;
+	sf::Clock m_ClockTarget;
+	int m_timeNextTarget;
 
 	sf::Clock m_ClockAnimationDmg;
 

@@ -3,7 +3,7 @@
 Monster::Monster() : Character()
 {
 
-	m_dimension = Vector3<float>(2, 2.7, 3.5);
+	m_dimension = Vector3<float>(0.9, 2.6, 0.9);
 	m_AttackRange = 2.2;
 	m_AttackSpeed = 1.3;
 	m_AttackDamage = 20;

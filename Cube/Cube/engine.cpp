@@ -236,7 +236,6 @@ void Engine::Render(float elapsedTime)
 			m_player.GetBullets()[i].Update();
 
 			//Check si y a collision
-			m_player.GetBullets()[i].CheckCollision(m_world);
 			for (int j = 0; j < MAX_MONSTER; j++)
 				if (m_player.GetBullets()[i].CheckCollision(m_monster[j]))
 					Play(m_SoundFleshImpact, 0);
@@ -246,6 +245,7 @@ void Engine::Render(float elapsedTime)
 					if (rand() % 3 >= 2)
 						Play(m_SoundFleshImpact, 100);
 			}
+			m_player.GetBullets()[i].CheckCollision(m_world);
 
 		}
 
@@ -354,8 +354,7 @@ void Engine::Render(float elapsedTime)
 		m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
 		m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
 		m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-		-m_player.GetHorizontalRotation(),
-		-m_player.GetVerticalRotation(), 1, 1, 1);
+		-m_player.GetHorizontalRotation(), -m_player.GetVerticalRotation(), 1, 1, 1);
 
 	else if (m_player.GetWeapon() == W_DOUBLE_BARREL_SHOTGUN)
 	{
@@ -377,8 +376,6 @@ void Engine::Render(float elapsedTime)
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-
-
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
@@ -387,7 +384,7 @@ void Engine::Render(float elapsedTime)
 	//for (int i = 0; i < MAX_BULLET; i++)
 	//m_player.GetBullets()[i].Draw();
 
-	//Draw Block focused
+	//Draw Block focused (black square)
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
 
@@ -396,7 +393,6 @@ void Engine::Render(float elapsedTime)
 
 		glBegin(GL_LINE_LOOP);
 		glColor3f(0.0f, 0.0f, 0.0f);
-		glNormal3f(0.f, 1.f, 0.f);
 
 		if (m_currentFaceNormal.z == -1)
 		{
