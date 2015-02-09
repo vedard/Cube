@@ -21,6 +21,7 @@ private:
 	struct V3
 	{
 		t x, y, z;
+		V3() :x(0), y(0), z(0){}
 	};
 	bool m_loaded;
 	V3<float> *m_vertex;

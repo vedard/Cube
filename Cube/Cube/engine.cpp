@@ -364,12 +364,12 @@ void Engine::Render(float elapsedTime)
 			m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
 			-m_player.GetHorizontalRotation(),
 			-m_player.GetVerticalRotation(), 1, 1, 1);
-		m_modelMp5k.Render(
+		/*m_modelMp5k.Render(
 			m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) - cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
 			m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
 			m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) - sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
 			-m_player.GetHorizontalRotation(),
-			-m_player.GetVerticalRotation(), 1, 1, 1);
+			-m_player.GetVerticalRotation(), 1, 1, 1);*/
 	}
 
 	//Draw Chunks
