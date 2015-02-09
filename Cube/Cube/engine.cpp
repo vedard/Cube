@@ -139,10 +139,10 @@ void Engine::LoadResource()
 		m_SoundStep[i].loadFromFile(AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
 	//Model 3d
-	m_modelCow.LoadOBJ(MODEL_PATH "cow.obj", TEXTURE_PATH "cow.png");
+	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 	m_modelM9.LoadOBJ(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg");
 	m_modelMp5k.LoadOBJ(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png");
-	m_modelRaptor.LoadOBJ(MODEL_PATH "creeper.obj", TEXTURE_PATH "creeper.png");
+	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
