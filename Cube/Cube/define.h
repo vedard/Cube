@@ -38,7 +38,7 @@ typedef long long int64;
 #define MAX_MONSTER 10
 #define MAX_COW 25
 #define PI 3.14159265358f
-#define MAX_BULLET 100
+#define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
@@ -74,7 +74,8 @@ enum BLOCK_TYPE {
 enum WEAPONS {
 	W_BLOCK,
 	W_PISTOL,
-	W_DOUBLE_BARREL_SHOTGUN
+	W_SUBMACHINE_GUN,
+	W_ASSAULT_RIFLE
 };
 
 

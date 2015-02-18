@@ -95,6 +95,7 @@
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="engine.cpp" />
+    <ClCompile Include="gun.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="monster.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
+    <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
@@ -119,12 +121,14 @@
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
+    <ClInclude Include="gun.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
+    <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="textureatlas.h" />
     <ClInclude Include="tool.h" />

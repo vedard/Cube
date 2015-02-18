@@ -13,25 +13,25 @@ displayInfo(false)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
-	{
 		m_keyboard[i] = false;
-	}
+
+	for (int i = 0; i < sf::Mouse::ButtonCount; i++)
+		m_mouseButton[i] = false;
 
 	//Creation du tableau des tableaux;
 	m_bInfo = new BlockInfo[256];
 	m_cow = new Animal[MAX_COW];
 	m_monster = new Monster[MAX_MONSTER];
-	m_SoundStep = new sf::SoundBuffer[6];
-	m_sound = new sf::Sound[200];
-	m_textureGun = new Texture[3];
+	playerGun = new Gun[3];
 }
 
 Engine::~Engine()
 {
+
 	m_world.SaveMap("map.sav");
+	//Sound::DeInit();
 	delete[] m_bInfo;
 	delete[] m_monster;
-	delete[] m_textureGun;
 }
 
 void Engine::Init()
@@ -92,9 +92,6 @@ void Engine::LoadResource()
 	//Load texture qui ne sont pas dans l'atlas
 	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
-	LoadTexture(m_textureGun[0], TEXTURE_PATH "hand.png");
-	LoadTexture(m_textureGun[1], TEXTURE_PATH "pistol.png");
-	LoadTexture(m_textureGun[2], TEXTURE_PATH "gun.png");
 
 	//Load texture dans l'atlas
 	AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp");
@@ -125,24 +122,29 @@ void Engine::LoadResource()
 
 	//Audio
 	std::cout << " Loading audio ..." << std::endl;
-	m_SoundGunShot.loadFromFile(AUDIO_PATH "glock18-1.wav");
-	m_SoundGunShot2.loadFromFile(AUDIO_PATH "xm1014-1.wav");
-	m_SoundGunDraw.loadFromFile(AUDIO_PATH "glock_draw.wav");
-	m_SoundFleshImpact.loadFromFile(AUDIO_PATH "cowhurt3.ogg");
+	Sound::AddSound(Sound::M9_FIRE, AUDIO_PATH "glock18-1.wav");
+	Sound::AddSound(Sound::MP5K_FIRE, AUDIO_PATH "mp7-1.wav");
+	Sound::AddSound(Sound::AK47_FIRE, AUDIO_PATH "ak47-1.wav");
+	Sound::AddSound(Sound::GUN_DRAW, AUDIO_PATH "glock_draw.wav");
+	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
+	for (int i = 0; i < 6; i++)
+		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
+
 	if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
 		abort();
 	m_music.setLoop(true);
 	m_music.setVolume(0);
 	m_music.play();
 
-	for (int i = 0; i < 6; i++)
-		m_SoundStep[i].loadFromFile(AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
 	//Model 3d
 	m_modelCow.LoadOBJ(MODEL_PATH "cow.obj", TEXTURE_PATH "cow.png");
-	m_modelM9.LoadOBJ(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg");
-	m_modelMp5k.LoadOBJ(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png");
 	m_modelRaptor.LoadOBJ(MODEL_PATH "creeper.obj", TEXTURE_PATH "creeper.png");
+
+	//Gun
+	playerGun[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 46);
+	playerGun[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
+	playerGun[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -226,28 +228,38 @@ void Engine::Render(float elapsedTime)
 		static Vector3<float> lastpos = m_player.GetPosition();
 		if (sqrtf(pow(lastpos.x - m_player.GetPosition().x, 2) + pow(lastpos.z - m_player.GetPosition().z, 2)) > 1.8f && !m_player.GetisInAir())
 		{
-			Play(m_SoundStep[rand() % 6], 12);
+			Sound::Play(Sound::STEP1 + rand() % 6, 12);
 			lastpos = m_player.GetPosition();
 		}
 
-		//Update les balles
-		for (int i = 0; i < MAX_BULLET; i++)
+		//Tirer
+		if (m_mouseButton[1] && m_player.GetWeapon() != W_BLOCK)
 		{
-			m_player.GetBullets()[i].Update();
 
-			//Check si y a collision
-			for (int j = 0; j < MAX_MONSTER; j++)
-				if (m_player.GetBullets()[i].CheckCollision(m_monster[j]))
-					Play(m_SoundFleshImpact, 0);
-			for (int j = 0; j < MAX_COW; j++)
-			{
-				if (m_player.GetBullets()[i].CheckCollision(m_cow[j]))
-					if (rand() % 3 >= 2)
-						Play(m_SoundFleshImpact, 100);
-			}
-			m_player.GetBullets()[i].CheckCollision(m_world);
+			playerGun[m_player.GetWeapon() - 1].Shoot(m_player.GetPosition().x, m_player.GetPosition().y + m_player.GetDimension().y, m_player.GetPosition().z, m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
+			(playerGun[m_player.GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
 
 		}
+
+		for (int k = 0; k < 3; k++)
+		{
+			//Update les balles
+			for (int i = 0; i < MAX_BULLET; i++)
+			{
+				playerGun[k].GetBullets()[i].Update();
+
+				//Check si y a collision
+				for (int j = 0; j < MAX_MONSTER; j++)
+					playerGun[k].GetBullets()[i].CheckCollision(m_monster[j]);
+
+				for (int j = 0; j < MAX_COW; j++)
+					playerGun[k].GetBullets()[i].CheckCollision(m_cow[j]);
+
+				playerGun[k].GetBullets()[i].CheckCollision(m_world);
+
+			}
+		}
+		
 
 		//Update les monstres
 		for (int i = 0; i < MAX_MONSTER; i++)
@@ -334,11 +346,6 @@ void Engine::Render(float elapsedTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	/*
-	std::thread a(&World::Update, &m_world, playerPos.x, playerPos.z, m_bInfo);
-	a.join();
-	*/
-
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
 	//Draw Monstres
@@ -349,28 +356,13 @@ void Engine::Render(float elapsedTime)
 		m_cow[i].Draw(m_modelCow);
 
 	//Draw guns
-	if (m_player.GetWeapon() == W_PISTOL)
-		m_modelM9.Render(
-		m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-		m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
-		m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-		-m_player.GetHorizontalRotation(), -m_player.GetVerticalRotation(), 1, 1, 1);
-
-	else if (m_player.GetWeapon() == W_DOUBLE_BARREL_SHOTGUN)
-	{
-		m_modelMp5k.Render(
-			m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-			m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
-			m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) + sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-			-m_player.GetHorizontalRotation(),
-			-m_player.GetVerticalRotation(), 1, 1, 1);
-		/*m_modelMp5k.Render(
-			m_player.GetPosition().x - (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) - cos(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (cos(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-			m_player.GetPosition().y + m_player.GetDimension().y + cos(m_player.GetVerticalRotation() * PI / 180 + PI / 2) - cos(m_player.GetVerticalRotation() * PI / 180) *0.5,
-			m_player.GetPosition().z - (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180 + PI / 2)) - sin(m_player.GetHorizontalRotation()* PI / 180) * 0.4 + (sin(m_player.GetHorizontalRotation() * PI / 180 + PI / 2) * sin(m_player.GetVerticalRotation() * PI / 180))*0.5,
-			-m_player.GetHorizontalRotation(),
-			-m_player.GetVerticalRotation(), 1, 1, 1);*/
-	}
+	if (m_player.GetWeapon() != W_BLOCK)
+	playerGun[m_player.GetWeapon()-1].Draw(
+			m_player.GetPosition().x,
+			m_player.GetPosition().y + m_player.GetDimension().y,
+			m_player.GetPosition().z,
+			m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
+	
 
 	//Draw Chunks
 	m_textureAtlas.Bind();
@@ -381,9 +373,10 @@ void Engine::Render(float elapsedTime)
 	glDisable(GL_TEXTURE_2D);
 
 	//Draw Bullets
-	//for (int i = 0; i < MAX_BULLET; i++)
-	//m_player.GetBullets()[i].Draw();
-
+	for (int j = 0; j < 3; j++)	
+		for (int i = 0; i < MAX_BULLET; i++)	
+			playerGun[j].GetBullets()[i].Draw();
+	
 	//Draw Block focused (black square)
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
@@ -489,14 +482,20 @@ void Engine::KeyPressEvent(unsigned char key)
 	if (m_keyboard[sf::Keyboard::Num2])
 	{
 		m_player.SetWeapon(W_PISTOL);
-		Play(m_SoundGunDraw);
+		Sound::Play(Sound::GUN_DRAW);
 
 	}
-	//3 ->  W_DOUBLE_BARREL_SHOTGUN
+	//3 ->  W_SUBMACHINE_GUN
 	if (m_keyboard[sf::Keyboard::Num3])
 	{
-		m_player.SetWeapon(W_DOUBLE_BARREL_SHOTGUN);
-		Play(m_SoundGunDraw);
+		m_player.SetWeapon(W_SUBMACHINE_GUN);
+		Sound::Play(Sound::GUN_DRAW);
+	}
+	//4 ->  W_ASSAULT_RIFLE
+	if (m_keyboard[sf::Keyboard::Num4])
+	{
+		m_player.SetWeapon(W_ASSAULT_RIFLE);
+		Sound::Play(Sound::GUN_DRAW);
 	}
 	//M -> spawn monster
 	else if (m_keyboard[sf::Keyboard::M])
@@ -606,6 +605,9 @@ void Engine::MouseMoveEvent(int x, int y)
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
+	//update le teableau
+	m_mouseButton[button] = true;
+
 	if (m_player.GetWeapon() == W_BLOCK)
 	{
 		//Left Click
@@ -643,27 +645,13 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		else if (button == 16)
 			m_player.SetBlock(-1);
 	}
-	else
-	{
-		//Left Click
-		if (button == 1)
-		{
-			m_player.Shoot();
-
-			if (m_player.GetWeapon() == W_PISTOL)
-				Play(m_SoundGunShot);
-			else if (m_player.GetWeapon() == W_DOUBLE_BARREL_SHOTGUN)
-				Play(m_SoundGunShot2);
-
-
-		}
-
-	}
 
 }
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
 {
+	//update le teableau
+	m_mouseButton[button] = false;
 }
 
 bool Engine::LoadTexture(Texture& texture, const std::string& filename, bool stopOnError)
@@ -997,21 +985,6 @@ void Engine::DrawCross(float r, float g, float b) const
 
 	glEnd();
 
-}
-
-void Engine::Play(sf::SoundBuffer &soundBuffer, int volume, const Vector3<float> pos)
-{
-	for (int i = 0; i < 200; i++)
-	{
-		if (m_sound[i].getStatus() == sf::Sound::Status::Stopped)
-		{
-			m_sound[i].setBuffer(soundBuffer);
-			m_sound[i].setVolume(volume);
-			m_sound[i].setPosition(pos.x, pos.y, pos.z);
-			m_sound[i].play();
-			break;
-		}
-	}
 }
 
 void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path)

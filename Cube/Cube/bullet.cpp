@@ -59,7 +59,7 @@ bool Bullet::CheckCollision(Character &character)
 			{
 
 				//f(x) = -1 * 1.04 ^ (x + 10) + 50
-				character.GetDamage(-1 * pow(1.04, m_distance + 10) + 50);
+				character.GetDamage(-1 * pow(1.04, m_distance + 10) + m_damage);
 				m_isActive = false;
 				return true;
 			}
@@ -95,11 +95,11 @@ void Bullet::Draw() const
 	if (m_isActive)
 	{
 
-		float width = 0.03;
+		float width = 0.20;
 
 		glPushMatrix();
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
-		glColor3f(0.f, 0.f, 0.f);
+		glColor3f(0.6f, 0.6f, 0.f);
 
 		glBegin(GL_QUADS);
 		glVertex3f(-width / 2, 0, -width / 2);
@@ -137,8 +137,9 @@ void Bullet::Draw() const
 
 	}
 }
-void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal)
+void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage)
 {
+	m_damage = damage;
 	m_pos = Vector3<float>(x, y, z);
 	directionVector = Vector3<float>(
 		cosf(PI / 2 * 3 + rotationHorizontal * PI / 180) * (cosf(-rotationVertical * PI / 180)),

@@ -19,7 +19,6 @@ m_HeadShake(0)
 	m_health = 100;
 	m_Armor = 1.3;
 	m_weapon = W_BLOCK;
-	m_bullets = new Bullet[MAX_BULLET];
 }
 
 Player::~Player()
@@ -110,13 +109,13 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		m_vitesse.x = 0;
 		m_vitesse.z = 0;
 
-		
+
 		//m_HeadShake -= 0.01;
 		//if (m_HeadShake <= 0)
-			m_HeadShake = 0;
+		m_HeadShake = 0;
 	}
 	else if (!m_isInAir)
-			m_HeadShake += 2.2 * m_vitesse.x;
+		m_HeadShake += 2.2 * m_vitesse.x;
 
 
 	//Normalize les vecteur
@@ -190,6 +189,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
 	}
+
+	
 }
 
 void Player::CheckUnderwater(World &world)
@@ -226,8 +227,8 @@ void Player::ApplyTranslation()
 	//Head shake a chaque pas
 	if (m_vitesse.x != 0 && !m_noClip)
 	{
-		glTranslatef(0.f, m_vitesse.x/2.2*sin(m_HeadShake), 0.f);
-		
+		glTranslatef(0.f, m_vitesse.x / 2.2*sin(m_HeadShake), 0.f);
+
 	}
 
 	//Si on est baisse 
@@ -262,20 +263,9 @@ void Player::SetRunning(bool running)
 		m_running = running;
 }
 
-BlockType Player::GetBlock() const
-{
-	return m_block;
-}
+BlockType Player::GetBlock() const { return m_block; }
 
-int Player::GetWeapon() const
-{
-	return m_weapon;
-}
-
-Bullet* &Player::GetBullets()
-{
-	return m_bullets;
-}
+int Player::GetWeapon() const { return m_weapon; }
 
 void Player::SetBlock(int direction)
 {
@@ -294,7 +284,7 @@ void Player::SetBlock(int direction)
 
 void Player::SetWeapon(int mode)
 {
-	if (mode >= 0 && mode <= 2)
+	if (mode >= 0 && mode <= 3)
 		m_weapon = mode;
 }
 
@@ -311,40 +301,5 @@ void Player::Jump()
 		m_vitesse.y = -0.09f;
 }
 
-void Player::Shoot()
-{
-	int nbrBullet = 0;
-	for (int i = 0; i < MAX_BULLET; i++)
-		if (!m_bullets[i].GetIsActive())
-		{
-			if (m_weapon == W_PISTOL)
-			{
-				m_bullets[i].Init(m_pos.x, m_pos.y + m_dimension.y, m_pos.z, m_VerticalRot, m_HorizontalRot);
-				break;
-			}
-			else if (m_weapon == W_DOUBLE_BARREL_SHOTGUN)
-			{
-				if (nbrBullet == 0)
-					m_bullets[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
+bool Player::Underwater() const { return m_headUnderwater; }
 
-				if (nbrBullet == 1)
-					m_bullets[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.4, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
-
-				if (nbrBullet == 2)
-					m_bullets[i].Init(m_pos.x + 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z + 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
-
-				if (nbrBullet == 3)
-					m_bullets[i].Init(m_pos.x - 0.1 * cosf(m_HorizontalRot* PI / 180), m_pos.y + m_dimension.y - 0.5, m_pos.z - 0.1 * sinf(m_HorizontalRot* PI / 180), m_VerticalRot, m_HorizontalRot);
-
-				nbrBullet++;
-				if (nbrBullet == 4)
-					break;
-			}
-
-		}
-}
-
-bool Player::Underwater() const
-{
-	return m_headUnderwater;
-}

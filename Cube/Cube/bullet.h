@@ -13,7 +13,7 @@ public:
 	Bullet();
 	~Bullet();
 
-	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal);
+	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage);
 
 	void Update();
 	bool CheckCollision(Character &character);

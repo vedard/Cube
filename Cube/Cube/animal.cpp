@@ -129,5 +129,7 @@ void Animal::GetDamage(float damage)
 {
 	m_ClockAnimationDmg.restart();
 	Jump();
+	if (rand() % 100 > 66)
+		Sound::Play(Sound::FLESH_IMPACT);
 	Character::GetDamage(damage);
 }

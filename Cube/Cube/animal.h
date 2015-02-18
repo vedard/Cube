@@ -3,6 +3,7 @@
 
 #include "character.h"
 #include "model3d.h"
+#include "sound.h"
 
 class Animal : public Character
 {

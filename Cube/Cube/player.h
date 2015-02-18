@@ -2,7 +2,7 @@
 #define PLAYER_H__
 #include "array2d.h"
 #include "character.h"
-#include "bullet.h"
+#include "gun.h"
 
 
 class Player : public Character
@@ -19,21 +19,19 @@ public:
 	void ApplyRotation() const;
 	void ApplyTranslation();
 	void ToggleNoClip();
-	void SetSneak(bool sneak);
-	void SetRunning(bool running);
 	void Jump();
-	void Shoot();
+
 
 	bool Underwater() const;
 
 	BlockType GetBlock() const;
 	int GetWeapon() const;
-	Bullet* &GetBullets();
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
 	void SetWeapon(int mode);
-
+	void SetSneak(bool sneak);
+	void SetRunning(bool running);
 
 
 
@@ -51,9 +49,7 @@ private:
 	
 	int m_weapon;			// current weapon
 
-	Bullet* m_bullets;		// Tableau de toutes les balles tirées
-	
-	float m_HeadShake;			// Shake la camera a chaque pas
+	float m_HeadShake;		// Shake la camera a chaque pas
 };
 
 #endif

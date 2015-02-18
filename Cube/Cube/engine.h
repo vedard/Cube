@@ -16,6 +16,8 @@
 #include "model3d.h"
 #include "animal.h"
 #include "vector3.h"
+#include "gun.h"
+#include "sound.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -45,7 +47,6 @@ private:
 	void DrawHud() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
-	void Play(sf::SoundBuffer &soundBuffer, int volume = 15, const Vector3<float> pos = Vector3<float>(0,0,0));
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
 
 private:
@@ -56,11 +57,12 @@ private:
 	Animal* m_cow;
 	
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
+	bool m_mouseButton[sf::Mouse::ButtonCount]; //tableau de toutes les touches du clavier
 
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
-	Texture* m_textureGun;
+	
 	
 	Shader m_shader01;
 	World m_world;
@@ -78,21 +80,14 @@ private:
 	int m_chunkToUpdate;
 	bool displayInfo;
 
-	//Sound
-	sf::SoundBuffer m_SoundGunShot;
-	sf::SoundBuffer m_SoundGunShot2;
-	sf::SoundBuffer m_SoundGunDraw;
-	sf::SoundBuffer m_SoundFleshImpact;
-	sf::SoundBuffer * m_SoundStep;
-
-	sf::Sound * m_sound;
 	sf::Music m_music;
 
 	//Model
-	Model3d m_modelM9;
-	Model3d m_modelMp5k;
 	Model3d m_modelCow;
 	Model3d m_modelRaptor;
+
+	//Gun 
+	Gun * playerGun;
 
 };
 
