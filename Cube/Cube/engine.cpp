@@ -138,8 +138,15 @@ void Engine::LoadResource()
 
 
 	//Model 3d
+<<<<<<< HEAD
 	m_modelCow.LoadOBJ(MODEL_PATH "cow.obj", TEXTURE_PATH "cow.png");
 	m_modelRaptor.LoadOBJ(MODEL_PATH "creeper.obj", TEXTURE_PATH "creeper.png");
+=======
+	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+	m_modelM9.LoadOBJ(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg");
+	m_modelMp5k.LoadOBJ(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png");
+	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+>>>>>>> fc495a43fc3a32aed2bc3e5a6e04bb1b4243f4d4
 
 	//Gun
 	playerGun[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 46);
@@ -392,7 +399,7 @@ void Engine::Render(float elapsedTime)
 			glVertex3f(0, 0, 0 - 0.01);
 			glVertex3f(0, 0.99, 0 - 0.01);
 			glVertex3f(0.99, 0.99, 0 - 0.01);
-			glVertex3f(0.99, 0, 0 - 0.01);
+			glVertex3f(0.99, 0, 0 - 0.01); 
 		}
 		else if (m_currentFaceNormal.x == 1)
 		{

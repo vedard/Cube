@@ -79,6 +79,7 @@ void Model3d::LoadOBJ(std::string ModelPath, std::string TexPath)
 			}
 			m_numFace++;
 
+
 		}
 	}
 
