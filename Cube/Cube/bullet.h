@@ -32,7 +32,8 @@ private:
 	Vector3<float> m_LastPos; //Use to check collision (ray system)
 	Vector3<float> m_vitesse;
 	Vector3<float> directionVector;
-
+	float m_HorizontalRot;
+	float m_VerticalRot;
 
 	bool m_isActive;
 

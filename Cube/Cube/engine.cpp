@@ -192,10 +192,11 @@ void Engine::Render(float elapsedTime)
 
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
-
+	gameTime += elapsedTime;
 	GetBlocAtCursor();
 
-	gameTime += elapsedTime;
+	//Chunk du joueur
+	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
 
 	//Spawn des monstre aleatoirement
 	if ((int)(gameTime * 100) % 1000 == 0)
@@ -271,6 +272,8 @@ void Engine::Render(float elapsedTime)
 		for (int i = 0; i < MAX_COW; i++)
 			m_cow[i].Move(m_world);
 
+		
+
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -289,7 +292,7 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyRotation();
 	m_player.ApplyTranslation();
 
-
+	
 
 	//Activation des shaders
 	m_shader01.Use();
@@ -336,18 +339,6 @@ void Engine::Render(float elapsedTime)
 		glPopMatrix();
 	}
 
-
-
-	//Chunk du joueur
-	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
-
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
-
-	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
-
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
 	//Draw Monstres
@@ -365,6 +356,13 @@ void Engine::Render(float elapsedTime)
 			m_player.GetPosition().z,
 			m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
 	
+
+	//m_world.InitChunks(playerPos.x, playerPos.z);
+	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+	t.detach();
+
+	//Update les chunk autour du joueur si il sont dirty
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
 	//Draw Chunks
 	m_textureAtlas.Bind();
@@ -812,29 +810,6 @@ void Engine::DrawHud() const
 
 
 	glEnable(GL_TEXTURE_2D);
-
-	// Affichage du Gun
-	/*if (m_player.GetWeapon() != W_PISTOL)
-	{
-
-	m_textureGun[m_player.GetWeapon()].Bind();
-	static const int gunSize = 270;
-	glLoadIdentity();
-	glTranslated(Width() / 2 - gunSize / 2, 0, 0);
-
-	glColor3f(1.f, 1.f, 1.f);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2i(gunSize, gunSize);
-	glTexCoord2f(1, 0);
-	glVertex2i(0, gunSize);
-	glTexCoord2f(1, 1);
-	glVertex2i(0, 0);
-	glTexCoord2f(0, 1);
-	glVertex2i(gunSize, 0);
-	glEnd();
-	}*/
-
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);

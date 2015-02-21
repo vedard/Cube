@@ -32,7 +32,9 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 				m_app.close();
 				break;
 			case sf::Event::Resized:
-				glViewport(0, 0, Event.size.width, Event.size.height);
+				DeInit();
+				InitWindow(Event.size.width, Event.size.height);
+				Init();
 				break;
 			case sf::Event::KeyPressed:
 				KeyPressEvent(Event.key.code);
@@ -105,11 +107,11 @@ int OpenglContext::GetMaxFps() const
 
 void OpenglContext::SetFullscreen(bool fullscreen)
 {
-	if (m_fullscreen == fullscreen)
-		return;
+	//if (m_fullscreen == fullscreen)
+		//return;
 
-	m_fullscreen = !m_fullscreen;
-
+	//m_fullscreen = !m_fullscreen;
+	m_app.setPosition(sf::Vector2i(0,0));
 	DeInit();
 	InitWindow(Width(), Height());
 	Init();

@@ -5,9 +5,9 @@ Bullet::Bullet() : m_LastPos(0, 0, 0)
 {
 	m_damage = 50;
 	m_isActive = false;
-	m_vitesse.x = 20;
-	m_vitesse.y = 20;
-	m_vitesse.z = 20;
+	m_vitesse.x = 16;
+	m_vitesse.y = 16;
+	m_vitesse.z = 16;
 	m_distance = 0;
 
 
@@ -95,42 +95,46 @@ void Bullet::Draw() const
 	if (m_isActive)
 	{
 
-		float width = 0.20;
+		float width = 1.0;
+		float height = 0.07;
+		float depth = 0.07;
 
 		glPushMatrix();
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
+		glRotatef(-m_HorizontalRot, 0.f, 1.f, 0.f);
+		glRotatef(-m_VerticalRot, 1.f, 0.f, 0.f);
 		glColor3f(0.6f, 0.6f, 0.f);
 
 		glBegin(GL_QUADS);
-		glVertex3f(-width / 2, 0, -width / 2);
-		glVertex3f(-width / 2, width, -width / 2);
-		glVertex3f(width / 2, width, -width / 2);
-		glVertex3f(width / 2, 0, -width / 2);
+		glVertex3f(-depth / 2, 0, -width / 2);
+		glVertex3f(-depth / 2, height, -width / 2);
+		glVertex3f(depth / 2, height, -width / 2);
+		glVertex3f(depth / 2, 0, -width / 2);
 
-		glVertex3f(width / 2, width, -width / 2);
-		glVertex3f(width / 2, width, width / 2);
-		glVertex3f(width / 2, 0, width / 2);
-		glVertex3f(width / 2, 0, -width / 2);
+		glVertex3f(depth / 2, height, -width / 2);
+		glVertex3f(depth / 2, height, width / 2);
+		glVertex3f(depth / 2, 0, width / 2);
+		glVertex3f(depth / 2, 0, -width / 2);
 
-		glVertex3f(-width / 2, 0, width / 2);
-		glVertex3f(width / 2, 0, width / 2);
-		glVertex3f(width / 2, width, width / 2);
-		glVertex3f(-width / 2, width, width / 2);
+		glVertex3f(-depth / 2, 0, width / 2);
+		glVertex3f(depth / 2, 0, width / 2);
+		glVertex3f(depth / 2, height, width / 2);
+		glVertex3f(-depth / 2, height, width / 2);
 
-		glVertex3f(-width / 2, width, width / 2);
-		glVertex3f(-width / 2, width, -width / 2);
-		glVertex3f(-width / 2, 0, -width / 2);
-		glVertex3f(-width / 2, 0, width / 2);
+		glVertex3f(-depth / 2, height, width / 2);
+		glVertex3f(-depth / 2, height, -width / 2);
+		glVertex3f(-depth / 2, 0, -width / 2);
+		glVertex3f(-depth / 2, 0, width / 2);
 
-		glVertex3f(-width / 2, width, width / 2);
-		glVertex3f(width / 2, width, width / 2);
-		glVertex3f(width / 2, width, -width / 2);
-		glVertex3f(-width / 2, width, -width / 2);
+		glVertex3f(-depth / 2, height, width / 2);
+		glVertex3f(depth / 2, height, width / 2);
+		glVertex3f(depth / 2, height, -width / 2);
+		glVertex3f(-depth / 2, height, -width / 2);
 
-		glVertex3f(-width / 2, 0, width / 2);
-		glVertex3f(-width / 2, 0, -width / 2);
-		glVertex3f(width / 2, 0, -width / 2);
-		glVertex3f(width / 2, 0, width / 2);
+		glVertex3f(-depth / 2, 0, width / 2);
+		glVertex3f(-depth / 2, 0, -width / 2);
+		glVertex3f(depth / 2, 0, -width / 2);
+		glVertex3f(depth / 2, 0, width / 2);
 		glEnd();
 
 		glPopMatrix();
@@ -150,6 +154,8 @@ void Bullet::Init(float x, float y, float z, float rotationVertical, float rotat
 	directionVector.y *= m_vitesse.y;
 	directionVector.x *= m_vitesse.x;
 	directionVector.z *= m_vitesse.z;
+	m_HorizontalRot = rotationHorizontal;
+	m_VerticalRot = rotationVertical;
 	m_distance = 0;
 	m_isActive = true;
 }
