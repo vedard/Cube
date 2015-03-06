@@ -58,7 +58,7 @@ bool Bullet::CheckCollision(Character &character)
 				&& m_LastPos.z + directionVector.z / nbrIteration * i < character.GetPosition().z + character.GetDimension().z / 2)
 			{
 
-				//f(x) = -1 * 1.04 ^ (x + 10) + 50
+				//f(x) = -1 * 1.02 ^ (x + 10) + 50
 				character.GetDamage(-1 * pow(1.04, m_distance + 10) + m_damage);
 				m_isActive = false;
 				return true;

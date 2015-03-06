@@ -10,8 +10,6 @@ void main()
     texel.rgb *= light.rgb * 0.9;
 	texel.a *= light.a * 0.9;
 
-	
-
 	if(underwater)
 	{
 		texel.r -= 0.20;

@@ -238,15 +238,12 @@ void Engine::Render(float elapsedTime)
 		//Tirer
 		if (m_mouseButton[1] && m_player.GetWeapon() != W_BLOCK)
 		{
-
 			playerGun[m_player.GetWeapon() - 1].Shoot(m_player.GetPosition().x, m_player.GetPosition().y + m_player.GetDimension().y, m_player.GetPosition().z, m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
 			(playerGun[m_player.GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
-
 		}
 
-		for (int k = 0; k < 3; k++)
-		{
-			//Update les balles
+		//Update les balles
+		for (int k = 0; k < 3; k++)				
 			for (int i = 0; i < MAX_BULLET; i++)
 			{
 				playerGun[k].GetBullets()[i].Update();
@@ -261,7 +258,7 @@ void Engine::Render(float elapsedTime)
 				playerGun[k].GetBullets()[i].CheckCollision(m_world);
 
 			}
-		}
+		
 		
 
 		//Update les monstres
@@ -271,9 +268,6 @@ void Engine::Render(float elapsedTime)
 		//Update les monstres
 		for (int i = 0; i < MAX_COW; i++)
 			m_cow[i].Move(m_world);
-
-		
-
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -441,6 +435,11 @@ void Engine::Render(float elapsedTime)
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
+			
+
+		
+	
 }
 
 void Engine::KeyPressEvent(unsigned char key)
