@@ -79,3 +79,24 @@ void Tool::CheckGLError(const char* file, int line)
 		exit(1);
 	}
 }
+
+std::string Tool::VectorToString(const Vector3<float>& v)
+{
+	std::stringstream ss;
+
+	ss << v.x << " " << v.y << " " << v.z;
+
+	return ss.str();
+}
+
+Vector3<float> Tool::StringToVector(const std::string& s)
+{
+	Vector3<float> v;
+
+	std::stringstream ss(s);
+
+	ss >> v.x >> v.y >> v.z;
+
+	return v;
+
+}

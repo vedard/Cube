@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include "vector3.h"
 
 // TODO ne pas oublier de ne pas definir DEBUGMODE en release
 #ifndef DEBUGMODE
@@ -23,6 +24,8 @@ public:
 	static void CheckTypes();
 	static bool LoadTextFile(const std::string& filename, std::string& buffer);
 	static void CheckGLError(const char* file, int line);
+	static std::string VectorToString(const Vector3<float>& v);
+	static Vector3<float> StringToVector(const std::string& s);
 
 	template <class T>
 	static bool  EqualWithEpsilon(const T& v1, const T& v2, T epsilon = T(0.0001))

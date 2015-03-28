@@ -1,22 +1,41 @@
 #ifndef DEFINE_H__
 #define DEFINE_H__
 
+#define PLATFORM_WINDOWS  1
+#define PLATFORM_MAC      2
+#define PLATFORM_UNIX     3
+
+#if defined(_WIN32)
+#define PLATFORM PLATFORM_WINDOWS
+#elif defined(__APPLE__)
+#define PLATFORM PLATFORM_MAC
+#else
+#define PLATFORM PLATFORM_UNIX
+#endif
+
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 
+#if PLATFORM == PLATFORM_WINDOWS
 
-
-#ifdef _WIN32
+#include <winsock2.h>
 #include <windows.h>
 
 #include <gl/GL.h>
 #include <gl/GLU.h>
+
+#elif PLATFORM == PLATFORM_MAC || 
+PLATFORM == PLATFORM_UNIX
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <GL/glut.h>
+
 #endif
 
-#ifndef _WIN32
-#include <GL/glut.h>
-#endif
+
 
 typedef unsigned char uint8;
 typedef unsigned short uint16;
@@ -35,17 +54,14 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 20
-#define MAX_MONSTER 10
-#define MAX_COW 25
+#define MAX_MONSTER 0
+#define MAX_COW 0
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
-
-
-
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 

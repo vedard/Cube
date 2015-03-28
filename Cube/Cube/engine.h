@@ -18,6 +18,8 @@
 #include "vector3.h"
 #include "gun.h"
 #include "sound.h"
+#include "networkManager.h"
+#include "playerActor.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -53,6 +55,7 @@ private:
 	bool m_wireframe;
 
 	Player m_player;
+	PlayerActor m_playerActor;
 	Monster* m_monster;
 	Animal* m_cow;
 	
@@ -88,6 +91,9 @@ private:
 
 	//Gun 
 	Gun * playerGun;
+
+	//NetworkManager
+	NetworkManager m_Netctl;
 
 };
 

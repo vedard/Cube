@@ -84,7 +84,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glew32.lib;sfml-system.lib;sfml-audio.lib;sfml-window.lib;sfml-graphics.lib;GlU32.Lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;glew32.lib;sfml-system.lib;sfml-audio.lib;sfml-window.lib;sfml-graphics.lib;GlU32.Lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -100,8 +100,10 @@
     <ClCompile Include="character.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
+    <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="playerActor.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -124,8 +126,10 @@
     <ClInclude Include="gun.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
+    <ClInclude Include="networkManager.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="playerActor.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="sound.h" />
@@ -134,6 +138,9 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cube.conf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

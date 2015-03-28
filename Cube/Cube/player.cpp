@@ -165,8 +165,6 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_pos.y += m_vitesse.y;
 			m_vitesse.y = 0;
 		}
-		/*else
-			m_isInAir = true;*/
 
 		//Acceleration
 		m_vitesse.y += (m_footUnderwater) ? 0.002f : 0.013f;

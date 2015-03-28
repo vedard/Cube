@@ -259,8 +259,6 @@ void Engine::Render(float elapsedTime)
 
 			}
 		
-		
-
 		//Update les monstres
 		for (int i = 0; i < MAX_MONSTER; i++)
 			m_monster[i].Move(m_world);
@@ -268,6 +266,20 @@ void Engine::Render(float elapsedTime)
 		//Update les monstres
 		for (int i = 0; i < MAX_COW; i++)
 			m_cow[i].Move(m_world);
+
+		//Net
+		static int sdf = 0;
+		if (sdf++ % 3 == 0)
+		{
+			m_Netctl.Send("p " + Tool::VectorToString(m_player.GetPosition()));
+			m_Netctl.Send("h " + std::to_string(m_player.GetHorizontalRotation()));	
+		}
+
+		std::string aaa = m_Netctl.Receive();
+		if (aaa[0] == 'p')
+			m_playerActor.SetPos(Tool::StringToVector(aaa.substr(2)));
+		else if (aaa[0] == 'h')
+			m_playerActor.SetRot(atof(aaa.substr(2).c_str()));
 
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
@@ -341,6 +353,8 @@ void Engine::Render(float elapsedTime)
 
 	for (int i = 0; i < MAX_COW; i++)
 		m_cow[i].Draw(m_modelCow);
+
+	m_playerActor.Draw(m_modelRaptor);
 
 	//Draw guns
 	if (m_player.GetWeapon() != W_BLOCK)
@@ -435,11 +449,6 @@ void Engine::Render(float elapsedTime)
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-
-			
-
-		
-	
 }
 
 void Engine::KeyPressEvent(unsigned char key)
