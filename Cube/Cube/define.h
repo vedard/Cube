@@ -21,17 +21,18 @@
 
 #include <winsock2.h>
 #include <windows.h>
+#include <WS2tcpip.h>
 
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
-#elif PLATFORM == PLATFORM_MAC || 
-PLATFORM == PLATFORM_UNIX
+#elif PLATFORM == PLATFORM_MAC || PLATFORM == PLATFORM_UNIX
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <GL/glut.h>
+#include <unistd.h>
 
 #endif
 

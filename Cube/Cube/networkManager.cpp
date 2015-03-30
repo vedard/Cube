@@ -47,12 +47,12 @@ void NetworkManager::Send(const std::string &packet)
 {
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(6666);
-	addr.sin_addr.S_un.S_un_b.s_b1 = 127;
-	addr.sin_addr.S_un.S_un_b.s_b2 = 0;
-	addr.sin_addr.S_un.S_un_b.s_b3 = 0;
-	addr.sin_addr.S_un.S_un_b.s_b4 = 1;
-
+	addr.sin_port = htons(6665);
+	addr.sin_addr.s_addr = htonl(
+        ( (unsigned long) 127 << 24 ) |
+        ( (unsigned long) 0 << 16 ) |
+        ( (unsigned long) 0 <<  8 ) |
+        ( (unsigned long) 1 ));
 	sendto(m_socketHandle, packet.c_str(), packet.length(), 0, (const sockaddr*)&addr, sizeof(addr));
 }
 
@@ -61,14 +61,14 @@ std::string NetworkManager::Receive()
 	sockaddr_in client;
 	int addrLen = sizeof(client);
 	char buffer[2048];
-	int count = recvfrom(m_socketHandle, buffer, sizeof(buffer) - 1, 0, (sockaddr*)&client, (int*)&addrLen);
+	int count = recvfrom(m_socketHandle, buffer, sizeof(buffer) - 1, 0, (sockaddr*)&client, (socklen_t*)&addrLen);
 
 	if (count < 0)	
 		return "";
 	
 	buffer[count] = '\0';
 
-	//std::cout << "Recu de "<< client.sin_addr.S_un.S_addr <<": " << buffer << std::endl;
+	//std::cout << "Recu de "<< client.sin_addr.s_addr <<": " << buffer << std::endl;
 	return std::string(buffer);
 }
 
@@ -92,7 +92,7 @@ bool NetworkManager::InitSocket()
 	WSADATA WsaData;
 	return WSAStartup(MAKEWORD(2, 2), &WsaData) == NO_ERROR;
 
-#elif
+#elif PLATFORM == PLATFORM_MAC || PLATFORM == PLATFORM_UNIX
 	return true;
 #endif
 
