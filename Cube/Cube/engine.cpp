@@ -275,17 +275,31 @@ void Engine::Render(float elapsedTime)
 			m_Netctl.Send("h " + std::to_string(m_player.GetHorizontalRotation()));	
 		}
 
-		std::string aaa = m_Netctl.Receive();
-		if (aaa[0] == 'p')
-			m_playerActor.SetPos(Tool::StringToVector(aaa.substr(2)));
-		else if (aaa[0] == 'h')
-			m_playerActor.SetRot(atof(aaa.substr(2).c_str()));
-
+		std::string packetBuffer = m_Netctl.Receive();
+		if (packetBuffer[0] == 'p')
+			m_playerActor.SetPos(Tool::StringToVector(packetBuffer.substr(2)));
+		else if (packetBuffer[0] == 'h')
+			m_playerActor.SetRot(atof(packetBuffer.substr(2).c_str()));
+		else if (packetBuffer[0] == 'm')
+		{
+			std::cout << packetBuffer << std::endl;
+			std::stringstream ss(packetBuffer);
+			char a;
+			int cx, cz, bx, by, bz;
+			int bt;
+			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
+			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
+			m_world.ChunkAt(cx, cz)->SetBlock(bx, by, bz,bt);
+		}
+		
+		
+		//Time control
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
 
+	//Clear 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(1.f, 1.f, 1.f);
 
@@ -299,7 +313,6 @@ void Engine::Render(float elapsedTime)
 	m_player.ApplyTranslation();
 
 	
-
 	//Activation des shaders
 	m_shader01.Use();
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
@@ -623,7 +636,13 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		{
 			Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
 			m_world.ChunkAt(chunkPos.x, chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-
+			m_Netctl.Send("m " + 
+				std::to_string(chunkPos.x) + 
+				" " + std::to_string(chunkPos.z) + 
+				" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) + 
+				" " + std::to_string(m_currentBlock.y) + 
+				" " + std::to_string(m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)) +
+				" " + "0");
 		}
 
 		//Right Click
@@ -641,6 +660,16 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				//Si ya collision on efface le block
 				if (m_player.CheckCollision(m_world))
 					m_world.ChunkAt(chunkPos.x, chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+				else
+				{
+					m_Netctl.Send("m " +
+						std::to_string(chunkPos.x) +
+						" " + std::to_string(chunkPos.z) +
+						" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
+						" " + std::to_string(newBlocPos.y) +
+						" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
+						" " + std::to_string(m_player.GetBlock()));
+				}
 			}
 
 

@@ -22,7 +22,7 @@ NetworkManager::NetworkManager()
 	//Address
 	m_address.sin_family = AF_INET;
 	m_address.sin_addr.s_addr = htonl(INADDR_ANY);
-	m_address.sin_port = htons(6667);
+	m_address.sin_port = htons(6666);
 
 	//Bind
 	if (bind(m_socketHandle, (const sockaddr*)&m_address, sizeof(sockaddr_in)) < 0)
@@ -47,7 +47,7 @@ void NetworkManager::Send(const std::string &packet)
 {
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(6665);
+	addr.sin_port = htons(6667);
 	addr.sin_addr.s_addr = htonl(
         ( (unsigned long) 127 << 24 ) |
         ( (unsigned long) 0 << 16 ) |
