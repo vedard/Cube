@@ -1,21 +1,17 @@
-* Cube
+# Cube
 Minecraft Clone in c++
 
+# Screenshot
+![Screenshot](http://i.imgur.com/fc7oHRX.png)	
 
-* Compilation
- - $ pacman -S sfml devil
- - $ make 
- - $ ./Cube
-
-
-* Controls
+# Controls
 
 |-------------------+---------------|
 | Moving            | w / a / s / d |
 | Delete block      | Left Click    |
 | Add block         | Right Click   |
 | Select a block    | Roullette     |
-| Sneaking          | Ctr           |
+| Sneaking          | Ctrl          |
 | Run               | Shift         |
 | Jump              | space         |
 | Fly / NoClip Mode | v             |
@@ -30,14 +26,5 @@ Minecraft Clone in c++
 |-------------------+---------------|
   
 
-* Bugs
-- spwan is buggy
-
-
-* Todo
-- Real infinite world 
-- Adding light
-- Adding IA
-- Collect of ressource (wood, mineral)
-- Crafting
-- Gravity for liquid
+# Todo
+- Redo everything, code is a mess
