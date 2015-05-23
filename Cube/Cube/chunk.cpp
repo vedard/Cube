@@ -4,7 +4,7 @@
 Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_iscreated(false), m_isDirty(true), m_chunkMesh(), m_transparentMesh(), m_position(0, 0, 0), m_save(false)
 {
 	m_blocks.Reset(BTYPE_AIR);
-
+	m_defaultBlock = BTYPE_AIR;
 
 }
 
@@ -96,7 +96,7 @@ const BlockType& Chunk::GetBlock(int x, int y, int z) const
 		return m_positiveZ->GetBlock(x, y, 0);
 
 	else
-		return BTYPE_AIR;
+		return m_defaultBlock;
 }
 
 void Chunk::SetPosition(int x, int y, int z)

@@ -32,9 +32,9 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 				m_app.close();
 				break;
 			case sf::Event::Resized:
-				DeInit();
-				InitWindow(Event.size.width, Event.size.height);
-				Init();
+//				DeInit();
+//				InitWindow(Event.size.width, Event.size.height);
+//				Init();
 				break;
 			case sf::Event::KeyPressed:
 				KeyPressEvent(Event.key.code);
@@ -107,10 +107,10 @@ int OpenglContext::GetMaxFps() const
 
 void OpenglContext::SetFullscreen(bool fullscreen)
 {
-	//if (m_fullscreen == fullscreen)
-		//return;
+	if (m_fullscreen == fullscreen)
+		return;
 
-	//m_fullscreen = !m_fullscreen;
+	m_fullscreen = !m_fullscreen;
 	m_app.setPosition(sf::Vector2i(0,0));
 	DeInit();
 	InitWindow(Width(), Height());
@@ -144,7 +144,6 @@ void OpenglContext::ShowCrossCursor() const
 
 void OpenglContext::InitWindow(int width, int height)
 {
-	
 	
 	Array2d<std::string> setting(10, 2);
 	setting.Reset("null");
@@ -223,7 +222,7 @@ void OpenglContext::InitWindow(int width, int height)
 		m_mouse_sensibility = atof(setting.Get(9, 1).c_str());
 
 	//Create windows
-	m_app.create(sf::VideoMode((width != 0) ? width : 800, (height != 0) ? height : 600, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Resize | sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));
+	m_app.create(sf::VideoMode((width != 0) ? width : 800, (height != 0) ? height : 600, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));
 	m_app.setVerticalSyncEnabled(vsync);
 }
 

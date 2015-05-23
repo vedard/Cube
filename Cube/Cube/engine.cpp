@@ -139,8 +139,8 @@ void Engine::LoadResource()
 
 	//Model 3d
 
-	m_modelCow.LoadOBJ(MODEL_PATH "cow.obj", TEXTURE_PATH "cow.png");
-	m_modelRaptor.LoadOBJ(MODEL_PATH "creeper.obj", TEXTURE_PATH "creeper.png");
+	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
 
 	//Gun
@@ -381,6 +381,7 @@ void Engine::Render(float elapsedTime)
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
 	t.detach();
+	
 
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
@@ -477,7 +478,6 @@ void Engine::KeyPressEvent(unsigned char key)
 	else if (m_keyboard[94])
 	{
 		SetFullscreen(!IsFullscreen());
-
 	}
 	//V -> toogle noclip mode
 	else if (m_keyboard[sf::Keyboard::V])

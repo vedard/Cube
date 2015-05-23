@@ -50,6 +50,7 @@ private:
 	ChunkMesh m_chunkMesh;
 	ChunkMesh m_transparentMesh;
 	Vector3<float> m_position;
+	BlockType m_defaultBlock; 				//On retourne ce block quand ya une erreur
 
 
 
