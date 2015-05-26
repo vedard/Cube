@@ -76,10 +76,6 @@ void Engine::Init()
 
 	CenterMouse();
 	HideCursor();
-
-
-
-
 }
 
 void Engine::DeInit()
@@ -165,7 +161,6 @@ void Engine::LoadResource()
 
 	// -- Player
 	m_player.SetName("Player 1");
-	m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 
 
 	//  -- Monster
@@ -189,6 +184,16 @@ void Engine::UnloadResource()
 
 void Engine::Render(float elapsedTime)
 {
+
+	//Clear 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if(!m_player.GetisAlive())
+	{
+		m_wireframe = false;	
+		DrawDeathScreen();
+		return;
+	}
 
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
@@ -299,8 +304,6 @@ void Engine::Render(float elapsedTime)
 		loops++;
 	}
 
-	//Clear 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(1.f, 1.f, 1.f);
 
 	// Transformations initiales
@@ -476,9 +479,8 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[94])
-	{
 		SetFullscreen(!IsFullscreen());
-	}
+	
 	//V -> toogle noclip mode
 	else if (m_keyboard[sf::Keyboard::V])
 		m_player.ToggleNoClip();
@@ -588,6 +590,10 @@ void Engine::KeyPressEvent(unsigned char key)
 		t.detach();
 		//m_player.Spawn(m_world);
 	}
+
+	if(!m_player.GetisAlive())
+		if(m_keyboard[sf::Keyboard::Return])
+			m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
@@ -854,6 +860,47 @@ void Engine::DrawHud() const
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+}
+void Engine::DrawDeathScreen() const
+{
+	
+	glEnable(GL_TEXTURE_2D);
+
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_BLEND);
+
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Bind de la texture pour le font
+	m_textureFont.Bind();
+
+	//Text
+	std::ostringstream ss;
+	ss << "You're dead !";
+	PrintText(Width()/2 - (ss.str().length() * 48) / 2, Height()/2, 64, ss.str());
+	
+	ss.str("");
+	ss << "Press enter to rise from your ashes";
+	PrintText(Width()/2 - (ss.str().length() * 24) / 2, Height()/2 - 96, 32, ss.str());
+
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
 }
 
 void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const

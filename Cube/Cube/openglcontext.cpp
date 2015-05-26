@@ -32,9 +32,9 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 				m_app.close();
 				break;
 			case sf::Event::Resized:
-//				DeInit();
-//				InitWindow(Event.size.width, Event.size.height);
-//				Init();
+				//DeInit();
+				//InitWindow(Event.size.width, Event.size.height);
+				//Init();
 				break;
 			case sf::Event::KeyPressed:
 				KeyPressEvent(Event.key.code);
@@ -144,7 +144,29 @@ void OpenglContext::ShowCrossCursor() const
 
 void OpenglContext::InitWindow(int width, int height)
 {
-	
+	m_width = width;
+	m_height = height;
+
+	//Lis le fichier de configuration si il na pas deja ete lu
+	static bool isConfigFileReaded = false;
+	if(!isConfigFileReaded)
+	{
+		isConfigFileReaded = true;
+		ReadConfig("Cube.conf");
+	}
+
+	//Create windows
+	m_app.create(sf::VideoMode((m_width != 0) ? m_width : 800, (m_height != 0) ? m_height : 600, 32), 
+			m_title.c_str(), 
+			m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Close), 
+			sf::ContextSettings(32, 8, m_AntiAliasing));
+	m_app.setVerticalSyncEnabled(m_vsync);
+	HideCursor();
+}
+
+void OpenglContext::ReadConfig(const std::string& filename)
+{
+
 	Array2d<std::string> setting(10, 2);
 	setting.Reset("null");
 	setting.Get(0, 0) = "width";
@@ -158,19 +180,21 @@ void OpenglContext::InitWindow(int width, int height)
 	setting.Get(8, 0) = "cross_color_b";
 	setting.Get(9, 0) = "mouse_sensibility";
 	
-	int AntiAliasing = 0;
-	bool vsync = true;
+	m_width = 0;
+	m_height = 0;
+	m_AntiAliasing = 0;
+	m_vsync = true;
 	m_renderDistance = 5;
 	m_mouse_sensibility = 0.2f;
 	m_cross_color_r = 0.f;
 	m_cross_color_g = 0.f;
 	m_cross_color_b = 0.f;
 
-	std::cout << "Reading " << "Cube.conf" << "..." << std::endl;
+	std::cout << "Reading " << filename << "..." << std::endl;
 
 	//Open file
 	std::ifstream file;
-	file.open("Cube.conf");
+	file.open(filename);
 
 	//Read All file
 	std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -192,13 +216,13 @@ void OpenglContext::InitWindow(int width, int height)
 	std::string a = setting.Get(2, 1);
 	//Convert string into int
 	if (setting.Get(0, 1) != "null")
-		width = (width == 0) ? atoi(setting.Get(0, 1).c_str()) : width;
+		m_width =  atoi(setting.Get(0, 1).c_str());
 
 	if (setting.Get(1, 1) != "null")
-		height = (height == 0) ? atoi(setting.Get(1, 1).c_str()) : height;
+		m_height =  atoi(setting.Get(1, 1).c_str()); 
 
 	if (setting.Get(2, 1) != "null")
-		AntiAliasing = atoi(setting.Get(2, 1).c_str());
+		m_AntiAliasing = atoi(setting.Get(2, 1).c_str());
 
 	if (setting.Get(3, 1) == "true" || setting.Get(3, 1) == "1")
 		m_fullscreen = true;
@@ -206,9 +230,9 @@ void OpenglContext::InitWindow(int width, int height)
 		m_fullscreen = false;
 
 	if (setting.Get(4, 1) == "true" || setting.Get(4, 1) == "1")
-		vsync = true;
+		m_vsync = true;
 	else
-		vsync = false;
+		m_vsync = false;
 
 	if (setting.Get(5, 1) != "null")
 		m_renderDistance = atoi(setting.Get(5, 1).c_str());
@@ -221,9 +245,6 @@ void OpenglContext::InitWindow(int width, int height)
 	if (setting.Get(9, 1) != "null")
 		m_mouse_sensibility = atof(setting.Get(9, 1).c_str());
 
-	//Create windows
-	m_app.create(sf::VideoMode((width != 0) ? width : 800, (height != 0) ? height : 600, 32), m_title.c_str(), m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Close), sf::ContextSettings(32, 8, AntiAliasing));
-	m_app.setVerticalSyncEnabled(vsync);
 }
 
 OpenglContext::MOUSE_BUTTON OpenglContext::ConvertMouseButton(sf::Mouse::Button button) const

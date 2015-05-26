@@ -62,6 +62,7 @@ protected:
 private:
     MOUSE_BUTTON ConvertMouseButton(sf::Mouse::Button button) const;
 	void InitWindow(int width = 0, int height = 0);
+	void ReadConfig(const std::string& filename);
 
 
 protected:
@@ -72,8 +73,8 @@ protected:
 
 private:
     int			m_maxFps;
-    bool		m_fullscreen;
-	
+    bool		m_fullscreen, m_vsync;
+	int 		m_width, m_height, m_AntiAliasing;	
     std::string m_title;
 	float m_lastFrameTime;
 

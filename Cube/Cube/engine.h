@@ -47,6 +47,7 @@ public:
 private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawHud() const;
+	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);

@@ -19,6 +19,8 @@ m_HeadShake(0)
 	m_health = 100;
 	m_Armor = 1.3;
 	m_weapon = W_BLOCK;
+	m_isAlive = false;
+	
 }
 
 Player::~Player()
@@ -169,12 +171,6 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		//Acceleration
 		m_vitesse.y += (m_footUnderwater) ? 0.002f : 0.013f;
 
-	}
-
-	//Si le player est mort
-	if (m_health <= 0)
-	{
-		Spawn(world, WORLD_SIZE*CHUNK_SIZE_X / 2, (WORLD_SIZE*CHUNK_SIZE_X / 2) + 3);
 	}
 
 	//Si le player est dans l'eau
