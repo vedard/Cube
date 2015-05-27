@@ -198,7 +198,6 @@ void Engine::Render(float elapsedTime)
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 	gameTime += elapsedTime;
-	GetBlocAtCursor();
 
 	//Chunk du joueur
 	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
@@ -459,6 +458,8 @@ void Engine::Render(float elapsedTime)
 		glPopMatrix();
 	}
 
+	GetBlocAtCursor();
+	
 	//Draw le hui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
