@@ -107,13 +107,11 @@ int OpenglContext::GetMaxFps() const
 
 void OpenglContext::SetFullscreen(bool fullscreen)
 {
-	if (m_fullscreen == fullscreen)
-		return;
-
-	m_fullscreen = !m_fullscreen;
+	ShowCursor();
+	m_fullscreen = fullscreen;
 	m_app.setPosition(sf::Vector2i(0,0));
 	DeInit();
-	InitWindow(Width(), Height());
+	InitWindow();
 	Init();
 }
 
@@ -155,13 +153,23 @@ void OpenglContext::InitWindow(int width, int height)
 		ReadConfig("Cube.conf");
 	}
 
+
+
+	std::cout << sf::VideoMode::getDesktopMode().width << std::endl; 	
+
+
 	//Create windows
-	m_app.create(sf::VideoMode((m_width != 0) ? m_width : 800, (m_height != 0) ? m_height : 600, 32), 
+	if(m_fullscreen)
+		m_app.create(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), 
 			m_title.c_str(), 
-			m_fullscreen ? sf::Style::Fullscreen : (sf::Style::Close), 
+			sf::Style::Fullscreen , 
+			sf::ContextSettings(32, 8, m_AntiAliasing));
+	else
+		m_app.create(sf::VideoMode((m_width != 0) ? m_width : 800, (m_height != 0) ? m_height : 600, 32), 
+			m_title.c_str(), 
+			sf::Style::Close, 
 			sf::ContextSettings(32, 8, m_AntiAliasing));
 	m_app.setVerticalSyncEnabled(m_vsync);
-	HideCursor();
 }
 
 void OpenglContext::ReadConfig(const std::string& filename)
