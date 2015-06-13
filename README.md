@@ -37,7 +37,7 @@ Minecraft Clone in c++
 	- LShift-w      
 - Create Random Map	 
 	- LShift-r      
-- Creer Flat Map   	 
+- Create Flat Map   	 
 	- LShift-f      
 - Delete Cache     	
 	- LShift-f5     
