@@ -3,6 +3,7 @@
 #include "array2d.h"
 #include "character.h"
 #include "gun.h"
+#include "Inventory.h"
 
 
 class Player : public Character
@@ -50,6 +51,8 @@ private:
 	int m_weapon;			// current weapon
 
 	float m_HeadShake;		// Shake la camera a chaque pas
+
+	Inventory m_inventory;	//Inventaire du joueur
 };
 
 #endif
