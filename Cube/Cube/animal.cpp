@@ -3,13 +3,13 @@
 
 Animal::Animal()
 {
-	m_dimension = Vector3<float>(1.5, 2.3, 2.4);
-	m_AttackRange = 5.2;
-	m_AttackSpeed = 1.1;
+	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
+	m_AttackRange = (int)5.2;
+	m_AttackSpeed = 1.1f;
 	m_AttackDamage = 10;
 	m_VerticalRot = 0;
-	m_Armor = 0.5;
-	m_HorizontalRot = rand() % 180;
+	m_Armor = 0.5f;
+	m_HorizontalRot = (float)(rand() % 180);
 	m_isAlive = false;
 	m_timeNextTarget = 3;
 
@@ -23,8 +23,8 @@ void Animal::Move(World &world)
 {
 	if (m_isAlive)
 	{
-		m_vitesse.x = 0.05;
-		m_vitesse.z = 0.05;
+		m_vitesse.x = 0.05f;
+		m_vitesse.z = 0.05f;
 
 		if (m_ClockTarget.getElapsedTime().asSeconds() < m_timeNextTarget)
 		{

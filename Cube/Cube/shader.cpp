@@ -120,7 +120,7 @@ bool Shader::CheckShaderError(GLenum shader, bool verbose)
 
 		std::cout << infoLog << std::endl;
 		delete[] infoLog;
-		return false;
+		return 0;
 	}
 
 	return compileOk;
