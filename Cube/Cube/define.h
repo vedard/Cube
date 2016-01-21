@@ -64,7 +64,7 @@ typedef long long int64;
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
 
-#define INVENTORY_SIZE 15
+#define INVENTORY_SIZE 15		//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3	//If changed, modification must be made into the render and the keybinding to apply the changes
 
 
