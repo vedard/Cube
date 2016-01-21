@@ -18,7 +18,7 @@ Inventory::~Inventory()
 		m_objetsFast[i] = new Item;
 	}
 
-	delete m_objetsFast;								//freed memory
+	delete[] *m_objetsFast;								//freed memory
 
 	for (size_t i = 0; i < FAST_INVENTORY_SIZE; i++)	//pointed dangling ptr to NULL
 	{
