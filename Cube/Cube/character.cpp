@@ -3,7 +3,7 @@
 
 Character::Character() :
 m_pos(0, 128, 0),
-m_dimension(1.3, 2.2, 0.7),
+m_dimension(1.3f, 2.2f, 0.7f),
 m_health(100),
 m_AttackRange(2),
 m_HorizontalRot(0.f),
@@ -12,7 +12,7 @@ m_vitesse(0, 0, 0),
 m_AttackSpeed(0),
 m_Armor(1),
 m_cooldownAttackTimer(),
-m_AttackDamage(30),
+m_AttackDamage(30.0f),
 m_isAlive(true)
 {
 
@@ -31,9 +31,9 @@ void Character::Spawn(World &world, int x, int z)
 {
 	m_isAlive = true;
 	m_health = 100;
-	m_pos.x = x;
+	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
-	m_pos.z = z;
+	m_pos.z = (float)z;
 
 	while (!CheckCollision(world))
 	{
@@ -41,9 +41,9 @@ void Character::Spawn(World &world, int x, int z)
 
 		if (m_pos.y < -100)
 		{
-			m_pos.x = x;
+			m_pos.x = (float)x;
 			m_pos.y = CHUNK_SIZE_Y;
-			m_pos.z = z;
+			m_pos.z = (float)z;
 			break;
 		}
 	}
@@ -80,9 +80,9 @@ void Character::Move(World &world)
 bool Character::CheckCollision(World &world) const
 {
 
-	int h = ceil(m_dimension.y);
-	int w = ceil(m_dimension.x);
-	int d = ceil(m_dimension.z);
+	int h = (int)ceil(m_dimension.y);
+	int w = (int)ceil(m_dimension.x);
+	int d = (int)ceil(m_dimension.z);
 
 	/*
 		dependament de la grandeur du personnage

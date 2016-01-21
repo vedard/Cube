@@ -101,9 +101,9 @@ const BlockType& Chunk::GetBlock(int x, int y, int z) const
 
 void Chunk::SetPosition(int x, int y, int z)
 {
-	m_position.x = x;
-	m_position.y = y;
-	m_position.z = z;
+	m_position.x = (float)x;
+	m_position.y = (float)y;
+	m_position.z = (float)z;
 }
 
 const Vector3<float> &Chunk::GetPosition() const
@@ -278,7 +278,7 @@ bool& Chunk::GetSave(){
 
 bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const
 {
-	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
+	BlockType faceType = GetBlock((int)(Blockpos.x + face.x), (int)(Blockpos.y + face.y), (int)(Blockpos.z + face.z));
 
 
 	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER) || faceType == BTYPE_LAVA)
@@ -295,7 +295,7 @@ float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float>
 
 	for (int i = 1; true; i++)
 	{
-		BlockType block = GetBlock(Blockpos.x + face.x, Blockpos.y + i, Blockpos.z + face.z);
+		BlockType block = GetBlock((int)(Blockpos.x + face.x), (int)(Blockpos.y + i), (int)(Blockpos.z + face.z));
 		if (block == BTYPE_AIR)
 		{
 			if (Blockpos.y + i > CHUNK_SIZE_Y)

@@ -17,7 +17,7 @@ m_HeadShake(0)
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
 	m_health = 100;
-	m_Armor = 1.3;
+	m_Armor = 1.3f;
 	m_weapon = W_BLOCK;
 	m_isAlive = false;
 	
@@ -46,16 +46,16 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	//Orientation du player en rad
 	float orientationPlayer = m_HorizontalRot * PI / 180;
 	//Multiplicateur de vitesse
-	m_vitesse.x = 0.1;
-	m_vitesse.z = 0.1;
+	m_vitesse.x = 0.1f;
+	m_vitesse.z = 0.1f;
 
 	//Change la vittesse selon l'etat du player
 
 	if (m_noClip)
 	{
-		m_vitesse.x = 1.2;
-		m_vitesse.z = 1.2;
-		m_vitesse.y = 1.2;
+		m_vitesse.x = 1.2f;
+		m_vitesse.z = 1.2f;
+		m_vitesse.y = 1.2f;
 	}
 	else
 	{
@@ -117,7 +117,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		m_HeadShake = 0;
 	}
 	else if (!m_isInAir)
-		m_HeadShake += 2.2 * m_vitesse.x;
+		m_HeadShake += 2.2f * m_vitesse.x;
 
 
 	//Normalize les vecteur
@@ -161,7 +161,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					GetDamage((int)exp(m_vitesse.y * 6));
+					GetDamage(exp(m_vitesse.y * 6));
 			}
 			//annule
 			m_pos.y += m_vitesse.y;
@@ -221,7 +221,7 @@ void Player::ApplyTranslation()
 	//Head shake a chaque pas
 	if (m_vitesse.x != 0 && !m_noClip)
 	{
-		glTranslatef(0.f, m_vitesse.x / 2.2*sin(m_HeadShake), 0.f);
+		glTranslatef(0.f, m_vitesse.x / 2.2f * sin(m_HeadShake), 0.0f);
 
 	}
 

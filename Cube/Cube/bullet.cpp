@@ -42,11 +42,11 @@ bool Bullet::CheckCollision(Character &character)
 	{
 		int nbrIteration = 10;
 		if (character.GetDimension().x <= character.GetDimension().y && character.GetDimension().x <= character.GetDimension().z)
-			nbrIteration = ceil(m_vitesse.x / character.GetDimension().x);
+			nbrIteration = (int)ceil(m_vitesse.x / character.GetDimension().x);
 		if (character.GetDimension().y <= character.GetDimension().x && character.GetDimension().y <= character.GetDimension().z)
-			nbrIteration = ceil(m_vitesse.y / character.GetDimension().y);
+			nbrIteration = (int)ceil(m_vitesse.y / character.GetDimension().y);
 		if (character.GetDimension().z <= character.GetDimension().y && character.GetDimension().z <= character.GetDimension().x)
-			nbrIteration = ceil(m_vitesse.z / character.GetDimension().z);
+			nbrIteration = (int)ceil(m_vitesse.z / character.GetDimension().z);
 
 		for (int i = 0; i < nbrIteration; i++)
 		{
@@ -59,7 +59,7 @@ bool Bullet::CheckCollision(Character &character)
 			{
 
 				//f(x) = -1 * 1.02 ^ (x + 10) + 50
-				character.GetDamage(-1 * pow(1.04, m_distance + 10) + m_damage);
+				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage));
 				m_isActive = false;
 				return true;
 			}
@@ -95,9 +95,9 @@ void Bullet::Draw() const
 	if (m_isActive)
 	{
 
-		float width = 1.0;
-		float height = 0.07;
-		float depth = 0.07;
+		float width = 1.0f;
+		float height = 0.07f;
+		float depth = 0.07f;
 
 		glPushMatrix();
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);
