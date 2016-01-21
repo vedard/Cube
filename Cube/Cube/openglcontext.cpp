@@ -109,7 +109,7 @@ void OpenglContext::SetFullscreen(bool fullscreen)
 {
 	ShowCursor();
 	m_fullscreen = fullscreen;
-	m_app.setPosition(sf::Vector2i(0,0));
+	m_app.setPosition(sf::Vector2i(0, 0));
 	DeInit();
 	InitWindow();
 	Init();
@@ -146,28 +146,24 @@ void OpenglContext::InitWindow(int width, int height)
 	m_height = height;
 
 	//Lis le fichier de configuration si il na pas deja ete lu
-	static bool isConfigFileReaded = false;
-	if(!isConfigFileReaded)
+	static bool isConfigFileRead = false;
+	if (!isConfigFileRead)
 	{
-		isConfigFileReaded = true;
+		isConfigFileRead = true;
 		ReadConfig("Cube.conf");
 	}
 
+	std::cout << sf::VideoMode::getDesktopMode().width << std::endl;
 
-
-	std::cout << sf::VideoMode::getDesktopMode().width << std::endl; 	
-
-
-	//Create windows
-	if(m_fullscreen)
-		m_app.create(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), 
-			m_title.c_str(), 
-			sf::Style::Fullscreen , 
+	if (m_fullscreen)
+		m_app.create(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32),
+			m_title.c_str(),
+			sf::Style::Fullscreen,
 			sf::ContextSettings(32, 8, m_AntiAliasing));
 	else
-		m_app.create(sf::VideoMode((m_width != 0) ? m_width : 800, (m_height != 0) ? m_height : 600, 32), 
-			m_title.c_str(), 
-			sf::Style::Close, 
+		m_app.create(sf::VideoMode((m_width != 0) ? m_width : 800, (m_height != 0) ? m_height : 600, 32),
+			m_title.c_str(),
+			sf::Style::Close,
 			sf::ContextSettings(32, 8, m_AntiAliasing));
 	m_app.setVerticalSyncEnabled(m_vsync);
 }
@@ -187,7 +183,7 @@ void OpenglContext::ReadConfig(const std::string& filename)
 	setting.Get(7, 0) = "cross_color_g";
 	setting.Get(8, 0) = "cross_color_b";
 	setting.Get(9, 0) = "mouse_sensibility";
-	
+
 	m_width = 0;
 	m_height = 0;
 	m_AntiAliasing = 0;
@@ -224,10 +220,10 @@ void OpenglContext::ReadConfig(const std::string& filename)
 	std::string a = setting.Get(2, 1);
 	//Convert string into int
 	if (setting.Get(0, 1) != "null")
-		m_width =  atoi(setting.Get(0, 1).c_str());
+		m_width = atoi(setting.Get(0, 1).c_str());
 
 	if (setting.Get(1, 1) != "null")
-		m_height =  atoi(setting.Get(1, 1).c_str()); 
+		m_height = atoi(setting.Get(1, 1).c_str());
 
 	if (setting.Get(2, 1) != "null")
 		m_AntiAliasing = atoi(setting.Get(2, 1).c_str());
@@ -245,13 +241,13 @@ void OpenglContext::ReadConfig(const std::string& filename)
 	if (setting.Get(5, 1) != "null")
 		m_renderDistance = atoi(setting.Get(5, 1).c_str());
 	if (setting.Get(6, 1) != "null")
-		m_cross_color_r = atof(setting.Get(6, 1).c_str());
+		m_cross_color_r = (float)atof(setting.Get(6, 1).c_str());
 	if (setting.Get(7, 1) != "null")
-		m_cross_color_g = atof(setting.Get(7, 1).c_str());
+		m_cross_color_g = (float)atof(setting.Get(7, 1).c_str());
 	if (setting.Get(8, 1) != "null")
-		m_cross_color_b = atof(setting.Get(8, 1).c_str());
+		m_cross_color_b = (float)atof(setting.Get(8, 1).c_str());
 	if (setting.Get(9, 1) != "null")
-		m_mouse_sensibility = atof(setting.Get(9, 1).c_str());
+		m_mouse_sensibility = (float)atof(setting.Get(9, 1).c_str());
 
 }
 

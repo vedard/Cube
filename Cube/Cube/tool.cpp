@@ -26,7 +26,7 @@ bool Tool::LoadTextFile(const std::string& filename, std::string& buffer)
 		return false;
 
 	f.seekg(0, std::ios::end);
-	unsigned int len = f.tellg();
+	unsigned int len = (unsigned int)f.tellg();
 	f.seekg(0, std::ios::beg);
 
 	char* tmp = new char[len + 1];

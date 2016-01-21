@@ -1,7 +1,5 @@
 ﻿#include "engine.h"
 
-
-
 Engine::Engine() :
 m_wireframe(false),
 m_player(),
@@ -55,7 +53,7 @@ void Engine::Init()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.6);
+	glAlphaFunc(GL_GREATER, (GLclampf)0.6);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
@@ -140,7 +138,7 @@ void Engine::LoadResource()
 
 
 	//Gun
-	playerGun[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 46);
+	playerGun[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, true, 400, 1000);
 	playerGun[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
 	playerGun[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
 
@@ -207,7 +205,7 @@ void Engine::Render(float elapsedTime)
 		for (int i = 0; i < MAX_MONSTER; i++)
 			if (!m_monster[i].GetisAlive())
 			{
-				m_monster[i].Spawn(m_world, (m_player.GetPosition().x) - 50 + rand() % 100, (m_player.GetPosition().z) - 50 + rand() % 100);
+				m_monster[i].Spawn(m_world, (int)((m_player.GetPosition().x) - 50 + rand() % 100), (int)((m_player.GetPosition().z) - 50 + rand() % 100));
 				break;
 			}
 
@@ -215,7 +213,7 @@ void Engine::Render(float elapsedTime)
 		for (int i = 0; i < MAX_COW; i++)
 			if (!m_cow[i].GetisAlive())
 			{
-				m_cow[i].Spawn(m_world, (m_player.GetPosition().x) - 100 + rand() % 200, (m_player.GetPosition().z) - 100 + rand() % 200);
+				m_cow[i].Spawn(m_world, (int)((m_player.GetPosition().x) - 100 + rand() % 200), (int)((m_player.GetPosition().z) - 100 + rand() % 200));
 				break;
 			}
 
@@ -283,7 +281,7 @@ void Engine::Render(float elapsedTime)
 		if (packetBuffer[0] == 'p')
 			m_playerActor.SetPos(Tool::StringToVector(packetBuffer.substr(2)));
 		else if (packetBuffer[0] == 'h')
-			m_playerActor.SetRot(atof(packetBuffer.substr(2).c_str()));
+			m_playerActor.SetRot((float)atof(packetBuffer.substr(2).c_str()));
 		else if (packetBuffer[0] == 'm')
 		{
 			std::cout << packetBuffer << std::endl;
@@ -293,7 +291,7 @@ void Engine::Render(float elapsedTime)
 			int bt;
 			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
-			m_world.ChunkAt(cx, cz)->SetBlock(bx, by, bz,bt);
+			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt);
 		}
 		
 		
@@ -406,52 +404,52 @@ void Engine::Render(float elapsedTime)
 	{
 
 		glPushMatrix();
-		glTranslatef(m_currentBlock.x, m_currentBlock.y, m_currentBlock.z);
+		glTranslatef((GLfloat)m_currentBlock.x, (GLfloat)m_currentBlock.y, (GLfloat)m_currentBlock.z);
 
 		glBegin(GL_LINE_LOOP);
 		glColor3f(0.0f, 0.0f, 0.0f);
 
 		if (m_currentFaceNormal.z == -1)
 		{
-			glVertex3f(0, 0, 0 - 0.01);
-			glVertex3f(0, 0.99, 0 - 0.01);
-			glVertex3f(0.99, 0.99, 0 - 0.01);
-			glVertex3f(0.99, 0, 0 - 0.01); 
+			glVertex3f(0, 0, 0 - (GLfloat)0.01);
+			glVertex3f(0, (GLfloat)0.99, 0 - (GLfloat)0.01);
+			glVertex3f((GLfloat)0.99, (GLfloat)0.99, 0 - (GLfloat)0.01);
+			glVertex3f((GLfloat)0.99, 0, 0 - (GLfloat)0.01);
 		}
 		else if (m_currentFaceNormal.x == 1)
 		{
-			glVertex3f(1 + 0.01, 0.99, 0);
-			glVertex3f(1 + 0.01, 0.99, 0.99);
-			glVertex3f(1 + 0.01, 0, 0.99);
-			glVertex3f(1 + 0.01, 0, 0);
+			glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, 0);
+			glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
+			glVertex3f(1 + (GLfloat)0.01, 0, (GLfloat)0.99);
+			glVertex3f(1 + (GLfloat)0.01, 0, 0);
 		}
 		else if (m_currentFaceNormal.z == 1)
 		{
-			glVertex3f(0, 0, 1 + 0.01 + 0.01);
-			glVertex3f(0.99, 0, 1 + 0.01 + 0.01);
-			glVertex3f(0.99, 0.99, 1 + 0.01 + 0.01);
-			glVertex3f(0, 0.99, 1 + 0.01 + 0.01);
+			glVertex3f(0, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+			glVertex3f((GLfloat)0.99, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+			glVertex3f((GLfloat)0.99, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+			glVertex3f(0, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
 		}
 		else if (m_currentFaceNormal.x == -1)
 		{
-			glVertex3f(0 - 0.01, 0.99, 0.99);
-			glVertex3f(0 - 0.01, 0.99, 0);
-			glVertex3f(0 - 0.01, 0, 0);
-			glVertex3f(0 - 0.01, 0, 0.99);
+			glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
+			glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, 0);
+			glVertex3f(0 - (GLfloat)0.01, 0, 0);
+			glVertex3f(0 - (GLfloat)0.01, 0, (GLfloat)0.99);
 		}
 		else if (m_currentFaceNormal.y == 1)
 		{
-			glVertex3f(0, 1 + 0.01, 0.99);
-			glVertex3f(0.99, 1 + 0.01, 0.99);
-			glVertex3f(0.99, 1 + 0.01, 0);
-			glVertex3f(0, 1 + 0.01, 0);
+			glVertex3f(0, 1 + (GLfloat)0.01, (GLfloat)0.99);
+			glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, (GLfloat)0.99);
+			glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, 0);
+			glVertex3f(0, 1 + (GLfloat)0.01, 0);
 		}
 		else if (m_currentFaceNormal.y == -1)
 		{
-			glVertex3f(0, 0 - 0.01, 0.99);
-			glVertex3f(0, 0 - 0.01, 0);
-			glVertex3f(0.99, 0 - 0.01, 0);
-			glVertex3f(0.99, 0 - 0.01, 0.99);
+			glVertex3f(0, 0 - (GLfloat)0.01, (GLfloat)0.99);
+			glVertex3f(0, 0 - (GLfloat)0.01, 0);
+			glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, 0);
+			glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, (GLfloat)0.99);
 
 		}
 		glEnd();
@@ -527,7 +525,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		for (int i = 0; i < MAX_MONSTER; i++)
 			if (!m_monster[i].GetisAlive())
 			{
-				m_monster[i].Spawn(m_world, (m_player.GetPosition().x) - 50 + rand() % 100, (m_player.GetPosition().z) - 50 + rand() % 100);
+				m_monster[i].Spawn(m_world, (int)((m_player.GetPosition().x) - 50 + rand() % 100), (int)((m_player.GetPosition().z) - 50 + rand() % 100));
 				break;
 			}
 
@@ -555,7 +553,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	{
 		for (int i = 0; i < WORLD_SIZE; i++)
 			for (int j = 0; j < WORLD_SIZE; j++)
-				m_world.ChunkAt(i, j)->DeleteCache();
+				m_world.ChunkAt((float)i, (float)j)->DeleteCache();
 
 	}
 	//Lshift + O -> open map
@@ -623,8 +621,9 @@ void Engine::MouseMoveEvent(int x, int y)
 		return;
 	CenterMouse();
 
-	float relativeX = x - Width() / 2;
-	float relativeY = y - Height() / 2;
+	float relativeX, relativeY;
+	relativeX = (float)(x - Width() / 2);
+	relativeY = (float)(y - Height() / 2);
 
 	m_player.TurnLeftRight(relativeX * m_mouse_sensibility);
 	m_player.TurnTopBottom(relativeY * m_mouse_sensibility);
@@ -642,7 +641,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		if (button == 1 && m_currentBlock.x != -1)
 		{
 			Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
-			m_world.ChunkAt(chunkPos.x, chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+			m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 			m_Netctl.Send("m " + 
 				std::to_string(chunkPos.x) + 
 				" " + std::to_string(chunkPos.z) + 
@@ -660,13 +659,13 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
 
 			//Si le chunk existe on place le block
-			if (m_world.ChunkAt(chunkPos.x, chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+			if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 			{
-				m_world.ChunkAt(chunkPos.x, chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
+				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
 
 				//Si ya collision on efface le block
 				if (m_player.CheckCollision(m_world))
-					m_world.ChunkAt(chunkPos.x, chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
 				else
 				{
 					m_Netctl.Send("m " +
@@ -957,7 +956,7 @@ void Engine::GetBlocAtCursor()
 
 	bool found = false;
 
-	if ((m_player.GetPosition() - Vector3<float>(posX, posY, posZ)).Length() < EDITING_DISTANCE)
+	if ((m_player.GetPosition() - Vector3<float>((const float)posX, (const float)posY, (const float)posZ)).Length() < EDITING_DISTANCE)
 	{
 		// Apres avoir determine la position du bloc en utilisant la partie entiere du hit
 		// point retourne par opengl, on doit verifier de chaque cote du bloc trouve pour trouver
@@ -974,7 +973,7 @@ void Engine::GetBlocAtCursor()
 				{
 					if (z >= 0)
 					{
-						BlockType bt = m_world.BlockAt(x, y, z);
+						BlockType bt = m_world.BlockAt((float)x, (float)y, (float)z);
 
 						if (bt == BTYPE_AIR)
 							continue;
@@ -983,7 +982,7 @@ void Engine::GetBlocAtCursor()
 						m_currentBlock.y = y;
 						m_currentBlock.z = z;
 
-						if (Tool::InRangeWithEpsilon<float>(posX, x, x + 1, 0.05f) && Tool::InRangeWithEpsilon<float>(posY, y, y + 1, 0.05f) && Tool::InRangeWithEpsilon<float>(posZ, z, z + 1, 0.05f))
+						if (Tool::InRangeWithEpsilon<float>((const float)posX, (const float)x, (const float)(x + 1), 0.05f) && Tool::InRangeWithEpsilon<float>((const float)posY, (const float)y, (const float)(y + 1), 0.05f) && Tool::InRangeWithEpsilon<float>((const float)posZ, (const float)z, (const float)(z + 1), 0.05f))
 						{
 							found = true;
 						}
@@ -1003,17 +1002,17 @@ void Engine::GetBlocAtCursor()
 		m_currentFaceNormal.Zero();
 
 		// Front et back:
-		if (Tool::EqualWithEpsilon<float>(posZ, m_currentBlock.z, 0.05f))
+		if (Tool::EqualWithEpsilon<float>((const float)posZ, (const float)m_currentBlock.z, 0.05f))
 			m_currentFaceNormal.z = -1;
-		else if (Tool::EqualWithEpsilon<float>(posZ, m_currentBlock.z + 1, 0.05f))
+		else if (Tool::EqualWithEpsilon<float>((const float)posZ, (const float)(m_currentBlock.z + 1), 0.05f))
 			m_currentFaceNormal.z = 1;
-		else if (Tool::EqualWithEpsilon<float>(posX, m_currentBlock.x, 0.05f))
+		else if (Tool::EqualWithEpsilon<float>((const float)posX, (const float)(m_currentBlock.x), 0.05f))
 			m_currentFaceNormal.x = -1;
-		else if (Tool::EqualWithEpsilon<float>(posX, m_currentBlock.x + 1, 0.05f))
+		else if (Tool::EqualWithEpsilon<float>((const float)posX, (const float)(m_currentBlock.x + 1), 0.05f))
 			m_currentFaceNormal.x = 1;
-		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y, 0.05f))
+		else if (Tool::EqualWithEpsilon<float>((const float)posY, (const float)(m_currentBlock.y), 0.05f))
 			m_currentFaceNormal.y = -1;
-		else if (Tool::EqualWithEpsilon<float>(posY, m_currentBlock.y + 1, 0.05f))
+		else if (Tool::EqualWithEpsilon<float>((const float)posY, (const float)(m_currentBlock.y + 1), 0.05f))
 			m_currentFaceNormal.y = 1;
 	}
 }

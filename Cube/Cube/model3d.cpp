@@ -1,6 +1,5 @@
 #include "model3d.h"
 
-
 Model3d::Model3d() :
 m_numFace(0),
 m_numVerts(0)
@@ -8,8 +7,6 @@ m_numVerts(0)
 	m_vertex = NULL;
 	m_face = NULL;
 }
-
-
 
 Model3d::~Model3d()
 {
