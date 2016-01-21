@@ -52,6 +52,10 @@ private:
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
 
+	// inventory
+	void RenderFastInventory();
+	void RenderInventory();
+
 private:
 	bool m_wireframe;
 
