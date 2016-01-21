@@ -65,7 +65,7 @@ typedef long long int64;
 #define MODEL_PATH	"../Cube/media/model/"
 
 #define INVENTORY_SIZE 15
-#define FAST_INVENTORY_SIZE 3
+#define FAST_INVENTORY_SIZE 3	//If changed, modification must be made into the render and the keybinding to apply the changes
 
 
 typedef uint8 BlockType;
