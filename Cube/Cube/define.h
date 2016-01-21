@@ -64,8 +64,11 @@ typedef long long int64;
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
 
-#define INVENTORY_SIZE 15
-#define FAST_INVENTORY_SIZE 3
+#define INVENTORY_SIZE 			15
+#define FAST_INVENTORY_SIZE 		3
+#define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
+#define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
+#define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 
 
 typedef uint8 BlockType;

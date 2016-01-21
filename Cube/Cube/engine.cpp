@@ -474,6 +474,19 @@ void Engine::KeyPressEvent(unsigned char key)
 	//update le teableau
 	m_keyboard[key] = true;
 
+	//#define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
+	//#define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
+	//#define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
+	if(m_keyboard[FIRST_FAST_INVENTORY_KEY])
+		std::cerr << "pressed z" << std::endl;
+
+	if(m_keyboard[SECOND_FAST_INVENTORY_KEY])
+		std::cerr << "pressed x" << std::endl;
+
+	if(m_keyboard[THIRD_FAST_INVENTORY_KEY])
+		std::cerr << "pressed c" << std::endl;
+
+
 	//Esc -> Arrete le programme
 	if (m_keyboard[36])
 		Stop();
@@ -848,13 +861,14 @@ void Engine::DrawHud() const
 		glVertex2i(48, 48);
 		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
 		glVertex2i(0, 48);
-
+		
 		glEnd();
+		glDisable(GL_TEXTURE_2D);		
 	}
 
+	RenderFastInventory();	
 
 	glEnable(GL_TEXTURE_2D);
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
@@ -1054,4 +1068,37 @@ void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const st
 	m_bInfo[type].Init(type, name);
 	m_texBlockIndex = m_textureAtlas.AddTexture(path);
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
+}
+
+void Engine::RenderFastInventory() const
+{
+	if(m_player.GetWeapon() != W_BLOCK)
+	{
+		glLoadIdentity();
+		glTranslated(Width(), 16, 0);
+	}
+
+	for(int i = 0; i < 3; i++)
+	{
+		glTranslated(-64, 0,0);
+
+		if(i != 1)
+			glColor3f(0.f,0.f,0.f);
+		else		
+			glColor3f(128.f,0.f,0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
+		
+		glColor3f(255.f,128.f,0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(0, 0);
+		glVertex2i(48, 0);
+		glVertex2i(48, 48);
+		glVertex2i(0, 48);
+		glEnd();
+	}
 }

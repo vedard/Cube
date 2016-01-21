@@ -53,7 +53,7 @@ private:
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
 
 	// inventory
-	void RenderFastInventory();
+	void RenderFastInventory() const;
 	void RenderInventory();
 
 private:
