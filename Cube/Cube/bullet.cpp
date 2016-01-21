@@ -50,12 +50,16 @@ bool Bullet::CheckCollision(Character &character)
 
 		for (int i = 0; i < nbrIteration; i++)
 		{
-			if (m_LastPos.x + directionVector.x / nbrIteration * i >= character.GetPosition().x - character.GetDimension().x / 2
-				&& m_LastPos.x + directionVector.x / nbrIteration * i < character.GetPosition().x + character.GetDimension().x / 2
-				&& m_LastPos.y + directionVector.y / nbrIteration * i >= character.GetPosition().y
-				&& m_LastPos.y + directionVector.y / nbrIteration * i < character.GetPosition().y + character.GetDimension().y
-				&& m_LastPos.z + directionVector.z / nbrIteration * i >= character.GetPosition().z - character.GetDimension().z / 2
-				&& m_LastPos.z + directionVector.z / nbrIteration * i < character.GetPosition().z + character.GetDimension().z / 2)
+			float x = m_LastPos.x + directionVector.x / nbrIteration * i;
+			float y = m_LastPos.y + directionVector.y / nbrIteration * i;
+			float z = m_LastPos.z + directionVector.z / nbrIteration * i;
+
+			if (x >= character.GetPosition().x - character.GetDimension().x / 2
+				&& x < character.GetPosition().x + character.GetDimension().x / 2
+				&& y >= character.GetPosition().y
+				&& y < character.GetPosition().y + character.GetDimension().y
+				&& z >= character.GetPosition().z - character.GetDimension().z / 2
+				&& z < character.GetPosition().z + character.GetDimension().z / 2)
 			{
 
 				//f(x) = -1 * 1.02 ^ (x + 10) + 50
@@ -67,16 +71,18 @@ bool Bullet::CheckCollision(Character &character)
 	}
 	return false;
 }
+
+
 bool Bullet::CheckCollision(World &world)
 {
 	if (m_isActive)
 	{
-
+		// Pour les collision les bullet se deplace trop rapidement il faut donc teste plusieur point entre la derniere position 
+		// et la position actuelle afin de s'assurer qu'elle na pas passe a travers un objet
 		int nbrIteration = 100;
 
 		for (int i = 0; i < nbrIteration; i++)
 		{
-
 			float x = m_LastPos.x + directionVector.x / nbrIteration * i;
 			float y = m_LastPos.y + directionVector.y / nbrIteration * i;
 			float z = m_LastPos.z + directionVector.z / nbrIteration * i;
