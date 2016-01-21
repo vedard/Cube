@@ -71,19 +71,30 @@ bool Bullet::CheckCollision(World &world)
 {
 	if (m_isActive)
 	{
-		BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y, m_pos.z);
 
-		//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
-		if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)
+		int nbrIteration = 100;
+
+		for (int i = 0; i < nbrIteration; i++)
 		{
-			/*Vector3<float> chunkPos(floor(m_pos.x / CHUNK_SIZE_X), 0, floor(m_pos.z / CHUNK_SIZE_Z));
-			Chunk * chunk = world.ChunkAt(chunkPos.x, chunkPos.z);
 
-			if (chunk)
-			chunk->RemoveBloc(m_pos.x - (chunkPos.x * CHUNK_SIZE_X), m_pos.y, m_pos.z - (chunkPos.z * CHUNK_SIZE_X));*/
-			m_isActive = false;
-			return true;
+			float x = m_LastPos.x + directionVector.x / nbrIteration * i;
+			float y = m_LastPos.y + directionVector.y / nbrIteration * i;
+			float z = m_LastPos.z + directionVector.z / nbrIteration * i;
 
+			BlockType bt1 = world.BlockAt(x, y, z);
+
+			//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
+			if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)
+			{
+				Vector3<float> chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
+				Chunk * chunk = world.ChunkAt(chunkPos.x, chunkPos.z);
+
+				if (chunk)
+					chunk->RemoveBloc(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
+				m_isActive = false;
+				return true;
+
+			}
 		}
 	}
 	return false;
