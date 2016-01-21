@@ -64,8 +64,9 @@ typedef long long int64;
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
 
-#define INVENTORY_SIZE 15		//Self-explanatory
-#define FAST_INVENTORY_SIZE 3	//If changed must apply the modification to the render and the keybinding
+#define INVENTORY_SIZE 15
+#define FAST_INVENTORY_SIZE 3
+
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
