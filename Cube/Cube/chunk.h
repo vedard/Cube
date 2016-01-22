@@ -36,6 +36,7 @@ public:
 private:
 	bool CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
 	float CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const;
+	void CheckWater(const Vector3<float> &Blockpos);
 
 
 	//Todo - rendre private

@@ -101,9 +101,9 @@ const BlockType& Chunk::GetBlock(int x, int y, int z) const
 
 void Chunk::SetPosition(int x, int y, int z)
 {
-	m_position.x = (float)x;
-	m_position.y = (float)y;
-	m_position.z = (float)z;
+	m_position.x = x;
+	m_position.y = y;
+	m_position.z = z;
 }
 
 const Vector3<float> &Chunk::GetPosition() const
@@ -116,6 +116,7 @@ void Chunk::Update(BlockInfo* &binfo)
 	// Update mesh
 	if (m_isDirty)
 	{
+		m_isDirty = false;
 		int maxVertexCount = (CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z) * (6 * 4);
 
 		//On creer un buffer pour les solid et un autre pour les transparents 
@@ -139,8 +140,7 @@ void Chunk::Update(BlockInfo* &binfo)
 					if (bt != BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_LEAVE)
 						AddBlockToMesh(vds, count_s, binfo[bt], Vector3<float>(x + m_position.x, y + m_position.y, z + m_position.z));
 
-
-					else if (bt == BTYPE_WATER || bt == BTYPE_LEAVE)
+					if (bt == BTYPE_WATER || bt == BTYPE_LEAVE || bt == BTYPE_RWATER1 || bt == BTYPE_RWATER2 || bt == BTYPE_RWATER3)
 						AddBlockToMesh(vdt, count_t, binfo[bt], Vector3<float>(x + m_position.x, y + m_position.y, z + m_position.z));
 
 				}
@@ -159,13 +159,16 @@ void Chunk::Update(BlockInfo* &binfo)
 		m_transparentMesh.SetMeshData(vdt, count_t);
 		delete[] vds;
 		delete[] vdt;
+		if (m_isDirty)
+			Update(binfo);
 	}
-	m_isDirty = false;
 }
 
 void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockInfo &binfo, const Vector3<float> &Blockpos)
 {
 	BlockType type = binfo.GetType();
+	if (type == BTYPE_WATER)
+		CheckWater(Vector3<float>((int)Blockpos.x % CHUNK_SIZE_X, (int)Blockpos.y % CHUNK_SIZE_Y, (int)Blockpos.z % CHUNK_SIZE_Z));
 
 	// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
@@ -272,16 +275,16 @@ bool Chunk::NeedUpdate() const
 		return false;
 }
 
-bool& Chunk::GetSave(){
+bool& Chunk::GetSave() {
 	return m_save;
 }
 
 bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const
 {
-	BlockType faceType = GetBlock((int)(Blockpos.x + face.x), (int)(Blockpos.y + face.y), (int)(Blockpos.z + face.z));
+	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType == BTYPE_WATER && type != BTYPE_WATER) || faceType == BTYPE_LAVA)
+	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType != BTYPE_WATER && type == BTYPE_WATER) || faceType == BTYPE_LAVA || (faceType == BTYPE_WATER && type != BTYPE_WATER))
 		return true;
 
 	return false;
@@ -295,7 +298,7 @@ float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float>
 
 	for (int i = 1; true; i++)
 	{
-		BlockType block = GetBlock((int)(Blockpos.x + face.x), (int)(Blockpos.y + i), (int)(Blockpos.z + face.z));
+		BlockType block = GetBlock(Blockpos.x + face.x, Blockpos.y + i, Blockpos.z + face.z);
 		if (block == BTYPE_AIR)
 		{
 			if (Blockpos.y + i > CHUNK_SIZE_Y)
@@ -308,5 +311,77 @@ float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float>
 			return 0.64f;
 		else
 			return  0.57f;
+	}
+}
+
+void Chunk::CheckWater(const Vector3<float> &Blockpos)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		BlockType bloc = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
+		BlockType bt = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
+		if (GetBlock(Blockpos.x - i, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
+		{
+			SetBlock(Blockpos.x - i, Blockpos.y - 1, Blockpos.z, BTYPE_WATER);
+		}
+		else if (GetBlock(Blockpos.x - i, Blockpos.y, Blockpos.z) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		{
+			SetBlock(Blockpos.x - i, Blockpos.y, Blockpos.z, BTYPE_RWATER1);
+			//m_isDirty = true;
+		}
+
+
+		if (GetBlock(Blockpos.x + i, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)// || bt == BTYPE_RWATER1 || bt == BTYPE_RWATER2 || bt == BTYPE_RWATER3)
+		{
+			SetBlock(Blockpos.x + i, Blockpos.y - 1, Blockpos.z, BTYPE_WATER);
+		}
+		else if (GetBlock(Blockpos.x + i, Blockpos.y, Blockpos.z) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		{
+			SetBlock(Blockpos.x + i, Blockpos.y, Blockpos.z, BTYPE_RWATER1);
+			//m_isDirty = true;
+		}
+
+
+		if (GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z - i) == BTYPE_AIR)
+		{
+			SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z - i, BTYPE_WATER);
+		}
+		else if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - i) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		{
+			SetBlock(Blockpos.x, Blockpos.y, Blockpos.z - i, BTYPE_RWATER1);
+			//m_isDirty = true;
+		}
+
+
+		if (GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z + 1) == BTYPE_AIR)
+		{
+			SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z + i, BTYPE_WATER);
+		}
+		else if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + i) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		{
+			SetBlock(Blockpos.x, Blockpos.y, Blockpos.z + i, BTYPE_RWATER1);
+			//m_isDirty = true;
+		}
+
+
+
+		//if (GetBlock(Blockpos.x + i, Blockpos.y, Blockpos.z) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		//{
+		//	SetBlock(Blockpos.x + i, Blockpos.y, Blockpos.z, BTYPE_RWATER1);
+		//	//m_isDirty = true;
+		//}
+		//if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - i) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		//{
+		//	SetBlock(Blockpos.x, Blockpos.y, Blockpos.z - i, BTYPE_RWATER1);
+		//	//m_isDirty = true;
+		//}
+		//if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + i) == BTYPE_AIR && bt != BTYPE_WATER && bt != BTYPE_RWATER1 && bt != BTYPE_RWATER2 && bt != BTYPE_RWATER3)
+		//{
+		//	SetBlock(Blockpos.x, Blockpos.y, Blockpos.z + i, BTYPE_RWATER1);
+		//	//m_isDirty = true;
+		//}
+
+
+
 	}
 }
