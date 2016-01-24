@@ -22,6 +22,9 @@ public:
 
 	void Afficher() const;
 
+	void SetDirection(char direction);
+	char GetDirection() const;
+
 	
 	friend std::ostream& operator<<(std::ostream& o, const BlockInfo& v);
 
@@ -30,6 +33,7 @@ private:
 	BlockType m_type;
 	std::string m_nom;
 	int m_durabilite;
+	char m_direction;
 
 public:
 	//Position texture dans l'atlas

@@ -72,7 +72,7 @@ void World::InitChunk(float i, float j)
 			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				if (chunk->GetBlock(x, y, z) != BTYPE_AIR)
-					chunk->SetBlock(x, y, z, BTYPE_AIR);
+					chunk->SetBlock(x, y, z, BTYPE_AIR, ' ');
 
 			}
 	//Height
@@ -95,27 +95,27 @@ void World::InitChunk(float i, float j)
 				{
 
 					if (y == 0)
-						chunk->SetBlock(x, height, z, BTYPE_GRASS);
+						chunk->SetBlock(x, height, z, BTYPE_GRASS, ' ');
 					else if (y >= 1 && y < 4)
-						chunk->SetBlock(x, height, z, BTYPE_DIRT);
+						chunk->SetBlock(x, height, z, BTYPE_DIRT, ' ');
 					else if (y >= 4)
-						chunk->SetBlock(x, height, z, BTYPE_STONE);
+						chunk->SetBlock(x, height, z, BTYPE_STONE, ' ');
 				}
 			}
 			val = scaled_octave_noise_2d(16, 0.3f, (float)((m_seed) ? 7 : 0), -1, 1, (float)(i * CHUNK_SIZE_X + x) / (5000 * biome), (float)(j * CHUNK_SIZE_Z + z) / (5000 * biome));
 
-			chunk->SetBlock(x, (int)(val + 65), z, BTYPE_NETHEREACK);
+			chunk->SetBlock(x, (int)(val + 65), z, BTYPE_NETHEREACK, ' ');
 
 			val = scaled_octave_noise_2d(15, 0.4f,(float)((m_seed) ? 8 : 0), -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
 
 
 			for (int y = 0; y <= 55; y++)
 			{
-				chunk->SetBlock(x, (int)(val + 20 - y), z, BTYPE_NETHEREACK);
+				chunk->SetBlock(x, (int)(val + 20 - y), z, BTYPE_NETHEREACK, ' ');
 			}
 			//Plancher de bedrock
-			chunk->SetBlock(x, 0, z, BTYPE_BED_ROCK);
-			chunk->SetBlock(x, 1, z, BTYPE_BED_ROCK);
+			chunk->SetBlock(x, 0, z, BTYPE_BED_ROCK, ' ');
+			chunk->SetBlock(x, 1, z, BTYPE_BED_ROCK, ' ');
 
 		}
 
@@ -164,7 +164,7 @@ void World::InitChunk(float i, float j)
 						chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
 						chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
 					{
-						chunk->SetBlock(x, y, z, BTYPE_WATER);
+						chunk->SetBlock(x, y, z, BTYPE_WATER, ' ');
 					}
 
 				}
@@ -179,7 +179,7 @@ void World::InitChunk(float i, float j)
 						chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
 						chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
 					{
-						chunk->SetBlock(x, y, z, BTYPE_LAVA);
+						chunk->SetBlock(x, y, z, BTYPE_LAVA, ' ');
 					}
 
 				}
@@ -192,10 +192,10 @@ void World::InitChunk(float i, float j)
 
 					if (chunk->GetBlock(x, y, z) == BTYPE_GRASS && chunk->GetBlock(x, y + 1, z) == BTYPE_WATER)
 					{
-						chunk->SetBlock(x, y, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 1, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 2, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 3, z, BTYPE_SAND);
+						chunk->SetBlock(x, y, z, BTYPE_SAND, ' ');
+						chunk->SetBlock(x, y - 1, z, BTYPE_SAND, ' ');
+						chunk->SetBlock(x, y - 2, z, BTYPE_SAND, ' ');
+						chunk->SetBlock(x, y - 3, z, BTYPE_SAND, ' ');
 						break;
 					}
 				}
@@ -228,7 +228,7 @@ void World::InitChunk(float i, float j)
 									!chunkTemp->GetSave()
 									)
 									//Set le bloc a air
-									chunkTemp->SetBlock((int)blockPos.x, (int)blockPos.y, (int)blockPos.z, BTYPE_AIR);
+									chunkTemp->SetBlock((int)blockPos.x, (int)blockPos.y, (int)blockPos.z, BTYPE_AIR, ' ');
 							}
 						}
 					}
@@ -332,7 +332,7 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 					{
 						ssline >> b;
 						if (b >= 0 && b < NUMBER_OF_BLOCK)
-							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType());
+							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType(), ' ');
 
 					}
 		}
@@ -385,30 +385,30 @@ void World::SaveMap(std::string filename)
 void World::AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z)
 {
 
-	chunk->SetBlock(x, y, z, mineral);
+	chunk->SetBlock(x, y, z, mineral, ' ');
 	if (rand() % 100 >= 60 && chunk->GetBlock(x + 1, y, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x + 1, y, z, mineral);
+		chunk->SetBlock(x + 1, y, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x - 1, y, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x - 1, y, z, mineral);
+		chunk->SetBlock(x - 1, y, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y + 1, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y + 1, z, mineral);
+		chunk->SetBlock(x, y + 1, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y - 1, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y - 1, z, mineral);
+		chunk->SetBlock(x, y - 1, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y, z + 1) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y, z + 1, mineral);
+		chunk->SetBlock(x, y, z + 1, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y, z - 1) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y, z - 1, mineral);
+		chunk->SetBlock(x, y, z - 1, mineral, ' ');
 	}
 }
 
@@ -418,25 +418,25 @@ void World::AddTree(Chunk * &chunk, int x, int y, int z)
 
 	for (int k = 0; k < hauteur; k++)
 	{
-		chunk->SetBlock(x, y + k, z, BTYPE_WOOD);
+		chunk->SetBlock(x, y + k, z, BTYPE_WOOD, ' ');
 	}
 
 
-	chunk->SetBlock(x + 1, y + hauteur - 1, z, BTYPE_LEAVE);
-	chunk->SetBlock(x + 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur - 1, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur - 1, z - 1, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur - 1, z, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x + 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
+	chunk->SetBlock(x + 1, y + hauteur - 1, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x + 1, y + hauteur - 1, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur - 1, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur - 1, z - 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur - 1, z - 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur - 1, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur - 1, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x + 1, y + hauteur - 1, z - 1, BTYPE_LEAVE, ' ');
 
-	chunk->SetBlock(x + 1, y + hauteur, z, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur, z - 1, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur, z, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur, z, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
+	chunk->SetBlock(x + 1, y + hauteur, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur, z - 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE, ' ');
 }
 
 void World::InitChunks(int CenterX, int CenterZ)

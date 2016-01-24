@@ -291,7 +291,7 @@ void Engine::Render(float elapsedTime)
 			int bt;
 			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
-			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt);
+			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt, ' ');
 		}
 		
 		
@@ -665,7 +665,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 				//Si ya collision on efface le block
 				if (m_player.CheckCollision(m_world))
-					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, ' ');
 				else
 				{
 					m_Netctl.Send("m " +

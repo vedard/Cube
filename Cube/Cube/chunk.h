@@ -16,12 +16,13 @@ public:
 	void PlaceBlock(int x, int y, int z, BlockType type);
 	//---------------------------------------------------
 
-	void SetBlock(int x, int y, int z, BlockType type);
+	void SetBlock(int x, int y, int z, BlockType type, char direction);
 	void SetPosition(int x, int y, int z);
 	const Vector3<float> &GetPosition() const;
 	const BlockType& GetBlock(int x, int y, int z) const;
+	const char& GetDirection(int x, int y, int z) const;
 	void Update(BlockInfo* &binfo);
-	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, const BlockInfo &binfo, const Vector3<float> &Blockpos);
+	void AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count,BlockInfo &binfo, const Vector3<float> &Blockpos);
 	void RenderSolidBuffer(GLenum &m_program) const;
 	void RenderTransparentBuffer(GLenum &m_program) const;
 	void DeleteCache();
@@ -36,7 +37,9 @@ public:
 private:
 	bool CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
 	float CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const;
-	void CheckWater(const Vector3<float> &Blockpos);
+	void CheckWater(const Vector3<float> &Blockpos, BlockInfo &binfo, int max);
+	BlockType ChooseWater(int numero);
+	void AddWater(const Vector3<float> &Blockpos);
 
 
 	//Todo - rendre private
