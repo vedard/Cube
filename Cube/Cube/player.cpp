@@ -14,6 +14,7 @@ m_footUnderwater(false),
 m_headUnderwater(false),
 m_HeadShake(0)
 {
+	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
 	m_health = 100;
@@ -75,6 +76,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		{
 			m_vitesse.x *= 0.6f;
 			m_vitesse.z *= 0.6f;
+		}
+		if (m_footUnderLava)
+		{
+			m_vitesse.x *= 0.4f;
+			m_vitesse.z *= 0.4f;
 		}
 	}
 
@@ -169,7 +175,18 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		}
 
 		//Acceleration
-		m_vitesse.y += (m_footUnderwater) ? 0.002f : 0.013f;
+		if (m_footUnderwater)
+		{
+			m_vitesse.y += 0.002f;
+		}
+		else if(m_footUnderLava)
+		{
+			m_vitesse.y += 0.001f;
+		}
+		else
+		{
+			m_vitesse.y += 0.013f;
+		}
 
 	}
 
@@ -183,7 +200,14 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
 	}
+	//si le player est en dessous de la lave
+	CheckUnderLava(world);
 
+	if (m_footUnderLava)
+	{
+		if (m_vitesse.y > 0.08f)
+			m_vitesse.y = 0.08f;
+	}
 	
 }
 
@@ -202,6 +226,23 @@ void Player::CheckUnderwater(World &world)
 		m_footUnderwater = true;
 	else
 		m_footUnderwater = false;
+}
+
+void Player::CheckUnderLava(World &world)
+{
+	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
+
+	if (bt1 == BTYPE_LAVA)
+		m_headUnderLava = true;
+	else
+		m_headUnderLava = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5f, m_pos.z);
+
+	if (bt1 == BTYPE_LAVA)
+		m_footUnderLava = true; 
+	else
+		m_footUnderLava = false;
 }
 
 void Player::ApplyRotation() const
@@ -293,7 +334,29 @@ void Player::Jump()
 		m_vitesse.y = -0.002f;
 	else if (m_footUnderwater)
 		m_vitesse.y = -0.09f;
+	else if (m_footUnderLava && !m_headUnderLava)
+		m_vitesse.y = -0.002f;
+	else if (m_footUnderLava)
+		m_vitesse.y = -0.09f;
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
 
+
+void Player::Tick()
+{
+	if (m_footUnderLava)
+		GetDamage(5);
+	if (m_headUnderwater)
+	{
+		m_BreathCount++;
+		if (m_BreathCount > 15)
+		{
+			GetDamage(3);
+		}
+	}
+	else
+	{
+		m_BreathCount = 0;
+	}
+}

@@ -99,7 +99,7 @@ bool Character::CheckCollision(World &world) const
 					m_pos.y + (m_dimension.y / h * y),
 					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 
-				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
+				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
 				if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER && bt1 != BTYPE_LAVA)
 					return true;
 			}

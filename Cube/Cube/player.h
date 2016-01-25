@@ -20,9 +20,11 @@ public:
 	void ApplyTranslation();
 	void ToggleNoClip();
 	void Jump();
+	void CheckTick();
 
 
 	bool Underwater() const;
+	bool UnderLava() const;
 
 	BlockType GetBlock() const;
 	int GetWeapon() const;
@@ -37,14 +39,20 @@ public:
 
 private:
 	void CheckUnderwater(World &world);
+	void CheckUnderLava(World &world);
+	void Tick();
 
 private:
-
+	time_t m_TickBegin;     //timer de tick
+	time_t m_TickEnd;     //timer de tick
+	int  m_BreathCount; //Compte les ticks pour la breath
 	bool m_noClip;			// Si on est en noclip mode (sans collision et vol)
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
+	bool m_headUnderLava;  // Si le joueur est sous la lave
+	bool m_footUnderLava;  // Si le joueur est sous la lave
 	BlockType m_block;		// Prochain block que le joueur peut placer
 	
 	int m_weapon;			// current weapon
