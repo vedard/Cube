@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 class Item
 {
 public:
@@ -7,7 +6,6 @@ public:
 	~Item();
 
 private:
-	std::string m_nom;
 	int m_quantity;
 
 };

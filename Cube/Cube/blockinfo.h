@@ -4,8 +4,9 @@
 #include <string>
 #include "define.h"
 #include "textureatlas.h"
+#include "item.h"
 
-class BlockInfo
+class BlockInfo : Item
 {
 public:
 	BlockInfo();
