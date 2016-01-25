@@ -107,6 +107,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	}
 	if (right) 
 		deplacementVector += rightVector;
+	if(left)
 		deplacementVector -= rightVector;
 	//Si on bouge pas -> vitesse = 0
 	if (!left && !right && !front && !back)
