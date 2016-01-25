@@ -3,7 +3,7 @@
 #include "array2d.h"
 #include "character.h"
 #include "gun.h"
-#include "Inventory.h"
+#include "inventory.h"
 
 
 class Player : public Character
