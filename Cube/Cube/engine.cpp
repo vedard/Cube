@@ -1,13 +1,13 @@
 ﻿#include "engine.h"
 
 Engine::Engine() :
-m_wireframe(false),
-m_player(),
-m_shader01(),
-m_textureAtlas(NUMBER_OF_BLOCK - 1),
-m_world(),
-m_currentBlock(-1, -1, -1),
-displayInfo(false)
+	m_wireframe(false),
+	m_player(),
+	m_shader01(),
+	m_textureAtlas(NUMBER_OF_BLOCK - 1),
+	m_world(),
+	m_currentBlock(-1, -1, -1),
+	displayInfo(false)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -180,25 +180,132 @@ void Engine::UnloadResource()
 
 }
 
-void Engine::Render(float elapsedTime)
+void Engine::UpdateEnvironement()
 {
+	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
+	//Update le player
+	m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+
+	//Update les balles
+	for (int k = 0; k < 3; k++)
+		for (int i = 0; i < MAX_BULLET; i++)
+		{
+			playerGun[k].GetBullets()[i].Update();
+
+			//Check si y a collision
+			for (int j = 0; j < MAX_MONSTER; j++)
+				playerGun[k].GetBullets()[i].CheckCollision(m_monster[j]);
+
+			for (int j = 0; j < MAX_COW; j++)
+				playerGun[k].GetBullets()[i].CheckCollision(m_cow[j]);
+
+			playerGun[k].GetBullets()[i].CheckCollision(m_world);
+
+		}
+
+	//Update les monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_monster[i].Move(m_world);
+
+	//Update les Cow
+	for (int i = 0; i < MAX_COW; i++)
+		m_cow[i].Move(m_world);
+
+	//m_world.InitChunks(playerPos.x, playerPos.z);
+	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+	t.detach();
+
+	//Update les chunk autour du joueur si il sont dirty
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+
+}
+void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if(!m_player.GetisAlive())
+	if (!m_player.GetisAlive())
 	{
-		m_wireframe = false;	
+		m_wireframe = false;
 		DrawDeathScreen();
 		return;
 	}
 
+	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
+	glColor3f(1.f, 1.f, 1.f);
+
+	// Transformations initiales
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+
+	//Place le joueur au centre du monde
+	m_player.ApplyRotation();
+	m_player.ApplyTranslation();
+
+
+	//Activation des shaders
+	m_shader01.Use();
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
+
+	//Ciel
+	if (m_player.GetPosition().y > 64)
+		DrawSky(gameTime);
+
+	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
+
+	//Draw Monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_monster[i].Draw(m_modelRaptor, false);
+
+	for (int i = 0; i < MAX_COW; i++)
+		m_cow[i].Draw(m_modelCow);
+
+	m_playerActor.Draw(m_modelRaptor);
+
+	//Draw guns
+	if (m_player.GetWeapon() != W_BLOCK)
+		playerGun[m_player.GetWeapon() - 1].Draw(
+			m_player.GetPosition().x,
+			m_player.GetPosition().y + m_player.GetDimension().y,
+			m_player.GetPosition().z,
+			m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
+
+
+
+	//Draw Chunks
+	m_textureAtlas.Bind();
+	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+
+	Shader::Disable();
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	//Draw Bullets
+	for (int j = 0; j < 3; j++)
+		for (int i = 0; i < MAX_BULLET; i++)
+			playerGun[j].GetBullets()[i].Draw();
+
+	//Draw Block focused (black square)
+	if (m_player.GetWeapon() == W_BLOCK)
+		DrawFocusedBlock();
+
+
+	//Draw le hui
+	if (m_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	DrawHud();
+	if (m_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+}
+
+void Engine::Render(float elapsedTime)
+{
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 	gameTime += elapsedTime;
-
-	//Chunk du joueur
-	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
 
 	//Spawn des monstre aleatoirement
 	if ((int)(gameTime * 100) % 1000 == 0)
@@ -226,8 +333,7 @@ void Engine::Render(float elapsedTime)
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
-		//Update le player
-		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+		UpdateEnvironement();
 
 		//Footstep
 		static Vector3<float> lastpos = m_player.GetPosition();
@@ -244,37 +350,12 @@ void Engine::Render(float elapsedTime)
 			(playerGun[m_player.GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
 		}
 
-		//Update les balles
-		for (int k = 0; k < 3; k++)				
-			for (int i = 0; i < MAX_BULLET; i++)
-			{
-				playerGun[k].GetBullets()[i].Update();
-
-				//Check si y a collision
-				for (int j = 0; j < MAX_MONSTER; j++)
-					playerGun[k].GetBullets()[i].CheckCollision(m_monster[j]);
-
-				for (int j = 0; j < MAX_COW; j++)
-					playerGun[k].GetBullets()[i].CheckCollision(m_cow[j]);
-
-				playerGun[k].GetBullets()[i].CheckCollision(m_world);
-
-			}
-		
-		//Update les monstres
-		for (int i = 0; i < MAX_MONSTER; i++)
-			m_monster[i].Move(m_world);
-
-		//Update les monstres
-		for (int i = 0; i < MAX_COW; i++)
-			m_cow[i].Move(m_world);
-
 		//Net
 		static int sdf = 0;
 		if (sdf++ % 3 == 0)
 		{
 			m_Netctl.Send("p " + Tool::VectorToString(m_player.GetPosition()));
-			m_Netctl.Send("h " + std::to_string(m_player.GetHorizontalRotation()));	
+			m_Netctl.Send("h " + std::to_string(m_player.GetHorizontalRotation()));
 		}
 
 		std::string packetBuffer = m_Netctl.Receive();
@@ -291,180 +372,17 @@ void Engine::Render(float elapsedTime)
 			int bt;
 			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
-			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt);
+			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt);
 		}
-		
-		
+
 		//Time control
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
 
-	glColor3f(1.f, 1.f, 1.f);
-
-	// Transformations initiales
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-
-	//Place le joueur au centre du monde
-	m_player.ApplyRotation();
-	m_player.ApplyTranslation();
-
-	
-	//Activation des shaders
-	m_shader01.Use();
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
-
-	//Ciel
-	if (m_player.GetPosition().y > 64)
-	{
-		glPushMatrix();
-		glTranslatef(m_player.GetPosition().x, 0, m_player.GetPosition().z);
-
-		glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
-
-		m_textureSky.Bind();
-
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
-		glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
-		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-		glTexCoord2f(0, 0.25);			glVertex3f(-512, 512, -512);
-
-		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-		glTexCoord2f(0.25, 0.5);		glVertex3f(512, -512, -512);
-		glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
-		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-
-		glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
-		glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
-		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-		glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
-
-		glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
-		glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
-		glTexCoord2f(1, 0.50);			glVertex3f(-512, -512, -512);
-		glTexCoord2f(1, 0.25);			glVertex3f(-512, 512, -512);
-
-		glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
-		glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
-		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-		glEnd();
-		glPopMatrix();
-	}
-
-	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
-
-	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_monster[i].Draw(m_modelRaptor, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_cow[i].Draw(m_modelCow);
-
-	m_playerActor.Draw(m_modelRaptor);
-
-	//Draw guns
-	if (m_player.GetWeapon() != W_BLOCK)
-	playerGun[m_player.GetWeapon()-1].Draw(
-			m_player.GetPosition().x,
-			m_player.GetPosition().y + m_player.GetDimension().y,
-			m_player.GetPosition().z,
-			m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
-	
-
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
-	
-
-	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
-
-	//Draw Chunks
-	m_textureAtlas.Bind();
-	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
-	Shader::Disable();
-	glDisable(GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
-
-	//Draw Bullets
-	for (int j = 0; j < 3; j++)	
-		for (int i = 0; i < MAX_BULLET; i++)	
-			playerGun[j].GetBullets()[i].Draw();
-	
-	//Draw Block focused (black square)
-	if (m_player.GetWeapon() == W_BLOCK)
-	{
-
-		glPushMatrix();
-		glTranslatef((GLfloat)m_currentBlock.x, (GLfloat)m_currentBlock.y, (GLfloat)m_currentBlock.z);
-
-		glBegin(GL_LINE_LOOP);
-		glColor3f(0.0f, 0.0f, 0.0f);
-
-		if (m_currentFaceNormal.z == -1)
-		{
-			glVertex3f(0, 0, 0 - (GLfloat)0.01);
-			glVertex3f(0, (GLfloat)0.99, 0 - (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, (GLfloat)0.99, 0 - (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, 0, 0 - (GLfloat)0.01);
-		}
-		else if (m_currentFaceNormal.x == 1)
-		{
-			glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, 0);
-			glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
-			glVertex3f(1 + (GLfloat)0.01, 0, (GLfloat)0.99);
-			glVertex3f(1 + (GLfloat)0.01, 0, 0);
-		}
-		else if (m_currentFaceNormal.z == 1)
-		{
-			glVertex3f(0, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-			glVertex3f(0, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-		}
-		else if (m_currentFaceNormal.x == -1)
-		{
-			glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
-			glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, 0);
-			glVertex3f(0 - (GLfloat)0.01, 0, 0);
-			glVertex3f(0 - (GLfloat)0.01, 0, (GLfloat)0.99);
-		}
-		else if (m_currentFaceNormal.y == 1)
-		{
-			glVertex3f(0, 1 + (GLfloat)0.01, (GLfloat)0.99);
-			glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, (GLfloat)0.99);
-			glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, 0);
-			glVertex3f(0, 1 + (GLfloat)0.01, 0);
-		}
-		else if (m_currentFaceNormal.y == -1)
-		{
-			glVertex3f(0, 0 - (GLfloat)0.01, (GLfloat)0.99);
-			glVertex3f(0, 0 - (GLfloat)0.01, 0);
-			glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, 0);
-			glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, (GLfloat)0.99);
-
-		}
-		glEnd();
-		glPopMatrix();
-	}
-
 	GetBlocAtCursor();
-	
-	//Draw le hui
-	if (m_wireframe)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	DrawHud();
-	if (m_wireframe)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	DrawEnvironement(gameTime);
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -479,7 +397,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[94])
 		SetFullscreen(!IsFullscreen());
-	
+
 	//V -> toogle noclip mode
 	else if (m_keyboard[sf::Keyboard::V])
 		m_player.ToggleNoClip();
@@ -530,8 +448,6 @@ void Engine::KeyPressEvent(unsigned char key)
 			}
 
 	}
-
-
 	//y -> toggle wireframe mode
 	else if (m_keyboard[24])
 	{
@@ -590,8 +506,8 @@ void Engine::KeyPressEvent(unsigned char key)
 		//m_player.Spawn(m_world);
 	}
 
-	if(!m_player.GetisAlive())
-		if(m_keyboard[sf::Keyboard::Return])
+	if (!m_player.GetisAlive())
+		if (m_keyboard[sf::Keyboard::Return])
 			m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 }
 
@@ -642,11 +558,11 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		{
 			Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
 			m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-			m_Netctl.Send("m " + 
-				std::to_string(chunkPos.x) + 
-				" " + std::to_string(chunkPos.z) + 
-				" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) + 
-				" " + std::to_string(m_currentBlock.y) + 
+			m_Netctl.Send("m " +
+				std::to_string(chunkPos.x) +
+				" " + std::to_string(chunkPos.z) +
+				" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) +
+				" " + std::to_string(m_currentBlock.y) +
 				" " + std::to_string(m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)) +
 				" " + "0");
 		}
@@ -863,7 +779,7 @@ void Engine::DrawHud() const
 }
 void Engine::DrawDeathScreen() const
 {
-	
+
 	glEnable(GL_TEXTURE_2D);
 
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -886,11 +802,11 @@ void Engine::DrawDeathScreen() const
 	//Text
 	std::ostringstream ss;
 	ss << "You're dead !";
-	PrintText(Width()/2 - (ss.str().length() * 48) / 2, Height()/2, 64, ss.str());
-	
+	PrintText(Width() / 2 - (ss.str().length() * 48) / 2, Height() / 2, 64, ss.str());
+
 	ss.str("");
 	ss << "Press enter to rise from your ashes";
-	PrintText(Width()/2 - (ss.str().length() * 24) / 2, Height()/2 - 96, 32, ss.str());
+	PrintText(Width() / 2 - (ss.str().length() * 24) / 2, Height() / 2 - 96, 32, ss.str());
 
 	glEnable(GL_TEXTURE_2D);
 
@@ -1045,6 +961,101 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(10, -1);
 
 	glEnd();
+
+}
+
+void Engine::DrawSky(float gameTime) const
+{
+	glPushMatrix();
+	glTranslatef(m_player.GetPosition().x, 0, m_player.GetPosition().z);
+
+	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
+
+	m_textureSky.Bind();
+
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
+	glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+	glTexCoord2f(0, 0.25);			glVertex3f(-512, 512, -512);
+
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+	glTexCoord2f(0.25, 0.5);		glVertex3f(512, -512, -512);
+	glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+	glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
+
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+	glTexCoord2f(1, 0.50);			glVertex3f(-512, -512, -512);
+	glTexCoord2f(1, 0.25);			glVertex3f(-512, 512, -512);
+
+	glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+	glEnd();
+	glPopMatrix();
+}
+
+void Engine::DrawFocusedBlock() const {
+
+	glPushMatrix();
+	glTranslatef((GLfloat)m_currentBlock.x, (GLfloat)m_currentBlock.y, (GLfloat)m_currentBlock.z);
+
+	glBegin(GL_LINE_LOOP);
+	glColor3f(0.0f, 0.0f, 0.0f);
+
+	if (m_currentFaceNormal.z == -1)
+	{
+		glVertex3f(0, 0, 0 - (GLfloat)0.01);
+		glVertex3f(0, (GLfloat)0.99, 0 - (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, (GLfloat)0.99, 0 - (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, 0, 0 - (GLfloat)0.01);
+	}
+	else if (m_currentFaceNormal.x == 1)
+	{
+		glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, 0);
+		glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
+		glVertex3f(1 + (GLfloat)0.01, 0, (GLfloat)0.99);
+		glVertex3f(1 + (GLfloat)0.01, 0, 0);
+	}
+	else if (m_currentFaceNormal.z == 1)
+	{
+		glVertex3f(0, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+		glVertex3f(0, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+	}
+	else if (m_currentFaceNormal.x == -1)
+	{
+		glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
+		glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, 0);
+		glVertex3f(0 - (GLfloat)0.01, 0, 0);
+		glVertex3f(0 - (GLfloat)0.01, 0, (GLfloat)0.99);
+	}
+	else if (m_currentFaceNormal.y == 1)
+	{
+		glVertex3f(0, 1 + (GLfloat)0.01, (GLfloat)0.99);
+		glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, (GLfloat)0.99);
+		glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, 0);
+		glVertex3f(0, 1 + (GLfloat)0.01, 0);
+	}
+	else if (m_currentFaceNormal.y == -1)
+	{
+		glVertex3f(0, 0 - (GLfloat)0.01, (GLfloat)0.99);
+		glVertex3f(0, 0 - (GLfloat)0.01, 0);
+		glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, 0);
+		glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, (GLfloat)0.99);
+
+	}
+	glEnd();
+	glPopMatrix();
 
 }
 
