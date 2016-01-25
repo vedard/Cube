@@ -105,12 +105,9 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		else
 			deplacementVector -= directionVector;
 	}
-	if (right) {
+	if (right) 
 		deplacementVector += rightVector;
-	}
-	else if (left) {
 		deplacementVector -= rightVector;
-	}
 	//Si on bouge pas -> vitesse = 0
 	if (!left && !right && !front && !back)
 	{
@@ -167,8 +164,9 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					GetDamage(exp(m_vitesse.y * 6));
+					GetDamage(exp(m_vitesse.y * 6), TRUE);
 			}
+			
 			//annule
 			m_pos.y += m_vitesse.y;
 			m_vitesse.y = 0;
@@ -176,39 +174,25 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 		//Acceleration
 		if (m_footUnderwater)
-		{
 			m_vitesse.y += 0.002f;
-		}
 		else if(m_footUnderLava)
-		{
 			m_vitesse.y += 0.001f;
-		}
 		else
-		{
 			m_vitesse.y += 0.013f;
-		}
-
 	}
 
 	//Si le player est dans l'eau
 	CheckUnderwater(world);
 
 	if (m_footUnderwater)
-	{
-
-
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
-	}
 	//si le player est en dessous de la lave
 	CheckUnderLava(world);
 
 	if (m_footUnderLava)
-	{
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
-	}
-	
 }
 
 void Player::CheckUnderwater(World &world)
@@ -220,7 +204,7 @@ void Player::CheckUnderwater(World &world)
 	else
 		m_headUnderwater = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 1.5f, m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5f, m_pos.z);
 
 	if (bt1 == BTYPE_WATER)
 		m_footUnderwater = true;
@@ -346,17 +330,13 @@ bool Player::Underwater() const { return m_headUnderwater; }
 void Player::Tick()
 {
 	if (m_footUnderLava)
-		GetDamage(5);
+		GetDamage(5,TRUE);
 	if (m_headUnderwater)
 	{
 		m_BreathCount++;
 		if (m_BreathCount > 15)
-		{
-			GetDamage(3);
-		}
+			GetDamage(3,TRUE);
 	}
 	else
-	{
 		m_BreathCount = 0;
-	}
 }

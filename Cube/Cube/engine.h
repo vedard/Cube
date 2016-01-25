@@ -45,8 +45,12 @@ public:
 	void GetBlocAtCursor();
 
 private:
+	void UpdateEnvironement();
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
+	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
+	void DrawFocusedBlock() const;
+	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
@@ -54,7 +58,7 @@ private:
 
 private:
 	bool m_wireframe;
-
+	float m_LastTickTime;
 	Player m_player;
 	PlayerActor m_playerActor;
 	Monster* m_monster;

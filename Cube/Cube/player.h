@@ -20,7 +20,7 @@ public:
 	void ApplyTranslation();
 	void ToggleNoClip();
 	void Jump();
-	void CheckTick();
+	void Tick();
 
 
 	bool Underwater() const;
@@ -40,7 +40,6 @@ public:
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
-	void Tick();
 
 private:
 	time_t m_TickBegin;     //timer de tick
