@@ -284,7 +284,7 @@ void Player::SetWeapon(int mode)
 
 void Player::Jump()
 {
-	if (!m_isInAir && !m_footUnderwater)
+	if (!m_isInAir && !m_footUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20))
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
