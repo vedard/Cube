@@ -205,7 +205,14 @@ void Player::CheckUnderwater(World &world)
 	else
 		m_headUnderwater = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5f, m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5, m_pos.z);
+
+	if (bt1 == BTYPE_WATER)
+		m_kneeUnderwater = true;
+	else
+		m_kneeUnderwater = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
 
 	if (bt1 == BTYPE_WATER)
 		m_footUnderwater = true;
@@ -222,10 +229,17 @@ void Player::CheckUnderLava(World &world)
 	else
 		m_headUnderLava = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5f, m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5 , m_pos.z);
 
 	if (bt1 == BTYPE_LAVA)
-		m_footUnderLava = true; 
+		m_kneeUnderLava = true; 
+	else
+		m_kneeUnderLava = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
+
+	if (bt1 == BTYPE_LAVA)
+		m_footUnderLava = true;
 	else
 		m_footUnderLava = false;
 }
@@ -310,19 +324,19 @@ void Player::SetWeapon(int mode)
 
 void Player::Jump()
 {
-	if (!m_isInAir && !m_footUnderwater)
+	if (!m_isInAir && !m_kneeUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20) && !m_kneeUnderLava)
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
 	}
-	else if (m_footUnderwater && !m_headUnderwater)
+	else if (m_footUnderwater && !m_headUnderwater && m_kneeUnderwater)
 		m_vitesse.y = -0.002f;
-	else if (m_footUnderwater)
+	else if (m_footUnderwater && m_headUnderwater && m_kneeUnderwater)
 		m_vitesse.y = -0.09f;
-	else if (m_footUnderLava && !m_headUnderLava)
+	else if (m_footUnderLava && !m_headUnderLava && m_kneeUnderLava)
 		m_vitesse.y = -0.002f;
-	else if (m_footUnderLava)
-		m_vitesse.y = -0.09f;
+	else if (m_footUnderLava && m_headUnderLava && m_kneeUnderLava)
+		m_vitesse.y = -0.07f;
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
