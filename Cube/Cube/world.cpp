@@ -1,8 +1,14 @@
 #include "world.h"
+#include "animal.h"
+#include "monster.h"
+#include "player.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
 {
-	
+	// Initialise les monstres et animaux.
+	m_animal = new Animal[MAX_COW];
+	m_monster = new Monster[MAX_MONSTER];
+	m_player = new Player;
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -35,13 +41,15 @@ World::~World()
 {
 }
 
+Animal* World::GetAnimal() const { return m_animal; }
+Monster* World::GetMonster() const { return m_monster; }
+Player* World::GetPlayer() const { return m_player; }
+
 void World::InitMap(int seed)
 {
-
 	m_seed = seed;
 	std::srand(seed);
 	randomize(seed);
-
 
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -51,14 +59,25 @@ void World::InitMap(int seed)
 			chunk->GetSave() = false;
 			chunk->DeleteCache();
 			chunk->m_iscreated = false;
-
 		}
-
 
 	if (seed != 0)
 		std::cout << "Map created with this seed: " << seed << std::endl << std::endl;
 	else
 		std::cout << "Flat map created" << std::endl << std::endl;
+
+	//  -- Monster
+	for (int i = 0; i < MAX_MONSTER; i++)
+	{
+		m_monster[i].SetName("Monster " + std::to_string(i + 1));
+		m_monster[i].SetTarget((Character*)&m_player);
+	}
+
+	//  -- Cow
+	for (int i = 0; i < MAX_COW; i++)
+		m_animal[i].SetName("Cow " + std::to_string(i + 1));
+
+
 }
 
 void World::InitChunk(float i, float j)
@@ -580,4 +599,24 @@ void World::SetUpdateDistance(int updateDist)
 {
 	if (updateDist > 0)
 		UpdateDistance = updateDist;
+}
+
+void World::SpawnAnimals()
+{
+		for (int i = 0; i < MAX_COW; i++)
+			if (!m_animal[i].GetisAlive())
+			{
+				m_animal[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+				break;
+			}
+}
+
+void World::SpawnMonsters()
+{
+	for (int i = 0; i < MAX_MONSTER; i++)
+		if (!m_monster[i].GetisAlive())
+		{
+			m_monster[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
+			break;
+		}
 }
