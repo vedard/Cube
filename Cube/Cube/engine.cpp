@@ -17,7 +17,6 @@ Engine::Engine() :
 
 	//Creation du tableau des tableaux;
 	m_bInfo = new BlockInfo[256];
-	playerGun = new Gun[3];
 }
 
 Engine::~Engine()
@@ -128,15 +127,13 @@ void Engine::LoadResource()
 
 
 	//Model 3d
-
 	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
-
 	//Gun
-	playerGun[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, true, 400, 1000);
-	playerGun[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
-	playerGun[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100);
+	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -175,16 +172,15 @@ void Engine::UpdateEnvironement()
 		playerGun[k].Update();
 		for (int i = 0; i < MAX_BULLET; i++)
 		{
-			playerGun[k].GetBullets()[i].Update();
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
 
 			//Check si y a collision
 			for (int j = 0; j < MAX_MONSTER; j++)
-				playerGun[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]);
-
+				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]);
 			for (int j = 0; j < MAX_COW; j++)
-				playerGun[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]);
+				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]);
 
-			playerGun[k].GetBullets()[i].CheckCollision(m_world);
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
 
 		}
 	}
@@ -252,7 +248,7 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
-		playerGun[m_world.GetPlayer()->GetWeapon() - 1].Draw(
+		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
 			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y,
 			m_world.GetPlayer()->GetPosition().z,
@@ -271,7 +267,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Bullets
 	for (int j = 0; j < 3; j++)
 		for (int i = 0; i < MAX_BULLET; i++)
-			playerGun[j].GetBullets()[i].Draw();
+			m_world.GetPlayer()->GetGuns()[j].GetBullets()[i].Draw();
 
 	//Draw Block focused (black square)
 	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
@@ -318,12 +314,16 @@ void Engine::Render(float elapsedTime)
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
-		//Tirer
-		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK)
-		{
-			playerGun[m_world.GetPlayer()->GetWeapon() - 1].Shoot(m_world.GetPlayer()->GetPosition().x, m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y, m_world.GetPlayer()->GetPosition().z, m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
-			(playerGun[m_world.GetPlayer()->GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
-		}
+		////Tirer
+		//if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+		//{
+		//	playerGun[m_world.GetPlayer()->GetWeapon() - 1].Shoot(m_world.GetPlayer()->GetPosition().x, m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y, m_world.GetPlayer()->GetPosition().z, m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
+		//	(playerGun[m_world.GetPlayer()->GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
+		//}
+
+		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
+			m_mouseButton[1] = false;
+
 
 		//Net
 		static int sdf = 0;
