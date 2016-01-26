@@ -63,6 +63,7 @@ typedef long long int64;
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
+#define TICK_DELAY .5f
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 

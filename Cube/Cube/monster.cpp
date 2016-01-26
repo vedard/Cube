@@ -152,5 +152,5 @@ void Monster::GetDamage(float damage)
 {
 	m_ClockAnimationDmg.restart();
 
-	Character::GetDamage(damage);
+	Character::GetDamage(damage,FALSE);
 }
