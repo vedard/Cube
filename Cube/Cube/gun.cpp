@@ -59,3 +59,4 @@ const bool Gun::GetIsAuto() const
 {
 	return m_isAutomatic;
 }
+

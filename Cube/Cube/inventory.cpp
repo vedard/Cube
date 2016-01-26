@@ -3,20 +3,59 @@
 
 Inventory::Inventory()
 {
-	for (size_t i = 0; i < FAST_INVENTORY_SIZE; i++)
+	for (size_t i = 0; i < sizeof(m_objetsFast); i++)
 		m_objetsFast[i] = &m_objets[i];
 }
 
 
 Inventory::~Inventory()
 {
-	for (size_t i = 0; i < FAST_INVENTORY_SIZE; i++)
+	for (size_t i = 0; i < sizeof(m_objetsFast); i++)
 		m_objetsFast[i] = new Item;
 
 	delete[] *m_objetsFast;								//freed memory
 
-	for (size_t i = 0; i < FAST_INVENTORY_SIZE; i++)	//pointed dangling ptr to NULL
+	for (size_t i = 0; i < sizeof(m_objetsFast); i++)	//pointed dangling ptr to NULL
 		m_objetsFast[i] = NULL;
+}
+
+void Inventory::AddItemQ(Item type)
+{
+	this->AddItemQ(type, 1);
+}
+
+void Inventory::AddItemQ(Item type, int number)
+{
+	for (size_t i = 0; i < sizeof(m_objets); i++)
+	{
+		if (m_objets[i].GetType() == type.GetType())
+		{
+			m_objets[i].Add(number);
+			break;
+		} 
+		if (m_objets[i].GetQuantity() == NULL || m_objets[i].GetQuantity() == 0)
+		{
+			m_objets[i] = type;
+			break;
+		}
+	}
+}
+
+void Inventory::RemoveItemQ(Item type)
+{
+	this->RemoveItemQ(type, 1);
+}
+
+void Inventory::RemoveItemQ(Item type, int number)
+{
+	for (size_t i = 0; i < sizeof(m_objets); i++)
+	{
+		if (m_objets[i].GetType() == type.GetType() && m_objets[i].GetQuantity() > 0)
+		{
+			m_objets[i].Remove(number);
+			break;
+		}
+	}
 }
 
 void Inventory::ReassignItemShortcut(int index_itemFast, int index_item)

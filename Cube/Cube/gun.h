@@ -6,7 +6,7 @@
 #include "sound.h"
 #include "item.h"
 
-class Gun : Item
+class Gun
 {
 
 public:
