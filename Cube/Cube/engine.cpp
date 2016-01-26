@@ -169,7 +169,7 @@ void Engine::UpdateEnvironement()
 	//Update les balles
 	for (int k = 0; k < 3; k++)
 	{ 
-		playerGun[k].Update();
+		m_world.GetPlayer()->GetGuns()[k].Update();
 		for (int i = 0; i < MAX_BULLET; i++)
 		{
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
