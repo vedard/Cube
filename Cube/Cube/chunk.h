@@ -4,6 +4,9 @@
 #include "chunkmesh.h"
 #include "vector3.h"
 #include "blockinfo.h"
+#include <stdlib.h>
+#include <sstream>
+#include <string>
 
 class Chunk
 {
@@ -37,9 +40,10 @@ public:
 private:
 	bool CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
 	float CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const;
-	void CheckWater(const Vector3<float> &Blockpos, BlockInfo &binfo, int max);
 	BlockType ChooseWater(int numero);
 	void AddWater(const Vector3<float> &Blockpos);
+	char GetDirection(const Vector3<float> &Blockpos);
+	void WaterExplosion(const Vector3<float> &Blockpos);
 
 
 	//Todo - rendre private

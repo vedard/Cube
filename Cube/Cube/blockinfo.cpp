@@ -48,15 +48,6 @@ void BlockInfo::Afficher() const
     std::cout << "Durabilite: " << m_durabilite << std::endl;
 }
 
-void BlockInfo::SetDirection(char direction)
-{
-	m_direction = direction;
-}
-
-char BlockInfo::GetDirection() const
-{
-	return m_direction;
-}
 
 std::ostream& operator<<(std::ostream& o, const BlockInfo& v)
 {
