@@ -5,7 +5,7 @@ Gun::Gun()
 {
 	m_bullets = new Bullet[MAX_BULLET];
 	bool m_isAutomatic = false;
-	float m_cooldown = 0.1;
+	float m_cooldown = 0.01f;
 }
 
 
@@ -26,9 +26,9 @@ void Gun::Draw(float x, float y, float z, float rotX, float rotY) const
 {
 	//Permet de render le model 3d de l'Arme a la bonne position (en bas a droite de l'ecran)
 	m_model.Render(
-		x - (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) + cos(rotX * PI / 180) * 0.4 + (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5,
-		y + cos(rotY * PI / 180 + PI / 2) - cos(rotY * PI / 180) * 0.5,
-		z - (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) + sin(rotX * PI / 180) * 0.4 + (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5,
+		(float)(x - (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) + cos(rotX * PI / 180) * 0.4 + (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5),
+		(float)(y + cos(rotY * PI / 180 + PI / 2) - cos(rotY * PI / 180) * 0.5),
+		(float)(z - (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) + sin(rotX * PI / 180) * 0.4 + (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5),
 		-rotX, -rotY, 1, 1, 1);
 }
 
@@ -47,6 +47,7 @@ bool Gun::Shoot(float x, float y, float z, float rotX, float rotY)
 	}
 	else
 		return false;
+	return false;
 }
 
 Bullet* Gun::GetBullets()

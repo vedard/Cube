@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2013 Laurent Gomila (laurent.gom@gmail.com)
+// Copyright (C) 2007-2015 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -40,7 +40,7 @@ namespace sf
 ////////////////////////////////////////////////////////////
 class SFML_GRAPHICS_API Transformable
 {
-public :
+public:
 
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
@@ -311,7 +311,7 @@ public :
     ////////////////////////////////////////////////////////////
     const Transform& getInverseTransform() const;
 
-private :
+private:
 
     ////////////////////////////////////////////////////////////
     // Member data
@@ -359,10 +359,10 @@ private :
 /// In addition to the position, rotation and scale, sf::Transformable
 /// provides an "origin" component, which represents the local origin
 /// of the three other components. Let's take an example with a 10x10
-/// pixels sprite. By default, the sprite is positionned/rotated/scaled
+/// pixels sprite. By default, the sprite is positioned/rotated/scaled
 /// relatively to its top-left corner, because it is the local point
 /// (0, 0). But if we change the origin to be (5, 5), the sprite will
-/// be positionned/rotated/scaled around its center instead. And if
+/// be positioned/rotated/scaled around its center instead. And if
 /// we set the origin to (10, 10), it will be transformed around its
 /// bottom-right corner.
 ///
@@ -396,7 +396,7 @@ private :
 /// \code
 /// class MyEntity
 /// {
-/// public :
+/// public:
 ///     void SetPosition(const MyVector& v)
 ///     {
 ///         myTransform.setPosition(v.x(), v.y());
@@ -407,10 +407,22 @@ private :
 ///         target.draw(..., myTransform.getTransform());
 ///     }
 ///
-/// private :
+/// private:
 ///     sf::Transformable myTransform;
 /// };
 /// \endcode
+///
+/// A note on coordinates and undistorted rendering: \n
+/// By default, SFML (or more exactly, OpenGL) may interpolate drawable objects
+/// such as sprites or texts when rendering. While this allows transitions
+/// like slow movements or rotations to appear smoothly, it can lead to
+/// unwanted results in some cases, for example blurred or distorted objects.
+/// In order to render a sf::Drawable object pixel-perfectly, make sure
+/// the involved coordinates allow a 1:1 mapping of pixels in the window
+/// to texels (pixels in the texture). More specifically, this means:
+/// * The object's position, origin and scale have no fractional part
+/// * The object's and the view's rotation are a multiple of 90 degrees
+/// * The view's center and size have no fractional part
 ///
 /// \see sf::Transform
 ///

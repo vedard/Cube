@@ -55,7 +55,7 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 20
-#define MAX_MONSTER 0
+#define MAX_MONSTER 10
 #define MAX_COW 30
 #define PI 3.14159265358f
 #define MAX_BULLET 500
@@ -64,12 +64,12 @@ typedef long long int64;
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
 
-#define INVENTORY_SIZE 			15
-#define FAST_INVENTORY_SIZE 		3
+#define INVENTORY_SIZE 			15	//Must be larger than FAST_INVENTORY_SIZE
+#define FAST_INVENTORY_SIZE 		3	//If changed, modification must be made into the render and the keybinding to apply the changes
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
-
+#define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 

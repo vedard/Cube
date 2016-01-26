@@ -42,24 +42,28 @@ bool Bullet::CheckCollision(Character &character)
 	{
 		int nbrIteration = 10;
 		if (character.GetDimension().x <= character.GetDimension().y && character.GetDimension().x <= character.GetDimension().z)
-			nbrIteration = ceil(m_vitesse.x / character.GetDimension().x);
+			nbrIteration = (int)ceil(m_vitesse.x / character.GetDimension().x);
 		if (character.GetDimension().y <= character.GetDimension().x && character.GetDimension().y <= character.GetDimension().z)
-			nbrIteration = ceil(m_vitesse.y / character.GetDimension().y);
+			nbrIteration = (int)ceil(m_vitesse.y / character.GetDimension().y);
 		if (character.GetDimension().z <= character.GetDimension().y && character.GetDimension().z <= character.GetDimension().x)
-			nbrIteration = ceil(m_vitesse.z / character.GetDimension().z);
+			nbrIteration = (int)ceil(m_vitesse.z / character.GetDimension().z);
 
 		for (int i = 0; i < nbrIteration; i++)
 		{
-			if (m_LastPos.x + directionVector.x / nbrIteration * i >= character.GetPosition().x - character.GetDimension().x / 2
-				&& m_LastPos.x + directionVector.x / nbrIteration * i < character.GetPosition().x + character.GetDimension().x / 2
-				&& m_LastPos.y + directionVector.y / nbrIteration * i >= character.GetPosition().y
-				&& m_LastPos.y + directionVector.y / nbrIteration * i < character.GetPosition().y + character.GetDimension().y
-				&& m_LastPos.z + directionVector.z / nbrIteration * i >= character.GetPosition().z - character.GetDimension().z / 2
-				&& m_LastPos.z + directionVector.z / nbrIteration * i < character.GetPosition().z + character.GetDimension().z / 2)
+			float x = m_LastPos.x + directionVector.x / nbrIteration * i;
+			float y = m_LastPos.y + directionVector.y / nbrIteration * i;
+			float z = m_LastPos.z + directionVector.z / nbrIteration * i;
+
+			if (x >= character.GetPosition().x - character.GetDimension().x / 2
+				&& x < character.GetPosition().x + character.GetDimension().x / 2
+				&& y >= character.GetPosition().y
+				&& y < character.GetPosition().y + character.GetDimension().y
+				&& z >= character.GetPosition().z - character.GetDimension().z / 2
+				&& z < character.GetPosition().z + character.GetDimension().z / 2)
 			{
 
 				//f(x) = -1 * 1.02 ^ (x + 10) + 50
-				character.GetDamage(-1 * pow(1.04, m_distance + 10) + m_damage);
+				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage));
 				m_isActive = false;
 				return true;
 			}
@@ -67,23 +71,36 @@ bool Bullet::CheckCollision(Character &character)
 	}
 	return false;
 }
+
+
 bool Bullet::CheckCollision(World &world)
 {
 	if (m_isActive)
 	{
-		BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y, m_pos.z);
+		// Pour les collision les bullet se deplace trop rapidement il faut donc teste plusieur point entre la derniere position 
+		// et la position actuelle afin de s'assurer qu'elle na pas passe a travers un objet
+		int nbrIteration = 100;
 
-		//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
-		if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)
+		for (int i = 0; i < nbrIteration; i++)
 		{
-			/*Vector3<float> chunkPos(floor(m_pos.x / CHUNK_SIZE_X), 0, floor(m_pos.z / CHUNK_SIZE_Z));
-			Chunk * chunk = world.ChunkAt(chunkPos.x, chunkPos.z);
+			float x = m_LastPos.x + directionVector.x / nbrIteration * i;
+			float y = m_LastPos.y + directionVector.y / nbrIteration * i;
+			float z = m_LastPos.z + directionVector.z / nbrIteration * i;
 
-			if (chunk)
-			chunk->RemoveBloc(m_pos.x - (chunkPos.x * CHUNK_SIZE_X), m_pos.y, m_pos.z - (chunkPos.z * CHUNK_SIZE_X));*/
-			m_isActive = false;
-			return true;
+			BlockType bt1 = world.BlockAt(x, y, z);
 
+			//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
+			if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)
+			{
+				Vector3<float> chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
+				Chunk * chunk = world.ChunkAt(chunkPos.x, chunkPos.z);
+
+				if (chunk)
+					chunk->RemoveBloc(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
+				m_isActive = false;
+				return true;
+
+			}
 		}
 	}
 	return false;
@@ -95,9 +112,9 @@ void Bullet::Draw() const
 	if (m_isActive)
 	{
 
-		float width = 1.0;
-		float height = 0.07;
-		float depth = 0.07;
+		float width = 1.0f;
+		float height = 0.07f;
+		float depth = 0.07f;
 
 		glPushMatrix();
 		glTranslatef(m_pos.x, m_pos.y, m_pos.z);

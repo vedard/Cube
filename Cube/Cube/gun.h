@@ -4,8 +4,9 @@
 #include "bullet.h"
 #include "model3d.h"
 #include "sound.h"
+#include "item.h"
 
-class Gun
+class Gun : Item
 {
 
 public:

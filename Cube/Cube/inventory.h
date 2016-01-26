@@ -8,6 +8,7 @@ public:
 	Inventory();
 	~Inventory();
 
+	void ReassignItemShortcut(int index_itemFast, int index_item);
 	void SwitchItems(int index_item1, int index_item2);
 private:
 

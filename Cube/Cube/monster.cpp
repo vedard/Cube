@@ -3,12 +3,12 @@
 Monster::Monster() : Character()
 {
 
-	m_dimension = Vector3<float>(0.9, 2.6, 0.9);
-	m_AttackRange = 2.2;
-	m_AttackSpeed = 1.3;
+	m_dimension = Vector3<float>(0.9f, 2.6f, 0.9f);
+	m_AttackRange = (int)2.2;
+	m_AttackSpeed = 1.3f;
 	m_AttackDamage = 20;
 	m_VerticalRot = 0;
-	m_Armor = 1.1;
+	m_Armor = 1.1f;
 	m_target = NULL;
 	m_isAlive = false;
 }
@@ -21,8 +21,8 @@ void Monster::Move(World &world)
 {
 	if (m_isAlive)
 	{
-		m_vitesse.x = 0.05;
-		m_vitesse.z = 0.05;
+		m_vitesse.x = 0.05f;
+		m_vitesse.z = 0.05f;
 
 		//Si la cible est valide
 		if (m_target)

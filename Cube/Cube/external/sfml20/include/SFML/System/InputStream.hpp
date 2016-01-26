@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2013 Laurent Gomila (laurent.gom@gmail.com)
+// Copyright (C) 2007-2015 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -29,6 +29,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Config.hpp>
+#include <SFML/System/Export.hpp>
 
 
 namespace sf
@@ -37,18 +38,21 @@ namespace sf
 /// \brief Abstract class for custom file input streams
 ///
 ////////////////////////////////////////////////////////////
-class InputStream
+class SFML_SYSTEM_API InputStream
 {
-public :
+public:
 
     ////////////////////////////////////////////////////////////
     /// \brief Virtual destructor
     ///
     ////////////////////////////////////////////////////////////
     virtual ~InputStream() {}
-    
+
     ////////////////////////////////////////////////////////////
     /// \brief Read data from the stream
+    ///
+    /// After reading, the stream's reading position must be
+    /// advanced by the amount of bytes read.
     ///
     /// \param data Buffer where to copy the read data
     /// \param size Desired number of bytes to read
@@ -67,7 +71,7 @@ public :
     ///
     ////////////////////////////////////////////////////////////
     virtual Int64 seek(Int64 position) = 0;
-    
+
     ////////////////////////////////////////////////////////////
     /// \brief Get the current reading position in the stream
     ///
@@ -111,21 +115,21 @@ public :
 /// // custom stream class that reads from inside a zip file
 /// class ZipStream : public sf::InputStream
 /// {
-/// public :
-/// 
+/// public:
+///
 ///     ZipStream(std::string archive);
 ///
 ///     bool open(std::string filename);
 ///
 ///     Int64 read(void* data, Int64 size);
-/// 
+///
 ///     Int64 seek(Int64 position);
-///     
+///
 ///     Int64 tell();
-/// 
+///
 ///     Int64 getSize();
 ///
-/// private :
+/// private:
 ///
 ///     ...
 /// };
