@@ -79,7 +79,7 @@ bool Bullet::CheckCollision(World &world)
 	{
 		// Pour les collision les bullet se deplace trop rapidement il faut donc teste plusieur point entre la derniere position 
 		// et la position actuelle afin de s'assurer qu'elle na pas passe a travers un objet
-		int nbrIteration = 100;
+		int nbrIteration = 60;
 
 		for (int i = 0; i < nbrIteration; i++)
 		{
