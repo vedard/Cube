@@ -171,6 +171,8 @@ void Engine::UpdateEnvironement()
 
 	//Update les balles
 	for (int k = 0; k < 3; k++)
+	{ 
+		playerGun[k].Update();
 		for (int i = 0; i < MAX_BULLET; i++)
 		{
 			playerGun[k].GetBullets()[i].Update();
@@ -185,6 +187,7 @@ void Engine::UpdateEnvironement()
 			playerGun[k].GetBullets()[i].CheckCollision(m_world);
 
 		}
+	}
 
 	//Update les monstres
 	for (int i = 0; i < MAX_MONSTER; i++)

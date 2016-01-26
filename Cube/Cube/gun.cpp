@@ -6,6 +6,8 @@ Gun::Gun()
 	m_bullets = new Bullet[MAX_BULLET];
 	bool m_isAutomatic = false;
 	float m_cooldown = 0.01f;
+	m_recoilByBullet = 0.09;
+	m_recoilTotal = 0.0f;
 }
 
 
@@ -24,12 +26,21 @@ void Gun::Init(std::string modelPath, std::string texturePath, int sound, bool i
 
 void Gun::Draw(float x, float y, float z, float rotX, float rotY) const
 {
+
 	//Permet de render le model 3d de l'Arme a la bonne position (en bas a droite de l'ecran)
 	m_model.Render(
-		(float)(x - (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) + cos(rotX * PI / 180) * 0.4 + (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5),
-		(float)(y + cos(rotY * PI / 180 + PI / 2) - cos(rotY * PI / 180) * 0.5),
-		(float)(z - (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) + sin(rotX * PI / 180) * 0.4 + (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5),
+		(float)(x - (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) * (1 - m_recoilTotal) + cos(rotX * PI / 180) * (0.4) + (cos(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5),
+		(float)(y + cos(rotY * PI / 180 + PI / 2 )* (1 - m_recoilTotal) - cos(rotY * PI / 180) * 0.5),
+		(float)(z - (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180 + PI / 2)) * (1 - m_recoilTotal) + sin(rotX * PI / 180) * (0.4) + (sin(rotX * PI / 180 + PI / 2) * sin(rotY * PI / 180)) * 0.5),
 		-rotX, -rotY, 1, 1, 1);
+}
+
+void Gun::Update() 
+{
+	m_recoilTotal /= 1.2;
+	if (m_recoilTotal < 0)
+		m_recoilTotal = 0;
+
 }
 
 bool Gun::Shoot(float x, float y, float z, float rotX, float rotY)
@@ -41,6 +52,7 @@ bool Gun::Shoot(float x, float y, float z, float rotX, float rotY)
 			if (!m_bullets[i].GetIsActive())
 			{
 				m_bullets[i].Init(x, y, z, rotY + (rand() % 50 - 25) * 20 / 400, rotX + (rand() % 50 - 25) * 20 / 400, m_damage);
+				m_recoilTotal += m_recoilByBullet;
 				Sound::Play(m_sound);
 				return true;
 			}
