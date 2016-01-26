@@ -306,7 +306,6 @@ void Engine::Render(float elapsedTime)
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
-		UpdateEnvironement();
 
 		//Footstep
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
@@ -347,6 +346,7 @@ void Engine::Render(float elapsedTime)
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
 			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt);
 		}
+		UpdateEnvironement();
 
 		//Time control
 		//1 / 0.02 = 50 fps
