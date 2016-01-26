@@ -617,6 +617,7 @@ void World::SpawnMonsters()
 		if (!m_monster[i].GetisAlive())
 		{
 			m_monster[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
+			m_monster[i].SetTarget(m_player);
 			break;
 		}
 }
