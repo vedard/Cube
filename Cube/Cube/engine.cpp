@@ -90,25 +90,31 @@ void Engine::LoadResource()
 	LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
 
 	//Load texture dans l'atlas
-	AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp");
-	AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp");
-	AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp");
-	AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp");
-	AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp");
-	AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp");
-	AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp");
-	AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp");
-	AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp");
-	AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp");
-	AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp");
-	AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp");
-	AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp");
-	AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp");
-	AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png");
-	AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png");
-	AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp");
-	AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp");
-	AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp");
+	AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
+	AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp", 1);
+	AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp", 1);
+	AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp", 1);
+	AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp", 1);
+	AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp", 1);
+	AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp", 1);
+	AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp", 1);
+	AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp", 1);
+	AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp", 1);
+	AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp", 1);
+	AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp", 1);
+	AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp", 1);
+	AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp", 1);
+	AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png", 1);
+	AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png", 1);
+	AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp", 1);
+	AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
+	AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
+
+	AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
+	AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
+	AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
+	AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
+
 
 	if (!m_textureAtlas.Generate(64, false))
 	{
@@ -1066,9 +1072,10 @@ void Engine::DrawFocusedBlock() const {
 
 }
 
-void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path)
+void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur)
 {
 	m_bInfo[type].Init(type, name);
+	m_bInfo[type].SetHauteur(hauteur);
 	m_texBlockIndex = m_textureAtlas.AddTexture(path);
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
 }
