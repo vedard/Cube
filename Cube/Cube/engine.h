@@ -45,7 +45,7 @@ public:
 	void GetBlocAtCursor();
 
 private:
-	void UpdateEnvironement();
+	void UpdateEnvironement(float gameTime);
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
@@ -58,7 +58,8 @@ private:
 
 private:
 	bool m_wireframe;
-	float m_LastTickTime;
+	float m_LastTickTimeDamage;
+	float m_LastTickTimeWater;
 	PlayerActor m_playerActor;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier

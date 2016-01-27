@@ -8,7 +8,8 @@ Engine::Engine() :
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false)
 {
-	m_LastTickTime = 0.0f;
+	m_LastTickTimeDamage = 0.0f;
+	m_LastTickTimeWater = 0.0f;
 
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -171,7 +172,7 @@ void Engine::UnloadResource()
 
 }
 
-void Engine::UpdateEnvironement()
+void Engine::UpdateEnvironement(float gameTime)
 {
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	//Update le player
@@ -208,6 +209,13 @@ void Engine::UpdateEnvironement()
 
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+
+	//Update eau
+	if (gameTime - m_LastTickTimeWater >= TICK_DELAY_WATER)
+	{
+		m_LastTickTimeWater = gameTime;
+		//m_world
+	}
 
 }
 void Engine::DrawEnvironement(float gameTime) {
@@ -299,9 +307,9 @@ void Engine::Render(float elapsedTime)
 	gameTime += elapsedTime;
 
 	//Gestion des Ticks
-	if (gameTime - m_LastTickTime >= TICK_DELAY)
+	if (gameTime - m_LastTickTimeDamage >= TICK_DELAY_DAMAGE)
 	{
-		m_LastTickTime = gameTime;
+		m_LastTickTimeDamage = gameTime;
 		m_world.GetPlayer()->Tick();
 	}
 
@@ -360,7 +368,7 @@ void Engine::Render(float elapsedTime)
 			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
 			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt, ' ');		}
-		UpdateEnvironement();
+		UpdateEnvironement(gameTime);
 
 		//Time control
 		//1 / 0.02 = 50 fps

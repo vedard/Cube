@@ -155,34 +155,36 @@ void Chunk::Update(BlockInfo* &binfo)
 						AddBlockToMesh(vdt, count_t, binfo[bt], Vector3<float>(x + m_position.x, y + m_position.y, z + m_position.z));
 
 				}
-
+		
+		//Delete when timer/thread works
 		for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 				for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 				{
 					BlockType bt = GetBlock(x, y, z);
 
-					if (bt == BTYPE_WATER || bt == BTYPE_FWATER)
+					if (bt == BTYPE_WATER || bt == BTYPE_FWATER && TickCount == 0)
 					{
 						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-					if (bt == BTYPE_RWATER1)
+					if (bt == BTYPE_RWATER1 && TickCount == 1)
 					{
 						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-					if (bt == BTYPE_RWATER2)
+					if (bt == BTYPE_RWATER2 && TickCount == 2)
 					{
 						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-					if (bt == BTYPE_RWATER3)
+					if (bt == BTYPE_RWATER3 && TickCount == 3)
 					{
 						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
 				}
+
 		if (count_s > USHRT_MAX)
 		{
 			count_s = USHRT_MAX;
@@ -355,6 +357,7 @@ float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float>
 	}
 }
 
+
 const char& Chunk::GetDirection(int x, int y, int z) const
 {
 	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
@@ -439,7 +442,7 @@ void Chunk::Water1(const Vector3<float> &Blockpos)
 		{
 			if (direction == 'Q')
 			{
-				direction = GetDirection(Blockpos);
+				direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
 				m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
 			}
 			if (direction != 'Q')
@@ -630,6 +633,41 @@ BlockType Chunk::WaterCheck(int x, int y, int z, BlockType bt)
 		else if (bt == BTYPE_RWATER2 && (BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
 			return BTYPE_RWATER3;
 	return BTYPE_AIR;
+}
+
+void Chunk::WaterTick()
+{
+
+	for (int x = 0; x < CHUNK_SIZE_X; ++x)
+		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+			{
+				BlockType bt = GetBlock(x, y, z);
+
+				if (bt == BTYPE_WATER || bt == BTYPE_FWATER && TickCount == 0)
+				{
+					//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					Water1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				if (bt == BTYPE_RWATER1 && TickCount == 1)
+				{
+					//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				if (bt == BTYPE_RWATER2 && TickCount == 2)
+				{
+					//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				if (bt == BTYPE_RWATER3 && TickCount == 3)
+				{
+					//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+			}
+	TickCount++;
+	if (TickCount > 3)
+		TickCount = 0;
 }
 
 

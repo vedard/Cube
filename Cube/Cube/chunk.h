@@ -48,6 +48,7 @@ private:
 	void Water2(const Vector3<float> &Blockpos);
 	void WaterExploded(const Vector3<float> &Blockpos);
 	BlockType WaterCheck(int x, int y, int z, BlockType bt);
+	void WaterTick();
 
 
 	//Todo - rendre private
@@ -63,6 +64,7 @@ private:
 	ChunkMesh m_transparentMesh;
 	Vector3<float> m_position;
 	BlockType m_defaultBlock; 				//On retourne ce block quand ya une erreur
+	int TickCount;
 
 
 
