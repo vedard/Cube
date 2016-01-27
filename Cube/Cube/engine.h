@@ -59,18 +59,14 @@ private:
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
-	Player m_player;
 	PlayerActor m_playerActor;
-	Monster* m_monster;
-	Animal* m_cow;
-	
+
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 	bool m_mouseButton[sf::Mouse::ButtonCount]; //tableau de toutes les touches du clavier
 
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
-	
 	
 	Shader m_shader01;
 	World m_world;
