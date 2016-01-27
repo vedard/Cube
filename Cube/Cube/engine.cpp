@@ -233,6 +233,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_shader01.Use();
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)

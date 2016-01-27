@@ -21,6 +21,7 @@ m_HeadShake(0)
 	m_Armor = 1.3f;
 	m_weapon = W_BLOCK;
 	m_isAlive = false;
+	m_godMode = false;
 	
 }
 
@@ -275,11 +276,13 @@ void Player::ToggleNoClip()
 	if (m_noClip)
 	{
 		m_noClip = false;
+		m_godMode = false;
 		m_vitesse.y = 0;
 	}
 	else
 	{
 		m_noClip = true;
+		m_godMode = true;
 		m_vitesse.y = 0;
 	}
 }
@@ -340,18 +343,20 @@ void Player::Jump()
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::UnderLava() const { return m_headUnderLava; }
 
 
 void Player::Tick()
-{
-	if (m_footUnderLava)
-		GetDamage(5,TRUE);
-	if (m_headUnderwater)
 	{
-		m_BreathCount++;
-		if (m_BreathCount > 15)
-			GetDamage(3,TRUE);
+		if (m_footUnderLava)
+			GetDamage(5, TRUE);
+		if (m_headUnderwater)
+		{
+			m_BreathCount++;
+			if (m_BreathCount > 15)
+				GetDamage(3, TRUE);
+		}
+		else
+			m_BreathCount = 0;
 	}
-	else
-		m_BreathCount = 0;
 }

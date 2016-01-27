@@ -42,6 +42,7 @@ private:
 	void CheckUnderLava(World &world);
 
 private:
+	bool m_godMode;
 	time_t m_TickBegin;     //timer de tick
 	time_t m_TickEnd;     //timer de tick
 	int  m_BreathCount; //Compte les ticks pour la breath
@@ -49,10 +50,12 @@ private:
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
+	bool m_kneeUnderwater;
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
-	bool m_headUnderLava;  // Si le joueur est sous la lave
+	bool m_headUnderLava; // Si le joueur est sous la lave
+	bool m_kneeUnderLava;
 	bool m_footUnderLava;  // Si le joueur est sous la lave
-	BlockType m_block;		// Prochain block que le joueur peut placer
+	BlockType m_block;// Prochain block que le joueur peut placer
 	
 	int m_weapon;			// current weapon
 

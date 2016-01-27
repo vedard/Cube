@@ -154,11 +154,18 @@ void Chunk::Update(BlockInfo* &binfo)
 					if (bt == BTYPE_WATER || bt == BTYPE_LEAVE || bt == BTYPE_RWATER1 || bt == BTYPE_RWATER2 || bt == BTYPE_RWATER3)
 						AddBlockToMesh(vdt, count_t, binfo[bt], Vector3<float>(x + m_position.x, y + m_position.y, z + m_position.z));
 
+
+				}
+		for (int x = 0; x < CHUNK_SIZE_X; ++x)
+			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+				for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+				{
+
+					BlockType bt = GetBlock(x, y, z);
 					if (bt == BTYPE_WATER || bt == BTYPE_FWATER)
 					{
 						AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-
 				}
 		if (count_s > USHRT_MAX)
 		{
@@ -186,7 +193,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 	/*if (type == BTYPE_WATER)
 		CheckWater(Vector3<float>((int)Blockpos.x % CHUNK_SIZE_X, (int)Blockpos.y % CHUNK_SIZE_Y, (int)Blockpos.z % CHUNK_SIZE_Z), binfo, 0);*/
 
-	// face
+		// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
 	{
 		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, 0, -1));
@@ -237,7 +244,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
 
-		if (type == BTYPE_WATER) ///Lorsque sous l'eau on peut voir le haut de locean
+		if (type == BTYPE_WATER || BTYPE_LAVA) ///Lorsque sous l'eau on peut voir le haut de locean
 		{
 			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .75f, type);
 			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 1.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
@@ -300,7 +307,7 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType != BTYPE_WATER && type == BTYPE_WATER) || faceType == BTYPE_LAVA || (faceType == BTYPE_WATER && type != BTYPE_WATER))
+	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE || (faceType != BTYPE_WATER && type == BTYPE_WATER) || (faceType != BTYPE_LAVA&& type == BTYPE_LAVA) || (faceType == BTYPE_LAVA&& type != BTYPE_LAVA) || (faceType == BTYPE_WATER && type != BTYPE_WATER))
 		return true;
 
 	return false;
@@ -368,94 +375,94 @@ const char& Chunk::GetDirection(int x, int y, int z) const
 //Fait couler l'eau
 void Chunk::AddWater(const Vector3<float> &Blockpos)
 {
-		BlockType blockwater[3] = { BTYPE_RWATER1, BTYPE_RWATER2, BTYPE_RWATER3 };
-		BlockType bt = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
-		if (bt != BTYPE_WATER && bt != BTYPE_FWATER)
-		{
-			
-			char direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
-			if (direction == 'Q')
-			{
-				//TODO change
-				direction = GetDirection(Blockpos);
-				m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
-			}
-			if (direction != 'Q')
-			{
-				int xModif = 0;
-				int zModif = 0;
-				switch (direction)
-				{
-				case 'N':
-					xModif = 0;
-					zModif = 1;
-					break;
-				case 'E':
-					xModif = 1;
-					zModif = 0;
-					break;
-				case 'W':
-					xModif = -1;
-					zModif = 0;
-					break;
-				case 'S':
-					xModif = 0;
-					zModif = -1;
-					break;
-				default:
-					xModif = 0;
-					zModif = 0;
-					break;
-				}
-				bool bcontinue = true;
-				if (bt == BTYPE_AIR)
-				{
-					bcontinue = false;
-					SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, direction);
-				}
+	BlockType blockwater[3] = { BTYPE_RWATER1, BTYPE_RWATER2, BTYPE_RWATER3 };
+	BlockType bt = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
+	if (bt != BTYPE_WATER && bt != BTYPE_FWATER)
+	{
 
-				bool bExploser = true;
+		char direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
+		if (direction == 'Q')
+		{
+			//TODO change
+			direction = GetDirection(Blockpos);
+			m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
+		}
+		if (direction != 'Q')
+		{
+			int xModif = 0;
+			int zModif = 0;
+			switch (direction)
+			{
+			case 'N':
+				xModif = 0;
+				zModif = 1;
+				break;
+			case 'E':
+				xModif = 1;
+				zModif = 0;
+				break;
+			case 'W':
+				xModif = -1;
+				zModif = 0;
+				break;
+			case 'S':
+				xModif = 0;
+				zModif = -1;
+				break;
+			default:
+				xModif = 0;
+				zModif = 0;
+				break;
+			}
+			bool bcontinue = true;
+			if (bt == BTYPE_AIR)
+			{
+				bcontinue = false;
+				SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, direction);
+			}
+
+			bool bExploser = true;
+			for (int i = 1; i < 4; i++)
+			{
+				BlockType blockkk = GetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif));
+				if (blockkk == BTYPE_AIR || blockkk == BTYPE_RWATER1 || blockkk == BTYPE_RWATER2 || blockkk == BTYPE_RWATER3 || blockkk == BTYPE_WATER || blockkk == BTYPE_FWATER)
+				{
+					bExploser = false;
+					break;
+				}
+			}
+			if (!bExploser)
+			{
+
 				for (int i = 1; i < 4; i++)
 				{
-					BlockType blockkk = GetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif));
-					if (blockkk == BTYPE_AIR || blockkk == BTYPE_RWATER1 || blockkk == BTYPE_RWATER2 || blockkk == BTYPE_RWATER3 || blockkk == BTYPE_WATER ||blockkk == BTYPE_FWATER)
+					if (bcontinue)
 					{
-						bExploser = false;
-						break;
-					}
-				}
-				if (!bExploser)
-				{
-
-					for (int i = 1; i < 4; i++)
-					{
-						if (bcontinue)
+						BlockType waterType = ChooseWater(i);
+						BlockType blockSuivant = GetBlock(Blockpos.x + (i * xModif), Blockpos.y, Blockpos.z + (i * zModif));
+						if (blockSuivant == BTYPE_AIR)// || blockSuivant == BTYPE_RWATER1 || blockSuivant == BTYPE_RWATER2 || blockSuivant == BTYPE_RWATER3)
 						{
-							BlockType waterType = ChooseWater(i);
-							BlockType blockSuivant = GetBlock(Blockpos.x + (i * xModif), Blockpos.y, Blockpos.z + (i * zModif));
-							if (blockSuivant == BTYPE_AIR)// || blockSuivant == BTYPE_RWATER1 || blockSuivant == BTYPE_RWATER2 || blockSuivant == BTYPE_RWATER3)
-							{
 
-								SetBlock(Blockpos.x + (i * xModif), Blockpos.y, Blockpos.z + (i * zModif), waterType, direction);
-								BlockType blocDessous = GetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif));
-								if (blocDessous == BTYPE_WATER || blocDessous == BTYPE_FWATER)
-									bcontinue = false;
-								else if (blocDessous == BTYPE_AIR)
-								{
-									SetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif), BTYPE_FWATER, direction);
-									bcontinue = false;
-								}
-							}
-							else
+							SetBlock(Blockpos.x + (i * xModif), Blockpos.y, Blockpos.z + (i * zModif), waterType, direction);
+							BlockType blocDessous = GetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif));
+							if (blocDessous == BTYPE_WATER || blocDessous == BTYPE_FWATER)
 								bcontinue = false;
+							else if (blocDessous == BTYPE_AIR)
+							{
+								SetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif), BTYPE_FWATER, direction);
+								bcontinue = false;
+							}
 						}
+						else
+							bcontinue = false;
 					}
 				}
-				else
-					WaterExplosion(Blockpos);
 			}
+			else
+				WaterExplosion(Blockpos);
 		}
-	
+	}
+
 }
 
 //Retourne la direction que devrait prendre l'eau
@@ -471,19 +478,19 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 		if (GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z + (i)) == BTYPE_AIR)
 			North = i;
 
-			if (i >= 4)
-				North = i;
-		
+		if (i >= 4)
+			North = i;
+
 		i++;
 	} while (North == 0);
 	i = 0;
 	do
 	{
-		if (GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z -(i)) == BTYPE_AIR)
+		if (GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z - (i)) == BTYPE_AIR)
 			South = i;
-			if (i >= 4)
-				South = i;
-			i++;
+		if (i >= 4)
+			South = i;
+		i++;
 
 	} while (South == 0);
 	i = 0;
@@ -492,8 +499,8 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 		if (GetBlock(Blockpos.x - i, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
 			West = i;
 
-			if (i >= 4)
-				West = i;
+		if (i >= 4)
+			West = i;
 		i++;
 
 	} while (West == 0);
@@ -503,9 +510,9 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 		if (GetBlock(Blockpos.x + i, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
 			East = i;
 
-			if (i >= 4)
-				East = i;
-		
+		if (i >= 4)
+			East = i;
+
 		i++;
 	} while (East == 0);
 
@@ -528,7 +535,7 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 	}
 
 	if (distance == East)
-direction += "E";
+		direction += "E";
 	else if (distance > East)
 	{
 		direction = "E";
@@ -836,97 +843,97 @@ void Chunk::WaterExplosion(const Vector3<float> &Blockpos)
 
 #pragma endregion
 #pragma region East
-		BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z);
-		if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER1)
+	BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z);
+	if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER1)
+	{
+		if (GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
+			SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, 'E');
+		else
 		{
-			if (GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
-				SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, 'E');
-			else
+			if (BlocktoCheck != BTYPE_RWATER1)
+				SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z, BTYPE_RWATER1, 'E');
+
+			//GAUCHE
+			BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 1);
+			if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER2)
 			{
-				if (BlocktoCheck != BTYPE_RWATER1)
-					SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z, BTYPE_RWATER1, 'E');
+				if (BlocktoCheck != BTYPE_RWATER2)
+					SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 1, BTYPE_RWATER2, 'E');
 
-				//GAUCHE
-				BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 1);
-				if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER2)
+				BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 1);
+				if (BlocktoCheck == BTYPE_AIR)
+					SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 1, BTYPE_FWATER, 'E');
+				else if (BlocktoCheck != BTYPE_WATER && BlocktoCheck != BTYPE_FWATER)
 				{
-					if (BlocktoCheck != BTYPE_RWATER2)
-						SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 1, BTYPE_RWATER2, 'E');
-
-					BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 1);
-					if (BlocktoCheck == BTYPE_AIR)
-						SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 1, BTYPE_FWATER, 'E');
-					else if (BlocktoCheck != BTYPE_WATER && BlocktoCheck != BTYPE_FWATER)
+					BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 2);
+					if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
 					{
-						BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 2);
-						if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
-						{
-							if (BlocktoCheck != BTYPE_RWATER3)
-								SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 2, BTYPE_RWATER3, 'N');
-							if (GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 2) == BTYPE_AIR)
-								SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 2, BTYPE_FWATER, 'N');
-						}
-						BlocktoCheck = GetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z + 1);
-						if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
-						{
-							if (BlocktoCheck != BTYPE_RWATER3)
-								SetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z + 1, BTYPE_RWATER3, 'E');
-							if (GetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z + 1) == BTYPE_AIR)
-								SetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z + 1, BTYPE_FWATER, 'E');
-						}
+						if (BlocktoCheck != BTYPE_RWATER3)
+							SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z + 2, BTYPE_RWATER3, 'N');
+						if (GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 2) == BTYPE_AIR)
+							SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z + 2, BTYPE_FWATER, 'N');
 					}
-				}
-
-				//CENTRE
-				BlocktoCheck = GetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z);
-				if (BlocktoCheck == BTYPE_AIR || BTYPE_RWATER3)
-				{
-					if (BlocktoCheck != BTYPE_RWATER2)
-						SetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z, BTYPE_RWATER2, 'E');
-					if (GetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
-						SetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, 'E');
-					else if (GetBlock(Blockpos.x + 3, Blockpos.y, Blockpos.z) == BTYPE_AIR)
+					BlocktoCheck = GetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z + 1);
+					if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
 					{
-						SetBlock(Blockpos.x + 3, Blockpos.y, Blockpos.z, BTYPE_RWATER3, 'E');
-						if (GetBlock(Blockpos.x + 3, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
-							SetBlock(Blockpos.x + 3, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, 'E');
-					}
-
-				}
-
-				//DROITE
-				BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 1);
-				if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER2)
-				{
-					if (BlocktoCheck != BTYPE_RWATER2)
-						SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 1, BTYPE_RWATER2, 'E');
-
-					BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 1);
-					if (BlocktoCheck == BTYPE_AIR)
-						SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 1, BTYPE_FWATER, 'E');
-					else if (BlocktoCheck != BTYPE_WATER && BlocktoCheck != BTYPE_FWATER)
-					{
-						BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 2);
-						if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
-						{
-							if (BlocktoCheck != BTYPE_RWATER3)
-								SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 2, BTYPE_RWATER3, 'S');
-							if (GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 2) == BTYPE_AIR)
-								SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 2, BTYPE_FWATER, 'S');
-						}
-						BlocktoCheck = GetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z - 1);
-						if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
-						{
-							if (BlocktoCheck != BTYPE_RWATER3)
-								SetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z - 1, BTYPE_RWATER3, 'E');
-							if (GetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z - 1) == BTYPE_AIR)
-								SetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z - 1, BTYPE_FWATER, 'E');
-						}
+						if (BlocktoCheck != BTYPE_RWATER3)
+							SetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z + 1, BTYPE_RWATER3, 'E');
+						if (GetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z + 1) == BTYPE_AIR)
+							SetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z + 1, BTYPE_FWATER, 'E');
 					}
 				}
 			}
-		
+
+			//CENTRE
+			BlocktoCheck = GetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z);
+			if (BlocktoCheck == BTYPE_AIR || BTYPE_RWATER3)
+			{
+				if (BlocktoCheck != BTYPE_RWATER2)
+					SetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z, BTYPE_RWATER2, 'E');
+				if (GetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
+					SetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, 'E');
+				else if (GetBlock(Blockpos.x + 3, Blockpos.y, Blockpos.z) == BTYPE_AIR)
+				{
+					SetBlock(Blockpos.x + 3, Blockpos.y, Blockpos.z, BTYPE_RWATER3, 'E');
+					if (GetBlock(Blockpos.x + 3, Blockpos.y - 1, Blockpos.z) == BTYPE_AIR)
+						SetBlock(Blockpos.x + 3, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, 'E');
+				}
+
+			}
+
+			//DROITE
+			BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 1);
+			if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER2)
+			{
+				if (BlocktoCheck != BTYPE_RWATER2)
+					SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 1, BTYPE_RWATER2, 'E');
+
+				BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 1);
+				if (BlocktoCheck == BTYPE_AIR)
+					SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 1, BTYPE_FWATER, 'E');
+				else if (BlocktoCheck != BTYPE_WATER && BlocktoCheck != BTYPE_FWATER)
+				{
+					BlocktoCheck = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 2);
+					if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
+					{
+						if (BlocktoCheck != BTYPE_RWATER3)
+							SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z - 2, BTYPE_RWATER3, 'S');
+						if (GetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 2) == BTYPE_AIR)
+							SetBlock(Blockpos.x + 1, Blockpos.y - 1, Blockpos.z - 2, BTYPE_FWATER, 'S');
+					}
+					BlocktoCheck = GetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z - 1);
+					if (BlocktoCheck == BTYPE_AIR || BlocktoCheck == BTYPE_RWATER3)
+					{
+						if (BlocktoCheck != BTYPE_RWATER3)
+							SetBlock(Blockpos.x + 2, Blockpos.y, Blockpos.z - 1, BTYPE_RWATER3, 'E');
+						if (GetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z - 1) == BTYPE_AIR)
+							SetBlock(Blockpos.x + 2, Blockpos.y - 1, Blockpos.z - 1, BTYPE_FWATER, 'E');
+					}
+				}
+			}
 		}
+
+	}
 #pragma endregion
 
 
