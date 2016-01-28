@@ -4,6 +4,7 @@
 #include "character.h"
 #include "gun.h"
 #include "inventory.h"
+#include "define.h"
 
 
 class Player : public Character

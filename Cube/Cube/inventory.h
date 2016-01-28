@@ -18,6 +18,8 @@ public:
 
 	void ReassignItemShortcut(int index_itemFast, int index_item);
 	void SwitchItems(int index_item1, int index_item2);
+
+	Item* GetItems();
 private:
 
 	Item m_objets [INVENTORY_SIZE];

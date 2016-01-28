@@ -33,7 +33,7 @@ void Inventory::AddItemQ(Item type, int number)
 			m_objets[i].Add(number);
 			break;
 		} 
-		if (m_objets[i].GetQuantity() == NULL || m_objets[i].GetQuantity() == 0)
+		if (m_objets[i].GetType() == NULL || m_objets[i].GetQuantity() == 0)
 		{
 			m_objets[i] = type;
 			break;
@@ -72,4 +72,9 @@ void Inventory::SwitchItems(int index_item1, int index_item2)
 		m_objets[index_item1] = m_objets[index_item2];
 		m_objets[index_item2] = tempItem;
 	}
+}
+
+Item * Inventory::GetItems()
+{
+	return m_objets;
 }

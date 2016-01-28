@@ -5,14 +5,14 @@
 
 
 Player::Player() :
-Character(),
-m_noClip(false),
-m_sneaked(false),
-m_running(false),
-m_block(BTYPE_GRASS),
-m_footUnderwater(false),
-m_headUnderwater(false),
-m_HeadShake(0)
+	Character(),
+	m_noClip(false),
+	m_sneaked(false),
+	m_running(false),
+	m_block(BTYPE_GRASS),
+	m_footUnderwater(false),
+	m_headUnderwater(false),
+	m_HeadShake(0)
 {
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
@@ -20,7 +20,7 @@ m_HeadShake(0)
 	m_Armor = 1.3f;
 	m_weapon = W_BLOCK;
 	m_isAlive = false;
-	
+
 }
 
 Player::~Player()
@@ -184,7 +184,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_vitesse.y = 0.08f;
 	}
 
-	
+
 }
 
 void Player::CheckUnderwater(World &world)

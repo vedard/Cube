@@ -64,8 +64,9 @@ typedef long long int64;
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
 
-#define INVENTORY_SIZE 			15	//Must be larger than FAST_INVENTORY_SIZE
-#define FAST_INVENTORY_SIZE 		3	//If changed, modification must be made into the render and the keybinding to apply the changes
+#define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
+#define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
+#define IS_INVENTORY_CREATIVE true	//If the inventory is in creative mode(infinite everything)
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
