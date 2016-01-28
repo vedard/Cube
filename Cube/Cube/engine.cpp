@@ -156,9 +156,9 @@ void Engine::LoadResource()
 	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
 	//Gun
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100);
-	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100, 0.2);
+	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25, 0.25);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40, 0.4);
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -191,9 +191,16 @@ void Engine::UpdateEnvironement()
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
 
+
+	// Update Guns
+	if (m_mouseButton[4])
+		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
+	else
+		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].DisableAiming();
+
 	//Update les balles
 	for (int k = 0; k < 3; k++)
-	{ 
+	{
 		m_world.GetPlayer()->GetGuns()[k].Update();
 		for (int i = 0; i < MAX_BULLET; i++)
 		{
@@ -248,7 +255,7 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	//Place le joueur au centre du monde
 	m_world.GetPlayer()->ApplyRotation();
-	m_world.GetPlayer()->ApplyTranslation();
+	float shake = m_world.GetPlayer()->ApplyTranslation();
 
 
 	//Activation des shaders
@@ -275,7 +282,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
-			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y,
+			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake, 
 			m_world.GetPlayer()->GetPosition().z,
 			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
 
@@ -731,8 +738,10 @@ void Engine::DrawHud() const
 
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
+
 	// Affichage du crosshair
-	DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
+	if(!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
+		DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
 
 	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 	{
@@ -941,25 +950,25 @@ void Engine::DrawCross(float r, float g, float b) const
 	glColor3f(r, g, b);
 	glBegin(GL_QUADS);
 
-	glVertex2i(-1, -10);
-	glVertex2i(1, -10);
-	glVertex2i(1, -3);
-	glVertex2i(-1, -3);
+	glVertex2i(-1, -25);
+	glVertex2i(1, -25);
+	glVertex2i(1, -20);
+	glVertex2i(-1, -20);
 
-	glVertex2i(-1, 10);
-	glVertex2i(-1, 3);
-	glVertex2i(1, 3);
-	glVertex2i(1, 10);
+	glVertex2i(-1, 25);
+	glVertex2i(-1, 20);
+	glVertex2i(1, 20);
+	glVertex2i(1, 25);
 
-	glVertex2i(-10, 1);
-	glVertex2i(-10, -1);
-	glVertex2i(-3, -1);
-	glVertex2i(-3, 1);
+	glVertex2i(-25, 1);
+	glVertex2i(-25, -1);
+	glVertex2i(-20, -1);
+	glVertex2i(-20, 1);
 
-	glVertex2i(10, 1);
-	glVertex2i(3, 1);
-	glVertex2i(3, -1);
-	glVertex2i(10, -1);
+	glVertex2i(25, 1);
+	glVertex2i(20, 1);
+	glVertex2i(20, -1);
+	glVertex2i(25, -1);
 
 	glEnd();
 

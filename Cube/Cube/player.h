@@ -17,7 +17,7 @@ public:
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, World &world);
 	void ApplyRotation() const;
-	void ApplyTranslation();
+	float ApplyTranslation(); // return le shake
 	void ToggleNoClip();
 	void Jump();
 	bool Shoot(World &world);

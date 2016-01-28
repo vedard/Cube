@@ -208,22 +208,26 @@ void Player::ApplyRotation() const
 
 }
 
-void Player::ApplyTranslation()
+float Player::ApplyTranslation()
 {
 
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(-m_pos.x, -(m_pos.y + m_dimension.y), -m_pos.z);
 
+	float shakevector = 0;
 	//Head shake a chaque pas
 	if (m_vitesse.x != 0 && !m_noClip)
 	{
-		glTranslatef(0.f, m_vitesse.x / 2.2f * sin(m_HeadShake), 0.0f);
+		shakevector = m_vitesse.x / 2.2f * sin(m_HeadShake);
+		glTranslatef(0.f, shakevector, 0.0f);
 
 	}
 
 	//Si on est baisse 
 	if (m_sneaked)
 		glTranslatef(0.f, 0.2f, 0.f);
+
+	return shakevector;
 }
 
 void Player::ToggleNoClip()

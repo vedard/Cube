@@ -11,10 +11,13 @@ class Gun
 public:
 	Gun();
 	~Gun();
-	void Init(std::string modelPath, std::string texturePath, int sound, bool isAuto, float RPM, float damage);
+	void Init(std::string modelPath, std::string texturePath, int sound, bool isAuto, float RPM, float damage, float aimHeight);
 	void Draw(float x, float y, float z, float rotX, float rotY) const;
 	void Update();
 	bool Shoot(float x, float y, float z, float rotX, float rotY);
+	void EnableAiming();
+	void DisableAiming();
+	const bool isAiming();
 	Bullet* GetBullets();
 	const bool GetIsAuto() const;
 
@@ -28,6 +31,7 @@ private:
 	float m_cooldown;
 	float m_damage;
 	float m_recoilByBullet;
+	float m_aimingHeight;
 
 	//Timer
 	sf::Clock m_timerCooldown;
@@ -35,6 +39,7 @@ private:
 	float m_recoilTotal;
 
 	int m_sound;
+	bool m_isAiming;
 
 };
 
