@@ -1071,3 +1071,96 @@ void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const st
 	m_texBlockIndex = m_textureAtlas.AddTexture(path);
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
 }
+
+void Engine::DrawMenu() const
+{
+	// Menu specs
+	int menuHeight = 150;
+	int menuWidth = 200;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	std::ostringstream ss;
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.7f, 0.7f, 0.7f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	ss << "Controls";
+	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
+
+	ss.str("");
+	ss << "Settings";
+	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
+
+	ss.str("");
+	ss << "Exit Game";
+	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
+
+	//// Bouton Controls
+	//DrawMenuButton(0, menuHeight / 2 + 10, 1.f, 0.f, 0.f, 50, 20, "Controls");
+
+	//// Bouton Settings
+	//DrawMenuButton(0, 0, 0.f, 1.f, 0.f, 50, 20, "Settings");
+
+	//// Bouton Exit Game
+	//DrawMenuButton(0, -(menuHeight / 2 + 10), 0.f, 0.f, 1.f, 50, 20, "Exit Game");
+
+	glDisable(GL_BLEND);
+
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+
+}
+
+void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const
+{
+	glLoadIdentity();
+	glTranslated(Width() / 2 + translateX, Height() / 2 + translateY, 0);
+	glColor4f(r, g, b, 0.5f);
+	glBegin(GL_QUADS);
+	glVertex2i(-width, -height);
+	glVertex2i(width, -height);
+	glVertex2i(width, height);
+	glVertex2i(-width, height);
+	glEnd();
+
+	m_textureFont.Bind();
+	std::ostringstream ss;
+	ss << texte;
+	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
+}

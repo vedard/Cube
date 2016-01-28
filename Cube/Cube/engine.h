@@ -56,6 +56,8 @@ private:
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
+	void DrawMenu() const;
+	void DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const;
 
 private:
 	bool m_wireframe;
@@ -99,6 +101,8 @@ private:
 	// Parametres
 
 	Parametre& m_settings = Parametre::GetInstance();
+
+	bool m_isMenuOpen;
 };
 
 #endif // ENGINE_H__
