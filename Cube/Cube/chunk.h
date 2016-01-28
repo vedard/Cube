@@ -31,6 +31,7 @@ public:
 	void DeleteCache();
 	bool NeedUpdate() const;
 	bool& GetSave();
+	void WaterTick(int bloc);
 
 
 	Chunk* m_positiveX;
@@ -44,11 +45,17 @@ private:
 	void SetExploded(int x, int y, int z, bool exploded);
 	bool GetExploded(int x, int y, int z) const;
 
+	void SetSource(int x, int y, int z, Vector3<float> source);
+	Vector3<float> GetSource(int x, int y, int z) const;
+
 	void Water1(const Vector3<float> &Blockpos);
 	void Water2(const Vector3<float> &Blockpos);
 	void WaterExploded(const Vector3<float> &Blockpos);
 	BlockType WaterCheck(int x, int y, int z, BlockType bt);
-	void WaterTick();
+	char GetDirection(const Vector3<float> &Blockpos);
+
+	void RemoveWater(const Vector3<float> &Blockpos);
+
 
 
 	//Todo - rendre private

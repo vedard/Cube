@@ -51,6 +51,8 @@ private:
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	bool m_headUnderLava;  // Si le joueur est sous la lave
+	bool m_kneeUnderwater;  // Si le joueur est sous l'eau
+	bool m_kneeUnderLava;  // Si le joueur est sous la lave
 	bool m_footUnderLava;  // Si le joueur est sous la lave
 	BlockType m_block;		// Prochain block que le joueur peut placer
 	

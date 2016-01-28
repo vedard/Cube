@@ -3,8 +3,11 @@
 #include "monster.h"
 #include "player.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), compteur(0)//, m_threadChunks(RunWater)
 {
+	//Chunk start
+	//m_threadChunks = std::thread(&World::RunWater);
+
 	// Initialise les monstres et animaux.
 	m_animal = new Animal[MAX_COW];
 	m_monster = new Monster[MAX_MONSTER];
@@ -39,6 +42,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
 
 World::~World()
 {
+	m_threadcontinue = false;
 }
 
 Animal* World::GetAnimal() const { return m_animal; }
@@ -620,3 +624,24 @@ void World::SpawnMonsters()
 			break;
 		}
 }
+
+void World::RunWater()
+{
+	m_threadcontinue = true;
+	while (m_threadcontinue)
+	{
+		
+		Chunk* chunks = m_chunks.GetChunk();
+		for (int i = 0; i < WORLD_SIZE * WORLD_SIZE; i++)
+		{
+			chunks[i].WaterTick(compteur);
+		}
+		compteur++;
+		if (compteur == 4)
+			compteur = 0;
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
+	m_threadChunks.join();
+}
+
+

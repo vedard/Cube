@@ -155,7 +155,7 @@ void Chunk::Update(BlockInfo* &binfo)
 						AddBlockToMesh(vdt, count_t, binfo[bt], Vector3<float>(x + m_position.x, y + m_position.y, z + m_position.z));
 
 				}
-		
+
 		//Delete when timer/thread works
 		for (int x = 0; x < CHUNK_SIZE_X; ++x)
 			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
@@ -163,24 +163,20 @@ void Chunk::Update(BlockInfo* &binfo)
 				{
 					BlockType bt = GetBlock(x, y, z);
 
-					if (bt == BTYPE_WATER || bt == BTYPE_FWATER && TickCount == 0)
+					if (bt == BTYPE_WATER || bt == BTYPE_FWATER)// && TickCount == 0)
 					{
-						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-					if (bt == BTYPE_RWATER1 && TickCount == 1)
+					if (bt == BTYPE_RWATER1)// && TickCount == 1)
 					{
-						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-					if (bt == BTYPE_RWATER2 && TickCount == 2)
+					if (bt == BTYPE_RWATER2)// && TickCount == 2)
 					{
-						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
-					if (bt == BTYPE_RWATER3 && TickCount == 3)
+					if (bt == BTYPE_RWATER3)// && TickCount == 3)
 					{
-						//AddWater(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 					}
 				}
@@ -212,7 +208,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 	/*if (type == BTYPE_WATER)
 		CheckWater(Vector3<float>((int)Blockpos.x % CHUNK_SIZE_X, (int)Blockpos.y % CHUNK_SIZE_Y, (int)Blockpos.z % CHUNK_SIZE_Z), binfo, 0);*/
 
-	// face
+		// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
 	{
 		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, 0, -1));
@@ -325,8 +321,8 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-	if (faceType == BTYPE_AIR || BTYPE_RWATER1 == faceType || faceType == BTYPE_RWATER2 || faceType == BTYPE_RWATER3 
-		|| faceType == BTYPE_FWATER || faceType == BTYPE_LEAVE || (faceType != BTYPE_WATER && type == BTYPE_WATER) 
+	if (faceType == BTYPE_AIR || BTYPE_RWATER1 == faceType || faceType == BTYPE_RWATER2 || faceType == BTYPE_RWATER3
+		|| faceType == BTYPE_FWATER || faceType == BTYPE_LEAVE || (faceType != BTYPE_WATER && type == BTYPE_WATER)
 		|| faceType == BTYPE_LAVA || (faceType == BTYPE_WATER && type != BTYPE_WATER))
 		return true;
 
@@ -437,12 +433,13 @@ void Chunk::Water1(const Vector3<float> &Blockpos)
 		if (bt == BTYPE_AIR)
 		{
 			SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, direction);
+			SetSource(Blockpos.x, Blockpos.y, Blockpos.z,Vector3<float>(Blockpos.x + m_position.x, Blockpos.y + m_position.y, Blockpos.z + m_position.z));
 		}
 		else
 		{
 			if (direction == 'Q')
 			{
-				direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
+				direction = GetDirection(Blockpos);
 				m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
 			}
 			if (direction != 'Q')
@@ -492,21 +489,26 @@ void Chunk::Water1(const Vector3<float> &Blockpos)
 						{
 							SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z, BTYPE_RWATER1, direction);
 							SetExploded(Blockpos.x + 1, Blockpos.y, Blockpos.z, true);
+							SetSource(Blockpos.x + 1, Blockpos.y, Blockpos.z, Vector3<float>(Blockpos.x + m_position.x, Blockpos.y + m_position.y, Blockpos.z + m_position.z));
 						}
 						if (GetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z) == BTYPE_AIR)
 						{
 							SetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z, BTYPE_RWATER1, direction);
 							SetExploded(Blockpos.x - 1, Blockpos.y, Blockpos.z, true);
+							SetSource(Blockpos.x - 1, Blockpos.y, Blockpos.z, Vector3<float>(Blockpos.x + m_position.x, Blockpos.y + m_position.y, Blockpos.z + m_position.z));
 						}
 						if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1) == BTYPE_AIR)
 						{
 							SetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1, BTYPE_RWATER1, direction);
 							SetExploded(Blockpos.x, Blockpos.y, Blockpos.z + 1, true);
+							SetSource(Blockpos.x, Blockpos.y, Blockpos.z + 1, Vector3<float>(Blockpos.x + m_position.x, Blockpos.y + m_position.y, Blockpos.z + m_position.z));
+
 						}
 						if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1) == BTYPE_AIR)
 						{
 							SetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1, BTYPE_RWATER1, direction);
 							SetExploded(Blockpos.x, Blockpos.y, Blockpos.z - 1, true);
+							SetSource(Blockpos.x, Blockpos.y, Blockpos.z - 1, Vector3<float>(Blockpos.x + m_position.x, Blockpos.y + m_position.y, Blockpos.z + m_position.z));
 						}
 					}
 					else
@@ -514,6 +516,7 @@ void Chunk::Water1(const Vector3<float> &Blockpos)
 						if (GetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif) == BTYPE_AIR)
 						{
 							SetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, BTYPE_RWATER1, direction);
+							SetSource(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, Vector3<float>(Blockpos.x + m_position.x, Blockpos.y + m_position.y, Blockpos.z + m_position.z));
 						}
 					}
 				}
@@ -530,9 +533,10 @@ void Chunk::Water2(const Vector3<float> &Blockpos)
 	{
 		char direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
 		BlockType bt = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
-		if (bt == BTYPE_AIR)
+		if (bt == BTYPE_AIR || bt == BTYPE_RWATER1 || bt == BTYPE_RWATER2 || bt == BTYPE_RWATER3)
 		{
 			SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, direction);
+			SetSource(Blockpos.x, Blockpos.y - 1, Blockpos.z, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
 		}
 		else if (bt != BTYPE_FWATER && bt != BTYPE_WATER)
 		{
@@ -565,7 +569,11 @@ void Chunk::Water2(const Vector3<float> &Blockpos)
 			if (blockToAdd != BTYPE_AIR)
 			{
 				if (GetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif) == BTYPE_AIR)
+				{
 					SetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, blockToAdd, direction);
+					SetSource(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
+
+				}
 			}
 		}
 	}
@@ -574,10 +582,11 @@ void Chunk::Water2(const Vector3<float> &Blockpos)
 void Chunk::WaterExploded(const Vector3<float> &Blockpos)
 {
 	BlockType blockUnder = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
-	if (blockUnder == BTYPE_AIR)
-	{ 
+	if (blockUnder == BTYPE_AIR || blockUnder == BTYPE_RWATER1 || blockUnder == BTYPE_RWATER2 || blockUnder == BTYPE_RWATER3)
+	{
 		SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FWATER, GetDirection(Blockpos.x, Blockpos.y, Blockpos.z));
 		SetExploded(Blockpos.x, Blockpos.y - 1, Blockpos.z, false);
+		SetSource(Blockpos.x, Blockpos.y - 1, Blockpos.z, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
 	}
 	else if (blockUnder != BTYPE_FWATER && blockUnder != BTYPE_WATER)
 	{
@@ -589,6 +598,7 @@ void Chunk::WaterExploded(const Vector3<float> &Blockpos)
 			{
 				SetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1, blockToAdd, 'N');
 				SetExploded(Blockpos.x, Blockpos.y, Blockpos.z + 1, true);
+				SetSource(Blockpos.x, Blockpos.y, Blockpos.z + 1, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
 			}
 		}
 		blockToAdd = WaterCheck(Blockpos.x, Blockpos.y, Blockpos.z - 1, bt);
@@ -598,6 +608,7 @@ void Chunk::WaterExploded(const Vector3<float> &Blockpos)
 			{
 				SetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1, blockToAdd, 'S');
 				SetExploded(Blockpos.x, Blockpos.y, Blockpos.z - 1, true);
+				SetSource(Blockpos.x, Blockpos.y, Blockpos.z - 1, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
 			}
 		}
 		blockToAdd = WaterCheck(Blockpos.x + 1, Blockpos.y, Blockpos.z, bt);
@@ -607,6 +618,7 @@ void Chunk::WaterExploded(const Vector3<float> &Blockpos)
 			{
 				SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z, blockToAdd, 'E');
 				SetExploded(Blockpos.x + 1, Blockpos.y, Blockpos.z, true);
+				SetSource(Blockpos.x + 1, Blockpos.y, Blockpos.z, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
 			}
 		}
 		blockToAdd = WaterCheck(Blockpos.x - 1, Blockpos.y, Blockpos.z, bt);
@@ -616,6 +628,7 @@ void Chunk::WaterExploded(const Vector3<float> &Blockpos)
 			{
 				SetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z, blockToAdd, 'W');
 				SetExploded(Blockpos.x - 1, Blockpos.y, Blockpos.z, true);
+				SetSource(Blockpos.x - 1, Blockpos.y, Blockpos.z, GetSource(Blockpos.x, Blockpos.y, Blockpos.z));
 			}
 		}
 	}
@@ -624,18 +637,18 @@ void Chunk::WaterExploded(const Vector3<float> &Blockpos)
 BlockType Chunk::WaterCheck(int x, int y, int z, BlockType bt)
 {
 	BlockType BlockToCheck = GetBlock(x, y, z);
-		if (bt == BTYPE_FWATER && (BlockToCheck == BTYPE_RWATER1 || BlockToCheck == BTYPE_RWATER2 || BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
-			return BTYPE_RWATER1;
-		else if (bt == BTYPE_WATER && (BlockToCheck == BTYPE_RWATER1 || BlockToCheck == BTYPE_RWATER2 || BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
-			return BTYPE_RWATER1;
-		else if (bt == BTYPE_RWATER1 && (BlockToCheck == BTYPE_RWATER2 || BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
-			return BTYPE_RWATER2;
-		else if (bt == BTYPE_RWATER2 && (BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
-			return BTYPE_RWATER3;
+	if (bt == BTYPE_FWATER && (BlockToCheck == BTYPE_RWATER1 || BlockToCheck == BTYPE_RWATER2 || BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RWATER1;
+	else if (bt == BTYPE_WATER && (BlockToCheck == BTYPE_RWATER1 || BlockToCheck == BTYPE_RWATER2 || BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RWATER1;
+	else if (bt == BTYPE_RWATER1 && (BlockToCheck == BTYPE_RWATER2 || BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RWATER2;
+	else if (bt == BTYPE_RWATER2 && (BlockToCheck == BTYPE_RWATER3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RWATER3;
 	return BTYPE_AIR;
 }
 
-void Chunk::WaterTick()
+void Chunk::WaterTick(int bloc)
 {
 
 	for (int x = 0; x < CHUNK_SIZE_X; ++x)
@@ -669,6 +682,190 @@ void Chunk::WaterTick()
 	if (TickCount > 3)
 		TickCount = 0;
 }
+
+char Chunk::GetDirection(const Vector3<float> &Blockpos)
+{
+	int North = 0, South = 0, East = 0, West = 0;
+	int i = 1;
+	if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1) == BTYPE_WATER && GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z) == BTYPE_WATER &&
+		GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1) == BTYPE_WATER && GetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z) == BTYPE_WATER)
+		return 'Q';
+	BlockType BlockUnder;
+	do
+	{
+		BlockUnder = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z + (i));
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+			North = i;
+
+		if (i >= 4)
+			North = i;
+
+		+i++;
+	} while (North == 0);
+	i = 0;
+	do
+	{
+		BlockUnder = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z - (i));
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+			South = i;
+		if (i >= 4)
+			South = i;
+		i++;
+
+
+	} while (South == 0);
+	i = 0;
+	do
+	{
+		BlockUnder = GetBlock(Blockpos.x - i, Blockpos.y - 1, Blockpos.z);
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+			West = i;
+
+		if (i >= 4)
+			West = i;
+		i++;
+
+	} while (West == 0);
+	i = 0;
+	do
+	{
+		BlockUnder = GetBlock(Blockpos.x + i, Blockpos.y - 1, Blockpos.z);
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+			East = i;
+
+		if (i >= 4)
+			East = i;
+
+		i++;
+	} while (East == 0);
+
+	std::string direction;
+	int distance;
+	if (North == South)
+	{
+		direction = "NS";
+		distance = North;
+	}
+	else if (North > South)
+	{
+		direction = "S";
+		distance = South;
+	}
+	else
+	{
+		direction = "N";
+		distance = North;
+	}
+
+	if (distance == East)
+		direction += "E";
+	else if (distance > East)
+	{
+		direction = "E";
+		distance = East;
+	}
+
+	if (distance == West)
+		direction += "W";
+	else if (distance > West)
+	{
+		direction = "W";
+		distance = West;
+	}
+
+	if (direction.length() > 1)
+	{
+		srand(time(NULL));
+		return direction[rand() % direction.length()];
+	}
+	else return direction[0];
+
+
+}
+
+
+void Chunk::SetSource(int x, int y, int z, Vector3<float> source)
+{
+	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
+	{
+		m_blocks.SetSource(x, y, z, source);
+	}
+	else if (x <= -1 && m_negativeX)
+	{
+		m_negativeX->m_blocks.SetSource(CHUNK_SIZE_X + x, y, z, source);
+	}
+	else if (x >= CHUNK_SIZE_X && m_positiveX)
+	{
+		int distance = x - CHUNK_SIZE_X;
+		m_positiveX->m_blocks.SetSource(distance, y, z, source);
+	}
+	else if (z <= -1 && m_negativeZ)
+	{
+		m_negativeZ->m_blocks.SetSource(x, y, CHUNK_SIZE_Z + z, source);
+
+	}
+	else if (z >= CHUNK_SIZE_Z && m_positiveZ)
+	{
+		int distance = z - CHUNK_SIZE_Z;
+		m_positiveZ->m_blocks.SetSource(x, y, distance, source);
+	}
+}
+
+Vector3<float> Chunk::GetSource(int x, int y, int z) const
+{
+	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
+		return m_blocks.GetSource(x, y, z);
+
+	else if (x >= -1 && m_negativeX)
+		return m_negativeX->GetSource(CHUNK_SIZE_X + x, y, z);
+
+	else if (x <= CHUNK_SIZE_X && m_positiveX)
+		return m_positiveX->GetSource(x - CHUNK_SIZE_X - 1, y, z);
+
+	else if (z <= -1 && m_negativeZ)
+		return m_negativeZ->GetSource(x, y, CHUNK_SIZE_Z + z);
+
+	else if (z >= CHUNK_SIZE_Z && m_positiveZ)
+		return m_positiveZ->GetSource(x, y, z - CHUNK_SIZE_Z - 1);
+
+	 return  m_blocks.GetSource(x, y, z);
+
+}
+
+void Chunk::RemoveWater(const Vector3<float> &Blockpos)
+{
+	for (int x = 0; x < CHUNK_SIZE_X; ++x)
+		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+			{
+				BlockType bt = GetBlock(x, y, z);
+				if (bt >= 16 && bt <= 25)
+				{
+					bool BonChunk = false;
+					Vector3<float> source = GetSource(x, y, z);
+					Chunk* sourceChunk = this;
+					int positionSourceX = source.x / 16;
+					int positionSourceZ = source.z / 16;
+					do
+					{
+						if (positionSourceX > m_position.x / 16)
+							sourceChunk = sourceChunk->m_positiveX;
+						else if (positionSourceX < m_position.x / 16)
+							sourceChunk = sourceChunk->m_negativeX;
+						else if (positionSourceZ > m_position.z / 16)
+							sourceChunk = sourceChunk->m_positiveZ;
+						else if (positionSourceZ < m_position.z / 16)
+							sourceChunk = sourceChunk->m_negativeZ;
+						else
+							BonChunk;
+
+
+					} while (BonChunk);
+					
+				}
+			}
+}
+
 
 
 

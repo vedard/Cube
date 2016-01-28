@@ -3,6 +3,7 @@
 
 #include "define.h"
 #include <cassert>
+#include "vector3.h"
 
 
 template<class t>
@@ -24,6 +25,10 @@ public:
 	bool& GetExploded(int x, int y, int z);
 	const bool& GetExploded(int x, int y, int z) const;
 
+	void SetSource(int x, int y, int z, Vector3<float> source);
+	Vector3<float>& GetSource(int x, int y, int z);
+	const Vector3<float>& GetSource(int x, int y, int z) const;
+
 
 	void Reset(t value);
 
@@ -32,6 +37,7 @@ private:
 	t* m_data;
 	char* m_direction;
 	bool* m_exploded;
+	Vector3<float>* m_source;
 public:
 };
 
@@ -42,6 +48,7 @@ Array3d<t>::Array3d(int x, int y, int z) : m_x(x), m_y(y), m_z(z)
 	m_data = new t[m_x * m_y * m_z];
 	m_direction = new char[m_x * m_y * m_z];
 	m_exploded = new bool[m_x * m_y * m_z];
+	m_source = new Vector3<float>[1];
 	Reset(0);
 }
 
@@ -140,6 +147,29 @@ const bool& Array3d<t>::GetExploded(int x, int y, int z) const
 	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
 
 	return m_exploded[x + (z * m_x) + (y * m_z * m_x)];
+}
+
+template<class t>
+void Array3d<t>::SetSource(int x, int y, int z, Vector3<float> source)
+{
+	if (x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z)
+		m_source[x + (z * m_x) + (y * m_z * m_x)] = source;
+}
+
+template<class t>
+Vector3<float>& Array3d<t>::GetSource(int x, int y, int z)
+{
+	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
+
+	return m_source[x + (z * m_x) + (y * m_z * m_x)];
+}
+
+template<class t>
+const Vector3<float>& Array3d<t>::GetSource(int x, int y, int z) const
+{
+	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
+
+	return m_source[x + (z * m_x) + (y * m_z * m_x)];
 }
 
 
