@@ -8,11 +8,9 @@
 int main()
 {
 	Parametre& m_settings = Parametre::GetInstance();
-    Tool::CheckTypes();
-
-
-    Engine engine;
-    engine.SetMaxFps(0);
-    engine.Start("Cube");
+	Tool::CheckTypes();
+	Engine engine;
+	engine.SetMaxFps(0);
+	engine.Start("Cube");
 	
 }

@@ -12,6 +12,10 @@
 #include <thread>
 #include "simplexnoise.h"
 
+class Player;
+class Animal;
+class Monster;
+
 class World
 {
 public:
@@ -21,6 +25,10 @@ public:
 	BlockType BlockAt(float x, float y, float z);
 	Chunk* ChunkAt(float x, float z);
 
+	Animal* GetAnimal() const;
+	Monster* GetMonster() const;
+	Player* GetPlayer() const;
+
 	void InitMap(int seed = 0);
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
@@ -29,22 +37,23 @@ public:
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
+	void SpawnMonsters();
+	void SpawnAnimals();
 
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
 	void AddTree(Chunk * &chunk, int x, int y, int z);
 	void InitChunk(float i, float j);
 
-
-private:
 	Array2d<Chunk> m_chunks;
+
+	Player* m_player;
+	Monster* m_monster;
+	Animal* m_animal;
 
 	int UpdateDistance;
 	int	m_seed;
-
 };
-
-
 #endif // !WORLD_H__
 
 

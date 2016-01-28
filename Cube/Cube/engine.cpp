@@ -1,13 +1,12 @@
 ﻿#include "engine.h"
 
 Engine::Engine() :
-m_wireframe(false),
-m_player(),
-m_shader01(),
-m_textureAtlas(NUMBER_OF_BLOCK - 1),
-m_world(),
-m_currentBlock(-1, -1, -1),
-displayInfo(false)
+	m_wireframe(false),
+	m_shader01(),
+	m_textureAtlas(NUMBER_OF_BLOCK - 1),
+	m_world(),
+	m_currentBlock(-1, -1, -1),
+	displayInfo(false)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -18,9 +17,6 @@ displayInfo(false)
 
 	//Creation du tableau des tableaux;
 	m_bInfo = new BlockInfo[256];
-	m_cow = new Animal[MAX_COW];
-	m_monster = new Monster[MAX_MONSTER];
-	playerGun = new Gun[3];
 }
 
 Engine::~Engine()
@@ -29,7 +25,6 @@ Engine::~Engine()
 	m_world.SaveMap("map.sav");
 	//Sound::DeInit();
 	delete[] m_bInfo;
-	delete[] m_monster;
 }
 
 void Engine::Init()
@@ -71,6 +66,31 @@ void Engine::Init()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+
+	glEnable(GL_FOG);
+	GLfloat fogcolor[4] = { 0.5, 0.5, 0.5, 1 };
+	GLint fogmode = GL_EXP;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, 1);
+	glFogf(GL_FOG_START, 1.0);
+	glFogf(GL_FOG_END, 5.0);
+
+	////fog?
+	//bool   gp;                      // G Pressed? ( New )
+	//GLuint filter;                      // Which Filter To Use
+	//GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
+	//GLuint fogfilter = 0;                    // Which Fog To Use
+	//GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // Fog Color
+
+	//glClearColor(0.5f, 0.5f, 0.5f, 1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+	//glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+	//glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
+	//glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
+	//glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+	//glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
+	//glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
+	//glEnable(GL_FOG);
 
 	CenterMouse();
 	HideCursor();
@@ -132,15 +152,13 @@ void Engine::LoadResource()
 
 
 	//Model 3d
-
 	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
-
 	//Gun
-	playerGun[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, true, 400, 1000);
-	playerGun[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
-	playerGun[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100);
+	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40);
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -152,26 +170,13 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
-	m_world.SetUpdateDistance(m_renderDistance);
+	m_world.SetUpdateDistance(m_settings.m_renderdistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
 	//Entity
 
 	// -- Player
-	m_player.SetName("Player 1");
-
-
-	//  -- Monster
-	for (int i = 0; i < MAX_MONSTER; i++)
-	{
-		m_monster[i].SetName("Monster " + std::to_string(i + 1));
-		m_monster[i].SetTarget(&m_player);
-	}
-
-	//  -- Cow
-	for (int i = 0; i < MAX_COW; i++)
-		m_cow[i].SetName("Cow " + std::to_string(i + 1));
-
+	m_world.GetPlayer()->SetName("Vincent Suce");
 
 }
 
@@ -180,42 +185,141 @@ void Engine::UnloadResource()
 
 }
 
-void Engine::Render(float elapsedTime)
+void Engine::UpdateEnvironement()
 {
+	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
+	//Update le player
+	m_world.GetPlayer()->Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+
+	//Update les balles
+	for (int k = 0; k < 3; k++)
+	{ 
+		m_world.GetPlayer()->GetGuns()[k].Update();
+		for (int i = 0; i < MAX_BULLET; i++)
+		{
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
+
+			//Check si y a collision
+			for (int j = 0; j < MAX_MONSTER; j++)
+				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]);
+			for (int j = 0; j < MAX_COW; j++)
+				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]);
+
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
+
+		}
+	}
+
+	//Update les monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_world.GetMonster()[i].Move(m_world);
+
+	//Update les Cow
+	for (int i = 0; i < MAX_COW; i++)
+		m_world.GetAnimal()[i].Move(m_world);
+
+	//m_world.InitChunks(playerPos.x, playerPos.z);
+	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+	t.detach();
+
+	//Update les chunk autour du joueur si il sont dirty
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+
+}
+void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if(!m_player.GetisAlive())
+	if (!m_world.GetPlayer()->GetisAlive())
 	{
-		m_wireframe = false;	
+		m_wireframe = false;
 		DrawDeathScreen();
 		return;
 	}
 
+	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
+	glColor3f(1.f, 1.f, 1.f);
+
+	// Transformations initiales
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+
+	//Place le joueur au centre du monde
+	m_world.GetPlayer()->ApplyRotation();
+	m_world.GetPlayer()->ApplyTranslation();
+
+
+	//Activation des shaders
+	m_shader01.Use();
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
+
+	//Ciel
+	if (m_world.GetPlayer()->GetPosition().y > 64)
+		DrawSky(gameTime);
+
+	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
+
+	//Draw Monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_world.GetMonster()[i].Draw(m_modelRaptor, false);
+
+	for (int i = 0; i < MAX_COW; i++)
+		m_world.GetAnimal()[i].Draw(m_modelCow);
+
+	m_playerActor.Draw(m_modelRaptor);
+
+	//Draw guns
+	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
+			m_world.GetPlayer()->GetPosition().x,
+			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y,
+			m_world.GetPlayer()->GetPosition().z,
+			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
+
+
+
+	//Draw Chunks
+	m_textureAtlas.Bind();
+	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+
+	Shader::Disable();
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	//Draw Bullets
+	for (int j = 0; j < 3; j++)
+		for (int i = 0; i < MAX_BULLET; i++)
+			m_world.GetPlayer()->GetGuns()[j].GetBullets()[i].Draw();
+
+	//Draw Block focused (black square)
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+		DrawFocusedBlock();
+
+
+	//Draw le hui
+	if (m_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	DrawHud();
+	if (m_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+}
+
+void Engine::Render(float elapsedTime)
+{
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 	gameTime += elapsedTime;
 
-	//Chunk du joueur
-	Vector3<int> playerPos((int)m_player.GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player.GetPosition().z / CHUNK_SIZE_Z);
-
 	//Spawn des monstre aleatoirement
 	if ((int)(gameTime * 100) % 1000 == 0)
-		for (int i = 0; i < MAX_MONSTER; i++)
-			if (!m_monster[i].GetisAlive())
-			{
-				m_monster[i].Spawn(m_world, (int)((m_player.GetPosition().x) - 50 + rand() % 100), (int)((m_player.GetPosition().z) - 50 + rand() % 100));
-				break;
-			}
+		m_world.SpawnAnimals();
 
 	if ((int)(gameTime * 100) % 100 == 0)
-		for (int i = 0; i < MAX_COW; i++)
-			if (!m_cow[i].GetisAlive())
-			{
-				m_cow[i].Spawn(m_world, (int)((m_player.GetPosition().x) - 100 + rand() % 200), (int)((m_player.GetPosition().z) - 100 + rand() % 200));
-				break;
-			}
+		m_world.SpawnMonsters();
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
@@ -226,55 +330,32 @@ void Engine::Render(float elapsedTime)
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
-		//Update le player
-		m_player.Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
 		//Footstep
-		static Vector3<float> lastpos = m_player.GetPosition();
-		if (sqrtf(pow(lastpos.x - m_player.GetPosition().x, 2) + pow(lastpos.z - m_player.GetPosition().z, 2)) > 1.8f && !m_player.GetisInAir())
+		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
+		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 		{
 			Sound::Play(Sound::STEP1 + rand() % 6, 12);
-			lastpos = m_player.GetPosition();
+			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
-		//Tirer
-		if (m_mouseButton[1] && m_player.GetWeapon() != W_BLOCK)
-		{
-			playerGun[m_player.GetWeapon() - 1].Shoot(m_player.GetPosition().x, m_player.GetPosition().y + m_player.GetDimension().y, m_player.GetPosition().z, m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
-			(playerGun[m_player.GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
-		}
+		////Tirer
+		//if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+		//{
+		//	playerGun[m_world.GetPlayer()->GetWeapon() - 1].Shoot(m_world.GetPlayer()->GetPosition().x, m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y, m_world.GetPlayer()->GetPosition().z, m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
+		//	(playerGun[m_world.GetPlayer()->GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
+		//}
 
-		//Update les balles
-		for (int k = 0; k < 3; k++)				
-			for (int i = 0; i < MAX_BULLET; i++)
-			{
-				playerGun[k].GetBullets()[i].Update();
+		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
+			m_mouseButton[1] = false;
 
-				//Check si y a collision
-				for (int j = 0; j < MAX_MONSTER; j++)
-					playerGun[k].GetBullets()[i].CheckCollision(m_monster[j]);
-
-				for (int j = 0; j < MAX_COW; j++)
-					playerGun[k].GetBullets()[i].CheckCollision(m_cow[j]);
-
-				playerGun[k].GetBullets()[i].CheckCollision(m_world);
-
-			}
-		
-		//Update les monstres
-		for (int i = 0; i < MAX_MONSTER; i++)
-			m_monster[i].Move(m_world);
-
-		//Update les monstres
-		for (int i = 0; i < MAX_COW; i++)
-			m_cow[i].Move(m_world);
 
 		//Net
 		static int sdf = 0;
 		if (sdf++ % 3 == 0)
 		{
-			m_Netctl.Send("p " + Tool::VectorToString(m_player.GetPosition()));
-			m_Netctl.Send("h " + std::to_string(m_player.GetHorizontalRotation()));	
+			m_Netctl.Send("p " + Tool::VectorToString(m_world.GetPlayer()->GetPosition()));
+			m_Netctl.Send("h " + std::to_string(m_world.GetPlayer()->GetHorizontalRotation()));
 		}
 
 		std::string packetBuffer = m_Netctl.Receive();
@@ -291,180 +372,18 @@ void Engine::Render(float elapsedTime)
 			int bt;
 			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
-			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt);
+			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt);
 		}
-		
-		
+		UpdateEnvironement();
+
 		//Time control
 		//1 / 0.02 = 50 fps
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
 
-	glColor3f(1.f, 1.f, 1.f);
-
-	// Transformations initiales
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-
-	//Place le joueur au centre du monde
-	m_player.ApplyRotation();
-	m_player.ApplyTranslation();
-
-	
-	//Activation des shaders
-	m_shader01.Use();
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_player.Underwater());
-
-	//Ciel
-	if (m_player.GetPosition().y > 64)
-	{
-		glPushMatrix();
-		glTranslatef(m_player.GetPosition().x, 0, m_player.GetPosition().z);
-
-		glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
-
-		m_textureSky.Bind();
-
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
-		glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
-		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-		glTexCoord2f(0, 0.25);			glVertex3f(-512, 512, -512);
-
-		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-		glTexCoord2f(0.25, 0.5);		glVertex3f(512, -512, -512);
-		glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
-		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-
-		glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
-		glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
-		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-		glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
-
-		glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
-		glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
-		glTexCoord2f(1, 0.50);			glVertex3f(-512, -512, -512);
-		glTexCoord2f(1, 0.25);			glVertex3f(-512, 512, -512);
-
-		glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
-		glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
-		glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
-		glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
-		glEnd();
-		glPopMatrix();
-	}
-
-	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
-
-	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_monster[i].Draw(m_modelRaptor, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_cow[i].Draw(m_modelCow);
-
-	m_playerActor.Draw(m_modelRaptor);
-
-	//Draw guns
-	if (m_player.GetWeapon() != W_BLOCK)
-	playerGun[m_player.GetWeapon()-1].Draw(
-			m_player.GetPosition().x,
-			m_player.GetPosition().y + m_player.GetDimension().y,
-			m_player.GetPosition().z,
-			m_player.GetHorizontalRotation(), m_player.GetVerticalRotation());
-	
-
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
-	
-
-	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
-
-	//Draw Chunks
-	m_textureAtlas.Bind();
-	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
-	Shader::Disable();
-	glDisable(GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
-
-	//Draw Bullets
-	for (int j = 0; j < 3; j++)	
-		for (int i = 0; i < MAX_BULLET; i++)	
-			playerGun[j].GetBullets()[i].Draw();
-	
-	//Draw Block focused (black square)
-	if (m_player.GetWeapon() == W_BLOCK)
-	{
-
-		glPushMatrix();
-		glTranslatef((GLfloat)m_currentBlock.x, (GLfloat)m_currentBlock.y, (GLfloat)m_currentBlock.z);
-
-		glBegin(GL_LINE_LOOP);
-		glColor3f(0.0f, 0.0f, 0.0f);
-
-		if (m_currentFaceNormal.z == -1)
-		{
-			glVertex3f(0, 0, 0 - (GLfloat)0.01);
-			glVertex3f(0, (GLfloat)0.99, 0 - (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, (GLfloat)0.99, 0 - (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, 0, 0 - (GLfloat)0.01);
-		}
-		else if (m_currentFaceNormal.x == 1)
-		{
-			glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, 0);
-			glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
-			glVertex3f(1 + (GLfloat)0.01, 0, (GLfloat)0.99);
-			glVertex3f(1 + (GLfloat)0.01, 0, 0);
-		}
-		else if (m_currentFaceNormal.z == 1)
-		{
-			glVertex3f(0, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-			glVertex3f((GLfloat)0.99, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-			glVertex3f(0, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
-		}
-		else if (m_currentFaceNormal.x == -1)
-		{
-			glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
-			glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, 0);
-			glVertex3f(0 - (GLfloat)0.01, 0, 0);
-			glVertex3f(0 - (GLfloat)0.01, 0, (GLfloat)0.99);
-		}
-		else if (m_currentFaceNormal.y == 1)
-		{
-			glVertex3f(0, 1 + (GLfloat)0.01, (GLfloat)0.99);
-			glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, (GLfloat)0.99);
-			glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, 0);
-			glVertex3f(0, 1 + (GLfloat)0.01, 0);
-		}
-		else if (m_currentFaceNormal.y == -1)
-		{
-			glVertex3f(0, 0 - (GLfloat)0.01, (GLfloat)0.99);
-			glVertex3f(0, 0 - (GLfloat)0.01, 0);
-			glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, 0);
-			glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, (GLfloat)0.99);
-
-		}
-		glEnd();
-		glPopMatrix();
-	}
-
 	GetBlocAtCursor();
-	
-	//Draw le hui
-	if (m_wireframe)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	DrawHud();
-	if (m_wireframe)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	DrawEnvironement(gameTime);
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -484,59 +403,57 @@ void Engine::KeyPressEvent(unsigned char key)
 		SetFullscreen(IsFullscreen());
 		m_keyboard[key] = false;
 	}
-	
+
 	//V -> toogle noclip mode
 	else if (m_keyboard[m_settings.m_noclip])
-		m_player.ToggleNoClip();
+		m_world.GetPlayer()->ToggleNoClip();
 
 	//Lctr -> Sneak
 	else if (m_keyboard[m_settings.m_crouch])
-		m_player.SetSneak(true);
+		m_world.GetPlayer()->SetSneak(true);
 
 	//LSHIFT -> RUN
 	else if (m_keyboard[m_settings.m_run])
-		m_player.SetRunning(true);
+		m_world.GetPlayer()->SetRunning(true);
 
 	//space -> jump
 	if (m_keyboard[m_settings.m_jump])
-		m_player.Jump();
+		m_world.GetPlayer()->Jump();
 
 	//1 -> W_BLOCK 
 	if (m_keyboard[m_settings.m_inventory1])
-		m_player.SetWeapon(W_BLOCK);
+		m_world.GetPlayer()->SetWeapon(W_BLOCK);
 
 	//2 ->  W_PISTOL
 	if (m_keyboard[m_settings.m_inventory2])
 	{
-		m_player.SetWeapon(W_PISTOL);
+		m_world.GetPlayer()->SetWeapon(W_PISTOL);
 		Sound::Play(Sound::GUN_DRAW);
 
 	}
 	//3 ->  W_SUBMACHINE_GUN
 	if (m_keyboard[m_settings.m_inventory3])
 	{
-		m_player.SetWeapon(W_SUBMACHINE_GUN);
+		m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
 		Sound::Play(Sound::GUN_DRAW);
 	}
 	//4 ->  W_ASSAULT_RIFLE
 	if (m_keyboard[m_settings.m_inventory4])
 	{
-		m_player.SetWeapon(W_ASSAULT_RIFLE);
+		m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
 		Sound::Play(Sound::GUN_DRAW);
 	}
 	//M -> spawn monster
 	else if (m_keyboard[m_settings.m_spawnmonster])
 	{
 		for (int i = 0; i < MAX_MONSTER; i++)
-			if (!m_monster[i].GetisAlive())
+			if (!m_world.GetMonster()[i].GetisAlive())
 			{
-				m_monster[i].Spawn(m_world, (int)((m_player.GetPosition().x) - 50 + rand() % 100), (int)((m_player.GetPosition().z) - 50 + rand() % 100));
+				m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 				break;
 			}
 
 	}
-
-
 	//y -> toggle wireframe mode
 	else if (m_keyboard[m_settings.m_wireframe])
 	{
@@ -567,7 +484,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		//m_world.LoadMap("map.sav", m_bInfo);
 		std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
 		t.detach();
-		//m_player.Spawn(m_world);
+		//m_world.GetPlayer()->Spawn(m_world);
 	}
 	//Lshift + W -> Write map
 	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
@@ -583,7 +500,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		//m_world.InitMap(time(NULL));
 		std::thread t(&World::InitMap, &m_world, time(NULL));
 		t.detach();
-		//m_player.Spawn(m_world);
+		//m_world.GetPlayer()->Spawn(m_world);
 	}
 
 	//Lshift + F -> Flat map
@@ -592,12 +509,12 @@ void Engine::KeyPressEvent(unsigned char key)
 		//m_world.InitMap(0);
 		std::thread t(&World::InitMap, &m_world, 0);
 		t.detach();
-		//m_player.Spawn(m_world);
+		//m_world.GetPlayer()->Spawn(m_world);
 	}
 
-	if(!m_player.GetisAlive())
-		if(m_keyboard[sf::Keyboard::Return])
-			m_player.Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
+	if (!m_world.GetPlayer()->GetisAlive())
+		if (m_keyboard[sf::Keyboard::Return])
+			m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
@@ -607,11 +524,11 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 	//end sneak
 	if (!m_keyboard[sf::Keyboard::LControl])
-		m_player.SetSneak(false);
+		m_world.GetPlayer()->SetSneak(false);
 
 	//end run
 	if (!m_keyboard[sf::Keyboard::LShift])
-		m_player.SetRunning(false);
+		m_world.GetPlayer()->SetRunning(false);
 
 }
 
@@ -630,8 +547,8 @@ void Engine::MouseMoveEvent(int x, int y)
 	relativeX = (float)(x - Width() / 2);
 	relativeY = (float)(y - Height() / 2);
 
-	m_player.TurnLeftRight(relativeX * m_settings.m_mousesensibility);
-	m_player.TurnTopBottom(relativeY * m_settings.m_mousesensibility);
+	m_world.GetPlayer()->TurnLeftRight(relativeX * m_settings.m_mousesensibility);
+	m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
 
 }
 
@@ -640,18 +557,18 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 	//update le teableau
 	m_mouseButton[button] = true;
 
-	if (m_player.GetWeapon() == W_BLOCK)
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 	{
 		//Left Click
 		if (button == 1 && m_currentBlock.x != -1)
 		{
 			Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
 			m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-			m_Netctl.Send("m " + 
-				std::to_string(chunkPos.x) + 
-				" " + std::to_string(chunkPos.z) + 
-				" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) + 
-				" " + std::to_string(m_currentBlock.y) + 
+			m_Netctl.Send("m " +
+				std::to_string(chunkPos.x) +
+				" " + std::to_string(chunkPos.z) +
+				" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) +
+				" " + std::to_string(m_currentBlock.y) +
 				" " + std::to_string(m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)) +
 				" " + "0");
 		}
@@ -666,10 +583,10 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			//Si le chunk existe on place le block
 			if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 			{
-				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_player.GetBlock());
+				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
 
 				//Si ya collision on efface le block
-				if (m_player.CheckCollision(m_world))
+				if (m_world.GetPlayer()->CheckCollision(m_world))
 					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
 				else
 				{
@@ -679,7 +596,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 						" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
 						" " + std::to_string(newBlocPos.y) +
 						" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
-						" " + std::to_string(m_player.GetBlock()));
+						" " + std::to_string(m_world.GetPlayer()->GetBlock()));
 				}
 			}
 
@@ -687,11 +604,11 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 		}
 		//Scroll Up
 		if (button == 8)
-			m_player.SetBlock(1);
+			m_world.GetPlayer()->SetBlock(1);
 
 		//Scroll Down
 		else if (button == 16)
-			m_player.SetBlock(-1);
+			m_world.GetPlayer()->SetBlock(-1);
 	}
 
 }
@@ -752,30 +669,30 @@ void Engine::DrawHud() const
 
 		//vie du joueur
 		ss.str("");
-		ss << "Health: " << m_player.GetHP();
+		ss << "Health: " << m_world.GetPlayer()->GetHP();
 		PrintText(10, 130, 12, ss.str());
 
 		//Armur du joueur
 		ss.str("");
-		ss << "Armor: " << m_player.GetArmor();
+		ss << "Armor: " << m_world.GetPlayer()->GetArmor();
 		PrintText(10, 110, 12, ss.str());
 
 		//force du joueur
 		ss.str("");
-		ss << "A.Damage: " << m_player.GetAttackDamage();
+		ss << "A.Damage: " << m_world.GetPlayer()->GetAttackDamage();
 		PrintText(10, 90, 12, ss.str());
 
 		//Attack speed du joueur
 		ss.str("");
-		ss << "A.Speed: " << m_player.GetAttackSpeed();
+		ss << "A.Speed: " << m_world.GetPlayer()->GetAttackSpeed();
 		PrintText(10, 70, 12, ss.str());
 
 		//Range du joueur
 		ss.str("");
-		ss << "A.Range: " << m_player.GetAttackRange();
+		ss << "A.Range: " << m_world.GetPlayer()->GetAttackRange();
 		PrintText(10, 50, 12, ss.str());
 
-		int orientation = (int)m_player.GetHorizontalRotation() % 360;
+		int orientation = (int)m_world.GetPlayer()->GetHorizontalRotation() % 360;
 
 		if (orientation < 0)
 			orientation = 360 + orientation;
@@ -802,16 +719,16 @@ void Engine::DrawHud() const
 
 		//Position du joueur
 		ss.str("");
-		ss << "Position " << m_player.GetPosition();
+		ss << "Position " << m_world.GetPlayer()->GetPosition();
 		PrintText(10, 10, 12, ss.str());
 	}
 	ss.str("");
 	//Pour chaque 10 point de vie on met un carre sinon un espace
-	for (int i = 0; i < m_player.GetHP() / 5; i++)
+	for (int i = 0; i < m_world.GetPlayer()->GetHP() / 5; i++)
 	{
 		ss << (char)254; // Le carractere ■
 	}
-	for (int i = 0; i < 100 / 5 - m_player.GetHP() / 5; i++)
+	for (int i = 0; i < 100 / 5 - m_world.GetPlayer()->GetHP() / 5; i++)
 	{
 		ss << " ";
 	}
@@ -822,7 +739,7 @@ void Engine::DrawHud() const
 	// Affichage du crosshair
 	DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
 
-	if (m_player.GetWeapon() == W_BLOCK)
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 	{
 		//Block selectionne
 		glLoadIdentity();
@@ -844,13 +761,13 @@ void Engine::DrawHud() const
 		glColor3f(1.f, 1.f, 1.f);
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
 		glVertex2i(0, 0);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
 		glVertex2i(48, 0);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
 		glVertex2i(48, 48);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
 		glVertex2i(0, 48);
 
 		glEnd();
@@ -868,7 +785,7 @@ void Engine::DrawHud() const
 }
 void Engine::DrawDeathScreen() const
 {
-	
+
 	glEnable(GL_TEXTURE_2D);
 
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -891,11 +808,11 @@ void Engine::DrawDeathScreen() const
 	//Text
 	std::ostringstream ss;
 	ss << "You're dead !";
-	PrintText(Width()/2 - (ss.str().length() * 48) / 2, Height()/2, 64, ss.str());
-	
+	PrintText(Width() / 2 - (ss.str().length() * 48) / 2, Height() / 2, 64, ss.str());
+
 	ss.str("");
 	ss << "Press enter to rise from your ashes";
-	PrintText(Width()/2 - (ss.str().length() * 24) / 2, Height()/2 - 96, 32, ss.str());
+	PrintText(Width() / 2 - (ss.str().length() * 24) / 2, Height() / 2 - 96, 32, ss.str());
 
 	glEnable(GL_TEXTURE_2D);
 
@@ -961,7 +878,7 @@ void Engine::GetBlocAtCursor()
 
 	bool found = false;
 
-	if ((m_player.GetPosition() - Vector3<float>((const float)posX, (const float)posY, (const float)posZ)).Length() < EDITING_DISTANCE)
+	if ((m_world.GetPlayer()->GetPosition() - Vector3<float>((const float)posX, (const float)posY, (const float)posZ)).Length() < EDITING_DISTANCE)
 	{
 		// Apres avoir determine la position du bloc en utilisant la partie entiere du hit
 		// point retourne par opengl, on doit verifier de chaque cote du bloc trouve pour trouver
@@ -1050,6 +967,101 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(10, -1);
 
 	glEnd();
+
+}
+
+void Engine::DrawSky(float gameTime) const
+{
+	glPushMatrix();
+	glTranslatef(m_world.GetPlayer()->GetPosition().x, 0, m_world.GetPlayer()->GetPosition().z);
+
+	glRotatef(gameTime * 1.1f, 0.f, 1.f, 0.f);
+
+	m_textureSky.Bind();
+
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0.50);			glVertex3f(-512, -512, -512);
+	glTexCoord2f(0.25, 0.50);		glVertex3f(512, -512, -512);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+	glTexCoord2f(0, 0.25);			glVertex3f(-512, 512, -512);
+
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+	glTexCoord2f(0.25, 0.5);		glVertex3f(512, -512, -512);
+	glTexCoord2f(0.5, 0.5);			glVertex3f(512, -512, 512);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+	glTexCoord2f(0.5, 0.50);		glVertex3f(512, -512, 512);
+
+	glTexCoord2f(0.75, 0.25);		glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.75, 0.50);		glVertex3f(-512, -512, 512);
+	glTexCoord2f(1, 0.50);			glVertex3f(-512, -512, -512);
+	glTexCoord2f(1, 0.25);			glVertex3f(-512, 512, -512);
+
+	glTexCoord2f(0.5, 0);			glVertex3f(-512, 512, 512);
+	glTexCoord2f(0.25, 0);			glVertex3f(-512, 512, -512);
+	glTexCoord2f(0.25, 0.25);		glVertex3f(512, 512, -512);
+	glTexCoord2f(0.5, 0.25);		glVertex3f(512, 512, 512);
+	glEnd();
+	glPopMatrix();
+}
+
+void Engine::DrawFocusedBlock() const {
+
+	glPushMatrix();
+	glTranslatef((GLfloat)m_currentBlock.x, (GLfloat)m_currentBlock.y, (GLfloat)m_currentBlock.z);
+
+	glBegin(GL_LINE_LOOP);
+	glColor3f(0.0f, 0.0f, 0.0f);
+
+	if (m_currentFaceNormal.z == -1)
+	{
+		glVertex3f(0, 0, 0 - (GLfloat)0.01);
+		glVertex3f(0, (GLfloat)0.99, 0 - (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, (GLfloat)0.99, 0 - (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, 0, 0 - (GLfloat)0.01);
+	}
+	else if (m_currentFaceNormal.x == 1)
+	{
+		glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, 0);
+		glVertex3f(1 + (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
+		glVertex3f(1 + (GLfloat)0.01, 0, (GLfloat)0.99);
+		glVertex3f(1 + (GLfloat)0.01, 0, 0);
+	}
+	else if (m_currentFaceNormal.z == 1)
+	{
+		glVertex3f(0, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, 0, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+		glVertex3f((GLfloat)0.99, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+		glVertex3f(0, (GLfloat)0.99, 1 + (GLfloat)0.01 + (GLfloat)0.01);
+	}
+	else if (m_currentFaceNormal.x == -1)
+	{
+		glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, (GLfloat)0.99);
+		glVertex3f(0 - (GLfloat)0.01, (GLfloat)0.99, 0);
+		glVertex3f(0 - (GLfloat)0.01, 0, 0);
+		glVertex3f(0 - (GLfloat)0.01, 0, (GLfloat)0.99);
+	}
+	else if (m_currentFaceNormal.y == 1)
+	{
+		glVertex3f(0, 1 + (GLfloat)0.01, (GLfloat)0.99);
+		glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, (GLfloat)0.99);
+		glVertex3f((GLfloat)0.99, 1 + (GLfloat)0.01, 0);
+		glVertex3f(0, 1 + (GLfloat)0.01, 0);
+	}
+	else if (m_currentFaceNormal.y == -1)
+	{
+		glVertex3f(0, 0 - (GLfloat)0.01, (GLfloat)0.99);
+		glVertex3f(0, 0 - (GLfloat)0.01, 0);
+		glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, 0);
+		glVertex3f((GLfloat)0.99, 0 - (GLfloat)0.01, (GLfloat)0.99);
+
+	}
+	glEnd();
+	glPopMatrix();
 
 }
 
