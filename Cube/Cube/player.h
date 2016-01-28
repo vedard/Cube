@@ -21,6 +21,7 @@ public:
 	void ToggleNoClip();
 	void Jump();
 	void Tick();
+	bool Shoot(World &world);
 
 
 	bool Underwater() const;
@@ -28,14 +29,13 @@ public:
 
 	BlockType GetBlock() const;
 	int GetWeapon() const;
+	Gun* GetGuns() const;
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
 	void SetWeapon(int mode);
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
-
-
 
 private:
 	void CheckUnderwater(World &world);
@@ -56,6 +56,7 @@ private:
 	bool m_kneeUnderLava;
 	bool m_footUnderLava;  // Si le joueur est sous la lave
 	BlockType m_block;// Prochain block que le joueur peut placer
+	Gun * Guns;
 	
 	int m_weapon;			// current weapon
 

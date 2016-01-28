@@ -58,7 +58,7 @@ typedef long long int64;
 #define MAX_MONSTER 0
 #define MAX_COW 30
 #define PI 3.14159265358f
-#define MAX_BULLET 500
+#define MAX_BULLET 100
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"

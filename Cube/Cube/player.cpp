@@ -23,6 +23,7 @@ m_HeadShake(0)
 	m_isAlive = false;
 	m_godMode = false;
 	
+	Guns = new Gun[3];	
 }
 
 Player::~Player()
@@ -304,6 +305,8 @@ BlockType Player::GetBlock() const { return m_block; }
 
 int Player::GetWeapon() const { return m_weapon; }
 
+Gun* Player::GetGuns() const { return Guns; }
+
 void Player::SetBlock(int direction)
 {
 	if (direction < 0)
@@ -340,6 +343,15 @@ void Player::Jump()
 		m_vitesse.y = -0.002f;
 	else if (m_footUnderLava && m_headUnderLava && m_kneeUnderLava)
 		m_vitesse.y = -0.07f;
+}
+
+bool Player::Shoot(World &world)
+{
+	Guns[GetWeapon() - 1].Shoot(GetPosition().x,GetPosition().y + world.GetPlayer()->GetDimension().y, GetPosition().z, GetHorizontalRotation(), GetVerticalRotation());
+	if (Guns[GetWeapon() - 1].GetIsAuto())
+		return true;
+	else
+		return false;
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
