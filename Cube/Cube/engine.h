@@ -61,6 +61,7 @@ private:
 
 private:
 	bool m_wireframe;
+	float m_LastTickTime;
 
 	PlayerActor m_playerActor;
 

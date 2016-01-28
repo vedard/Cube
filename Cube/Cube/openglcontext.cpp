@@ -3,7 +3,6 @@
 
 OpenglContext::OpenglContext() : m_maxFps(999999), m_fullscreen(false), m_title(""), m_lastFrameTime(0)
 {
-	SetConfig();
 }
 
 OpenglContext::~OpenglContext()

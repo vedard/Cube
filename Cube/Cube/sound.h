@@ -7,7 +7,7 @@ class Sound
 {
 public:
 	typedef int32 SoundBuffer;
-	enum { M9_FIRE, MP5K_FIRE, AK47_FIRE, GUN_DRAW, FLESH_IMPACT, STEP1, STEP2, STEP3, STEP4, STEP5, STEP6 };
+	enum { M9_FIRE, MP5K_FIRE, AK47_FIRE, GUN_DRAW, FLESH_IMPACT, STEP1, STEP2, STEP3, STEP4, STEP5, STEP6, BACKGROUND};
 
 
 	static void DeInit();
