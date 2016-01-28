@@ -7,6 +7,7 @@ m_shader01(),
 m_textureAtlas(NUMBER_OF_BLOCK - 1),
 m_world(),
 m_currentBlock(-1, -1, -1),
+m_fastInventoryKeySelected(0),
 displayInfo(false)
 {
 	//Initialisation des touches
@@ -471,18 +472,9 @@ void Engine::KeyPressEvent(unsigned char key)
 {
 	//update le teableau
 	m_keyboard[key] = true;
-
-	//#define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
-	//#define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
-	//#define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
-	if(m_keyboard[FIRST_FAST_INVENTORY_KEY])
-		std::cerr << "pressed z" << std::endl;
-
-	if(m_keyboard[SECOND_FAST_INVENTORY_KEY])
-		std::cerr << "pressed x" << std::endl;
-
-	if(m_keyboard[THIRD_FAST_INVENTORY_KEY])
-		std::cerr << "pressed c" << std::endl;
+	
+	if((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
+		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 
 
 	//Esc -> Arrete le programme
@@ -610,7 +602,7 @@ void Engine::KeyPressEvent(unsigned char key)
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
-	//update le teableau
+	//update le tableau
 	m_keyboard[key] = false;
 
 	//end sneak
@@ -1077,14 +1069,17 @@ void Engine::RenderFastInventory() const
 		glTranslated(Width(), 16, 0);
 	}
 
+	int keys[3] = {THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY};
+
 	for(int i = 0; i < 3; i++)
 	{
 		glTranslated(-64, 0,0);
-
-		if(i != 1)
-			glColor3f(0.f,0.f,0.f);
-		else		
+		
+		if(keys[i] == m_fastInventoryKeySelected)
 			glColor3f(128.f,0.f,0.f);
+		else
+			glColor3f(0.f,0.f,0.f);
+	
 		glBegin(GL_QUADS);
 		glVertex2i(-2, -2);
 		glVertex2i(50, -2);

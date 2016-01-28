@@ -71,6 +71,7 @@ private:
 	Texture m_textureSky;
 	Texture m_textureFont;
 	
+	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
 	World m_world;
