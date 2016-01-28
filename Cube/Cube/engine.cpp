@@ -227,7 +227,7 @@ void Engine::Render(float elapsedTime)
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
 		//Update le player
-		m_player.Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+		m_player.Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
 		//Footstep
 		static Vector3<float> lastpos = m_player.GetPosition();
@@ -473,54 +473,59 @@ void Engine::KeyPressEvent(unsigned char key)
 	m_keyboard[key] = true;
 
 	//Esc -> Arrete le programme
-	if (m_keyboard[36])
+	if (m_keyboard[m_settings.m_menu])
 		Stop();
 
 	//f10 -> toggle fulscreen mode
-	else if (m_keyboard[94])
-		SetFullscreen(!IsFullscreen());
+	else if (m_keyboard[m_settings.m_fullscreen])
+	{
+		m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+		m_settings.Save();
+		SetFullscreen(IsFullscreen());
+		m_keyboard[key] = false;
+	}
 	
 	//V -> toogle noclip mode
-	else if (m_keyboard[sf::Keyboard::V])
+	else if (m_keyboard[m_settings.m_noclip])
 		m_player.ToggleNoClip();
 
 	//Lctr -> Sneak
-	else if (m_keyboard[sf::Keyboard::LControl])
+	else if (m_keyboard[m_settings.m_crouch])
 		m_player.SetSneak(true);
 
 	//LSHIFT -> RUN
-	else if (m_keyboard[sf::Keyboard::LShift])
+	else if (m_keyboard[m_settings.m_run])
 		m_player.SetRunning(true);
 
 	//space -> jump
-	if (m_keyboard[sf::Keyboard::Space])
+	if (m_keyboard[m_settings.m_jump])
 		m_player.Jump();
 
 	//1 -> W_BLOCK 
-	if (m_keyboard[sf::Keyboard::Num1])
+	if (m_keyboard[m_settings.m_inventory1])
 		m_player.SetWeapon(W_BLOCK);
 
 	//2 ->  W_PISTOL
-	if (m_keyboard[sf::Keyboard::Num2])
+	if (m_keyboard[m_settings.m_inventory2])
 	{
 		m_player.SetWeapon(W_PISTOL);
 		Sound::Play(Sound::GUN_DRAW);
 
 	}
 	//3 ->  W_SUBMACHINE_GUN
-	if (m_keyboard[sf::Keyboard::Num3])
+	if (m_keyboard[m_settings.m_inventory3])
 	{
 		m_player.SetWeapon(W_SUBMACHINE_GUN);
 		Sound::Play(Sound::GUN_DRAW);
 	}
 	//4 ->  W_ASSAULT_RIFLE
-	if (m_keyboard[sf::Keyboard::Num4])
+	if (m_keyboard[m_settings.m_inventory4])
 	{
 		m_player.SetWeapon(W_ASSAULT_RIFLE);
 		Sound::Play(Sound::GUN_DRAW);
 	}
 	//M -> spawn monster
-	else if (m_keyboard[sf::Keyboard::M])
+	else if (m_keyboard[m_settings.m_spawnmonster])
 	{
 		for (int i = 0; i < MAX_MONSTER; i++)
 			if (!m_monster[i].GetisAlive())
@@ -533,7 +538,7 @@ void Engine::KeyPressEvent(unsigned char key)
 
 
 	//y -> toggle wireframe mode
-	else if (m_keyboard[24])
+	else if (m_keyboard[m_settings.m_wireframe])
 	{
 
 		m_wireframe = !m_wireframe;
@@ -543,7 +548,7 @@ void Engine::KeyPressEvent(unsigned char key)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 	//F3 -> toggle info
-	else if (m_keyboard[sf::Keyboard::F3])
+	else if (m_keyboard[m_settings.m_info])
 	{
 		displayInfo = !displayInfo;
 
@@ -625,8 +630,8 @@ void Engine::MouseMoveEvent(int x, int y)
 	relativeX = (float)(x - Width() / 2);
 	relativeY = (float)(y - Height() / 2);
 
-	m_player.TurnLeftRight(relativeX * m_mouse_sensibility);
-	m_player.TurnTopBottom(relativeY * m_mouse_sensibility);
+	m_player.TurnLeftRight(relativeX * m_settings.m_mousesensibility);
+	m_player.TurnTopBottom(relativeY * m_settings.m_mousesensibility);
 
 }
 
@@ -815,7 +820,7 @@ void Engine::DrawHud() const
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	// Affichage du crosshair
-	DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
+	DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
 
 	if (m_player.GetWeapon() == W_BLOCK)
 	{

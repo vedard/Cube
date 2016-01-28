@@ -7,6 +7,7 @@
 
 int main()
 {
+	Parametre& m_settings = Parametre::GetInstance();
     Tool::CheckTypes();
 
 

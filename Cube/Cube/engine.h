@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cmath>
 #include <thread>
+#include "parametre.h"
 
 
 class Engine : public OpenglContext
@@ -95,7 +96,9 @@ private:
 
 	//NetworkManager
 	NetworkManager m_Netctl;
+	// Parametres
 
+	Parametre& m_settings = Parametre::GetInstance();
 };
 
 #endif // ENGINE_H__
