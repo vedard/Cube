@@ -67,6 +67,31 @@ void Engine::Init()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
 
+	glEnable(GL_FOG);
+	GLfloat fogcolor[4] = { 0.5, 0.5, 0.5, 1 };
+	GLint fogmode = GL_EXP;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, 1);
+	glFogf(GL_FOG_START, 1.0);
+	glFogf(GL_FOG_END, 5.0);
+
+	////fog?
+	//bool   gp;                      // G Pressed? ( New )
+	//GLuint filter;                      // Which Filter To Use
+	//GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
+	//GLuint fogfilter = 0;                    // Which Fog To Use
+	//GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // Fog Color
+
+	//glClearColor(0.5f, 0.5f, 0.5f, 1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+	//glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+	//glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
+	//glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
+	//glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+	//glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
+	//glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
+	//glEnable(GL_FOG);
+
 	CenterMouse();
 	HideCursor();
 }
