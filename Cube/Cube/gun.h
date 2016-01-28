@@ -13,6 +13,7 @@ public:
 	~Gun();
 	void Init(std::string modelPath, std::string texturePath, int sound, bool isAuto, float RPM, float damage);
 	void Draw(float x, float y, float z, float rotX, float rotY) const;
+	void Update();
 	bool Shoot(float x, float y, float z, float rotX, float rotY);
 	Bullet* GetBullets();
 	const bool GetIsAuto() const;
@@ -26,9 +27,12 @@ private:
 	bool m_isAutomatic;
 	float m_cooldown;
 	float m_damage;
+	float m_recoilByBullet;
 
 	//Timer
 	sf::Clock m_timerCooldown;
+
+	float m_recoilTotal;
 
 	int m_sound;
 

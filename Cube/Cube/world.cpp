@@ -129,7 +129,7 @@ void World::InitChunk(float i, float j)
 
 			chunk->SetBlock(x, (int)(val + 65), z, BTYPE_NETHEREACK, ' ');
 
-			val = scaled_octave_noise_2d(15, 0.4f,(float)((m_seed) ? 8 : 0), -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
+			val = scaled_octave_noise_2d(15, 0.4f, (float)((m_seed) ? 8 : 0), -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
 
 
 			for (int y = 0; y <= 55; y++)
@@ -184,8 +184,8 @@ void World::InitChunk(float i, float j)
 				{
 					if (chunk->GetBlock(x, y, z) == BTYPE_AIR &&
 						(chunk->GetBlock(x, y - 1, z) == BTYPE_GRASS ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
+							chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
+							chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
 					{
 						chunk->SetBlock(x, y, z, BTYPE_WATER, ' ');
 					}
@@ -199,8 +199,8 @@ void World::InitChunk(float i, float j)
 				{
 					if (chunk->GetBlock(x, y, z) == BTYPE_AIR &&
 						(chunk->GetBlock(x, y - 1, z) == BTYPE_NETHEREACK ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
+							chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
+							chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
 					{
 						chunk->SetBlock(x, y, z, BTYPE_LAVA, ' ');
 					}
@@ -551,6 +551,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 
 }
 
+
 int World::ChunkNotUpdated(int CenterX, int CenterZ)
 {
 	int chunkNotUpdated = 0;
@@ -607,12 +608,12 @@ void World::SetUpdateDistance(int updateDist)
 
 void World::SpawnAnimals()
 {
-		for (int i = 0; i < MAX_COW; i++)
-			if (!m_animal[i].GetisAlive())
-			{
-				m_animal[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
-				break;
-			}
+	for (int i = 0; i < MAX_COW; i++)
+		if (!m_animal[i].GetisAlive())
+		{
+			m_animal[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			break;
+		}
 }
 
 void World::SpawnMonsters()
@@ -621,6 +622,7 @@ void World::SpawnMonsters()
 		if (!m_monster[i].GetisAlive())
 		{
 			m_monster[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
+			m_monster[i].SetTarget(m_player);
 			break;
 		}
 }

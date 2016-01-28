@@ -206,7 +206,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 	BlockType type = binfo.GetType();
 	float h = binfo.GetHauteur();
 	/*if (type == BTYPE_WATER)
-		CheckWater(Vector3<float>((int)Blockpos.x % CHUNK_SIZE_X, (int)Blockpos.y % CHUNK_SIZE_Y, (int)Blockpos.z % CHUNK_SIZE_Z), binfo, 0);*/
+	CheckWater(Vector3<float>((int)Blockpos.x % CHUNK_SIZE_X, (int)Blockpos.y % CHUNK_SIZE_Y, (int)Blockpos.z % CHUNK_SIZE_Z), binfo, 0);*/
 
 		// face
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, -1)))
@@ -321,9 +321,7 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-	if (faceType == BTYPE_AIR || BTYPE_RWATER1 == faceType || faceType == BTYPE_RWATER2 || faceType == BTYPE_RWATER3
-		|| faceType == BTYPE_FWATER || faceType == BTYPE_LEAVE || (faceType != BTYPE_WATER && type == BTYPE_WATER)
-		|| faceType == BTYPE_LAVA || (faceType == BTYPE_WATER && type != BTYPE_WATER))
+	if (faceType == BTYPE_AIR || ((16 <= faceType && faceType <= 25)&& (type < 16 || type > 25 ) ) || ((16 > faceType || faceType > 25) && (type >= 16 && type <= 25)))
 		return true;
 
 	return false;
@@ -439,7 +437,7 @@ void Chunk::Water1(const Vector3<float> &Blockpos)
 		{
 			if (direction == 'Q')
 			{
-				direction = GetDirection(Blockpos);
+				//direction = GetDirection(Blockpos);
 				m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
 			}
 			if (direction != 'Q')

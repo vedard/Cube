@@ -63,7 +63,7 @@ bool Bullet::CheckCollision(Character &character)
 			{
 
 				//f(x) = -1 * 1.02 ^ (x + 10) + 50
-				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage),FALSE);
+				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage),FALSE,FALSE);
 				m_isActive = false;
 				return true;
 			}
@@ -79,7 +79,7 @@ bool Bullet::CheckCollision(World &world)
 	{
 		// Pour les collision les bullet se deplace trop rapidement il faut donc teste plusieur point entre la derniere position 
 		// et la position actuelle afin de s'assurer qu'elle na pas passe a travers un objet
-		int nbrIteration = 100;
+		int nbrIteration = 60;
 
 		for (int i = 0; i < nbrIteration; i++)
 		{

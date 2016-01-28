@@ -21,6 +21,7 @@ public:
 	void ToggleNoClip();
 	void Jump();
 	void Tick();
+	bool Shoot(World &world);
 
 
 	bool Underwater() const;
@@ -28,6 +29,7 @@ public:
 
 	BlockType GetBlock() const;
 	int GetWeapon() const;
+	Gun* GetGuns() const;
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
@@ -35,13 +37,12 @@ public:
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 
-
-
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
 
 private:
+	bool m_godMode;
 	time_t m_TickBegin;     //timer de tick
 	time_t m_TickEnd;     //timer de tick
 	int  m_BreathCount; //Compte les ticks pour la breath
@@ -49,12 +50,14 @@ private:
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
+	bool m_kneeUnderwater;
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
-	bool m_headUnderLava;  // Si le joueur est sous la lave
+	bool m_headUnderLava; // Si le joueur est sous la lave
 	bool m_kneeUnderwater;  // Si le joueur est sous l'eau
 	bool m_kneeUnderLava;  // Si le joueur est sous la lave
 	bool m_footUnderLava;  // Si le joueur est sous la lave
-	BlockType m_block;		// Prochain block que le joueur peut placer
+	BlockType m_block;// Prochain block que le joueur peut placer
+	Gun * Guns;
 	
 	int m_weapon;			// current weapon
 
