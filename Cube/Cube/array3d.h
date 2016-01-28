@@ -19,12 +19,20 @@ public:
 	const t& Get(int x, int y, int z) const;
 	char& GetDirection(int x, int y, int z);
 	const char& GetDirection(int x, int y, int z) const;
+
+	void SetExploded(int x, int y, int z, bool exploded);
+	bool& GetExploded(int x, int y, int z);
+	const bool& GetExploded(int x, int y, int z) const;
+
+
 	void Reset(t value);
 
 private:
 	int m_x, m_y, m_z;
 	t* m_data;
 	char* m_direction;
+	bool* m_exploded;
+public:
 };
 
 
@@ -33,6 +41,7 @@ Array3d<t>::Array3d(int x, int y, int z) : m_x(x), m_y(y), m_z(z)
 {
 	m_data = new t[m_x * m_y * m_z];
 	m_direction = new char[m_x * m_y * m_z];
+	m_exploded = new bool[m_x * m_y * m_z];
 	Reset(0);
 }
 
@@ -51,6 +60,7 @@ Array3d<t>::Array3d(const Array3d& array)
 
 	m_data = new t[m_x * m_y * m_z];
 	m_direction = new char[m_x * m_y * m_z];
+	m_exploded = new bool[m_x * m_y * m_z];
 	for (int i = 0; i < m_x * m_y * m_z; ++i)
 		m_data[i] = array.m_data[i];
 }
@@ -105,8 +115,32 @@ void Array3d<t>::Reset(t value)
 {
 	for (int i = 0; i < m_x * m_y * m_z; ++i)
 		m_data[i] = value;
+	for (int i = 0; i < m_x * m_y * m_z; ++i)
+		m_exploded[i] = false;
 }
 
+template<class t>
+void Array3d<t>::SetExploded(int x, int y, int z, bool exploded)
+{
+	if (x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z)
+		m_exploded[x + (z * m_x) + (y * m_z * m_x)] = exploded;
+}
+
+template<class t>
+bool& Array3d<t>::GetExploded(int x, int y, int z)
+{
+	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
+
+	return m_exploded[x + (z * m_x) + (y * m_z * m_x)];
+}
+
+template<class t>
+const bool& Array3d<t>::GetExploded(int x, int y, int z) const
+{
+	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
+
+	return m_exploded[x + (z * m_x) + (y * m_z * m_x)];
+}
 
 
 #endif // ARRAY3D_H__

@@ -40,10 +40,14 @@ public:
 private:
 	bool CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vector3<float> &face) const;
 	float CheckLightning(const Vector3<float> &Blockpos, const Vector3<float> &face) const;
-	BlockType ChooseWater(int numero);
-	void AddWater(const Vector3<float> &Blockpos);
-	char GetDirection(const Vector3<float> &Blockpos);
-	void WaterExplosion(const Vector3<float> &Blockpos);
+
+	void SetExploded(int x, int y, int z, bool exploded);
+	bool GetExploded(int x, int y, int z) const;
+
+	void Water1(const Vector3<float> &Blockpos);
+	void Water2(const Vector3<float> &Blockpos);
+	void WaterExploded(const Vector3<float> &Blockpos);
+	BlockType WaterCheck(int x, int y, int z, BlockType bt);
 
 
 	//Todo - rendre private

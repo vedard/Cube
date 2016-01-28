@@ -63,7 +63,7 @@ bool Bullet::CheckCollision(Character &character)
 			{
 
 				//f(x) = -1 * 1.02 ^ (x + 10) + 50
-				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage),FALSE);
+				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage),FALSE,FALSE);
 				m_isActive = false;
 				return true;
 			}

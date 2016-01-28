@@ -131,5 +131,5 @@ void Animal::GetDamage(float damage)
 	Jump();
 	if (rand() % 100 > 66)
 		Sound::Play(Sound::FLESH_IMPACT);
-	Character::GetDamage(damage,FALSE);
+	Character::GetDamage(damage,FALSE,FALSE);
 }

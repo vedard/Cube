@@ -166,7 +166,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					GetDamage(exp(m_vitesse.y * 6), TRUE);
+					GetDamage(exp(m_vitesse.y * 6), TRUE,m_godMode);
 			}
 			
 			//annule
@@ -201,21 +201,21 @@ void Player::CheckUnderwater(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
 
-	if (bt1 == BTYPE_WATER)
+	if (bt1 > 15 && bt1 < 21)
 		m_headUnderwater = true;
 	else
 		m_headUnderwater = false;
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5, m_pos.z);
 
-	if (bt1 == BTYPE_WATER)
+	if (bt1 > 15 && bt1 < 21)
 		m_kneeUnderwater = true;
 	else
 		m_kneeUnderwater = false;
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
 
-	if (bt1 == BTYPE_WATER)
+	if (bt1 > 15 && bt1 < 21)
 		m_footUnderwater = true;
 	else
 		m_footUnderwater = false;
@@ -225,21 +225,21 @@ void Player::CheckUnderLava(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
 
-	if (bt1 == BTYPE_LAVA)
+	if (bt1 > 20 && bt1 < 26)
 		m_headUnderLava = true;
 	else
 		m_headUnderLava = false;
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5 , m_pos.z);
 
-	if (bt1 == BTYPE_LAVA)
+	if (bt1 > 20 && bt1 < 26)
 		m_kneeUnderLava = true; 
 	else
 		m_kneeUnderLava = false;
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
 
-	if (bt1 == BTYPE_LAVA)
+	if (bt1 > 20 && bt1 < 26)
 		m_footUnderLava = true;
 	else
 		m_footUnderLava = false;
@@ -349,14 +349,15 @@ bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 	{
 		if (m_footUnderLava)
-			GetDamage(5, TRUE);
+			GetDamage(5, TRUE,m_godMode);
 		if (m_headUnderwater)
 		{
 			m_BreathCount++;
 			if (m_BreathCount > 15)
-				GetDamage(3, TRUE);
+				GetDamage(3, TRUE,m_godMode);
 		}
 		else
 			m_BreathCount = 0;
+
 	}
-}
+
