@@ -17,6 +17,7 @@ Engine::Engine() :
 
 	//Creation du tableau des tableaux;
 	m_bInfo = new BlockInfo[256];
+
 }
 
 Engine::~Engine()
@@ -141,6 +142,7 @@ void Engine::LoadResource()
 	Sound::AddSound(Sound::AK47_FIRE, AUDIO_PATH "ak47-1.wav");
 	Sound::AddSound(Sound::GUN_DRAW, AUDIO_PATH "glock_draw.wav");
 	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
+	Sound::AddSound(Sound::BACKGROUND, AUDIO_PATH "music.wav");
 	for (int i = 0; i < 6; i++)
 		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
@@ -330,7 +332,16 @@ void Engine::Render(float elapsedTime)
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
-
+		//Gestion des Ticks
+		if (gameTime - m_LastTickTime >= TICK_DELAY)
+		{
+			m_LastTickTime = gameTime;
+			m_world.GetPlayer()->Tick();
+			if (true)
+			{
+				Sound::Play(Sound::BACKGROUND);
+			}
+		}
 		//Footstep
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
 		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
@@ -394,7 +405,6 @@ void Engine::KeyPressEvent(unsigned char key)
 	//Esc -> Arrete le programme
 	if (m_keyboard[m_settings.m_menu])
 		Stop();
-
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[m_settings.m_fullscreen])
 	{

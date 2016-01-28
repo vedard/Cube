@@ -303,4 +303,17 @@ bool Player::Shoot(World &world)
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
+void Player::Tick()
+{
+	/*if (m_footUnderLava)
+		GetDamage(5, TRUE, m_godMode);
+	if (m_headUnderwater)
+	{
+		m_BreathCount++;
+		if (m_BreathCount > 15)
+			GetDamage(3, TRUE, m_godMode);
+	}
+	else
+		m_BreathCount = 0;*/
 
+}
