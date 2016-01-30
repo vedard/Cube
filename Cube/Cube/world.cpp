@@ -3,15 +3,19 @@
 #include "monster.h"
 #include "player.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), compteur(0)//, m_threadChunks(RunWater)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
 	//Chunk start
-	//m_threadChunks = std::thread(&World::RunWater);
+	//m_threadChunks = new std::thread[20];
+	//for (int i = 0; i < 20; i++)
+	//	m_threadChunks[i] = std::thread(&World::RunWater, this, i * 20);
 
 	// Initialise les monstres et animaux.
 	m_animal = new Animal[MAX_COW];
 	m_monster = new Monster[MAX_MONSTER];
 	m_player = new Player;
+
+	
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -38,6 +42,9 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 			if (j > 0)
 				chunk->m_negativeZ = ChunkAt((float)i, (float)(j - 1));
 		}
+	m_threadChunks = std::thread(&World::RunWater, this);
+	m_threadChunks.detach();
+	
 }
 
 World::~World()
@@ -313,7 +320,7 @@ Chunk* World::ChunkAt(float x, float z)
 void World::LoadMap(std::string filename, BlockInfo* &binfo)
 {
 	std::cout << "Loading " << filename << "..." << std::endl;
-
+	m_bInfo = binfo;
 	//Open file
 	std::ifstream file;
 	file.open(filename.c_str());
@@ -355,7 +362,10 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 					{
 						ssline >> b;
 						if (b >= 0 && b < NUMBER_OF_BLOCK)
+						{
+							chunk->m_bInfo = m_bInfo;
 							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType(), ' ');
+						}
 
 					}
 		}
@@ -629,21 +639,53 @@ void World::SpawnMonsters()
 
 void World::RunWater()
 {
-	m_threadcontinue = true;
-	while (m_threadcontinue)
-	{
-		
-		Chunk* chunks = m_chunks.GetChunk();
-		for (int i = 0; i < WORLD_SIZE * WORLD_SIZE; i++)
+		int compteur = 0;
+
+		while (m_threadcontinue)
 		{
-			chunks[i].WaterTick(compteur);
+
+			Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+			for (int i = 0; i < UpdateDistance * 2; i++)
+				for (int j = 0; j < UpdateDistance * 2; j++)
+				{
+					Chunk * chunk = ChunkAt((float)(playerPos.x + i - UpdateDistance), (float)(playerPos.z + j - UpdateDistance));
+
+					//Si le chunk existe on le render
+					if (chunk)
+					{
+						if (chunk->DeleteWater)
+						{
+							RemoveWater(chunk->WaterSource);
+							chunk->DeleteWater = false;
+						}
+						chunk->WaterTick(compteur);
+					}
+				}
+			compteur++;
+			if (compteur == 4)
+				compteur = 0;
+
+			//std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		compteur++;
-		if (compteur == 4)
-			compteur = 0;
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-	}
-	m_threadChunks.join();
+	
 }
+
+void World::RemoveWater(Vector3<float> vf)
+{
+	Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
+		{
+			Chunk * chunk = ChunkAt((float)(playerPos.x + i - UpdateDistance), (float)(playerPos.z + j - UpdateDistance));
+			chunk->RemoveWater(vf);
+		}
+
+}
+
+
+
+
+
+
 
 

@@ -136,7 +136,12 @@ void Engine::LoadResource()
 	AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
 	AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
 
+	AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .90f);
+	AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
+	AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
+	AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 
+	
 	if (!m_textureAtlas.Generate(64, false))
 	{
 		std::cout << " Unable to generate texture atlas ..." << std::endl;
@@ -415,7 +420,10 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	//Esc -> Arrete le programme
 	if (m_keyboard[36])
+	{
+		m_world.m_threadcontinue = false;
 		Stop();
+	}
 
 	//f10 -> toggle fulscreen mode
 	else if (m_keyboard[94])

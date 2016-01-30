@@ -41,13 +41,18 @@ public:
 	void SpawnMonsters();
 	void SpawnAnimals();
 	void RunWater();
+	void RemoveWater(Vector3<float> vf);
 
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
 	void AddTree(Chunk * &chunk, int x, int y, int z);
 	void InitChunk(float i, float j);
 	std::thread m_threadChunks;
+public:
 	bool m_threadcontinue;
+	BlockInfo* m_bInfo;
+private:
+	bool m_started;
 
 	Array2d<Chunk> m_chunks;
 
@@ -57,7 +62,6 @@ private:
 
 	int UpdateDistance;
 	int	m_seed;
-	int compteur;
 
 };
 #endif // !WORLD_H__
