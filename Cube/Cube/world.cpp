@@ -402,7 +402,13 @@ void World::SaveMap(std::string filename)
 				for (int x = 0; x < CHUNK_SIZE_X; ++x)
 					for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 						for (int y = 0; y <= CHUNK_SIZE_Y; y++)
+						{
+							/*BlockType bt = (int)ChunkAt((float)i, (float)j)->GetBlock(x, y, z);
+							if (bt == BTYPE_RWATER1 || bt == BTYPE_RWATER2 || bt == BTYPE_RWATER3 || bt == BTYPE_FWATER
+								|| bt == BTYPE_RLAVA1 || bt == BTYPE_RLAVA2 || bt == BTYPE_RLAVA2 || bt == BTYPE_RLAVA3)
+								bt = BTYPE_AIR;*/
 							file << (int)ChunkAt((float)i, (float)j)->GetBlock(x, y, z) << " ";
+						}
 
 
 				std::cout << "Chunk " << count++ << " / " << total << " saved" << std::endl;
@@ -645,10 +651,10 @@ void World::RunWater()
 		{
 
 			Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
-			for (int i = 0; i < UpdateDistance * 2; i++)
-				for (int j = 0; j < UpdateDistance * 2; j++)
+			for (int i = 0; i < UpdateDistance - 2; i++)
+				for (int j = 0; j < UpdateDistance - 2; j++)
 				{
-					Chunk * chunk = ChunkAt((float)(playerPos.x + i - UpdateDistance), (float)(playerPos.z + j - UpdateDistance));
+					Chunk * chunk = ChunkAt((float)(playerPos.x + i -3), (float)(playerPos.z + j - 3));
 
 					//Si le chunk existe on le render
 					if (chunk)

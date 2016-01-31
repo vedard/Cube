@@ -26,14 +26,6 @@ public:
 	bool& GetExploded(int x, int y, int z);
 	const bool& GetExploded(int x, int y, int z) const;
 
-	void SetSource(int x, int y, int z, Vector3<float> source);
-	//Vector3<float>& GetSource(int x, int y, int z);
-	const Vector3<float>& GetSource(int x, int y, int z) const;
-	void RemoveSource(int x, int y, int z, Vector3<float> source);
-
-	int GetPositionTotal() const;
-
-
 	void Reset(t value);
 
 private:
@@ -51,7 +43,6 @@ private:
 	bool* m_exploded;
 
 	//std::map<Vector3<float>, Vector3<float>, Class1Compare> m_source;
-	std::list<PaireVector3*> m_source;
 	int* m_xp;
 	int* m_yp;
 	int* m_zp;
@@ -166,67 +157,6 @@ const bool& Array3d<t>::GetExploded(int x, int y, int z) const
 	assert(x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z);
 
 	return m_exploded[x + (z * m_x) + (y * m_z * m_x)];
-}
-
-template<class t>
-void Array3d<t>::SetSource(int x, int y, int z, Vector3<float> source)
-{
-	if (x >= 0 && y >= 0 && z >= 0 && x < m_x && y < m_y && z < m_z)
-	{		
-		PaireVector3 *p3 = new PaireVector3(Vector3<float>(x, y, z), source);
-		std::list<PaireVector3*>::const_iterator it;
-		bool badd = true;
-		for (it = m_source.begin(); it != m_source.end(); it++)
-		{
-			if ((*it)->position == Vector3<float>(x,y,z))
-				badd = false;
-		}
-		if (badd)
-			m_source.push_back(p3);
-	}
-	m_source.unique();
-
-}
-
-template<class t>
-const Vector3<float>& Array3d<t>::GetSource(int x, int y, int z) const
-{
-	Vector3<float> f = Vector3<float>(x, y, z);
-	std::list<PaireVector3*>::const_iterator it;
-	for (it = m_source.begin(); it != m_source.end(); it++)
-	{
-		if ((*it)->position == f)
-			return (*it)->source;
-	}
-	return Vector3<float>(x, y, z);
-
-}
-
-template<class t>
-int Array3d<t>::GetPositionTotal() const
-{
-	return  m_x * m_y * m_z;
-}
-
-template<class t>
-void Array3d<t>::RemoveSource(int x, int y, int z, Vector3<float> source)
-{
-	/*Vector3<float> f = Vector3<float>(x, y, z);
-	std::list<PaireVector3*>::const_iterator it;
-	std::list<PaireVector3*>::const_iterator it2;
-	for (it = m_source.begin(); it != m_source.end(); it++)
-	{
-		if ((*it)->position == f && (*it)->source == source)
-			it2 = it;
-	}
-	m_source.erase(it);*/
-	//m_source.remove(&pv);
-	/*std::list<PaireVector3*>::const_iterator it;
-	for (it = m_source.begin(); it != m_source.end(); it++)
-	{
-		if ((*it)->position == f)
-			m_source.erase(it);
-	}*/
 }
 
 

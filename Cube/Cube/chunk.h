@@ -46,9 +46,6 @@ private:
 	void SetExploded(int x, int y, int z, bool exploded);
 	bool GetExploded(int x, int y, int z) const;
 
-	void SetSource(int x, int y, int z, Vector3<float> source);
-	Vector3<float> GetSource(int x, int y, int z) const;
-
 	void Water1(const Vector3<float> &Blockpos);
 	void Water2(const Vector3<float> &Blockpos);
 	void WaterExploded(const Vector3<float> &Blockpos);
