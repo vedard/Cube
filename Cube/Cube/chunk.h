@@ -32,7 +32,6 @@ public:
 	bool NeedUpdate() const;
 	bool& GetSave();
 	void WaterTick(int bloc);
-	void LavaTick(int bloc);
 	void RemoveWater(Vector3<float> vf);
 	void RemoveLava(Vector3<float> vf);
 
@@ -67,6 +66,7 @@ public:
 	Vector3<float> m_position;
 	BlockInfo* m_bInfo;
 	bool DeleteWater;
+	bool DeleteLava;
 	Vector3<float> WaterSource;
 
 private:
