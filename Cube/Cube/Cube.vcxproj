@@ -103,10 +103,12 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="character.cpp" />
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
     <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
+    <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="playerActor.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -129,8 +131,11 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
     <ClInclude Include="gun.h" />
-    <ClInclude Include="Inventory.h" />
+
+	<ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
+    <ClInclude Include="menu.h" />
+    <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
     <ClInclude Include="networkManager.h" />

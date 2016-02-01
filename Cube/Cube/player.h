@@ -23,7 +23,7 @@ public:
 	void ToggleNoClip();
 	void Jump();
 	bool Shoot(World &world);
-
+	void Tick();
 
 	bool Underwater() const;
 

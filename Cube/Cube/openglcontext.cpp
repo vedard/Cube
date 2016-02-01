@@ -13,7 +13,7 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 {
 	m_title = title;
 
-	InitWindow(width, height);
+	InitWindow(m_settings.m_width, m_settings.m_height);
 
 	Init();
 	LoadResource();
@@ -108,7 +108,7 @@ int OpenglContext::GetMaxFps() const
 void OpenglContext::SetFullscreen(bool fullscreen)
 {
 	ShowCursor();
-	m_fullscreen = fullscreen;
+	m_settings.m_isfullscreen = fullscreen;
 	m_app.setPosition(sf::Vector2i(0, 0));
 	DeInit();
 	InitWindow();
@@ -117,7 +117,7 @@ void OpenglContext::SetFullscreen(bool fullscreen)
 
 bool OpenglContext::IsFullscreen() const
 {
-	return m_fullscreen;
+	return m_settings.m_isfullscreen;
 }
 
 void OpenglContext::MakeRelativeToCenter(int& x, int& y) const
@@ -142,113 +142,21 @@ void OpenglContext::ShowCrossCursor() const
 
 void OpenglContext::InitWindow(int width, int height)
 {
-	m_width = width;
-	m_height = height;
-
 	//Lis le fichier de configuration si il na pas deja ete lu
-	static bool isConfigFileRead = false;
-	if (!isConfigFileRead)
-	{
-		isConfigFileRead = true;
-		ReadConfig("Cube.conf");
-	}
 
 	std::cout << sf::VideoMode::getDesktopMode().width << std::endl;
 
-	if (m_fullscreen)
+	if (m_settings.m_isfullscreen)
 		m_app.create(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32),
 			m_title.c_str(),
 			sf::Style::Fullscreen,
-			sf::ContextSettings(32, 8, m_AntiAliasing));
+			sf::ContextSettings(32, 8, m_settings.m_antialiasing));
 	else
-		m_app.create(sf::VideoMode((m_width != 0) ? m_width : 800, (m_height != 0) ? m_height : 600, 32),
+		m_app.create(sf::VideoMode((m_settings.m_width != 0) ? m_settings.m_width : 800, (m_settings.m_height != 0) ? m_settings.m_height : 600, 32),
 			m_title.c_str(),
 			sf::Style::Close,
-			sf::ContextSettings(32, 8, m_AntiAliasing));
-	m_app.setVerticalSyncEnabled(m_vsync);
-}
-
-void OpenglContext::ReadConfig(const std::string& filename)
-{
-
-	Array2d<std::string> setting(10, 2);
-	setting.Reset("null");
-	setting.Get(0, 0) = "width";
-	setting.Get(1, 0) = "height";
-	setting.Get(2, 0) = "antialiasing";
-	setting.Get(3, 0) = "fullscreen";
-	setting.Get(4, 0) = "vsync";
-	setting.Get(5, 0) = "render_distance";
-	setting.Get(6, 0) = "cross_color_r";
-	setting.Get(7, 0) = "cross_color_g";
-	setting.Get(8, 0) = "cross_color_b";
-	setting.Get(9, 0) = "mouse_sensibility";
-
-	m_width = 0;
-	m_height = 0;
-	m_AntiAliasing = 0;
-	m_vsync = true;
-	m_renderDistance = 5;
-	m_mouse_sensibility = 0.2f;
-	m_cross_color_r = 0.f;
-	m_cross_color_g = 0.f;
-	m_cross_color_b = 0.f;
-
-	std::cout << "Reading " << filename << "..." << std::endl;
-
-	//Open file
-	std::ifstream file;
-	file.open(filename);
-
-	//Read All file
-	std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	std::stringstream ss(str);
-
-	//Close it
-	file.close();
-
-	//read setting value
-	while (ss)
-	{
-		std::string temp;
-
-		ss >> temp;
-		int index = setting.GetIndex(temp);
-		if (index != -1)
-			ss >> setting.Get(setting.GetIndex(temp), 1);
-	}
-	std::string a = setting.Get(2, 1);
-	//Convert string into int
-	if (setting.Get(0, 1) != "null")
-		m_width = atoi(setting.Get(0, 1).c_str());
-
-	if (setting.Get(1, 1) != "null")
-		m_height = atoi(setting.Get(1, 1).c_str());
-
-	if (setting.Get(2, 1) != "null")
-		m_AntiAliasing = atoi(setting.Get(2, 1).c_str());
-
-	if (setting.Get(3, 1) == "true" || setting.Get(3, 1) == "1")
-		m_fullscreen = true;
-	else
-		m_fullscreen = false;
-
-	if (setting.Get(4, 1) == "true" || setting.Get(4, 1) == "1")
-		m_vsync = true;
-	else
-		m_vsync = false;
-
-	if (setting.Get(5, 1) != "null")
-		m_renderDistance = atoi(setting.Get(5, 1).c_str());
-	if (setting.Get(6, 1) != "null")
-		m_cross_color_r = (float)atof(setting.Get(6, 1).c_str());
-	if (setting.Get(7, 1) != "null")
-		m_cross_color_g = (float)atof(setting.Get(7, 1).c_str());
-	if (setting.Get(8, 1) != "null")
-		m_cross_color_b = (float)atof(setting.Get(8, 1).c_str());
-	if (setting.Get(9, 1) != "null")
-		m_mouse_sensibility = (float)atof(setting.Get(9, 1).c_str());
-
+			sf::ContextSettings(32, 8, m_settings.m_antialiasing));
+	m_app.setVerticalSyncEnabled(m_settings.m_vsync);
 }
 
 OpenglContext::MOUSE_BUTTON OpenglContext::ConvertMouseButton(sf::Mouse::Button button) const

@@ -63,6 +63,7 @@ typedef long long int64;
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define MODEL_PATH	"../Cube/media/model/"
+#define TICK_DELAY .5f
 
 #define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
@@ -103,7 +104,19 @@ enum WEAPONS {
 	W_ASSAULT_RIFLE
 };
 
+// Pour savoir sur quel menu nous nous situons
+enum SOUS_MENU {
+	SM_PRINCIPAL,
+	SM_CONTROLS,
+	SM_SETTINGS
+};
 
+// Buttons/states du menu principal
+enum MENU_PRINCIPAL {
+	MP_CONTROLS,
+	MP_SETTINGS,
+	MP_EXIT_GAME
+};
 
 
 #endif // DEFINE_H__

@@ -18,6 +18,8 @@ displayInfo(false)
 
 	//Creation du tableau des tableaux;
 	m_bInfo = new BlockInfo[256];
+
+	m_isMenuOpen = false;
 }
 
 Engine::~Engine()
@@ -142,13 +144,16 @@ void Engine::LoadResource()
 	Sound::AddSound(Sound::AK47_FIRE, AUDIO_PATH "ak47-1.wav");
 	Sound::AddSound(Sound::GUN_DRAW, AUDIO_PATH "glock_draw.wav");
 	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
+	Sound::AddSound(Sound::MUSIC1, AUDIO_PATH "music.wav");
+
+
 	for (int i = 0; i < 6; i++)
 		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
 	if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
 		abort();
 	m_music.setLoop(true);
-	m_music.setVolume(0);
+	m_music.setVolume(10);
 	m_music.play();
 
 
@@ -171,13 +176,13 @@ void Engine::LoadResource()
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
-	m_world.SetUpdateDistance(m_renderDistance);
+	m_world.SetUpdateDistance(m_settings.m_renderdistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
 	//Entity
 
 	// -- Player
-	m_world.GetPlayer()->SetName("Mick le mexicain");
+	m_world.GetPlayer()->SetName("Vincent Suce");
 
 }
 
@@ -190,7 +195,7 @@ void Engine::UpdateEnvironement()
 {
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	//Update le player
-	m_world.GetPlayer()->Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
 
 	// Update Guns
@@ -314,6 +319,10 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	// Draw le menu
+	if (m_isMenuOpen)
+		DrawMenu();
+
 }
 
 void Engine::Render(float elapsedTime)
@@ -334,11 +343,27 @@ void Engine::Render(float elapsedTime)
 		m_fps = (int)round(1.f / elapsedTime);
 
 	int loops = 0;
-
+	if (m_firstMusic)
+	{
+		m_firstMusic = false;
+		Sound::Play(Sound::MUSIC1);
+	}
+	
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
-
+		//Gestion des Ticks
+		if (gameTime - m_LastTickTime >= TICK_DELAY)
+		{
+			m_cptTick++;
+			m_LastTickTime = gameTime;
+			m_world.GetPlayer()->Tick();
+			if (m_cptTick >= 320)
+			{
+				Sound::Play(Sound::AK47_FIRE);
+				m_cptTick = 0;
+			}
+		}
 		//Footstep
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
 		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
@@ -402,126 +427,161 @@ void Engine::KeyPressEvent(unsigned char key)
 	if((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 
-
-	//Esc -> Arrete le programme
+	if (m_isMenuOpen)
+	{
+		// Fermer menu
+		if (m_keyboard[m_settings.m_menu])
+		{
+			if (m_isMenuOpen)
+			{
+				m_isMenuOpen = false;
+				HideCursor();
+			}
+		}
+		else if (m_keyboard[sf::Keyboard::Return])
+		{
+			if (m_menu->m_currentMenuItem == 2)
+				Stop();
+		}
+		else
+		{
+			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+		}
+	}
+	else
+	{
+		if (m_keyboard[m_settings.m_menu])
+		{
+			m_isMenuOpen = true;
+			ShowCursor();
+			DrawMenu();
+			m_menu = new Menu(SM_PRINCIPAL);
+		}
+//Esc -> Arrete le programme
 	if (m_keyboard[36])
 		Stop();
 
-	//f10 -> toggle fulscreen mode
-	else if (m_keyboard[94])
-		SetFullscreen(!IsFullscreen());
+		//f10 -> toggle fulscreen mode
+		else if (m_keyboard[m_settings.m_fullscreen])
+		{
+			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+			m_settings.Save();
+			SetFullscreen(IsFullscreen());
+			m_keyboard[key] = false;
+		}
 
-	//V -> toogle noclip mode
-	else if (m_keyboard[sf::Keyboard::V])
-		m_world.GetPlayer()->ToggleNoClip();
+		//V -> toogle noclip mode
+		else if (m_keyboard[m_settings.m_noclip])
+			m_world.GetPlayer()->ToggleNoClip();
 
-	//Lctr -> Sneak
-	else if (m_keyboard[sf::Keyboard::LControl])
-		m_world.GetPlayer()->SetSneak(true);
+		//Lctr -> Sneak
+		else if (m_keyboard[m_settings.m_crouch])
+			m_world.GetPlayer()->SetSneak(true);
 
-	//LSHIFT -> RUN
-	else if (m_keyboard[sf::Keyboard::LShift])
-		m_world.GetPlayer()->SetRunning(true);
+		//LSHIFT -> RUN
+		else if (m_keyboard[m_settings.m_run])
+			m_world.GetPlayer()->SetRunning(true);
 
-	//space -> jump
-	if (m_keyboard[sf::Keyboard::Space])
-		m_world.GetPlayer()->Jump();
+		//space -> jump
+		if (m_keyboard[m_settings.m_jump])
+			m_world.GetPlayer()->Jump();
 
-	//1 -> W_BLOCK 
-	if (m_keyboard[sf::Keyboard::Num1])
-		m_world.GetPlayer()->SetWeapon(W_BLOCK);
+		//1 -> W_BLOCK 
+		if (m_keyboard[m_settings.m_inventory1])
+			m_world.GetPlayer()->SetWeapon(W_BLOCK);
 
-	//2 ->  W_PISTOL
-	if (m_keyboard[sf::Keyboard::Num2])
-	{
-		m_world.GetPlayer()->SetWeapon(W_PISTOL);
-		Sound::Play(Sound::GUN_DRAW);
+		//2 ->  W_PISTOL
+		if (m_keyboard[m_settings.m_inventory2])
+		{
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
+			Sound::Play(Sound::GUN_DRAW);
 
+		}
+		//3 ->  W_SUBMACHINE_GUN
+		if (m_keyboard[m_settings.m_inventory3])
+		{
+			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		//4 ->  W_ASSAULT_RIFLE
+		if (m_keyboard[m_settings.m_inventory4])
+		{
+			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		//M -> spawn monster
+		else if (m_keyboard[m_settings.m_spawnmonster])
+		{
+			for (int i = 0; i < MAX_MONSTER; i++)
+				if (!m_world.GetMonster()[i].GetisAlive())
+				{
+					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
+					break;
+				}
+
+		}
+		//y -> toggle wireframe mode
+		else if (m_keyboard[m_settings.m_wireframe])
+		{
+
+			m_wireframe = !m_wireframe;
+			if (m_wireframe)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		//F3 -> toggle info
+		else if (m_keyboard[m_settings.m_info])
+		{
+			displayInfo = !displayInfo;
+
+		}
+		//Lshift + F5 -> delete Cache
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
+		{
+			for (int i = 0; i < WORLD_SIZE; i++)
+				for (int j = 0; j < WORLD_SIZE; j++)
+					m_world.ChunkAt((float)i, (float)j)->DeleteCache();
+
+		}
+		//Lshift + O -> open map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
+		{
+			//m_world.LoadMap("map.sav", m_bInfo);
+			std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
+			t.detach();
+			//m_world.GetPlayer()->Spawn(m_world);
+		}
+		//Lshift + W -> Write map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
+		{
+			//m_world.SaveMap("map.sav");
+			std::thread t(&World::SaveMap, &m_world, "map.sav");
+			t.detach();
+		}
+
+		//Lshift + R -> Random map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
+		{
+			//m_world.InitMap(time(NULL));
+			std::thread t(&World::InitMap, &m_world, time(NULL));
+			t.detach();
+			//m_world.GetPlayer()->Spawn(m_world);
+		}
+
+		//Lshift + F -> Flat map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
+		{
+			//m_world.InitMap(0);
+			std::thread t(&World::InitMap, &m_world, 0);
+			t.detach();
+			//m_world.GetPlayer()->Spawn(m_world);
+		}
+
+		if (!m_world.GetPlayer()->GetisAlive())
+			if (m_keyboard[sf::Keyboard::Return])
+				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 	}
-	//3 ->  W_SUBMACHINE_GUN
-	if (m_keyboard[sf::Keyboard::Num3])
-	{
-		m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
-		Sound::Play(Sound::GUN_DRAW);
-	}
-	//4 ->  W_ASSAULT_RIFLE
-	if (m_keyboard[sf::Keyboard::Num4])
-	{
-		m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
-		Sound::Play(Sound::GUN_DRAW);
-	}
-	//M -> spawn monster
-	else if (m_keyboard[sf::Keyboard::M])
-	{
-		for (int i = 0; i < MAX_MONSTER; i++)
-			if (!m_world.GetMonster()[i].GetisAlive())
-			{
-				m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
-				break;
-			}
-
-	}
-	//y -> toggle wireframe mode
-	else if (m_keyboard[24])
-	{
-
-		m_wireframe = !m_wireframe;
-		if (m_wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	//F3 -> toggle info
-	else if (m_keyboard[sf::Keyboard::F3])
-	{
-		displayInfo = !displayInfo;
-
-	}
-	//Lshift + F5 -> delete Cache
-	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
-	{
-		for (int i = 0; i < WORLD_SIZE; i++)
-			for (int j = 0; j < WORLD_SIZE; j++)
-				m_world.ChunkAt((float)i, (float)j)->DeleteCache();
-
-	}
-	//Lshift + O -> open map
-	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
-	{
-		//m_world.LoadMap("map.sav", m_bInfo);
-		std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
-		t.detach();
-		//m_world.GetPlayer()->Spawn(m_world);
-	}
-	//Lshift + W -> Write map
-	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
-	{
-		//m_world.SaveMap("map.sav");
-		std::thread t(&World::SaveMap, &m_world, "map.sav");
-		t.detach();
-	}
-
-	//Lshift + R -> Random map
-	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
-	{
-		//m_world.InitMap(time(NULL));
-		std::thread t(&World::InitMap, &m_world, time(NULL));
-		t.detach();
-		//m_world.GetPlayer()->Spawn(m_world);
-	}
-
-	//Lshift + F -> Flat map
-	else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
-	{
-		//m_world.InitMap(0);
-		std::thread t(&World::InitMap, &m_world, 0);
-		t.detach();
-		//m_world.GetPlayer()->Spawn(m_world);
-	}
-
-	if (!m_world.GetPlayer()->GetisAlive())
-		if (m_keyboard[sf::Keyboard::Return])
-			m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
@@ -541,81 +601,91 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 void Engine::MouseMoveEvent(int x, int y)
 {
-	// Centrer la souris seulement si elle n'est pas déjà centrée
-	// Il est nécessaire de faire la vérification pour éviter de tomber
-	// dans une boucle infinie où l'appel à CenterMouse génère un
-	// MouseMoveEvent, qui rapelle CenterMouse qui rapelle un autre 
-	// MouseMoveEvent, etc
-	if (x == (Width() / 2) && y == (Height() / 2))
-		return;
-	CenterMouse();
+	if (!m_isMenuOpen)
+	{
+		// Centrer la souris seulement si elle n'est pas déjà centrée
+		// Il est nécessaire de faire la vérification pour éviter de tomber
+		// dans une boucle infinie où l'appel à CenterMouse génère un
+		// MouseMoveEvent, qui rapelle CenterMouse qui rapelle un autre 
+		// MouseMoveEvent, etc
+		if (x == (Width() / 2) && y == (Height() / 2))
+			return;
+		CenterMouse();
 
-	float relativeX, relativeY;
-	relativeX = (float)(x - Width() / 2);
-	relativeY = (float)(y - Height() / 2);
+		float relativeX, relativeY;
+		relativeX = (float)(x - Width() / 2);
+		relativeY = (float)(y - Height() / 2);
 
-	m_world.GetPlayer()->TurnLeftRight(relativeX * m_mouse_sensibility);
-	m_world.GetPlayer()->TurnTopBottom(relativeY * m_mouse_sensibility);
+		m_world.GetPlayer()->TurnLeftRight(relativeX * m_settings.m_mousesensibility);
+		m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
+	}
 
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	//update le teableau
-	m_mouseButton[button] = true;
-
-	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+	if (m_isMenuOpen)
 	{
-		//Left Click
-		if (button == 1 && m_currentBlock.x != -1)
-		{
-			Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
-			m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-			m_Netctl.Send("m " +
-				std::to_string(chunkPos.x) +
-				" " + std::to_string(chunkPos.z) +
-				" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) +
-				" " + std::to_string(m_currentBlock.y) +
-				" " + std::to_string(m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)) +
-				" " + "0");
-		}
 
-		//Right Click
-		else if (button == 4 && m_currentBlock.x != -1)
-		{
-			//Position du nouveau block
-			Vector3<int> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
-			Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
+	}
+	else
+	{
+		//update le teableau
+		m_mouseButton[button] = true;
 
-			//Si le chunk existe on place le block
-			if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+		{
+			//Left Click
+			if (button == 1 && m_currentBlock.x != -1)
 			{
-				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
-
-				//Si ya collision on efface le block
-				if (m_world.GetPlayer()->CheckCollision(m_world))
-					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
-				else
-				{
-					m_Netctl.Send("m " +
-						std::to_string(chunkPos.x) +
-						" " + std::to_string(chunkPos.z) +
-						" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
-						" " + std::to_string(newBlocPos.y) +
-						" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
-						" " + std::to_string(m_world.GetPlayer()->GetBlock()));
-				}
+				Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
+				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_Netctl.Send("m " +
+					std::to_string(chunkPos.x) +
+					" " + std::to_string(chunkPos.z) +
+					" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) +
+					" " + std::to_string(m_currentBlock.y) +
+					" " + std::to_string(m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)) +
+					" " + "0");
 			}
 
+			//Right Click
+			else if (button == 4 && m_currentBlock.x != -1)
+			{
+				//Position du nouveau block
+				Vector3<int> newBlocPos(m_currentBlock.x + m_currentFaceNormal.x, m_currentBlock.y + m_currentFaceNormal.y, m_currentBlock.z + m_currentFaceNormal.z);
+				Vector3<int> chunkPos(newBlocPos.x / CHUNK_SIZE_X, 0, newBlocPos.z / CHUNK_SIZE_Z);
 
+				//Si le chunk existe on place le block
+				if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
+				{
+					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
+
+					//Si ya collision on efface le block
+					if (m_world.GetPlayer()->CheckCollision(m_world))
+						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR);
+					else
+					{
+						m_Netctl.Send("m " +
+							std::to_string(chunkPos.x) +
+							" " + std::to_string(chunkPos.z) +
+							" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
+							" " + std::to_string(newBlocPos.y) +
+							" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
+							" " + std::to_string(m_world.GetPlayer()->GetBlock()));
+					}
+				}
+
+
+			}
+			//Scroll Up
+			if (button == 8)
+				m_world.GetPlayer()->SetBlock(1);
+
+			//Scroll Down
+			else if (button == 16)
+				m_world.GetPlayer()->SetBlock(-1);
 		}
-		//Scroll Up
-		if (button == 8)
-			m_world.GetPlayer()->SetBlock(1);
-
-		//Scroll Down
-		else if (button == 16)
-			m_world.GetPlayer()->SetBlock(-1);
 	}
 
 }
@@ -746,7 +816,7 @@ void Engine::DrawHud() const
 
 	// Affichage du crosshair
 	if(!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
-		DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
+		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
 
 	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{	// show inventory hud
@@ -1123,6 +1193,112 @@ void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const st
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
 }
 
+void Engine::DrawMenu() const
+{
+	// Menu specs
+	int menuHeight = 150;
+	int menuWidth = 200;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	std::ostringstream ss;
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.7f, 0.7f, 0.7f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	glColor3f(0.5f, 0.5f, 0.5f);
+
+	if (m_menu->m_currentMenuItem == 0)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+	ss << "Controls";
+	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
+
+	if (m_menu->m_currentMenuItem == 1)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+	ss.str("");
+	ss << "Settings";
+	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
+
+	if (m_menu->m_currentMenuItem == 2)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+	ss.str("");
+	ss << "Exit Game";
+	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
+
+	//// Bouton Controls
+	//DrawMenuButton(0, menuHeight / 2 + 10, 1.f, 0.f, 0.f, 50, 20, "Controls");
+
+	//// Bouton Settings
+	//DrawMenuButton(0, 0, 0.f, 1.f, 0.f, 50, 20, "Settings");
+
+	//// Bouton Exit Game
+	//DrawMenuButton(0, -(menuHeight / 2 + 10), 0.f, 0.f, 1.f, 50, 20, "Exit Game");
+
+	glDisable(GL_BLEND);
+
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+
+}
+
+void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const
+{
+	glLoadIdentity();
+	glTranslated(Width() / 2 + translateX, Height() / 2 + translateY, 0);
+	glColor4f(r, g, b, 0.5f);
+	glBegin(GL_QUADS);
+	glVertex2i(-width, -height);
+	glVertex2i(width, -height);
+	glVertex2i(width, height);
+	glVertex2i(-width, height);
+	glEnd();
+
+	m_textureFont.Bind();
+	std::ostringstream ss;
+	ss << texte;
+	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
+}
 void Engine::RenderFastInventory() const
 {
 	if(m_world.GetPlayer()->GetWeapon() != W_BLOCK)
