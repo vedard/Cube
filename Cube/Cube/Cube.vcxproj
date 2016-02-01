@@ -99,6 +99,8 @@
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="gun.cpp" />
+    <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="menu.cpp" />
@@ -129,7 +131,7 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
     <ClInclude Include="gun.h" />
-	<ClInclude Include="Inventory.h" />
+    <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="parametre.h" />
