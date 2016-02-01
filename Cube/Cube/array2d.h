@@ -17,6 +17,7 @@ public:
 	const t& Get(int x, int y) const;
 	int GetIndex(t value) const;
 	void Reset(t value);
+	t* GetChunk();
 
 private:
 	int m_x, m_y;
@@ -82,6 +83,12 @@ void Array2d<t>::Reset(t value)
 	for (int i = 0; i < m_x * m_y ; ++i)
 		m_data[i] = value;
 	
+}
+
+template<class t>
+t* Array2d<t>::GetChunk()
+{
+	return m_data;
 }
 
 #endif // ARRAY2D_H__

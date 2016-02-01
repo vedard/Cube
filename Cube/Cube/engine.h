@@ -47,7 +47,7 @@ public:
 	void GetBlocAtCursor();
 
 private:
-	void UpdateEnvironement();
+	void UpdateEnvironement(float gameTime);
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
@@ -56,7 +56,7 @@ private:
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
-	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
+	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenu() const;
 	void DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const;
 
@@ -66,6 +66,7 @@ private:
 	bool m_firstMusic = true;
 	int m_cptTick = 0;
 	int m_musiclist [6] = {};
+	float m_LastTickTimeWater;
 	PlayerActor m_playerActor;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
