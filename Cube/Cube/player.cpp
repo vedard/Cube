@@ -5,14 +5,14 @@
 
 
 Player::Player() :
-	Character(),
-	m_noClip(false),
-	m_sneaked(false),
-	m_running(false),
-	m_block(BTYPE_GRASS),
-	m_footUnderwater(false),
-	m_headUnderwater(false),
-	m_HeadShake(0)
+Character(),
+m_noClip(false),
+m_sneaked(false),
+m_running(false),
+m_block(BTYPE_GRASS),
+m_footUnderwater(false),
+m_headUnderwater(false),
+m_HeadShake(0)
 {
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
@@ -20,7 +20,7 @@ Player::Player() :
 	m_Armor = 1.3f;
 	m_weapon = W_BLOCK;
 	m_isAlive = false;
-
+	Guns = new Gun[3];	
 }
 
 Player::~Player()
@@ -178,13 +178,9 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 	if (m_footUnderwater)
 	{
-
-
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
 	}
-
-
 }
 
 void Player::CheckUnderwater(World &world)
@@ -212,22 +208,26 @@ void Player::ApplyRotation() const
 
 }
 
-void Player::ApplyTranslation()
+float Player::ApplyTranslation()
 {
 
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(-m_pos.x, -(m_pos.y + m_dimension.y), -m_pos.z);
 
+	float shakevector = 0;
 	//Head shake a chaque pas
 	if (m_vitesse.x != 0 && !m_noClip)
 	{
-		glTranslatef(0.f, m_vitesse.x / 2.2f * sin(m_HeadShake), 0.0f);
+		shakevector = m_vitesse.x / 2.2f * sin(m_HeadShake);
+		glTranslatef(0.f, shakevector, 0.0f);
 
 	}
 
 	//Si on est baisse 
 	if (m_sneaked)
 		glTranslatef(0.f, 0.2f, 0.f);
+
+	return shakevector;
 }
 
 void Player::ToggleNoClip()
@@ -261,6 +261,8 @@ BlockType Player::GetBlock() const { return m_block; }
 
 int Player::GetWeapon() const { return m_weapon; }
 
+Gun* Player::GetGuns() const { return Guns; }
+
 void Player::SetBlock(int direction)
 {
 	if (direction < 0)
@@ -284,7 +286,7 @@ void Player::SetWeapon(int mode)
 
 void Player::Jump()
 {
-	if (!m_isInAir && !m_footUnderwater)
+	if (!m_isInAir && !m_footUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20))
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
@@ -295,5 +297,27 @@ void Player::Jump()
 		m_vitesse.y = -0.09f;
 }
 
-bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::Shoot(World &world)
+{
+	Guns[GetWeapon() - 1].Shoot(GetPosition().x,GetPosition().y + world.GetPlayer()->GetDimension().y, GetPosition().z, GetHorizontalRotation(), GetVerticalRotation());
+	if (Guns[GetWeapon() - 1].GetIsAuto())
+		return true;
+	else
+		return false;
+}
 
+bool Player::Underwater() const { return m_headUnderwater; }
+void Player::Tick()
+{
+	/*if (m_footUnderLava)
+		GetDamage(5, TRUE, m_godMode);
+	if (m_headUnderwater)
+	{
+		m_BreathCount++;
+		if (m_BreathCount > 15)
+			GetDamage(3, TRUE, m_godMode);
+	}
+	else
+		m_BreathCount = 0;*/
+
+}

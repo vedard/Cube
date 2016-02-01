@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <cmath>
 #include <thread>
+#include "parametre.h"
+#include "menu.h"
 
 
 class Engine : public OpenglContext
@@ -45,33 +47,33 @@ public:
 	void GetBlocAtCursor();
 
 private:
+	void UpdateEnvironement();
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
+	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
+	void DrawFocusedBlock() const;
+	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
-
-	// inventory
-	void RenderFastInventory() const;
-	void RenderInventory();
+	void DrawMenu() const;
+	void DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const;
 
 private:
 	bool m_wireframe;
-
-	Player m_player;
+	float m_LastTickTime;
+	bool m_firstMusic = true;
+	int m_cptTick = 0;
+	int m_musiclist [6] = {};
 	PlayerActor m_playerActor;
-	Monster* m_monster;
-	Animal* m_cow;
-	
+
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 	bool m_mouseButton[sf::Mouse::ButtonCount]; //tableau de toutes les touches du clavier
 
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
-	
-	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
 	World m_world;
@@ -100,7 +102,12 @@ private:
 
 	//NetworkManager
 	NetworkManager m_Netctl;
+	// Parametres
 
+	Parametre& m_settings = Parametre::GetInstance();
+
+	bool m_isMenuOpen;
+	Menu* m_menu;
 };
 
 #endif // ENGINE_H__
