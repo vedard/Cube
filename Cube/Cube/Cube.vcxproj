@@ -129,6 +129,8 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
     <ClInclude Include="gun.h" />
+	<ClInclude Include="Inventory.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />

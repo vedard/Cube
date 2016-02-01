@@ -97,4 +97,5 @@ Bullet* Gun::GetBullets()
 const bool Gun::GetIsAuto() const
 {
 	return m_isAutomatic;
+
 }

@@ -54,7 +54,7 @@ private:
 
 	float m_HeadShake;		// Shake la camera a chaque pas
 
-	Inventory m_inventory;	//Inventaire du joueur
+	//Inventory m_inventory;	//Inventaire du joueur
 };
 
 #endif

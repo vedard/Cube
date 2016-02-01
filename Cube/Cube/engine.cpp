@@ -6,7 +6,8 @@ Engine::Engine() :
 	m_textureAtlas(NUMBER_OF_BLOCK - 1),
 	m_world(),
 	m_currentBlock(-1, -1, -1),
-	displayInfo(false)
+	displayInfo(false),
+	m_fastInventoryKeySelected(0)
 {
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -287,7 +288,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
-			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake, 
+			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake,
 			m_world.GetPlayer()->GetPosition().z,
 			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
 
@@ -347,7 +348,7 @@ void Engine::Render(float elapsedTime)
 		m_firstMusic = false;
 		Sound::Play(Sound::MUSIC1);
 	}
-	
+
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
@@ -423,6 +424,11 @@ void Engine::KeyPressEvent(unsigned char key)
 	//update le teableau
 	m_keyboard[key] = true;
 
+
+	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
+		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
+
+
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -453,6 +459,9 @@ void Engine::KeyPressEvent(unsigned char key)
 			DrawMenu();
 			m_menu = new Menu(SM_PRINCIPAL);
 		}
+		//Esc -> Arrete le programme
+		if (m_keyboard[36])
+			Stop();
 
 		//f10 -> toggle fulscreen mode
 		else if (m_keyboard[m_settings.m_fullscreen])
@@ -808,53 +817,105 @@ void Engine::DrawHud() const
 	glDisable(GL_TEXTURE_2D);
 
 	// Affichage du crosshair
-	if(!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
+	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
+
 
 	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 	{
 		//Block selectionne
-		glLoadIdentity();
-		glTranslated(Width() - 64, 16, 0);
 
-		//contour 	
-		glColor3f(0.f, 0.f, 0.f);
-		glBegin(GL_QUADS);
-		glVertex2i(-2, -2);
-		glVertex2i(50, -2);
-		glVertex2i(50, 50);
-		glVertex2i(-2, 50);
-		glEnd();
+		if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		{	// show inventory hud
+
+			glLoadIdentity();
+			glTranslated(Width() - 64, 16, 0);
+
+			//contour 	
+			glColor3f(0.f, 0.f, 0.f);
+			glBegin(GL_QUADS);
+			glVertex2i(-2, -2);
+			glVertex2i(50, -2);
+			glVertex2i(50, 50);
+			glVertex2i(-2, 50);
+			glEnd();
 
 
-		//block
-		m_textureAtlas.Bind();
+
+			//block
+			m_textureAtlas.Bind();
+			glEnable(GL_TEXTURE_2D);
+			glColor3f(1.f, 1.f, 1.f);
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+			glVertex2i(0, 0);
+			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+			glVertex2i(48, 0);
+			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+			glVertex2i(48, 48);
+			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+			glVertex2i(0, 48);
+
+
+			std::cout << "bonjour" << std::endl;
+
+
+			glEnd();
+		}
+
+		else
+		{	// Affichage du crosshair
+			DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
+
+			if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+			{
+				//Block selectionne
+				glLoadIdentity();
+				glTranslated(Width() - 64, 16, 0);
+
+				//contour 	
+				glColor3f(0.f, 0.f, 0.f);
+				glBegin(GL_QUADS);
+				glVertex2i(-2, -2);
+				glVertex2i(50, -2);
+				glVertex2i(50, 50);
+				glVertex2i(-2, 50);
+				glEnd();
+
+
+				//block
+				m_textureAtlas.Bind();
+				glEnable(GL_TEXTURE_2D);
+				glColor3f(1.f, 1.f, 1.f);
+
+				glBegin(GL_QUADS);
+				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+				glVertex2i(0, 0);
+				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+				glVertex2i(48, 0);
+				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+				glVertex2i(48, 48);
+				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+				glVertex2i(0, 48);
+
+				glEnd();
+				glDisable(GL_TEXTURE_2D);
+			}
+		}
+
+
 		glEnable(GL_TEXTURE_2D);
-		glColor3f(1.f, 1.f, 1.f);
 
-		glBegin(GL_QUADS);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-		glVertex2i(0, 0);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-		glVertex2i(48, 0);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-		glVertex2i(48, 48);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-		glVertex2i(0, 48);
-
-		glEnd();
+		glEnable(GL_LIGHTING);
+		glEnable(GL_DEPTH_TEST);
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
 	}
-
-
-	glEnable(GL_TEXTURE_2D);
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST);
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
 }
+
 void Engine::DrawDeathScreen() const
 {
 
@@ -1039,7 +1100,6 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(25, -1);
 
 	glEnd();
-
 }
 
 void Engine::DrawSky(float gameTime) const
@@ -1249,4 +1309,40 @@ void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, fl
 	std::ostringstream ss;
 	ss << texte;
 	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
+
+}
+void Engine::RenderFastInventory() const
+{
+	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+	{
+		glLoadIdentity();
+		glTranslated(Width(), 16, 0);
+	}
+
+	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
+
+	for (int i = 0; i < 3; i++)
+	{
+		glTranslated(-64, 0, 0);
+
+		if (keys[i] == m_fastInventoryKeySelected)
+			glColor3f(128.f, 0.f, 0.f);
+		else
+			glColor3f(0.f, 0.f, 0.f);
+
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
+
+		glColor3f(255.f, 128.f, 0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(0, 0);
+		glVertex2i(48, 0);
+		glVertex2i(48, 48);
+		glVertex2i(0, 48);
+		glEnd();
+	}
 }

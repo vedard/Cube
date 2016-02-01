@@ -48,6 +48,7 @@ public:
 
 private:
 	void UpdateEnvironement();
+	void RenderFastInventory() const;
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
@@ -74,6 +75,8 @@ private:
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
+
+	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
 	World m_world;

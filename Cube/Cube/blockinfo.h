@@ -6,7 +6,7 @@
 #include "textureatlas.h"
 #include "item.h"
 
-class BlockInfo : Item
+class BlockInfo 
 {
 public:
 	BlockInfo();
