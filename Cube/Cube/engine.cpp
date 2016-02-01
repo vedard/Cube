@@ -790,7 +790,7 @@ void Engine::DrawHud() const
 
 		if (orientation >= 135 && orientation <= 225)
 			direction = "Positive Z";
-
+	
 		if (orientation >= 225 && orientation <= 315)
 			direction = "Negative X";
 
@@ -819,45 +819,85 @@ void Engine::DrawHud() const
 
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
-	// Affichage du crosshair
-	DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
 
-	if (m_player.GetWeapon() == W_BLOCK)
-	{
-		//Block selectionne
+	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	{	// show inventory hud
 		glLoadIdentity();
-		glTranslated(Width() - 64, 16, 0);
-
-		//contour 	
-		glColor3f(0.f, 0.f, 0.f);
-		glBegin(GL_QUADS);
-		glVertex2i(-2, -2);
-		glVertex2i(50, -2);
-		glVertex2i(50, 50);
-		glVertex2i(-2, 50);
-		glEnd();
-
-
-		//block
-		m_textureAtlas.Bind();
-		glEnable(GL_TEXTURE_2D);
-		glColor3f(1.f, 1.f, 1.f);
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
-		glVertex2i(0, 0);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
-		glVertex2i(48, 0);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
-		glVertex2i(48, 48);
-		glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
-		glVertex2i(0, 48);
+		glTranslated(Width() / 2, Height() / 2, 0);
 		
+		glColor3f(0.f,0.f,0.f);
+		glBegin(GL_QUADS);		
+		
+		glVertex2i(-(Width()/4), -(Height()/4)); // SW x,y
+		glVertex2i(+(Width()/4), -(Height()/4)); // SE
+		glVertex2i(+(Width()/4), +(Height()/4)); // NE
+		glVertex2i(-(Width()/4), +(Height()/4)); // NW
 		glEnd();
-		glDisable(GL_TEXTURE_2D);		
-	}
+		
+		glTranslated(-(Width()/4) - 64, +(Height()/4),0);
+		glColor3f(60.f,60.f,60.f);		
+		
 
-	RenderFastInventory();	
+		for(int i = 0; i < 3; i++)
+		{
+			for(int j = 0; j < 5; j++)
+			{		
+				glTranslated(64,0,0);		
+				glBegin(GL_QUADS);
+				glVertex2i(0,-50);
+				glVertex2i(50,-50);
+				glVertex2i(50,0);
+				glVertex2i(0,0);
+				glEnd();
+			}		
+				glTranslated(-(64 *  5),-64,0);
+		}
+
+		
+		std::cout << "bonjour" << std::endl;
+
+	}
+	else
+	{	// Affichage du crosshair
+		DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
+	
+		if (m_player.GetWeapon() == W_BLOCK)
+		{
+			//Block selectionne
+			glLoadIdentity();
+			glTranslated(Width() - 64, 16, 0);
+	
+			//contour 	
+			glColor3f(0.f, 0.f, 0.f);
+			glBegin(GL_QUADS);
+			glVertex2i(-2, -2);
+			glVertex2i(50, -2);
+			glVertex2i(50, 50);
+			glVertex2i(-2, 50);
+			glEnd();
+
+
+			//block
+			m_textureAtlas.Bind();
+			glEnable(GL_TEXTURE_2D);
+			glColor3f(1.f, 1.f, 1.f);
+	
+			glBegin(GL_QUADS);
+			glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+			glVertex2i(0, 0);
+			glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .50f);
+			glVertex2i(48, 0);
+			glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .00f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+			glVertex2i(48, 48);
+			glTexCoord2f(m_bInfo[m_player.GetBlock()].u + m_bInfo[m_player.GetBlock()].w * .50f, m_bInfo[m_player.GetBlock()].v + m_bInfo[m_player.GetBlock()].h * .75f);
+			glVertex2i(0, 48);
+			
+			glEnd();
+			glDisable(GL_TEXTURE_2D);		
+		}
+
+		RenderFastInventory();
+	}
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -1027,7 +1067,7 @@ void Engine::DrawCross(float r, float g, float b) const
 {
 	glLoadIdentity();
 	glTranslated(Width() / 2, Height() / 2, 0);
-	glColor3f(r, g, b);
+	glColor3f(r,g,b);
 	glBegin(GL_QUADS);
 
 	glVertex2i(-1, -10);
@@ -1044,14 +1084,13 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(-10, -1);
 	glVertex2i(-3, -1);
 	glVertex2i(-3, 1);
-
+	
 	glVertex2i(10, 1);
 	glVertex2i(3, 1);
 	glVertex2i(3, -1);
 	glVertex2i(10, -1);
 
 	glEnd();
-
 }
 
 void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path)
@@ -1095,4 +1134,9 @@ void Engine::RenderFastInventory() const
 		glVertex2i(0, 48);
 		glEnd();
 	}
+}
+
+void Engine::RenderInventory()
+{
+
 }
