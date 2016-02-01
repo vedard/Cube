@@ -2,18 +2,18 @@
 
 
 Character::Character() :
-m_pos(0, 128, 0),
-m_dimension(1.3f, 2.2f, 0.7f),
-m_health(100),
-m_AttackRange(2),
-m_HorizontalRot(0.f),
-m_VerticalRot(45.f),
-m_vitesse(0, 0, 0),
-m_AttackSpeed(0),
-m_Armor(1),
-m_cooldownAttackTimer(),
-m_AttackDamage(30.0f),
-m_isAlive(true)
+	m_pos(0, 128, 0),
+	m_dimension(1.3f, 2.2f, 0.7f),
+	m_health(100),
+	m_AttackRange(2),
+	m_HorizontalRot(0.f),
+	m_VerticalRot(45.f),
+	m_vitesse(0, 0, 0),
+	m_AttackSpeed(0),
+	m_Armor(1),
+	m_cooldownAttackTimer(),
+	m_AttackDamage(30.0f),
+	m_isAlive(true)
 {
 
 	m_Name = "Character ";
@@ -99,8 +99,8 @@ bool Character::CheckCollision(World &world) const
 					m_pos.y + (m_dimension.y / h * y),
 					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 
-				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER -> il y a collision
-				if (bt1 != BTYPE_AIR && bt1 != BTYPE_WATER)
+				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
+				if (bt1 != BTYPE_AIR && (bt1<16 || bt1>25))
 					return true;
 			}
 
@@ -178,7 +178,7 @@ bool Character::Attack(Character * character, float damage)
 				+ pow(character->GetPosition().z - m_pos.z, 2)) < m_AttackRange)
 			{
 				std::cout << m_Name << " attack " << character->GetName() << "." << std::endl;
-				character->GetDamage(damage);
+				character->GetDamage(damage,FALSE,FALSE);
 				m_cooldownAttackTimer.restart();
 				return true;
 			}
@@ -191,23 +191,29 @@ bool Character::Attack(Character * character)
 	return Attack(character, m_AttackDamage);
 }
 
-void Character::GetDamage(float damage)
+void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
-	//Reduction par l'armur
-	if (m_Armor > 0)
-		damage /= m_Armor;
-
-	//Toujours un minimun de 1 damange
-	damage = (damage < 1) ? 1 : damage;
-
-	m_health -= damage;
-
-	std::cout << m_Name << " received " << damage << " damage." << std::endl;
-
-	if (m_health <= 0)
+	if (!godMode)
 	{
-		m_isAlive = false;
-		std::cout << m_Name << " died." << std::endl;
+		if (!ignoreArmor)
+		{
+			//Reduction par l'armur
+			if (m_Armor > 0)
+				damage /= m_Armor;
+
+			//Toujours un minimun de 1 damange
+
+			damage = (damage < 1) ? 1 : damage;
+		}
+		m_health -= damage;
+
+		std::cout << m_Name << " received " << damage << " damage." << std::endl;
+
+		if (m_health <= 0)
+		{
+			m_isAlive = false;
+			std::cout << m_Name << " died." << std::endl;
+		}
 	}
 }
 
@@ -245,10 +251,10 @@ float Character::GetAttackSpeed() const { return m_AttackSpeed; }
 
 float Character::GetArmor() const { return m_Armor; }
 
-float  Character::GetAttackDamage() const{ return m_AttackDamage; }
+float  Character::GetAttackDamage() const { return m_AttackDamage; }
 
-const std::string& Character::GetName() const{ return m_Name; }
+const std::string& Character::GetName() const { return m_Name; }
 
 bool Character::GetisAlive() const { return m_isAlive; }
 
-bool Character::GetisInAir() const{ return m_isInAir; }
+bool Character::GetisInAir() const { return m_isInAir; }
