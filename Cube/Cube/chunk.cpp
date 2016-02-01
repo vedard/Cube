@@ -318,7 +318,21 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 		|| (
 			(16 > faceType || faceType > 25) 
 			&& (type >= 16 && type <= 25)
-			))
+			)
+		||
+		(faceType == BTYPE_RLAVA1 && type == BTYPE_LAVA) ||
+		(faceType == BTYPE_RLAVA3 && type == BTYPE_RLAVA2)
+		|| (faceType == BTYPE_RWATER1 && type == BTYPE_WATER) ||
+		(faceType == BTYPE_RLAVA2 && type == BTYPE_RLAVA1)
+		||
+		(faceType == BTYPE_RWATER3 && type == BTYPE_RWATER2)
+		||
+		(faceType == BTYPE_RWATER2 && type == BTYPE_RWATER1)
+		||
+		(faceType == BTYPE_RWATER1 && type == BTYPE_FWATER)
+		||
+		(faceType == BTYPE_RLAVA1 && type == BTYPE_FLAVA)
+		)
 		return true;
 
 	return false;
