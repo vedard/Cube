@@ -26,6 +26,7 @@
 #include <cmath>
 #include <thread>
 #include "parametre.h"
+#include "menu.h"
 
 
 class Engine : public OpenglContext
@@ -104,6 +105,7 @@ private:
 	Parametre& m_settings = Parametre::GetInstance();
 
 	bool m_isMenuOpen;
+	Menu* m_menu;
 };
 
 #endif // ENGINE_H__
