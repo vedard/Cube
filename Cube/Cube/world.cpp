@@ -43,7 +43,9 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 				chunk->m_negativeZ = ChunkAt((float)i, (float)(j - 1));
 		}
 	m_threadChunks = std::thread(&World::RunWater, this);
+	m_threadChunksEnvers = std::thread(&World::RunWater, this);
 	m_threadChunks.detach();
+	m_threadChunksEnvers.detach();
 	
 }
 
@@ -671,7 +673,7 @@ void World::RunWater()
 			if (compteur == 4)
 				compteur = 0;
 
-			//std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 	
 }
@@ -687,6 +689,39 @@ void World::RemoveWater(Vector3<float> vf)
 		}
 
 }
+
+void World::RunWaterReverse()
+{
+	int compteur = 3;
+
+	while (m_threadcontinue)
+	{
+
+		Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+		for (int i = UpdateDistance - 2; i >= 0 - 2; i--)
+			for (int j = UpdateDistance - 2; j >= 0 - 2; j--)
+			{
+				Chunk * chunk = ChunkAt((float)(playerPos.x + i - 3), (float)(playerPos.z + j - 3));
+
+				//Si le chunk existe on le render
+				if (chunk)
+				{
+					if (chunk->DeleteWater)
+					{
+						RemoveWater(chunk->WaterSource);
+						chunk->DeleteWater = false;
+					}
+					chunk->WaterTick(compteur);
+				}
+			}
+		compteur--;
+		if (compteur == -1)
+			compteur = 2;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+}
+
 
 
 

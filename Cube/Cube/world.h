@@ -41,6 +41,7 @@ public:
 	void SpawnMonsters();
 	void SpawnAnimals();
 	void RunWater();
+	void RunWaterReverse();
 	void RemoveWater(Vector3<float> vf);
 
 private:
@@ -48,6 +49,7 @@ private:
 	void AddTree(Chunk * &chunk, int x, int y, int z);
 	void InitChunk(float i, float j);
 	std::thread m_threadChunks;
+	std::thread m_threadChunksEnvers;
 public:
 	bool m_threadcontinue;
 	BlockInfo* m_bInfo;
