@@ -142,14 +142,16 @@ void Engine::LoadResource()
 	Sound::AddSound(Sound::AK47_FIRE, AUDIO_PATH "ak47-1.wav");
 	Sound::AddSound(Sound::GUN_DRAW, AUDIO_PATH "glock_draw.wav");
 	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
-	Sound::AddSound(Sound::BACKGROUND, AUDIO_PATH "music.wav");
+	Sound::AddSound(Sound::MUSIC1, AUDIO_PATH "music.wav");
+
+
 	for (int i = 0; i < 6; i++)
 		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
 	if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
 		abort();
 	m_music.setLoop(true);
-	m_music.setVolume(0);
+	m_music.setVolume(10);
 	m_music.play();
 
 
@@ -191,7 +193,7 @@ void Engine::UpdateEnvironement()
 {
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	//Update le player
-	m_world.GetPlayer()->Move(m_keyboard[sf::Keyboard::W], m_keyboard[sf::Keyboard::S], m_keyboard[sf::Keyboard::A], m_keyboard[sf::Keyboard::D], m_world);
+	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
 	//Update les balles
 	for (int k = 0; k < 3; k++)
@@ -328,18 +330,25 @@ void Engine::Render(float elapsedTime)
 		m_fps = (int)round(1.f / elapsedTime);
 
 	int loops = 0;
-
+	if (m_firstMusic)
+	{
+		m_firstMusic = false;
+		Sound::Play(Sound::MUSIC1);
+	}
+	
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
 		//Gestion des Ticks
 		if (gameTime - m_LastTickTime >= TICK_DELAY)
 		{
+			m_cptTick++;
 			m_LastTickTime = gameTime;
 			m_world.GetPlayer()->Tick();
-			if (true)
+			if (m_cptTick >= 320)
 			{
-				Sound::Play(Sound::BACKGROUND);
+				Sound::Play(Sound::AK47_FIRE);
+				m_cptTick = 0;
 			}
 		}
 		//Footstep

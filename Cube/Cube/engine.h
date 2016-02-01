@@ -60,7 +60,9 @@ private:
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
-
+	bool m_firstMusic = true;
+	int m_cptTick = 0;
+	int m_musiclist [6] = {};
 	PlayerActor m_playerActor;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
