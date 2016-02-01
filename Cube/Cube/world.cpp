@@ -1,8 +1,14 @@
 #include "world.h"
+#include "animal.h"
+#include "monster.h"
+#include "player.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
 {
-	
+	// Initialise les monstres et animaux.
+	m_animal = new Animal[MAX_COW];
+	m_monster = new Monster[MAX_MONSTER];
+	m_player = new Player;
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -35,13 +41,15 @@ World::~World()
 {
 }
 
+Animal* World::GetAnimal() const { return m_animal; }
+Monster* World::GetMonster() const { return m_monster; }
+Player* World::GetPlayer() const { return m_player; }
+
 void World::InitMap(int seed)
 {
-
 	m_seed = seed;
 	std::srand(seed);
 	randomize(seed);
-
 
 	//Erase map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -51,14 +59,25 @@ void World::InitMap(int seed)
 			chunk->GetSave() = false;
 			chunk->DeleteCache();
 			chunk->m_iscreated = false;
-
 		}
-
 
 	if (seed != 0)
 		std::cout << "Map created with this seed: " << seed << std::endl << std::endl;
 	else
 		std::cout << "Flat map created" << std::endl << std::endl;
+
+	//  -- Monster
+	for (int i = 0; i < MAX_MONSTER; i++)
+	{
+		m_monster[i].SetName("Monster " + std::to_string(i + 1));
+		m_monster[i].SetTarget((Character*)&m_player);
+	}
+
+	//  -- Cow
+	for (int i = 0; i < MAX_COW; i++)
+		m_animal[i].SetName("Cow " + std::to_string(i + 1));
+
+
 }
 
 void World::InitChunk(float i, float j)
@@ -106,7 +125,7 @@ void World::InitChunk(float i, float j)
 
 			chunk->SetBlock(x, (int)(val + 65), z, BTYPE_NETHEREACK);
 
-			val = scaled_octave_noise_2d(15, 0.4f,(float)((m_seed) ? 8 : 0), -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
+			val = scaled_octave_noise_2d(15, 0.4f, (float)((m_seed) ? 8 : 0), -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
 
 
 			for (int y = 0; y <= 55; y++)
@@ -161,8 +180,8 @@ void World::InitChunk(float i, float j)
 				{
 					if (chunk->GetBlock(x, y, z) == BTYPE_AIR &&
 						(chunk->GetBlock(x, y - 1, z) == BTYPE_GRASS ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
+							chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
+							chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
 					{
 						chunk->SetBlock(x, y, z, BTYPE_WATER);
 					}
@@ -176,8 +195,8 @@ void World::InitChunk(float i, float j)
 				{
 					if (chunk->GetBlock(x, y, z) == BTYPE_AIR &&
 						(chunk->GetBlock(x, y - 1, z) == BTYPE_NETHEREACK ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
-						chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
+							chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
+							chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
 					{
 						chunk->SetBlock(x, y, z, BTYPE_LAVA);
 					}
@@ -528,6 +547,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 
 }
 
+
 int World::ChunkNotUpdated(int CenterX, int CenterZ)
 {
 	int chunkNotUpdated = 0;
@@ -580,4 +600,25 @@ void World::SetUpdateDistance(int updateDist)
 {
 	if (updateDist > 0)
 		UpdateDistance = updateDist;
+}
+
+void World::SpawnAnimals()
+{
+	for (int i = 0; i < MAX_COW; i++)
+		if (!m_animal[i].GetisAlive())
+		{
+			m_animal[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			break;
+		}
+}
+
+void World::SpawnMonsters()
+{
+	for (int i = 0; i < MAX_MONSTER; i++)
+		if (!m_monster[i].GetisAlive())
+		{
+			m_monster[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
+			m_monster[i].SetTarget(m_player);
+			break;
+		}
 }

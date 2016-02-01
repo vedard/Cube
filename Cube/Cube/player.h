@@ -19,23 +19,23 @@ public:
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, World &world);
 	void ApplyRotation() const;
-	void ApplyTranslation();
+	float ApplyTranslation(); // return le shake
 	void ToggleNoClip();
 	void Jump();
+	bool Shoot(World &world);
 
 
 	bool Underwater() const;
 
 	BlockType GetBlock() const;
 	int GetWeapon() const;
+	Gun* GetGuns() const;
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
 	void SetWeapon(int mode);
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
-
-
 
 private:
 	void CheckUnderwater(World &world);
@@ -48,6 +48,7 @@ private:
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	BlockType m_block;		// Prochain block que le joueur peut placer
+	Gun * Guns;
 	
 	int m_weapon;			// current weapon
 

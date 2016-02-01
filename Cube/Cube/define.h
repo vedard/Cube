@@ -55,10 +55,10 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 20
-#define MAX_MONSTER 10
+#define MAX_MONSTER 100
 #define MAX_COW 30
 #define PI 3.14159265358f
-#define MAX_BULLET 500
+#define MAX_BULLET 100
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
