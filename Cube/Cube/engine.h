@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <cmath>
 #include <thread>
+#include "parametre.h"
+#include "menu.h"
 
 
 class Engine : public OpenglContext
@@ -55,10 +57,15 @@ private:
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path);
+	void DrawMenu() const;
+	void DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const;
 
 private:
 	bool m_wireframe;
-
+	float m_LastTickTime;
+	bool m_firstMusic = true;
+	int m_cptTick = 0;
+	int m_musiclist [6] = {};
 	PlayerActor m_playerActor;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
@@ -95,7 +102,12 @@ private:
 
 	//NetworkManager
 	NetworkManager m_Netctl;
+	// Parametres
 
+	Parametre& m_settings = Parametre::GetInstance();
+
+	bool m_isMenuOpen;
+	Menu* m_menu;
 };
 
 #endif // ENGINE_H__
