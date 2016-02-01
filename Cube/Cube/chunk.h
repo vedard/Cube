@@ -32,7 +32,9 @@ public:
 	bool NeedUpdate() const;
 	bool& GetSave();
 	void WaterTick(int bloc);
+	void LavaTick(int bloc);
 	void RemoveWater(Vector3<float> vf);
+	void RemoveLava(Vector3<float> vf);
 
 
 	Chunk* m_positiveX;
@@ -50,6 +52,10 @@ private:
 	void Water2(const Vector3<float> &Blockpos);
 	void WaterExploded(const Vector3<float> &Blockpos);
 	BlockType WaterCheck(int x, int y, int z, BlockType bt);
+	void Lava1(const Vector3<float> &Blockpos);
+	void Lava2(const Vector3<float> &Blockpos);
+	void LavaExploded(const Vector3<float> &Blockpos);
+	BlockType LavaCheck(int x, int y, int z, BlockType bt);
 	char GetDirection(const Vector3<float> &Blockpos);
 
 

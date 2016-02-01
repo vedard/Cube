@@ -642,17 +642,33 @@ void Chunk::WaterTick(int bloc)
 				{
 					Water1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 				}
-				if (bt == BTYPE_RWATER1 && bloc == 1)
+				else if (bt == BTYPE_RWATER1 && bloc == 1)
 				{
 					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 				}
-				if (bt == BTYPE_RWATER2 && bloc == 2)
+				else if (bt == BTYPE_RWATER2 && bloc == 2)
 				{
 					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 				}
-				if (bt == BTYPE_RWATER3 && bloc == 3)
+				else if (bt == BTYPE_RWATER3 && bloc == 3)
 				{
 					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				else if ((bt == BTYPE_LAVA || bt == BTYPE_FLAVA) && bloc == 0)
+				{
+					Lava1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				else if (bt == BTYPE_RLAVA1 && bloc == 1)
+				{
+					Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				else if (bt == BTYPE_RLAVA2 && bloc == 2)
+				{
+					Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+				}
+				else if (bt == BTYPE_RLAVA3 && bloc == 3)
+				{
+					Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
 				}
 			}
 
@@ -665,11 +681,14 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 	if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1) == BTYPE_WATER && GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z) == BTYPE_WATER &&
 		GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1) == BTYPE_WATER && GetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z) == BTYPE_WATER)
 		return 'Q';
+	if (GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1) == BTYPE_LAVA && GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z) == BTYPE_LAVA &&
+		GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1) == BTYPE_LAVA && GetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z) == BTYPE_LAVA)
+		return 'Q';
 	BlockType BlockUnder;
 	do
 	{
 		BlockUnder = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z + (i));
-		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER || BlockUnder == BTYPE_RLAVA1 || BlockUnder == BTYPE_RLAVA2 || BlockUnder == BTYPE_RLAVA3 || BlockUnder == BTYPE_LAVA)
 			North = i;
 
 		if (i >= 4)
@@ -681,7 +700,7 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 	do
 	{
 		BlockUnder = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z - (i));
-		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER || BlockUnder == BTYPE_RLAVA1 || BlockUnder == BTYPE_RLAVA2 || BlockUnder == BTYPE_RLAVA3 || BlockUnder == BTYPE_LAVA)
 			South = i;
 		if (i >= 4)
 			South = i;
@@ -693,7 +712,7 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 	do
 	{
 		BlockUnder = GetBlock(Blockpos.x - i, Blockpos.y - 1, Blockpos.z);
-		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER || BlockUnder == BTYPE_RLAVA1 || BlockUnder == BTYPE_RLAVA2 || BlockUnder == BTYPE_RLAVA3 || BlockUnder == BTYPE_LAVA)
 			West = i;
 
 		if (i >= 4)
@@ -705,7 +724,7 @@ char Chunk::GetDirection(const Vector3<float> &Blockpos)
 	do
 	{
 		BlockUnder = GetBlock(Blockpos.x + i, Blockpos.y - 1, Blockpos.z);
-		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER)
+		if (BlockUnder == BTYPE_AIR || BlockUnder == BTYPE_RWATER1 || BlockUnder == BTYPE_RWATER2 || BlockUnder == BTYPE_RWATER3 || BlockUnder == BTYPE_WATER || BlockUnder == BTYPE_RLAVA1 || BlockUnder == BTYPE_RLAVA2 || BlockUnder == BTYPE_RLAVA3 || BlockUnder == BTYPE_LAVA)
 			East = i;
 
 		if (i >= 4)
@@ -773,6 +792,239 @@ void Chunk::RemoveWater(Vector3<float> vf)
 						chunk->SetExploded(xp, yp, zp, false);
 				}
 			}
+}
+
+void Chunk::RemoveLava(Vector3<float> vf)
+{
+	Chunk* chunk = this;
+	for (int yp = vf.y; yp > 0; --yp)
+		for (int zp = 0; zp < CHUNK_SIZE_Z; ++zp)
+			for (int xp = 0; xp < CHUNK_SIZE_X; ++xp)
+			{
+				if (GetBlock(xp, yp, zp) >= 17 && GetBlock(xp, yp, zp) <= 20)
+				{
+					if (chunk->GetBlock(xp, yp, zp) > BTYPE_LAVA && chunk->GetBlock(xp, yp, zp) <= BTYPE_FLAVA)
+						chunk->SetBlock(xp, yp, zp, BTYPE_AIR, 'Q');
+					else if (chunk->GetBlock(xp, yp, zp) == BTYPE_LAVA)
+						chunk->SetExploded(xp, yp, zp, false);
+				}
+			}
+}
+
+void Chunk::Lava1(const Vector3<float> &Blockpos)
+{
+	BlockType bt = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
+	if (bt != BTYPE_FLAVA)
+	{
+		char direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
+		if (bt == BTYPE_AIR)
+		{
+			SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FLAVA, direction);
+		}
+		else
+		{
+			if (direction == 'Q')
+			{
+				direction = GetDirection(Blockpos);
+				m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
+			}
+			if (direction != 'Q')
+			{
+				int xModif = 0;
+				int zModif = 0;
+				switch (direction)
+				{
+				case 'N':
+					xModif = 0;
+					zModif = 1;
+					break;
+				case 'E':
+					xModif = 1;
+					zModif = 0;
+					break;
+				case 'W':
+					xModif = -1;
+					zModif = 0;
+					break;
+				case 'S':
+					xModif = 0;
+					zModif = -1;
+					break;
+				default:
+					xModif = 0;
+					zModif = 0;
+					break;
+				}
+
+				bool bExplode = true;
+				for (int i = 1; i < 4; i++)
+				{
+					BlockType blockkk = GetBlock(Blockpos.x + (i * xModif), Blockpos.y - 1, Blockpos.z + (i * zModif));
+					if (blockkk == BTYPE_AIR || blockkk == BTYPE_RLAVA1 || blockkk == BTYPE_RLAVA2 || blockkk == BTYPE_RLAVA3 || blockkk == BTYPE_LAVA || blockkk == BTYPE_FLAVA)
+					{
+						bExplode = false;
+						break;
+					}
+				}
+				if (bExplode == true)
+				{
+					SetExploded(Blockpos.x, Blockpos.y, Blockpos.z, true);
+					BlockType checkBlock = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z);
+					if (checkBlock == BTYPE_AIR || (BTYPE_RLAVA1 < checkBlock && checkBlock <= BTYPE_RLAVA3))
+					{
+						SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z, BTYPE_RLAVA1, direction);
+						SetExploded(Blockpos.x + 1, Blockpos.y, Blockpos.z, true);
+					}
+					checkBlock = GetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z);
+					if (checkBlock == BTYPE_AIR || (BTYPE_RLAVA1 < checkBlock && checkBlock <= BTYPE_RLAVA3))
+					{
+						SetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z, BTYPE_RLAVA1, direction);
+						SetExploded(Blockpos.x - 1, Blockpos.y, Blockpos.z, true);
+					}
+					checkBlock = GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1);
+					if (checkBlock == BTYPE_AIR || (BTYPE_RLAVA1 < checkBlock && checkBlock <= BTYPE_RLAVA3))
+					{
+						SetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1, BTYPE_RLAVA1, direction);
+						SetExploded(Blockpos.x, Blockpos.y, Blockpos.z + 1, true);
+
+					}
+					checkBlock = GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1);
+					if (checkBlock == BTYPE_AIR || (BTYPE_RLAVA1 < checkBlock && checkBlock <= BTYPE_RLAVA3))
+					{
+						SetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1, BTYPE_RLAVA1, direction);
+						SetExploded(Blockpos.x, Blockpos.y, Blockpos.z - 1, true);
+					}
+				}
+				else
+				{
+					if (GetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif) == BTYPE_AIR)
+					{
+						SetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, BTYPE_RLAVA1, direction);
+					}
+				}
+			}
+		}
+	}
+}
+
+void Chunk::Lava2(const Vector3<float> &Blockpos)
+{
+	if (GetExploded(Blockpos.x, Blockpos.y, Blockpos.z) == true)
+		LavaExploded(Blockpos);
+	else
+	{
+		char direction = GetDirection(Blockpos.x, Blockpos.y, Blockpos.z);
+		BlockType bt = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
+		if (bt == BTYPE_AIR || bt == BTYPE_RLAVA1 || bt == BTYPE_RLAVA2 || bt == BTYPE_RLAVA3)
+		{
+			SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FLAVA, direction);
+		}
+		else if (bt != BTYPE_FLAVA && bt != BTYPE_LAVA)
+		{
+			int xModif = 0;
+			int zModif = 0;
+			switch (direction)
+			{
+			case 'N':
+				xModif = 0;
+				zModif = 1;
+				break;
+			case 'E':
+				xModif = 1;
+				zModif = 0;
+				break;
+			case 'W':
+				xModif = -1;
+				zModif = 0;
+				break;
+			case 'S':
+				xModif = 0;
+				zModif = -1;
+				break;
+			default:
+				xModif = 0;
+				zModif = 0;
+				break;
+			}
+			BlockType blockToAdd = LavaCheck(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, GetBlock(Blockpos.x, Blockpos.y, Blockpos.z));
+			if (blockToAdd != BTYPE_AIR)
+			{
+				if (GetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif) == BTYPE_AIR)
+				{
+					SetBlock(Blockpos.x + xModif, Blockpos.y, Blockpos.z + zModif, blockToAdd, direction);
+
+				}
+			}
+		}
+	}
+}
+
+void Chunk::LavaExploded(const Vector3<float> &Blockpos)
+{
+	BlockType blockUnder = GetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z);
+	if (blockUnder == BTYPE_AIR || blockUnder == BTYPE_RLAVA1 || blockUnder == BTYPE_RLAVA2 || blockUnder == BTYPE_RLAVA3)
+	{
+		SetBlock(Blockpos.x, Blockpos.y - 1, Blockpos.z, BTYPE_FLAVA, GetDirection(Blockpos.x, Blockpos.y, Blockpos.z));
+		SetExploded(Blockpos.x, Blockpos.y - 1, Blockpos.z, false);
+	}
+	else if (blockUnder != BTYPE_FLAVA && blockUnder != BTYPE_LAVA)
+	{
+		BlockType bt = GetBlock(Blockpos.x, Blockpos.y, Blockpos.z);
+		BlockType blockToAdd = LavaCheck(Blockpos.x, Blockpos.y, Blockpos.z + 1, bt);
+		if (blockToAdd != BTYPE_AIR)
+		{
+			BlockType checkBlock = GetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1);
+			if (checkBlock == BTYPE_AIR)//|| (blockToAdd > checkBlock && checkBlock <= BTYPE_RWATER3) )
+			{
+				SetBlock(Blockpos.x, Blockpos.y, Blockpos.z + 1, blockToAdd, 'N');
+				SetExploded(Blockpos.x, Blockpos.y, Blockpos.z + 1, true);
+			}
+		}
+		blockToAdd = LavaCheck(Blockpos.x, Blockpos.y, Blockpos.z - 1, bt);
+		if (blockToAdd != BTYPE_AIR)
+		{
+			BlockType checkBlock = GetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1);
+			if (checkBlock == BTYPE_AIR)// || (blockToAdd > checkBlock && checkBlock <= BTYPE_RWATER3))
+			{
+				SetBlock(Blockpos.x, Blockpos.y, Blockpos.z - 1, blockToAdd, 'S');
+				SetExploded(Blockpos.x, Blockpos.y, Blockpos.z - 1, true);
+			}
+		}
+		blockToAdd = LavaCheck(Blockpos.x + 1, Blockpos.y, Blockpos.z, bt);
+		if (blockToAdd != BTYPE_AIR)
+		{
+			BlockType checkBlock = GetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z);
+			if (checkBlock == BTYPE_AIR)// || (blockToAdd > checkBlock && checkBlock <= BTYPE_RWATER3))
+			{
+				SetBlock(Blockpos.x + 1, Blockpos.y, Blockpos.z, blockToAdd, 'E');
+				SetExploded(Blockpos.x + 1, Blockpos.y, Blockpos.z, true);
+			}
+		}
+		blockToAdd = LavaCheck(Blockpos.x - 1, Blockpos.y, Blockpos.z, bt);
+		if (blockToAdd != BTYPE_AIR)
+		{
+			BlockType checkBlock = GetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z);
+			if (checkBlock == BTYPE_AIR)// || (blockToAdd > checkBlock && checkBlock <= BTYPE_RWATER3))
+			{
+				SetBlock(Blockpos.x - 1, Blockpos.y, Blockpos.z, blockToAdd, 'W');
+				SetExploded(Blockpos.x - 1, Blockpos.y, Blockpos.z, true);
+			}
+		}
+	}
+}
+
+BlockType Chunk::LavaCheck(int x, int y, int z, BlockType bt)
+{
+	BlockType BlockToCheck = GetBlock(x, y, z);
+	if (bt == BTYPE_FLAVA && (BlockToCheck == BTYPE_RLAVA1 || BlockToCheck == BTYPE_RLAVA2 || BlockToCheck == BTYPE_RLAVA3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RLAVA1;
+	else if (bt == BTYPE_LAVA && (BlockToCheck == BTYPE_RLAVA1 || BlockToCheck == BTYPE_RLAVA2 || BlockToCheck == BTYPE_RLAVA3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RLAVA1;
+	else if (bt == BTYPE_RLAVA1 && (BlockToCheck == BTYPE_RLAVA2 || BlockToCheck == BTYPE_RLAVA3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RLAVA2;
+	else if (bt == BTYPE_RLAVA2 && (BlockToCheck == BTYPE_RLAVA3 || BlockToCheck == BTYPE_AIR))
+		return BTYPE_RLAVA3;
+	return BTYPE_AIR;
 }
 
 
