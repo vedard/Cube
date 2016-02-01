@@ -663,8 +663,13 @@ void World::RunWater()
 					{
 						if (chunk->DeleteWater)
 						{
-							RemoveWater(chunk->WaterSource);
 							chunk->DeleteWater = false;
+							RemoveWater(chunk->WaterSource);
+						}
+						if (chunk->DeleteLava)
+						{
+							chunk->DeleteLava = false;
+							RemoveLava(chunk->WaterSource);
 						}
 						chunk->WaterTick(compteur);
 					}
@@ -711,6 +716,11 @@ void World::RunWaterReverse()
 						RemoveWater(chunk->WaterSource);
 						chunk->DeleteWater = false;
 					}
+					if (chunk->DeleteLava)
+					{
+						RemoveLava(chunk->WaterSource);
+						chunk->DeleteLava = false;
+					}
 					chunk->WaterTick(compteur);
 				}
 			}
@@ -721,6 +731,18 @@ void World::RunWaterReverse()
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
+
+void World::RemoveLava(Vector3<float> vf)
+{
+	Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
+		{
+			Chunk * chunk = ChunkAt((float)(playerPos.x + i - UpdateDistance), (float)(playerPos.z + j - UpdateDistance));
+			chunk->RemoveLava(vf);
+		}
+}
+
 
 
 

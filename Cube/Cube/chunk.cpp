@@ -25,6 +25,12 @@ void Chunk::RemoveBloc(int x, int y, int z)
 		DeleteWater = true;
 		WaterSource = vf;
 	}
+	if (m_blocks.Get(x, y, z) == BTYPE_LAVA)
+	{
+		Vector3<float> vf = Vector3<float>(x + m_position.x, y + m_position.y, z + m_position.z);
+		RemoveLava(vf);
+		DeleteLava = true;
+	}
 	m_blocks.Set(x, y, z, BTYPE_AIR);
 	m_isDirty = true;
 	m_save = true;
@@ -823,7 +829,7 @@ void Chunk::RemoveLava(Vector3<float> vf)
 			{
 				if (GetBlock(xp, yp, zp) >= 17 && GetBlock(xp, yp, zp) <= 20)
 				{
-					if (chunk->GetBlock(xp, yp, zp) > BTYPE_LAVA && chunk->GetBlock(xp, yp, zp) <= BTYPE_FLAVA)
+					if (chunk->GetBlock(xp, yp, zp) < BTYPE_LAVA && chunk->GetBlock(xp, yp, zp) >= BTYPE_RLAVA1)
 						chunk->SetBlock(xp, yp, zp, BTYPE_AIR, 'Q');
 					else if (chunk->GetBlock(xp, yp, zp) == BTYPE_LAVA)
 						chunk->SetExploded(xp, yp, zp, false);
