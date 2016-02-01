@@ -32,6 +32,7 @@ public:
 	bool NeedUpdate() const;
 	bool& GetSave();
 	void WaterTick(int bloc);
+	void RemoveWater(Vector3<float> vf);
 
 
 	Chunk* m_positiveX;
@@ -45,37 +46,33 @@ private:
 	void SetExploded(int x, int y, int z, bool exploded);
 	bool GetExploded(int x, int y, int z) const;
 
-	void SetSource(int x, int y, int z, Vector3<float> source);
-	Vector3<float> GetSource(int x, int y, int z) const;
-
 	void Water1(const Vector3<float> &Blockpos);
 	void Water2(const Vector3<float> &Blockpos);
 	void WaterExploded(const Vector3<float> &Blockpos);
 	BlockType WaterCheck(int x, int y, int z, BlockType bt);
 	char GetDirection(const Vector3<float> &Blockpos);
 
-	void RemoveWater(const Vector3<float> &Blockpos);
 
 
 
 	//Todo - rendre private
 public:
 	bool m_iscreated;               //Si le chunk a été init selon le seed de la map
+	Vector3<float> m_position;
+	BlockInfo* m_bInfo;
+	bool DeleteWater;
+	Vector3<float> WaterSource;
 
 private:
 	Array3d<BlockType> m_blocks;
-	
+	//Array3d<BlocSettings> m_blocks;
+	ChunkMesh::VertexData * vdt;
+	int count_t;
 	bool m_isDirty;					//Si il faut le reajouter au mesh
 	bool m_save;					//Si faut le sauvegarder
 	ChunkMesh m_chunkMesh;
 	ChunkMesh m_transparentMesh;
-	Vector3<float> m_position;
 	BlockType m_defaultBlock; 				//On retourne ce block quand ya une erreur
-	int TickCount;
-
-
-
-
 };
 
 #endif // CHUNK_H__

@@ -58,7 +58,7 @@ typedef long long int64;
 #define MAX_MONSTER 0
 #define MAX_COW 30
 #define PI 3.14159265358f
-#define MAX_BULLET 100
+#define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
@@ -67,20 +67,20 @@ typedef long long int64;
 #define TICK_DELAY_WATER .2f
 
 typedef uint8 BlockType;
-enum BLOCK_TYPE {
-	BTYPE_AIR,
-	BTYPE_GRASS,
-	BTYPE_TEST,
-	BTYPE_STONE,
-	BTYPE_CHEST,
-	BTYPE_WOOD_PLANK,
-	BTYPE_BED_ROCK,
-	BTYPE_DIRT,
-	BTYPE_IRON,
-	BTYPE_COAL,
-	BTYPE_DIAMOND,
-	BTYPE_GOLD,
-	BTYPE_REDSTONE,
+enum BLOCK_TYPE { 
+	BTYPE_AIR, 
+	BTYPE_GRASS, 
+	BTYPE_TEST, 
+	BTYPE_STONE, 
+	BTYPE_CHEST, 
+	BTYPE_WOOD_PLANK, 
+	BTYPE_BED_ROCK, 
+	BTYPE_DIRT, 
+	BTYPE_IRON, 
+	BTYPE_COAL, 
+	BTYPE_DIAMOND, 
+	BTYPE_GOLD, 
+	BTYPE_REDSTONE, 
 	BTYPE_LAPIS_LAZULI,
 	BTYPE_WOOD,
 	BTYPE_LEAVE,
