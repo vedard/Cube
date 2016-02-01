@@ -437,7 +437,7 @@ void Chunk::Water1(const Vector3<float> &Blockpos)
 		{
 			if (direction == 'Q')
 			{
-				//direction = GetDirection(Blockpos);
+				direction = GetDirection(Blockpos);
 				m_blocks.SetDirection(Blockpos.x, Blockpos.y, Blockpos.z, direction);
 			}
 			if (direction != 'Q')
