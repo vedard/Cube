@@ -5,6 +5,7 @@
 #include "gun.h"
 #include "inventory.h"
 #include "define.h"
+#include <memory>
 
 
 class Player : public Character
@@ -63,7 +64,7 @@ private:
 
 	float m_HeadShake;		// Shake la camera a chaque pas
 
-	Inventory *m_inventory;	//Inventaire du joueur
+	std::unique_ptr<Inventory> m_inventory;	//Inventaire du joueur
 };
 
 #endif
