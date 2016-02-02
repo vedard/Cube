@@ -41,12 +41,25 @@ int BlockInfo::GetDurabilite() const
     return m_durabilite;
 }
 
+void BlockInfo::SetHauteur(float hauteur)
+{
+	if (hauteur <= 1) m_hauteur = hauteur;
+}
+float BlockInfo::GetHauteur() const
+{
+	return m_hauteur;
+}
+
+
+
+
 void BlockInfo::Afficher() const
 {
     std::cout << "Type: " << m_type << std::endl;
     std::cout << "Nom: " << m_nom << std::endl;
     std::cout << "Durabilite: " << m_durabilite << std::endl;
 }
+
 
 std::ostream& operator<<(std::ostream& o, const BlockInfo& v)
 {

@@ -3,12 +3,19 @@
 #include "monster.h"
 #include "player.h"
 
-World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
+World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
+	//Chunk start
+	//m_threadChunks = new std::thread[20];
+	//for (int i = 0; i < 20; i++)
+	//	m_threadChunks[i] = std::thread(&World::RunWater, this, i * 20);
+
 	// Initialise les monstres et animaux.
 	m_animal = new Animal[MAX_COW];
 	m_monster = new Monster[MAX_MONSTER];
 	m_player = new Player;
+
+	
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
@@ -35,10 +42,16 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5)
 			if (j > 0)
 				chunk->m_negativeZ = ChunkAt((float)i, (float)(j - 1));
 		}
+	m_threadChunks = std::thread(&World::RunWater, this);
+	//m_threadChunksEnvers = std::thread(&World::RunWater, this);
+	/*m_threadChunks.detach();
+	m_threadChunksEnvers.detach();*/
+	
 }
 
 World::~World()
 {
+	m_threadcontinue = false;
 }
 
 Animal* World::GetAnimal() const { return m_animal; }
@@ -91,7 +104,7 @@ void World::InitChunk(float i, float j)
 			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				if (chunk->GetBlock(x, y, z) != BTYPE_AIR)
-					chunk->SetBlock(x, y, z, BTYPE_AIR);
+					chunk->SetBlock(x, y, z, BTYPE_AIR, ' ');
 
 			}
 	//Height
@@ -114,27 +127,27 @@ void World::InitChunk(float i, float j)
 				{
 
 					if (y == 0)
-						chunk->SetBlock(x, height, z, BTYPE_GRASS);
+						chunk->SetBlock(x, height, z, BTYPE_GRASS, ' ');
 					else if (y >= 1 && y < 4)
-						chunk->SetBlock(x, height, z, BTYPE_DIRT);
+						chunk->SetBlock(x, height, z, BTYPE_DIRT, ' ');
 					else if (y >= 4)
-						chunk->SetBlock(x, height, z, BTYPE_STONE);
+						chunk->SetBlock(x, height, z, BTYPE_STONE, ' ');
 				}
 			}
 			val = scaled_octave_noise_2d(16, 0.3f, (float)((m_seed) ? 7 : 0), -1, 1, (float)(i * CHUNK_SIZE_X + x) / (5000 * biome), (float)(j * CHUNK_SIZE_Z + z) / (5000 * biome));
 
-			chunk->SetBlock(x, (int)(val + 65), z, BTYPE_NETHEREACK);
+			chunk->SetBlock(x, (int)(val + 65), z, BTYPE_NETHEREACK, ' ');
 
 			val = scaled_octave_noise_2d(15, 0.4f, (float)((m_seed) ? 8 : 0), -40, 35, (float)(i * CHUNK_SIZE_X + x) / (4500 * biome), (float)(j * CHUNK_SIZE_Z + z) / (4500 * biome));
 
 
 			for (int y = 0; y <= 55; y++)
 			{
-				chunk->SetBlock(x, (int)(val + 20 - y), z, BTYPE_NETHEREACK);
+				chunk->SetBlock(x, (int)(val + 20 - y), z, BTYPE_NETHEREACK, ' ');
 			}
 			//Plancher de bedrock
-			chunk->SetBlock(x, 0, z, BTYPE_BED_ROCK);
-			chunk->SetBlock(x, 1, z, BTYPE_BED_ROCK);
+			chunk->SetBlock(x, 0, z, BTYPE_BED_ROCK, ' ');
+			chunk->SetBlock(x, 1, z, BTYPE_BED_ROCK, ' ');
 
 		}
 
@@ -183,7 +196,7 @@ void World::InitChunk(float i, float j)
 							chunk->GetBlock(x, y - 1, z) == BTYPE_DIRT ||
 							chunk->GetBlock(x, y - 1, z) == BTYPE_WATER))
 					{
-						chunk->SetBlock(x, y, z, BTYPE_WATER);
+						chunk->SetBlock(x, y, z, BTYPE_WATER, ' ');
 					}
 
 				}
@@ -198,7 +211,7 @@ void World::InitChunk(float i, float j)
 							chunk->GetBlock(x, y - 1, z) == BTYPE_BED_ROCK ||
 							chunk->GetBlock(x, y - 1, z) == BTYPE_LAVA))
 					{
-						chunk->SetBlock(x, y, z, BTYPE_LAVA);
+						chunk->SetBlock(x, y, z, BTYPE_LAVA, ' ');
 					}
 
 				}
@@ -211,10 +224,10 @@ void World::InitChunk(float i, float j)
 
 					if (chunk->GetBlock(x, y, z) == BTYPE_GRASS && chunk->GetBlock(x, y + 1, z) == BTYPE_WATER)
 					{
-						chunk->SetBlock(x, y, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 1, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 2, z, BTYPE_SAND);
-						chunk->SetBlock(x, y - 3, z, BTYPE_SAND);
+						chunk->SetBlock(x, y, z, BTYPE_SAND, ' ');
+						chunk->SetBlock(x, y - 1, z, BTYPE_SAND, ' ');
+						chunk->SetBlock(x, y - 2, z, BTYPE_SAND, ' ');
+						chunk->SetBlock(x, y - 3, z, BTYPE_SAND, ' ');
 						break;
 					}
 				}
@@ -247,7 +260,7 @@ void World::InitChunk(float i, float j)
 									!chunkTemp->GetSave()
 									)
 									//Set le bloc a air
-									chunkTemp->SetBlock((int)blockPos.x, (int)blockPos.y, (int)blockPos.z, BTYPE_AIR);
+									chunkTemp->SetBlock((int)blockPos.x, (int)blockPos.y, (int)blockPos.z, BTYPE_AIR, ' ');
 							}
 						}
 					}
@@ -309,7 +322,7 @@ Chunk* World::ChunkAt(float x, float z)
 void World::LoadMap(std::string filename, BlockInfo* &binfo)
 {
 	std::cout << "Loading " << filename << "..." << std::endl;
-
+	m_bInfo = binfo;
 	//Open file
 	std::ifstream file;
 	file.open(filename.c_str());
@@ -351,7 +364,10 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 					{
 						ssline >> b;
 						if (b >= 0 && b < NUMBER_OF_BLOCK)
-							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType());
+						{
+							chunk->m_bInfo = m_bInfo;
+							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType(), ' ');
+						}
 
 					}
 		}
@@ -388,7 +404,13 @@ void World::SaveMap(std::string filename)
 				for (int x = 0; x < CHUNK_SIZE_X; ++x)
 					for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 						for (int y = 0; y <= CHUNK_SIZE_Y; y++)
+						{
+							/*BlockType bt = (int)ChunkAt((float)i, (float)j)->GetBlock(x, y, z);
+							if (bt == BTYPE_RWATER1 || bt == BTYPE_RWATER2 || bt == BTYPE_RWATER3 || bt == BTYPE_FWATER
+								|| bt == BTYPE_RLAVA1 || bt == BTYPE_RLAVA2 || bt == BTYPE_RLAVA2 || bt == BTYPE_RLAVA3)
+								bt = BTYPE_AIR;*/
 							file << (int)ChunkAt((float)i, (float)j)->GetBlock(x, y, z) << " ";
+						}
 
 
 				std::cout << "Chunk " << count++ << " / " << total << " saved" << std::endl;
@@ -404,30 +426,30 @@ void World::SaveMap(std::string filename)
 void World::AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z)
 {
 
-	chunk->SetBlock(x, y, z, mineral);
+	chunk->SetBlock(x, y, z, mineral, ' ');
 	if (rand() % 100 >= 60 && chunk->GetBlock(x + 1, y, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x + 1, y, z, mineral);
+		chunk->SetBlock(x + 1, y, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x - 1, y, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x - 1, y, z, mineral);
+		chunk->SetBlock(x - 1, y, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y + 1, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y + 1, z, mineral);
+		chunk->SetBlock(x, y + 1, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y - 1, z) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y - 1, z, mineral);
+		chunk->SetBlock(x, y - 1, z, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y, z + 1) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y, z + 1, mineral);
+		chunk->SetBlock(x, y, z + 1, mineral, ' ');
 	}
 	if (rand() % 100 >= 60 && chunk->GetBlock(x, y, z - 1) == BTYPE_STONE)
 	{
-		chunk->SetBlock(x, y, z - 1, mineral);
+		chunk->SetBlock(x, y, z - 1, mineral, ' ');
 	}
 }
 
@@ -437,25 +459,25 @@ void World::AddTree(Chunk * &chunk, int x, int y, int z)
 
 	for (int k = 0; k < hauteur; k++)
 	{
-		chunk->SetBlock(x, y + k, z, BTYPE_WOOD);
+		chunk->SetBlock(x, y + k, z, BTYPE_WOOD, ' ');
 	}
 
 
-	chunk->SetBlock(x + 1, y + hauteur - 1, z, BTYPE_LEAVE);
-	chunk->SetBlock(x + 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur - 1, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur - 1, z - 1, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur - 1, z, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur - 1, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x + 1, y + hauteur - 1, z - 1, BTYPE_LEAVE);
+	chunk->SetBlock(x + 1, y + hauteur - 1, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x + 1, y + hauteur - 1, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur - 1, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur - 1, z - 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur - 1, z - 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur - 1, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur - 1, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x + 1, y + hauteur - 1, z - 1, BTYPE_LEAVE, ' ');
 
-	chunk->SetBlock(x + 1, y + hauteur, z, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur, z + 1, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur, z - 1, BTYPE_LEAVE);
-	chunk->SetBlock(x - 1, y + hauteur, z, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur, z, BTYPE_LEAVE);
-	chunk->SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE);
+	chunk->SetBlock(x + 1, y + hauteur, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur, z + 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur, z - 1, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x - 1, y + hauteur, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur, z, BTYPE_LEAVE, ' ');
+	chunk->SetBlock(x, y + hauteur + 1, z, BTYPE_LEAVE, ' ');
 }
 
 void World::InitChunks(int CenterX, int CenterZ)
@@ -622,3 +644,74 @@ void World::SpawnMonsters()
 			break;
 		}
 }
+
+void World::RunWater()
+{
+		int compteur = 0;
+
+		while (m_threadcontinue)
+		{
+
+			Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+			for (int i = 0; i < UpdateDistance * 2; i++)
+				for (int j = 0; j < UpdateDistance * 2; j++)
+				{
+					Chunk * chunk = ChunkAt((float)(playerPos.x + i -3), (float)(playerPos.z + j - 3));
+
+					//Si le chunk existe on le render
+					if (chunk)
+					{
+						if (chunk->DeleteWater)
+						{
+							chunk->DeleteWater = false;
+							RemoveWater(chunk->WaterSource);
+						}
+						if (chunk->DeleteLava)
+						{
+							chunk->DeleteLava = false;
+							RemoveLava(chunk->WaterSource);
+						}
+						chunk->WaterTick(compteur);
+					}
+				}
+			compteur++;
+			if (compteur == 4)
+				compteur = 0;
+
+			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+	
+}
+
+void World::RemoveWater(Vector3<float> vf)
+{
+	Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
+		{
+			Chunk * chunk = ChunkAt((float)(playerPos.x + i - UpdateDistance), (float)(playerPos.z + j - UpdateDistance));
+			chunk->RemoveWater(vf);
+		}
+
+}
+
+void World::RemoveLava(Vector3<float> vf)
+{
+	Vector3<int> playerPos((int)m_player->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_player->GetPosition().z / CHUNK_SIZE_Z);
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
+		{
+			Chunk * chunk = ChunkAt((float)(playerPos.x + i - UpdateDistance), (float)(playerPos.z + j - UpdateDistance));
+			chunk->RemoveLava(vf);
+		}
+}
+
+
+
+
+
+
+
+
+
+

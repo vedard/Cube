@@ -14,12 +14,15 @@ m_footUnderwater(false),
 m_headUnderwater(false),
 m_HeadShake(0)
 {
+	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
 	m_VerticalRot = 0;
 	m_health = 100;
 	m_Armor = 1.3f;
 	m_weapon = W_BLOCK;
 	m_isAlive = false;
+	m_godMode = false;
+	
 	Guns = new Gun[3];	
 }
 
@@ -76,6 +79,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_vitesse.x *= 0.6f;
 			m_vitesse.z *= 0.6f;
 		}
+		if (m_footUnderLava)
+		{
+			m_vitesse.x *= 0.4f;
+			m_vitesse.z *= 0.4f;
+		}
 	}
 
 	//Deplacement Avant/Arriere
@@ -99,12 +107,10 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		else
 			deplacementVector -= directionVector;
 	}
-	if (right) {
+	if (right) 
 		deplacementVector += rightVector;
-	}
-	else if (left) {
+	if(left)
 		deplacementVector -= rightVector;
-	}
 	//Si on bouge pas -> vitesse = 0
 	if (!left && !right && !front && !back)
 	{
@@ -161,43 +167,83 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					GetDamage(exp(m_vitesse.y * 6));
+					GetDamage(exp(m_vitesse.y * 6), false,m_godMode);
 			}
+			
 			//annule
 			m_pos.y += m_vitesse.y;
 			m_vitesse.y = 0;
 		}
 
 		//Acceleration
-		m_vitesse.y += (m_footUnderwater) ? 0.002f : 0.013f;
-
+		if (m_footUnderwater)
+			m_vitesse.y += 0.002f;
+		else if(m_footUnderLava)
+			m_vitesse.y += 0.001f;
+		else
+			m_vitesse.y += 0.013f;
 	}
 
 	//Si le player est dans l'eau
 	CheckUnderwater(world);
 
 	if (m_footUnderwater)
-	{
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
-	}
+	//si le player est en dessous de la lave
+	CheckUnderLava(world);
+
+	if (m_footUnderLava)
+		if (m_vitesse.y > 0.08f)
+			m_vitesse.y = 0.08f;
 }
 
 void Player::CheckUnderwater(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
 
-	if (bt1 == BTYPE_WATER)
+	if (bt1 > 15 && bt1 < 21)
 		m_headUnderwater = true;
 	else
 		m_headUnderwater = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 1.5f, m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5, m_pos.z);
 
-	if (bt1 == BTYPE_WATER)
+	if (bt1 > 15 && bt1 < 21)
+		m_kneeUnderwater = true;
+	else
+		m_kneeUnderwater = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
+
+	if (bt1 > 15 && bt1 < 21)
 		m_footUnderwater = true;
 	else
 		m_footUnderwater = false;
+}
+
+void Player::CheckUnderLava(World &world)
+{
+	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
+
+	if (bt1 > 20 && bt1 < 26)
+		m_headUnderLava = true;
+	else
+		m_headUnderLava = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5 , m_pos.z);
+
+	if (bt1 > 20 && bt1 < 26)
+		m_kneeUnderLava = true; 
+	else
+		m_kneeUnderLava = false;
+
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
+
+	if (bt1 > 20 && bt1 < 26)
+		m_footUnderLava = true;
+	else
+		m_footUnderLava = false;
 }
 
 void Player::ApplyRotation() const
@@ -235,11 +281,13 @@ void Player::ToggleNoClip()
 	if (m_noClip)
 	{
 		m_noClip = false;
+		m_godMode = false;
 		m_vitesse.y = 0;
 	}
 	else
 	{
 		m_noClip = true;
+		m_godMode = true;
 		m_vitesse.y = 0;
 	}
 }
@@ -286,15 +334,19 @@ void Player::SetWeapon(int mode)
 
 void Player::Jump()
 {
-	if (!m_isInAir && !m_footUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20))
+	if (!m_isInAir && !m_kneeUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20) && !m_kneeUnderLava)
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
 	}
-	else if (m_footUnderwater && !m_headUnderwater)
+	else if (m_footUnderwater && !m_headUnderwater && m_kneeUnderwater)
 		m_vitesse.y = -0.002f;
-	else if (m_footUnderwater)
+	else if (m_footUnderwater && m_headUnderwater && m_kneeUnderwater)
 		m_vitesse.y = -0.09f;
+	else if (m_footUnderLava && !m_headUnderLava && m_kneeUnderLava)
+		m_vitesse.y = -0.002f;
+	else if (m_footUnderLava && m_headUnderLava && m_kneeUnderLava)
+		m_vitesse.y = -0.07f;
 }
 
 bool Player::Shoot(World &world)
@@ -307,17 +359,18 @@ bool Player::Shoot(World &world)
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
-	/*if (m_footUnderLava)
-		GetDamage(5, TRUE, m_godMode);
+	if (m_footUnderLava)
+ 		GetDamage(5, true, m_godMode);
 	if (m_headUnderwater)
 	{
 		m_BreathCount++;
 		if (m_BreathCount > 15)
-			GetDamage(3, TRUE, m_godMode);
+			GetDamage(3, true, m_godMode);
 	}
 	else
-		m_BreathCount = 0;*/
+		m_BreathCount = 0;
 
 }

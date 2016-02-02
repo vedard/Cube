@@ -4,8 +4,9 @@
 #include <string>
 #include "define.h"
 #include "textureatlas.h"
+#include "item.h"
 
-class BlockInfo
+class BlockInfo 
 {
 public:
 	BlockInfo();
@@ -20,6 +21,9 @@ public:
 	void SetDurabilite(int durabilite);
 	int GetDurabilite() const;
 
+	void SetHauteur(float hauteur);
+	float GetHauteur() const;
+
 	void Afficher() const;
 
 	
@@ -30,6 +34,7 @@ private:
 	BlockType m_type;
 	std::string m_nom;
 	int m_durabilite;
+	float m_hauteur;
 
 public:
 	//Position texture dans l'atlas
