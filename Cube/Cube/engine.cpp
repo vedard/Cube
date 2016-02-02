@@ -27,6 +27,7 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
+
 	m_world.SaveMap("map.sav");
 	Sound::DeInit();
 	delete[] m_bInfo;
@@ -60,32 +61,26 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
+	glEnable(GL_FOG);
+	GLfloat fogcolor[4] = { 0.2f, 0.2f, 0.2f, 1 };
+	GLint fogmode = GL_EXP;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, 0.07f);
+	glFogf(GL_FOG_START, .04f);
+	glFogf(GL_FOG_END, 9.0f);
+
 	// Light
-	GLfloat light0Pos[4] = { 0.0f, CHUNK_SIZE_Y, 0.0f, 1.0f };
+	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
 	GLfloat light0Amb[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 	GLfloat light0Diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat light0Spec[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-
-
-	//fog?
-	GLuint filter;                      // Which Filter To Use
-	GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
-	GLuint fogfilter = 0;                    // Which Fog To Use
-	GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // Fog Color
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
-	glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
-	glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
-	glFogf(GL_FOG_DENSITY, 0.10f);              // How Dense Will The Fog Be
-	glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
-	glFogf(GL_FOG_START, 0.10f);             // Fog Start Depth
-	glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
-	glEnable(GL_FOG);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 
 	CenterMouse();
 	HideCursor();
@@ -133,6 +128,7 @@ void Engine::LoadResource()
 	AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 	AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 
+
 	if (!m_textureAtlas.Generate(64, false))
 	{
 		std::cout << " Unable to generate texture atlas ..." << std::endl;
@@ -148,14 +144,16 @@ void Engine::LoadResource()
 	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
 	Sound::AddSound(Sound::MUSIC1, AUDIO_PATH "music.wav");
 
+
 	for (int i = 0; i < 6; i++)
 		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
-	if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
-		abort();
-	m_music.setLoop(true);
-	m_music.setVolume(10);
-	m_music.play();
+	//if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
+	//	abort();
+	//m_music.setLoop(true);
+	//m_music.setVolume(10);
+	//m_music.play();
+
 
 	//Model 3d
 	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
@@ -242,10 +240,10 @@ void Engine::UpdateEnvironement(float gameTime)
 	if (gameTime - m_LastTickTimeWater >= TICK_DELAY_WATER)
 	{
 		m_LastTickTimeWater = gameTime;
+		//m_world
 	}
 
 }
-
 void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
@@ -273,7 +271,7 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	//Activation des shaders
 	m_shader01.Use();
- 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
@@ -329,7 +327,7 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	// Draw le menu
 	if (m_isMenuOpen)
-		DrawMenu();
+		DrawMenuPrincipal();
 
 }
 
@@ -361,14 +359,14 @@ void Engine::Render(float elapsedTime)
 	if (m_firstMusic)
 	{
 		m_firstMusic = false;
-		Sound::Play(Sound::MUSIC1);
+		//Sound::Play(Sound::MUSIC1);
 	}
 
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
 	{
 		//Gestion des Ticks
-		
+
 		//Footstep
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
 		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
@@ -410,7 +408,8 @@ void Engine::Render(float elapsedTime)
 			int bt;
 			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
-			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz,bt, ' ');		}
+			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt, ' ');
+		}
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -424,7 +423,7 @@ void Engine::Render(float elapsedTime)
 
 void Engine::KeyPressEvent(unsigned char key)
 {
-	if(m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
+	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
 		m_keyboard[key] = false;
 	else
 	{
@@ -435,7 +434,7 @@ void Engine::KeyPressEvent(unsigned char key)
 
 	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
-	
+
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -447,160 +446,159 @@ void Engine::KeyPressEvent(unsigned char key)
 				HideCursor();
 			}
 		}
-			else if (m_keyboard[sf::Keyboard::Return])
+		else if (m_keyboard[sf::Keyboard::Return])
+		{
+			if (m_menu->m_currentMenuItem == 2)
 			{
-				if (m_menu->m_currentMenuItem == 2)
-				{
-					m_world.m_threadcontinue = false;
-					Stop();
-				}
+				m_world.m_threadcontinue = false;
+				Stop();
 			}
-			else
-			{
-				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-			}
-		
 		}
 		else
 		{
-			if (m_keyboard[m_settings.m_menu])
-			{
-				m_isMenuOpen = true;
-				ShowCursor();
-				DrawMenu();
-				m_menu = new Menu(SM_PRINCIPAL);
-			}
-		//Esc -> Arrete le programme
-		if (m_keyboard[36])
-			Stop();
-
-
-			//f10 -> toggle fulscreen mode
-			else if (m_keyboard[m_settings.m_fullscreen])
-			{
-				m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
-				m_settings.Save();
-				SetFullscreen(IsFullscreen());
-				m_keyboard[key] = false;
-			}
-
-			//V -> toogle noclip mode
-			else if (m_keyboard[m_settings.m_noclip])
-				m_world.GetPlayer()->ToggleNoClip();
-
-			//Lctr -> Sneak
-			else if (m_keyboard[m_settings.m_crouch])
-				m_world.GetPlayer()->SetSneak(true);
-
-			//LSHIFT -> RUN
-			else if (m_keyboard[m_settings.m_run])
-				m_world.GetPlayer()->SetRunning(true);
-
-			//space -> jump
-			if (m_keyboard[m_settings.m_jump])
-				m_world.GetPlayer()->Jump();
-
-			//1 -> W_BLOCK 
-			if (m_keyboard[m_settings.m_inventory1])
-				m_world.GetPlayer()->SetWeapon(W_BLOCK);
-
-			//2 ->  W_PISTOL
-			if (m_keyboard[m_settings.m_inventory2])
-			{
-				m_world.GetPlayer()->SetWeapon(W_PISTOL);
-				Sound::Play(Sound::GUN_DRAW);
-
-			}
-			//3 ->  W_SUBMACHINE_GUN
-			if (m_keyboard[m_settings.m_inventory3])
-			{
-				m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
-				Sound::Play(Sound::GUN_DRAW);
-			}
-			//4 ->  W_ASSAULT_RIFLE
-			if (m_keyboard[m_settings.m_inventory4])
-			{
-				m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
-				Sound::Play(Sound::GUN_DRAW);
-			}
-			//M -> spawn monster
-			else if (m_keyboard[m_settings.m_spawnmonster])
-			{
-				for (int i = 0; i < MAX_MONSTER; i++)
-					if (!m_world.GetMonster()[i].GetisAlive())
-					{
-						m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
-						break;
-					}
-
-			}
-			//y -> toggle wireframe mode
-			else if (m_keyboard[m_settings.m_wireframe])
-			{
-
-				m_wireframe = !m_wireframe;
-				if (m_wireframe)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				else
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			}
-			//F3 -> toggle info
-			else if (m_keyboard[m_settings.m_info])
-			{
-				displayInfo = !displayInfo;
-
-			}
-			//Lshift + F5 -> delete Cache
-			else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
-			{
-				for (int i = 0; i < WORLD_SIZE; i++)
-					for (int j = 0; j < WORLD_SIZE; j++)
-						m_world.ChunkAt((float)i, (float)j)->DeleteCache();
-
-			}
-			//Lshift + O -> open map
-			else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
-			{
-				//m_world.LoadMap("map.sav", m_bInfo);
-				std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
-				t.detach();
-				//m_world.GetPlayer()->Spawn(m_world);
-			}
-			//Lshift + W -> Write map
-			else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
-			{
-				//m_world.SaveMap("map.sav");
-				std::thread t(&World::SaveMap, &m_world, "map.sav");
-				t.detach();
-			}
-
-			//Lshift + R -> Random map
-			else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
-			{
-				//m_world.InitMap(time(NULL));
-				std::thread t(&World::InitMap, &m_world, time(NULL));
-				t.detach();
-				//m_world.GetPlayer()->Spawn(m_world);
-			}
-
-			//Lshift + F -> Flat map
-			else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
-			{
-				//m_world.InitMap(0);
-				std::thread t(&World::InitMap, &m_world, 0);
-				t.detach();
-				//m_world.GetPlayer()->Spawn(m_world);
-			}
-
-			if (!m_world.GetPlayer()->GetisAlive())
-				if (m_keyboard[sf::Keyboard::Return])
-					m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
+			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
+
 	}
+	else
+	{
+		if (m_keyboard[m_settings.m_menu])
+		{
+			m_isMenuOpen = true;
+			ShowCursor();
+			m_menu = new Menu(SM_PRINCIPAL);
+		}
+
+
+		//f10 -> toggle fulscreen mode
+		else if (m_keyboard[m_settings.m_fullscreen])
+		{
+			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+			m_settings.Save();
+			SetFullscreen(IsFullscreen());
+			m_keyboard[key] = false;
+		}
+
+		//V -> toogle noclip mode
+		else if (m_keyboard[m_settings.m_noclip])
+			m_world.GetPlayer()->ToggleNoClip();
+
+		//Lctr -> Sneak
+		else if (m_keyboard[m_settings.m_crouch])
+			m_world.GetPlayer()->SetSneak(true);
+
+		//LSHIFT -> RUN
+		else if (m_keyboard[m_settings.m_run])
+			m_world.GetPlayer()->SetRunning(true);
+
+		//space -> jump
+		if (m_keyboard[m_settings.m_jump])
+			m_world.GetPlayer()->Jump();
+
+		//1 -> W_BLOCK 
+		if (m_keyboard[m_settings.m_inventory1])
+			m_world.GetPlayer()->SetWeapon(W_BLOCK);
+
+		//2 ->  W_PISTOL
+		if (m_keyboard[m_settings.m_inventory2])
+		{
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
+			Sound::Play(Sound::GUN_DRAW);
+
+		}
+		//3 ->  W_SUBMACHINE_GUN
+		if (m_keyboard[m_settings.m_inventory3])
+		{
+			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		//4 ->  W_ASSAULT_RIFLE
+		if (m_keyboard[m_settings.m_inventory4])
+		{
+			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		//M -> spawn monster
+		else if (m_keyboard[m_settings.m_spawnmonster])
+		{
+			for (int i = 0; i < MAX_MONSTER; i++)
+				if (!m_world.GetMonster()[i].GetisAlive())
+				{
+					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
+					break;
+				}
+
+		}
+		//y -> toggle wireframe mode
+		else if (m_keyboard[m_settings.m_wireframe])
+		{
+
+			m_wireframe = !m_wireframe;
+			if (m_wireframe)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		//F3 -> toggle info
+		else if (m_keyboard[m_settings.m_info])
+		{
+			displayInfo = !displayInfo;
+
+		}
+		//Lshift + F5 -> delete Cache
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
+		{
+			for (int i = 0; i < WORLD_SIZE; i++)
+				for (int j = 0; j < WORLD_SIZE; j++)
+					m_world.ChunkAt((float)i, (float)j)->DeleteCache();
+
+		}
+		//Lshift + O -> open map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
+		{
+			//m_world.LoadMap("map.sav", m_bInfo);
+			std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
+			t.detach();
+			//m_world.GetPlayer()->Spawn(m_world);
+		}
+		//Lshift + W -> Write map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
+		{
+			//m_world.SaveMap("map.sav");
+			std::thread t(&World::SaveMap, &m_world, "map.sav");
+			t.detach();
+		}
+
+		//Lshift + R -> Random map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
+		{
+			//m_world.InitMap(time(NULL));
+			std::thread t(&World::InitMap, &m_world, time(NULL));
+			t.detach();
+			//m_world.GetPlayer()->Spawn(m_world);
+		}
+
+		//Lshift + F -> Flat map
+		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
+		{
+			//m_world.InitMap(0);
+			std::thread t(&World::InitMap, &m_world, 0);
+			t.detach();
+			//m_world.GetPlayer()->Spawn(m_world);
+		}
+
+		if (!m_world.GetPlayer()->GetisAlive())
+			if (m_keyboard[sf::Keyboard::Return])
+				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
+	}
+}
+
+
+
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
-	if(key == OPEN_CLOSE_INVENTORY_KEY) {}
+	if (key == OPEN_CLOSE_INVENTORY_KEY) {}
 	else
 	{
 		// update le tableau
@@ -681,7 +679,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 					//Si ya collision on efface le block
 					if (m_world.GetPlayer()->CheckCollision(m_world))
-						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X),BTYPE_AIR,'Q');
+						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
 					else
 					{
 						m_Netctl.Send("m " +
@@ -840,26 +838,26 @@ void Engine::DrawHud() const
 	{	// show inventory hud
 		glLoadIdentity();
 		glTranslated(Width() / 2, Height() / 2, 0);
-		glColor3f(0.f,0.f,0.f);
+		glColor3f(0.f, 0.f, 0.f);
 		glBegin(GL_QUADS);
-		glVertex2i(-(Width()/4), -(Height()/4));
-		glVertex2i(+(Width()/4), -(Height()/4));
-		glVertex2i(+(Width()/4), +(Height()/4));
-		glVertex2i(-(Width()/4), +(Height()/4));
+		glVertex2i(-(Width() / 4), -(Height() / 4));
+		glVertex2i(+(Width() / 4), -(Height() / 4));
+		glVertex2i(+(Width() / 4), +(Height() / 4));
+		glVertex2i(-(Width() / 4), +(Height() / 4));
 		glEnd();
 
-		
+
 		int inventaire_longueur = Width() / 2;
 		int inventaire_hauteur = Height() / 2;
 
 		int incrementeur_hauteur = inventaire_hauteur / 3;
 		int incrementeur_longueur = inventaire_longueur / 5;
-		
-		glTranslated(-(Width()/4), -(Height()/4),0);
-		
-		for(int i = 0; i < 3; i++)
+
+		glTranslated(-(Width() / 4), -(Height() / 4), 0);
+
+		for (int i = 0; i < 3; i++)
 		{
-			for(int j = 0; j < 5; j++)
+			for (int j = 0; j < 5; j++)
 			{
 				glColor3f(20.f, 20.f, 20.f);
 				glBegin(GL_QUADS);
@@ -868,10 +866,10 @@ void Engine::DrawHud() const
 				glVertex2i(incrementeur_longueur * 0.9, incrementeur_hauteur * 0.9);
 				glVertex2i(0, incrementeur_hauteur * 0.9);
 				glEnd();
-				glTranslated(incrementeur_longueur,0,0.1);
+				glTranslated(incrementeur_longueur, 0, 0.1);
 			}
 			glTranslated(-(incrementeur_longueur * 5), incrementeur_hauteur, 0);
-		}		
+		}
 	}
 	else
 	{
@@ -909,7 +907,7 @@ void Engine::DrawHud() const
 			glEnd();
 			glDisable(GL_TEXTURE_2D);
 		}
-		
+
 		RenderFastInventory();
 	}
 
@@ -1211,7 +1209,7 @@ void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const st
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
 }
 
-void Engine::DrawMenu() const
+void Engine::DrawMenuPrincipal() const
 {
 	// Menu specs
 	int menuHeight = 150;
@@ -1226,7 +1224,6 @@ void Engine::DrawMenu() const
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glDisable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -1244,7 +1241,7 @@ void Engine::DrawMenu() const
 	glTranslated(menuPositionX, menuPositionY, 0);
 
 	// Zone menu
-	glColor4f(0.7f, 0.7f, 0.7f, 1.f);
+	glColor4f(0.f, 0.f, 0.f, 1.f);
 	glBegin(GL_QUADS);
 	glVertex2i(-menuWidth, -menuHeight);
 	glVertex2i(menuWidth, -menuHeight);
@@ -1252,6 +1249,8 @@ void Engine::DrawMenu() const
 	glVertex2i(-menuWidth, menuHeight);
 	glEnd();
 
+
+	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	if (m_menu->m_currentMenuItem == 0)
@@ -1277,46 +1276,15 @@ void Engine::DrawMenu() const
 	ss << "Exit Game";
 	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
 
-	//// Bouton Controls
-	//DrawMenuButton(0, menuHeight / 2 + 10, 1.f, 0.f, 0.f, 50, 20, "Controls");
-
-	//// Bouton Settings
-	//DrawMenuButton(0, 0, 0.f, 1.f, 0.f, 50, 20, "Settings");
-
-	//// Bouton Exit Game
-	//DrawMenuButton(0, -(menuHeight / 2 + 10), 0.f, 0.f, 1.f, 50, 20, "Exit Game");
 
 	glDisable(GL_BLEND);
-
 	glEnable(GL_TEXTURE_2D);
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-
-
-}
-
-void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const
-{
-	glLoadIdentity();
-	glTranslated(Width() / 2 + translateX, Height() / 2 + translateY, 0);
-	glColor4f(r, g, b, 0.5f);
-	glBegin(GL_QUADS);
-	glVertex2i(-width, -height);
-	glVertex2i(width, -height);
-	glVertex2i(width, height);
-	glVertex2i(-width, height);
-	glEnd();
-
-	m_textureFont.Bind();
-	std::ostringstream ss;
-	ss << texte;
-	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
-
 }
 
 void Engine::RenderFastInventory() const
