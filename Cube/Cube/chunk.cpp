@@ -370,7 +370,6 @@ float Chunk::CheckLightning(const Vector3<float> &Blockpos, const Vector3<float>
 	}
 }
 
-
 const char& Chunk::GetDirection(int x, int y, int z) const
 {
 	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
@@ -391,7 +390,6 @@ const char& Chunk::GetDirection(int x, int y, int z) const
 	else
 		return Chunk::QUIT;
 }
-
 
 void Chunk::SetExploded(int x, int y, int z, bool exploded)
 {
@@ -419,6 +417,7 @@ void Chunk::SetExploded(int x, int y, int z, bool exploded)
 		m_positiveZ->m_blocks.SetExploded(x, y, distance, exploded);
 	}
 }
+
 bool Chunk::GetExploded(int x, int y, int z) const
 {
 	if (x >= 0 && y >= 0 && z >= 0 && x < CHUNK_SIZE_X && y < CHUNK_SIZE_Y && z < CHUNK_SIZE_Z)
