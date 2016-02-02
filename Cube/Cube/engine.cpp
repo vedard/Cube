@@ -343,7 +343,7 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	// Draw le menu
 	if (m_isMenuOpen)
-		DrawMenu();
+		DrawMenuPrincipal();
 
 }
 
@@ -482,7 +482,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		{
 			m_isMenuOpen = true;
 			ShowCursor();
-			DrawMenu();
 			m_menu = new Menu(SM_PRINCIPAL);
 		}
 
@@ -1226,7 +1225,7 @@ void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const st
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
 }
 
-void Engine::DrawMenu() const
+void Engine::DrawMenuPrincipal() const
 {
 	// Menu specs
 	int menuHeight = 150;
@@ -1241,7 +1240,6 @@ void Engine::DrawMenu() const
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glDisable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -1259,7 +1257,7 @@ void Engine::DrawMenu() const
 	glTranslated(menuPositionX, menuPositionY, 0);
 
 	// Zone menu
-	glColor4f(0.7f, 0.7f, 0.7f, 1.f);
+	glColor4f(0.f, 0.f, 0.f, 1.f);
 	glBegin(GL_QUADS);
 	glVertex2i(-menuWidth, -menuHeight);
 	glVertex2i(menuWidth, -menuHeight);
@@ -1267,6 +1265,8 @@ void Engine::DrawMenu() const
 	glVertex2i(-menuWidth, menuHeight);
 	glEnd();
 
+
+	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	if (m_menu->m_currentMenuItem == 0)
@@ -1292,47 +1292,17 @@ void Engine::DrawMenu() const
 	ss << "Exit Game";
 	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
 
-	//// Bouton Controls
-	//DrawMenuButton(0, menuHeight / 2 + 10, 1.f, 0.f, 0.f, 50, 20, "Controls");
-
-	//// Bouton Settings
-	//DrawMenuButton(0, 0, 0.f, 1.f, 0.f, 50, 20, "Settings");
-
-	//// Bouton Exit Game
-	//DrawMenuButton(0, -(menuHeight / 2 + 10), 0.f, 0.f, 1.f, 50, 20, "Exit Game");
 
 	glDisable(GL_BLEND);
-
 	glEnable(GL_TEXTURE_2D);
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-
-
 }
 
-void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const
-{
-	glLoadIdentity();
-	glTranslated(Width() / 2 + translateX, Height() / 2 + translateY, 0);
-	glColor4f(r, g, b, 0.5f);
-	glBegin(GL_QUADS);
-	glVertex2i(-width, -height);
-	glVertex2i(width, -height);
-	glVertex2i(width, height);
-	glVertex2i(-width, height);
-	glEnd();
-
-	m_textureFont.Bind();
-	std::ostringstream ss;
-	ss << texte;
-	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
-
-}
 void Engine::RenderFastInventory() const
 {
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
