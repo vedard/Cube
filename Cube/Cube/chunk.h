@@ -57,8 +57,8 @@ private:
 	BlockType LavaCheck(int x, int y, int z, BlockType bt);
 	char GetDirection(const Vector3<float> &Blockpos);
 
-
-
+	static char QUIT;
+	
 
 	//Todo - rendre private
 public:

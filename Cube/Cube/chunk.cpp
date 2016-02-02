@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+char Chunk::QUIT = 'Q';
+
 Chunk::Chunk() :m_blocks(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z), m_iscreated(false), m_isDirty(true), m_chunkMesh(), m_transparentMesh(), m_position(0, 0, 0), m_save(false), DeleteWater(false)
 {
 	m_blocks.Reset(BTYPE_AIR);
@@ -387,7 +389,7 @@ const char& Chunk::GetDirection(int x, int y, int z) const
 		return m_positiveZ->GetDirection(x, y, z - CHUNK_SIZE_Z - 1);
 
 	else
-		return 'Q';
+		return Chunk::QUIT;
 }
 
 

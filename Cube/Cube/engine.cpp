@@ -845,14 +845,43 @@ void Engine::DrawHud() const
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
 
+	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	{	// show inventory hud
 
-	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+		glLoadIdentity();
+		glTranslated(Width() - 64, 16, 0);
+
+		//contour 	
+		glColor3f(0.f, 0.f, 0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
+
+		//block
+		m_textureAtlas.Bind();
+		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.f, 1.f, 1.f);
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(0, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(48, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(48, 48);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(0, 48);
+
+		glEnd();
+	}
+	else
 	{
-		//Block selectionne
-
-		if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
-		{	// show inventory hud
-
+		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+		{
+			//Block selectionne
 			glLoadIdentity();
 			glTranslated(Width() - 64, 16, 0);
 
@@ -864,7 +893,6 @@ void Engine::DrawHud() const
 			glVertex2i(50, 50);
 			glVertex2i(-2, 50);
 			glEnd();
-
 
 
 			//block
@@ -882,63 +910,20 @@ void Engine::DrawHud() const
 			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
 			glVertex2i(0, 48);
 
-
-			std::cout << "bonjour" << std::endl;
-
-
 			glEnd();
+			glDisable(GL_TEXTURE_2D);
 		}
-
-		else
-		{	// Affichage du crosshair
-			DrawCross(m_cross_color_r, m_cross_color_g, m_cross_color_b);
-
-			if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
-			{
-				//Block selectionne
-				glLoadIdentity();
-				glTranslated(Width() - 64, 16, 0);
-
-				//contour 	
-				glColor3f(0.f, 0.f, 0.f);
-				glBegin(GL_QUADS);
-				glVertex2i(-2, -2);
-				glVertex2i(50, -2);
-				glVertex2i(50, 50);
-				glVertex2i(-2, 50);
-				glEnd();
-
-
-				//block
-				m_textureAtlas.Bind();
-				glEnable(GL_TEXTURE_2D);
-				glColor3f(1.f, 1.f, 1.f);
-
-				glBegin(GL_QUADS);
-				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-				glVertex2i(0, 0);
-				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-				glVertex2i(48, 0);
-				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-				glVertex2i(48, 48);
-				glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-				glVertex2i(0, 48);
-
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-		}
-
-
-		glEnable(GL_TEXTURE_2D);
-
-		glEnable(GL_LIGHTING);
-		glEnable(GL_DEPTH_TEST);
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
 	}
+
+	RenderFastInventory();
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 }
 
 void Engine::DrawDeathScreen() const

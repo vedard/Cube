@@ -16,4 +16,4 @@ private:
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 };
 
-#endif MENU_H__
+#endif

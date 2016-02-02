@@ -167,7 +167,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					GetDamage(exp(m_vitesse.y * 6), TRUE,m_godMode);
+					GetDamage(exp(m_vitesse.y * 6), false,m_godMode);
 			}
 			
 			//annule
@@ -363,12 +363,12 @@ bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
 	if (m_footUnderLava)
- 		GetDamage(5, TRUE, m_godMode);
+ 		GetDamage(5, true, m_godMode);
 	if (m_headUnderwater)
 	{
 		m_BreathCount++;
 		if (m_BreathCount > 15)
-			GetDamage(3, TRUE, m_godMode);
+			GetDamage(3, true, m_godMode);
 	}
 	else
 		m_BreathCount = 0;

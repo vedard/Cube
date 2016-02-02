@@ -178,7 +178,7 @@ bool Character::Attack(Character * character, float damage)
 				+ pow(character->GetPosition().z - m_pos.z, 2)) < m_AttackRange)
 			{
 				std::cout << m_Name << " attack " << character->GetName() << "." << std::endl;
-				character->GetDamage(damage,FALSE,FALSE);
+				character->GetDamage(damage,false,false);
 				m_cooldownAttackTimer.restart();
 				return true;
 			}

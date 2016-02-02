@@ -33,7 +33,7 @@ void Inventory::AddItemQ(Item type, int number)
 			m_objets[i].Add(number);
 			break;
 		} 
-		if (m_objets[i].GetType() == NULL || m_objets[i].GetQuantity() == 0)
+		if (m_objets[i].GetQuantity() == 0)
 		{
 			m_objets[i] = type;
 			break;
