@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />
+    <None Include="media\shaders\shader01.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

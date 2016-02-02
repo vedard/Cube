@@ -27,9 +27,8 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
-
 	m_world.SaveMap("map.sav");
-	//Sound::DeInit();
+	Sound::DeInit();
 	delete[] m_bInfo;
 }
 
@@ -73,30 +72,20 @@ void Engine::Init()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
 
+
+	//fog?
+	GLuint filter;                      // Which Filter To Use
+	GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
+	GLuint fogfilter = 0;                    // Which Fog To Use
+	GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // Fog Color
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+	glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+	glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
+	glFogf(GL_FOG_DENSITY, 0.10f);              // How Dense Will The Fog Be
+	glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+	glFogf(GL_FOG_START, 0.10f);             // Fog Start Depth
+	glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
 	glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.5, 0.5, 0.5, 1 };
-	GLint fogmode = GL_EXP;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, 1);
-	glFogf(GL_FOG_START, 1.0);
-	glFogf(GL_FOG_END, 5.0);
-
-	////fog?
-	//bool   gp;                      // G Pressed? ( New )
-	//GLuint filter;                      // Which Filter To Use
-	//GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
-	//GLuint fogfilter = 0;                    // Which Fog To Use
-	//GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // Fog Color
-
-	//glClearColor(0.5f, 0.5f, 0.5f, 1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
-	//glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
-	//glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
-	//glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
-	//glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
-	//glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
-	//glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
-	//glEnable(GL_FOG);
 
 	CenterMouse();
 	HideCursor();
@@ -144,7 +133,6 @@ void Engine::LoadResource()
 	AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 	AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 
-	
 	if (!m_textureAtlas.Generate(64, false))
 	{
 		std::cout << " Unable to generate texture atlas ..." << std::endl;
@@ -160,7 +148,6 @@ void Engine::LoadResource()
 	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
 	Sound::AddSound(Sound::MUSIC1, AUDIO_PATH "music.wav");
 
-
 	for (int i = 0; i < 6; i++)
 		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
 
@@ -169,7 +156,6 @@ void Engine::LoadResource()
 	m_music.setLoop(true);
 	m_music.setVolume(10);
 	m_music.play();
-
 
 	//Model 3d
 	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
@@ -256,10 +242,10 @@ void Engine::UpdateEnvironement(float gameTime)
 	if (gameTime - m_LastTickTimeWater >= TICK_DELAY_WATER)
 	{
 		m_LastTickTimeWater = gameTime;
-		//m_world
 	}
 
 }
+
 void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
@@ -611,9 +597,6 @@ void Engine::KeyPressEvent(unsigned char key)
 					m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 		}
 	}
-
-	
-
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
@@ -1335,6 +1318,7 @@ void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, fl
 	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
 
 }
+
 void Engine::RenderFastInventory() const
 {
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)

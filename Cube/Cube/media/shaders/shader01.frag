@@ -27,4 +27,5 @@ void main()
 		texel.b -= 0.50;
 	}
     gl_FragColor = texel;
+
 }
