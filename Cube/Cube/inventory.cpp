@@ -13,46 +13,56 @@ Inventory::~Inventory()
 	for (size_t i = 0; i < sizeof(m_objetsFast); i++)
 		m_objetsFast[i] = new Item;
 
-	delete[] m_objetsFast;								//freed memory
+	delete[] * m_objetsFast;								//freed memory
 
 	for (size_t i = 0; i < sizeof(m_objetsFast); i++)	//pointed dangling ptr to NULL
 		m_objetsFast[i] = NULL;
 }
 
-void Inventory::AddItemQ(Item type)
+void Inventory::AddItemQ(BlockType type)
 {
 	this->AddItemQ(type, 1);
 }
 
-void Inventory::AddItemQ(Item type, int number)
+void Inventory::AddItemQ(BlockType type, int number)
 {
-	for (size_t i = 0; i < sizeof(m_objets); i++)
+	bool isAdded = false;
+
+	for each (Item var in m_objets)
 	{
-		if (m_objets[i].GetType() == type.GetType())
+		if (var.GetType() == type)
 		{
-			m_objets[i].Add(number);
+			var.Add(number);
+			isAdded = true;
 			break;
-		} 
-		if (m_objets[i].GetQuantity() == 0)
+		}
+	}
+
+	if (!isAdded)
+	{
+		for each (Item var in m_objets)
 		{
-			m_objets[i] = type;
-			break;
+			if (var.GetQuantity() == 0)
+			{
+				var.AddNew(type, number);
+				break;
+			}
 		}
 	}
 }
 
-void Inventory::RemoveItemQ(Item type)
+bool Inventory::RemoveItemQ(BlockType type)
 {
 	this->RemoveItemQ(type, 1);
 }
 
-void Inventory::RemoveItemQ(Item type, int number)
+bool Inventory::RemoveItemQ(BlockType type, int number)
 {
-	for (size_t i = 0; i < sizeof(m_objets); i++)
+	for each (Item var in m_objets)
 	{
-		if (m_objets[i].GetType() == type.GetType() && m_objets[i].GetQuantity() > 0)
+		if (var.GetType() == type && var.GetQuantity() > 0)
 		{
-			m_objets[i].Remove(number);
+			var.Remove(number);
 			break;
 		}
 	}

@@ -672,6 +672,11 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			if (button == 1 && m_currentBlock.x != -1)
 			{
 				Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
+
+				//AddToInventory
+				//Add Block to Player Inventory BEFORE removal in the world
+				m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
+
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 				m_Netctl.Send("m " +
 					std::to_string(chunkPos.x) +

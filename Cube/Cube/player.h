@@ -39,6 +39,9 @@ public:
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 
+	void AddToInventory(BlockType type);
+	void RemoveFromInventory(BlockType type);
+
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
