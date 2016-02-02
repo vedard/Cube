@@ -3,6 +3,7 @@ varying vec4 light;
 uniform bool underwater;
 uniform bool underlava;
 
+
 void main()
 {
     vec4 texel;
@@ -32,4 +33,5 @@ void main()
 		texel.b -= 0.50;
 	}
     gl_FragColor = texel;
+
 }

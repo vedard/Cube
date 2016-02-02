@@ -61,42 +61,26 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
+	glEnable(GL_FOG);
+	GLfloat fogcolor[4] = { 0.2f, 0.2f, 0.2f, 1 };
+	GLint fogmode = GL_EXP;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, 0.07f);
+	glFogf(GL_FOG_START, .04f);
+	glFogf(GL_FOG_END, 9.0f);
+
 	// Light
-	GLfloat light0Pos[4] = { 0.0f, CHUNK_SIZE_Y, 0.0f, 1.0f };
+	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
 	GLfloat light0Amb[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 	GLfloat light0Diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat light0Spec[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-
-	glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.5, 0.5, 0.5, 1 };
-	GLint fogmode = GL_EXP;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, 1);
-	glFogf(GL_FOG_START, 1.0);
-	glFogf(GL_FOG_END, 5.0);
-
-	////fog?
-	//bool   gp;                      // G Pressed? ( New )
-	//GLuint filter;                      // Which Filter To Use
-	//GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
-	//GLuint fogfilter = 0;                    // Which Fog To Use
-	//GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // Fog Color
-
-	//glClearColor(0.5f, 0.5f, 0.5f, 1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
-	//glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
-	//glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
-	//glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
-	//glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
-	//glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
-	//glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
-	//glEnable(GL_FOG);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 
 	CenterMouse();
 	HideCursor();
@@ -343,7 +327,7 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	// Draw le menu
 	if (m_isMenuOpen)
-		DrawMenu();
+		DrawMenuPrincipal();
 
 }
 
@@ -482,7 +466,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		{
 			m_isMenuOpen = true;
 			ShowCursor();
-			DrawMenu();
 			m_menu = new Menu(SM_PRINCIPAL);
 		}
 
@@ -1231,7 +1214,7 @@ void Engine::AddTextureToAtlas(BlockType type, const std::string &name, const st
 	m_textureAtlas.TextureIndexToCoord(m_texBlockIndex, m_bInfo[type].u, m_bInfo[type].v, m_bInfo[type].w, m_bInfo[type].h);
 }
 
-void Engine::DrawMenu() const
+void Engine::DrawMenuPrincipal() const
 {
 	// Menu specs
 	int menuHeight = 150;
@@ -1246,7 +1229,6 @@ void Engine::DrawMenu() const
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glDisable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -1264,7 +1246,7 @@ void Engine::DrawMenu() const
 	glTranslated(menuPositionX, menuPositionY, 0);
 
 	// Zone menu
-	glColor4f(0.7f, 0.7f, 0.7f, 1.f);
+	glColor4f(0.f, 0.f, 0.f, 1.f);
 	glBegin(GL_QUADS);
 	glVertex2i(-menuWidth, -menuHeight);
 	glVertex2i(menuWidth, -menuHeight);
@@ -1272,6 +1254,8 @@ void Engine::DrawMenu() const
 	glVertex2i(-menuWidth, menuHeight);
 	glEnd();
 
+
+	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	if (m_menu->m_currentMenuItem == 0)
@@ -1297,47 +1281,17 @@ void Engine::DrawMenu() const
 	ss << "Exit Game";
 	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
 
-	//// Bouton Controls
-	//DrawMenuButton(0, menuHeight / 2 + 10, 1.f, 0.f, 0.f, 50, 20, "Controls");
-
-	//// Bouton Settings
-	//DrawMenuButton(0, 0, 0.f, 1.f, 0.f, 50, 20, "Settings");
-
-	//// Bouton Exit Game
-	//DrawMenuButton(0, -(menuHeight / 2 + 10), 0.f, 0.f, 1.f, 50, 20, "Exit Game");
 
 	glDisable(GL_BLEND);
-
 	glEnable(GL_TEXTURE_2D);
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-
-
 }
 
-void Engine::DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const
-{
-	glLoadIdentity();
-	glTranslated(Width() / 2 + translateX, Height() / 2 + translateY, 0);
-	glColor4f(r, g, b, 0.5f);
-	glBegin(GL_QUADS);
-	glVertex2i(-width, -height);
-	glVertex2i(width, -height);
-	glVertex2i(width, height);
-	glVertex2i(-width, height);
-	glEnd();
-
-	m_textureFont.Bind();
-	std::ostringstream ss;
-	ss << texte;
-	PrintText((Width() / 2) - (width / 2), (Height() / 2) + translateY - (height / 2), 12.f, ss.str());
-
-}
 void Engine::RenderFastInventory() const
 {
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
