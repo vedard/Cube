@@ -438,14 +438,18 @@ void Engine::Render(float elapsedTime)
 
 void Engine::KeyPressEvent(unsigned char key)
 {
-	//update le teableau
-	m_keyboard[key] = true;
+	if(m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
+		m_keyboard[key] = false;
+	else
+	{
+		//update le teableau
+		m_keyboard[key] = true;
+	}
 
 
 	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
-
-
+	
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -613,8 +617,12 @@ void Engine::KeyPressEvent(unsigned char key)
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
-	//update le teableau
-	m_keyboard[key] = false;
+	if(key == OPEN_CLOSE_INVENTORY_KEY) {}
+	else
+	{
+		// update le tableau
+		m_keyboard[key] = false;
+	}
 
 	//end sneak
 	if (!m_keyboard[sf::Keyboard::LControl])
@@ -847,35 +855,40 @@ void Engine::DrawHud() const
 
 	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{	// show inventory hud
-
 		glLoadIdentity();
-		glTranslated(Width() - 64, 16, 0);
-
-		//contour 	
-		glColor3f(0.f, 0.f, 0.f);
+		glTranslated(Width() / 2, Height() / 2, 0);
+		glColor3f(0.f,0.f,0.f);
 		glBegin(GL_QUADS);
-		glVertex2i(-2, -2);
-		glVertex2i(50, -2);
-		glVertex2i(50, 50);
-		glVertex2i(-2, 50);
+		glVertex2i(-(Width()/4), -(Height()/4));
+		glVertex2i(+(Width()/4), -(Height()/4));
+		glVertex2i(+(Width()/4), +(Height()/4));
+		glVertex2i(-(Width()/4), +(Height()/4));
 		glEnd();
 
-		//block
-		m_textureAtlas.Bind();
-		glEnable(GL_TEXTURE_2D);
-		glColor3f(1.f, 1.f, 1.f);
+		
+		int inventaire_longueur = Width() / 2;
+		int inventaire_hauteur = Height() / 2;
 
-		glBegin(GL_QUADS);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-		glVertex2i(0, 0);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-		glVertex2i(48, 0);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-		glVertex2i(48, 48);
-		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-		glVertex2i(0, 48);
-
-		glEnd();
+		int incrementeur_hauteur = inventaire_hauteur / 3;
+		int incrementeur_longueur = inventaire_longueur / 5;
+		
+		glTranslated(-(Width()/4), -(Height()/4),0);
+		
+		for(int i = 0; i < 3; i++)
+		{
+			for(int j = 0; j < 5; j++)
+			{
+				glColor3f(20.f, 20.f, 20.f);
+				glBegin(GL_QUADS);
+				glVertex2i(0, 0);
+				glVertex2i(incrementeur_longueur * 0.9, 0);
+				glVertex2i(incrementeur_longueur * 0.9, incrementeur_hauteur * 0.9);
+				glVertex2i(0, incrementeur_hauteur * 0.9);
+				glEnd();
+				glTranslated(incrementeur_longueur,0,0.1);
+			}
+			glTranslated(-(incrementeur_longueur * 5), incrementeur_hauteur, 0);
+		}		
 	}
 	else
 	{
@@ -913,9 +926,9 @@ void Engine::DrawHud() const
 			glEnd();
 			glDisable(GL_TEXTURE_2D);
 		}
+		
+		RenderFastInventory();
 	}
-
-	RenderFastInventory();
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
