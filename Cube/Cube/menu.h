@@ -10,8 +10,8 @@ public:
 	~Menu();
 	void OnKeyDown(unsigned char key);
 	int m_currentMenuItem;
-private:
 	SOUS_MENU m_currentMenu;
+private:
 	int m_menuItemsAmount;
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 };

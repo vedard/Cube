@@ -343,8 +343,12 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	// Draw le menu
 	if (m_isMenuOpen)
-		DrawMenuPrincipal();
-
+	{
+		if (m_menu->m_currentMenu == SM_PRINCIPAL)
+			DrawMenuPrincipal();
+		else if (m_menu->m_currentMenu == SM_SETTINGS)
+			DrawMenuSettings();
+	}
 }
 
 void Engine::Render(float elapsedTime)
@@ -451,6 +455,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 
+	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -464,10 +469,21 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[sf::Keyboard::Return])
 		{
-			if (m_menu->m_currentMenuItem == 2)
+			if (m_menu->m_currentMenu == SM_PRINCIPAL)
 			{
-				m_world.m_threadcontinue = false;
-				Stop();
+				if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
+				{
+					m_world.m_threadcontinue = false;
+					Stop();
+				}
+				else if (m_menu->m_currentMenuItem == MP_SETTINGS)
+				{
+					m_menu = new Menu(SM_SETTINGS);
+				}
+			}
+			else if (m_menu->m_currentMenu == SM_SETTINGS)
+			{
+
 			}
 		}
 		else
@@ -1269,14 +1285,14 @@ void Engine::DrawMenuPrincipal() const
 	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
-	if (m_menu->m_currentMenuItem == 0)
+	if (m_menu->m_currentMenuItem == MP_CONTROLS)
 		glColor3f(1.f, 0.f, 0.f);
 	else
 		glColor3f(0.5f, 0.5f, 0.5f);
 	ss << "Controls";
 	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
 
-	if (m_menu->m_currentMenuItem == 1)
+	if (m_menu->m_currentMenuItem == MP_SETTINGS)
 		glColor3f(1.f, 0.f, 0.f);
 	else
 		glColor3f(0.5f, 0.5f, 0.5f);
@@ -1284,12 +1300,88 @@ void Engine::DrawMenuPrincipal() const
 	ss << "Settings";
 	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
 
-	if (m_menu->m_currentMenuItem == 2)
+	if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
 		glColor3f(1.f, 0.f, 0.f);
 	else
 		glColor3f(0.5f, 0.5f, 0.5f);
 	ss.str("");
 	ss << "Exit Game";
+	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
+
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void Engine::DrawMenuSettings() const
+{
+	// Menu specs
+	int menuHeight = 150;
+	int menuWidth = 200;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	std::ostringstream ss;
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+
+	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
+	glColor3f(0.5f, 0.5f, 0.5f);
+
+	if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+	ss << "Fullscreen";
+	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
+
+	if (m_menu->m_currentMenuItem == MS_WIDTH)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+	ss.str("");
+	ss << "Width";
+	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
+
+	if (m_menu->m_currentMenuItem == MS_HEIGHT)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+	ss.str("");
+	ss << "Height";
 	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
 
 

@@ -6,6 +6,8 @@ Menu::Menu(SOUS_MENU currentMenu) : m_currentMenu(currentMenu)
 
 	if (m_currentMenu == SM_PRINCIPAL)
 		m_menuItemsAmount = 2; // Starts at 0
+	else if (m_currentMenu == SM_SETTINGS)
+		m_menuItemsAmount = 9;
 
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -27,8 +29,6 @@ void Menu::OnKeyDown(unsigned char key)
 
 		if (m_currentMenuItem <= -1)
 			m_currentMenuItem = m_menuItemsAmount;
-		
-		m_keyboard[key] = false;
 	}
 	else if (m_keyboard[sf::Keyboard::Return])
 	{
@@ -52,7 +52,7 @@ void Menu::OnKeyDown(unsigned char key)
 
 		if (m_currentMenuItem > m_menuItemsAmount)
 			m_currentMenuItem = 0;
-
-		m_keyboard[key] = false;
 	}
+
+	m_keyboard[key] = false;
 }

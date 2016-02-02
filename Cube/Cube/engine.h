@@ -59,6 +59,7 @@ private:
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;
+	void DrawMenuSettings() const;
 
 private:
 	bool m_wireframe;
