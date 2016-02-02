@@ -3,6 +3,7 @@
 Engine::Engine() :
 	m_wireframe(false),
 	m_shader01(),
+	m_shader02(),
 	m_textureAtlas(NUMBER_OF_BLOCK - 1),
 	m_world(),
 	m_currentBlock(-1, -1, -1),
@@ -187,6 +188,7 @@ void Engine::LoadResource()
 		std::cout << " Failed to load shader " << std::endl;
 		exit(1);
 	}
+	
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
@@ -290,6 +292,11 @@ void Engine::DrawEnvironement(float gameTime) {
  	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "hurt"), true);
+
+	m_shader02.Use();
+
+
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
@@ -372,11 +379,11 @@ void Engine::Render(float elapsedTime)
 		m_fps = (int)round(1.f / elapsedTime);
 
 	int loops = 0;
-	if (m_firstMusic)
+	/*if (m_firstMusic)
 	{
 		m_firstMusic = false;
 		Sound::Play(Sound::MUSIC1);
-	}
+	}*/
 
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)

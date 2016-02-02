@@ -80,6 +80,7 @@ private:
 	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
+	Shader m_shader02;
 	World m_world;
 
 	//Indexe de la texutre dans l'atlas

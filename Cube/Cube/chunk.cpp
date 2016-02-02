@@ -663,40 +663,47 @@ void Chunk::WaterTick(int bloc)
 		for (int z = 0; z < CHUNK_SIZE_Z; ++z)
 			for (int y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
-				BlockType bt = GetBlock(x, y, z);
+				try
+				{
+					BlockType bt = GetBlock(x, y, z);
 
 
-				if ((bt == BTYPE_WATER || bt == BTYPE_FWATER) && bloc == 0)
-				{
-					Water1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					if ((bt == BTYPE_WATER || bt == BTYPE_FWATER) && bloc == 0)
+					{
+						Water1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if (bt == BTYPE_RWATER1 && bloc == 1)
+					{
+						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if (bt == BTYPE_RWATER2 && bloc == 2)
+					{
+						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if (bt == BTYPE_RWATER3 && bloc == 3)
+					{
+						Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if ((bt == BTYPE_LAVA || bt == BTYPE_FLAVA) && bloc == 0)
+					{
+						Lava1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if (bt == BTYPE_RLAVA1 && bloc == 1)
+					{
+						Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if (bt == BTYPE_RLAVA2 && bloc == 2)
+					{
+						Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
+					else if (bt == BTYPE_RLAVA3 && bloc == 3)
+					{
+						Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+					}
 				}
-				else if (bt == BTYPE_RWATER1 && bloc == 1)
+				catch (...)
 				{
-					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
-				}
-				else if (bt == BTYPE_RWATER2 && bloc == 2)
-				{
-					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
-				}
-				else if (bt == BTYPE_RWATER3 && bloc == 3)
-				{
-					Water2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
-				}
-				else if ((bt == BTYPE_LAVA || bt == BTYPE_FLAVA) && bloc == 0)
-				{
-					Lava1(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
-				}
-				else if (bt == BTYPE_RLAVA1 && bloc == 1)
-				{
-					Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
-				}
-				else if (bt == BTYPE_RLAVA2 && bloc == 2)
-				{
-					Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
-				}
-				else if (bt == BTYPE_RLAVA3 && bloc == 3)
-				{
-					Lava2(Vector3<float>((int)x % CHUNK_SIZE_X, (int)y % CHUNK_SIZE_Y, (int)z % CHUNK_SIZE_Z));
+
 				}
 			}
 

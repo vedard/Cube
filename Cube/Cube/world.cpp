@@ -44,8 +44,8 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 		}
 	m_threadChunks = std::thread(&World::RunWater, this);
 	//m_threadChunksEnvers = std::thread(&World::RunWater, this);
-	/*m_threadChunks.detach();
-	m_threadChunksEnvers.detach();*/
+	m_threadChunks.detach();
+	//m_threadChunksEnvers.detach();
 	
 }
 
