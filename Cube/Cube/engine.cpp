@@ -345,7 +345,7 @@ void Engine::Render(float elapsedTime)
 	if (m_firstMusic)
 	{
 		m_firstMusic = false;
-		Sound::Play(Sound::MUSIC1);
+		//Sound::Play(Sound::MUSIC1);
 	}
 	
 	//Lock les mouvements a 50 fps
