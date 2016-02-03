@@ -9,6 +9,7 @@ public:
 	Menu(SOUS_MENU currentMenu);
 	~Menu();
 	void OnKeyDown(unsigned char key);
+	void SaveChanges();
 	int m_currentMenuItem;
 	SOUS_MENU m_currentMenu;
 private:

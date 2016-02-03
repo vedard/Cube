@@ -30,21 +30,25 @@ void Menu::OnKeyDown(unsigned char key)
 		if (m_currentMenuItem <= -1)
 			m_currentMenuItem = m_menuItemsAmount;
 	}
-	else if (m_keyboard[sf::Keyboard::Return])
-	{
-		
-	}
 	else if (m_keyboard[sf::Keyboard::Left])
 	{
+		if (m_currentMenu == SM_SETTINGS)
+		{
+			m_currentMenuItem -= ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
 
+			if (m_currentMenuItem < 0)
+				m_currentMenuItem += (m_menuItemsAmount + 1);
+		}
 	}
 	else if (m_keyboard[sf::Keyboard::Right])
 	{
+		if (m_currentMenu == SM_SETTINGS)
+		{
+			m_currentMenuItem += ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
 
-	}
-	else if (m_keyboard[sf::Keyboard::Escape])
-	{
-
+			if (m_currentMenuItem > m_menuItemsAmount)
+				m_currentMenuItem -= (m_menuItemsAmount + 1);
+		}
 	}
 	else if (m_keyboard[sf::Keyboard::Down])
 	{
@@ -55,4 +59,9 @@ void Menu::OnKeyDown(unsigned char key)
 	}
 
 	m_keyboard[key] = false;
+}
+
+void Menu::SaveChanges()
+{
+
 }

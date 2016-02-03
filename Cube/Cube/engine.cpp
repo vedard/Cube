@@ -469,21 +469,19 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[sf::Keyboard::Return])
 		{
+			ManageMenuEnterKeyPress();
+		}
+		else if (m_keyboard[sf::Keyboard::BackSpace])
+		{
 			if (m_menu->m_currentMenu == SM_PRINCIPAL)
 			{
-				if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
-				{
-					m_world.m_threadcontinue = false;
-					Stop();
-				}
-				else if (m_menu->m_currentMenuItem == MP_SETTINGS)
-				{
-					m_menu = new Menu(SM_SETTINGS);
-				}
+				m_isMenuOpen = false;
+				HideCursor();
 			}
-			else if (m_menu->m_currentMenu == SM_SETTINGS)
+			else
 			{
-
+				m_menu->SaveChanges();
+				m_menu = new Menu(SM_PRINCIPAL);
 			}
 		}
 		else
@@ -1282,31 +1280,12 @@ void Engine::DrawMenuPrincipal() const
 	glEnd();
 
 
-	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
-	if (m_menu->m_currentMenuItem == MP_CONTROLS)
-		glColor3f(1.f, 0.f, 0.f);
-	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss << "Controls";
-	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
-
-	if (m_menu->m_currentMenuItem == MP_SETTINGS)
-		glColor3f(1.f, 0.f, 0.f);
-	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss.str("");
-	ss << "Settings";
-	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
-
-	if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
-		glColor3f(1.f, 0.f, 0.f);
-	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss.str("");
-	ss << "Exit Game";
-	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
+	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2));
+	DrawMenuButton(MP_EXIT_GAME, "Exit Game", Width() / 2 - 40, (Height() / 2) - (menuHeight / 2));
 
 
 	glDisable(GL_BLEND);
@@ -1321,11 +1300,44 @@ void Engine::DrawMenuPrincipal() const
 
 void Engine::DrawMenuSettings() const
 {
+	// Menu stats/info
+	std::string fullscreen;
+	std::string gameWidth;
+	std::string gameHeight;
+	std::string antiAliasing;
+	std::string vSync;
+	std::string renderDistance;
+	std::string rCrossColor;
+	std::string gCrossColor;
+	std::string bCrossColor;
+	std::string mouseSensivity;
+
 	// Menu specs
-	int menuHeight = 150;
-	int menuWidth = 200;
+	int menuHeight = 300;
+	int menuWidth = 400;
 	int menuPositionX = Width() / 2;
 	int menuPositionY = Height() / 2;
+
+	// Mettre les stats/infos en string
+	gameWidth = std::to_string(m_settings.m_width);
+	gameHeight = std::to_string(m_settings.m_height);
+	antiAliasing = std::to_string(m_settings.m_antialiasing) + "x";
+	renderDistance = std::to_string(m_settings.m_renderdistance);
+	rCrossColor = std::to_string(m_settings.m_crossred);
+	rCrossColor = std::to_string(m_settings.m_crossgreen);
+	rCrossColor = std::to_string(m_settings.m_crossblue);
+	mouseSensivity = std::to_string(m_settings.m_mousesensibility);
+
+	if (m_settings.m_fullscreen == true)
+		fullscreen = "True";
+	else
+		fullscreen = "False";
+
+	if (m_settings.m_vsync == true)
+		vSync = "True";
+	else
+		vSync = "False";
+
 
 	glEnable(GL_TEXTURE_2D);
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -1340,10 +1352,6 @@ void Engine::DrawMenuSettings() const
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
-	// Préparer le font pour écrire dans le menu
-	m_textureFont.Bind();
-	std::ostringstream ss;
-
 	// Translate au centre pour y dessiner le menu
 	glLoadIdentity();
 	glTranslated(menuPositionX, menuPositionY, 0);
@@ -1357,32 +1365,38 @@ void Engine::DrawMenuSettings() const
 	glVertex2i(-menuWidth, menuHeight);
 	glEnd();
 
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
 
-	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
+	int column1Width = (Width() / 2) - menuWidth + 40;
+	int column2Width = (Width() / 2) - (menuWidth / 2);
+	int column3Width = (Width() / 2) + (menuWidth / 4);
+	int column4Width = (Width() / 2) + menuWidth - (menuWidth / 4);
+
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
-	if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
-		glColor3f(1.f, 0.f, 0.f);
-	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss << "Fullscreen";
-	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
+	DrawMenuButton(MS_FULLSCREEN, "Fullscreen", column1Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_FULLSCREEN, fullscreen, column2Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_WIDTH, "Width", column1Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_WIDTH, gameWidth, column2Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_HEIGHT, "Height", column1Width, (Height() / 2));
+	DrawMenuButton(MS_HEIGHT, gameHeight, column2Width, (Height() / 2));
+	DrawMenuButton(MS_ANTI_ALIASING, "Anti-Aliasing", column1Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_ANTI_ALIASING, antiAliasing, column2Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_VSYNC, "V-Sync", column1Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_VSYNC, vSync, column2Width, (Height() / 2) - (menuHeight / 2));
 
-	if (m_menu->m_currentMenuItem == MS_WIDTH)
-		glColor3f(1.f, 0.f, 0.f);
-	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss.str("");
-	ss << "Width";
-	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
-
-	if (m_menu->m_currentMenuItem == MS_HEIGHT)
-		glColor3f(1.f, 0.f, 0.f);
-	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss.str("");
-	ss << "Height";
-	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
+	DrawMenuButton(MS_RENDER_DISTANCE, "Render Distance", column3Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_RENDER_DISTANCE, renderDistance, column4Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_G, rCrossColor, column4Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_MOUSE_SENSIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_MOUSE_SENSIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight / 2));
 
 
 	glDisable(GL_BLEND);
@@ -1393,6 +1407,36 @@ void Engine::DrawMenuSettings() const
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+}
+
+void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const
+{
+	if (m_menu->m_currentMenuItem == menuItem)
+		glColor3f(1.f, 0.f, 0.f);
+	else
+		glColor3f(0.5f, 0.5f, 0.5f);
+
+	PrintText(xPos, yPos, 12.f, text);
+}
+
+void Engine::ManageMenuEnterKeyPress()
+{
+	if (m_menu->m_currentMenu == SM_PRINCIPAL)
+	{
+		if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
+		{
+			m_world.m_threadcontinue = false;
+			Stop();
+		}
+		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
+		{
+			m_menu = new Menu(SM_SETTINGS);
+		}
+	}
+	else if (m_menu->m_currentMenu == SM_SETTINGS)
+	{
+
+	}
 }
 
 void Engine::RenderFastInventory() const
