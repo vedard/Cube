@@ -1328,7 +1328,7 @@ void Engine::DrawMenuSettings() const
 	rCrossColor = std::to_string(m_settings.m_crossblue);
 	mouseSensivity = std::to_string(m_settings.m_mousesensibility);
 
-	if (m_settings.m_fullscreen == true)
+	if (m_settings.m_isfullscreen == true)
 		fullscreen = "True";
 	else
 		fullscreen = "False";
@@ -1395,8 +1395,8 @@ void Engine::DrawMenuSettings() const
 	DrawMenuButton(MS_CROSSCOLOR_G, rCrossColor, column4Width, (Height() / 2));
 	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 4));
 	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
-	DrawMenuButton(MS_MOUSE_SENSIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
-	DrawMenuButton(MS_MOUSE_SENSIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight / 2));
 
 
 	glDisable(GL_BLEND);
@@ -1435,7 +1435,50 @@ void Engine::ManageMenuEnterKeyPress()
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS)
 	{
+		if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
+		{
+			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+			m_settings.Save();
+			SetFullscreen(IsFullscreen());
+		}
+		else if (m_menu->m_currentMenuItem == MS_WIDTH)
+		{
 
+		}
+		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MS_VSYNC)
+		{
+			m_settings.m_vsync = !m_settings.m_vsync;
+			m_settings.Save();
+			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+		}
+		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
+		{
+
+		}
 	}
 }
 
