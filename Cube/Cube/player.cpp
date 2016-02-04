@@ -251,6 +251,11 @@ void Player::CheckUnderLava(World &world)
 		m_footUnderLava = false;
 }
 
+void Player::ResetDeath()
+{
+	m_headWasUnderwater = false;
+}
+
 void Player::ApplyRotation() const
 {
 	glMatrixMode(GL_MODELVIEW);
@@ -364,6 +369,7 @@ bool Player::Shoot(World &world)
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::footUnderwater() const { return m_footUnderwater; }
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
@@ -388,22 +394,21 @@ void Player::Tick()
 			//isHurt = 20;
 		}
 	}
-	else
-		m_BreathCount = 0;
-
 
 }
 
-void Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
+bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
+	bool b = false;
 	if (InvulnerabilityTimer <= 0)
 	{
-		Character::GetDamage(damage, ignoreArmor, godMode);
+		b = Character::GetDamage(damage, ignoreArmor, godMode);
 		if (!godMode)
 		{
 			isHurt = 20;
 			InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
 		}
 	}
+	return b;
 }
 

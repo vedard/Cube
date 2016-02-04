@@ -191,7 +191,7 @@ bool Character::Attack(Character * character)
 	return Attack(character, m_AttackDamage);
 }
 
-void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
+bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
 	if (!godMode)
 	{
@@ -215,6 +215,7 @@ void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 			std::cout << m_Name << " died." << std::endl;
 		}
 	}
+	return m_isAlive;
 }
 
 void Character::Jump()

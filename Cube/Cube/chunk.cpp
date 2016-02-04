@@ -189,8 +189,11 @@ void Chunk::Update(BlockInfo* &binfo)
 			std::cout << "[ Chunk :: Update ] Chunk data truncaned , too much vertices to have a 16 bit index " << std::endl;
 		}
 
-		m_chunkMesh.SetMeshData(vds, count_s);
-		m_transparentMesh.SetMeshData(vdt, count_t);
+		if (!Parametre::GetInstance().m_isServer)
+		{
+			m_chunkMesh.SetMeshData(vds, count_s);
+			m_transparentMesh.SetMeshData(vdt, count_t);
+		}
 		delete[] vds;
 		delete[] vdt;
 		if (m_isDirty)
@@ -318,13 +321,13 @@ bool Chunk::CheckFace(BlockType type, const Vector3<float> &Blockpos, const Vect
 	BlockType faceType = GetBlock(Blockpos.x + face.x, Blockpos.y + face.y, Blockpos.z + face.z);
 
 
-	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE 
+	if (faceType == BTYPE_AIR || faceType == BTYPE_LEAVE
 		|| (
-			(16 <= faceType && faceType <= 25) 
+			(16 <= faceType && faceType <= 25)
 			&& (type < 16 || type > 25)
-			) 
+			)
 		|| (
-			(16 > faceType || faceType > 25) 
+			(16 > faceType || faceType > 25)
 			&& (type >= 16 && type <= 25)
 			)
 		||

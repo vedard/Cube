@@ -36,6 +36,11 @@ Engine::~Engine()
 
 void Engine::Init()
 {
+	if (m_settings.m_isServer)
+	{
+		return;
+	}
+
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
@@ -83,6 +88,14 @@ void Engine::Init()
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
 	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 
+	//Shader
+	std::cout << "Loading and compiling shaders ..." << std::endl;
+	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
+	{
+		std::cout << "Failed to load shader " << std::endl;
+		exit(1);
+	}
+
 	CenterMouse();
 	HideCursor();
 }
@@ -94,86 +107,92 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
-	//Load texture qui ne sont pas dans l'atlas
-	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
-	LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
 	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
 
-	//Load texture dans l'atlas
-	AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
-	AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp", 1);
-	AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp", 1);
-	AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp", 1);
-	AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp", 1);
-	AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp", 1);
-	AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp", 1);
-	AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp", 1);
-	AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp", 1);
-	AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp", 1);
-	AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp", 1);
-	AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp", 1);
-	AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp", 1);
-	AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp", 1);
-	AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png", 1);
-	AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png", 1);
-	AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp", 1);
-	AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
-	AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
-
-	AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
-	AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
-	AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
-	AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
-
-	AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .90f);
-	AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
-	AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
-	AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 
 
-	if (!m_textureAtlas.Generate(64, false))
+	if (!m_settings.m_isServer)
 	{
-		std::cout << " Unable to generate texture atlas ..." << std::endl;
-		abort();
+		//Load texture qui ne sont pas dans l'atlas
+		LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
+		LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
+
+		//Load texture dans l'atlas
+		AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
+		AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp", 1);
+		AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp", 1);
+		AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp", 1);
+		AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp", 1);
+		AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp", 1);
+		AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp", 1);
+		AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp", 1);
+		AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp", 1);
+		AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp", 1);
+		AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp", 1);
+		AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp", 1);
+		AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp", 1);
+		AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp", 1);
+		AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png", 1);
+		AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png", 1);
+		AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp", 1);
+		AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
+		AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
+
+		AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
+		AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
+		AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
+		AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
+
+		AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .90f);
+		AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
+		AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
+		AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
+
+
+		if (!m_textureAtlas.Generate(64, false))
+		{
+			std::cout << "Unable to generate texture atlas ..." << std::endl;
+			abort();
+		}
+
+		//Audio
+		std::cout << " Loading audio ..." << std::endl;
+		Sound::AddSound(Sound::M9_FIRE, WEAPONS_PATH "glock18-1.wav");
+		Sound::AddSound(Sound::MP5K_FIRE, WEAPONS_PATH "mp7-1.wav");
+		Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
+		Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
+		Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
+		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
+		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
+		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		for (int i = 0; i < 6; i++)
+		{
+			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+			if (i < 4)
+			{
+				Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+			}
+		}
+
+		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+			abort();
+		m_music.setLoop(true);
+		m_music.setVolume(m_settings.m_musicvolume);
+		m_music.play();
+
+
+		//Model 3d
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 	}
-
-	//Audio
-	std::cout << " Loading audio ..." << std::endl;
-	Sound::AddSound(Sound::M9_FIRE, AUDIO_PATH "glock18-1.wav");
-	Sound::AddSound(Sound::MP5K_FIRE, AUDIO_PATH "mp7-1.wav");
-	Sound::AddSound(Sound::AK47_FIRE, AUDIO_PATH "ak47-1.wav");
-	Sound::AddSound(Sound::GUN_DRAW, AUDIO_PATH "glock_draw.wav");
-	Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
-	Sound::AddSound(Sound::MUSIC1, AUDIO_PATH "music.wav");
-
-
-	for (int i = 0; i < 6; i++)
-		Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
-
-	//if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
-	//	abort();
-	//m_music.setLoop(true);
-	//m_music.setVolume(10);
-	//m_music.play();
-
-
-	//Model 3d
-	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
 	//Gun
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100, 0.2);
-	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40, 0.4);
-
-	//Shader
-	std::cout << " Loading and compiling shaders ..." << std::endl;
-	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
-	{
-		std::cout << " Failed to load shader " << std::endl;
-		exit(1);
-	}
-	
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
+	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 40, 0.4);
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
@@ -242,6 +261,7 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 }
+
 void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
@@ -361,11 +381,6 @@ void Engine::Render(float elapsedTime)
 		m_fps = (int)round(1.f / elapsedTime);
 
 	int loops = 0;
-	/*if (m_firstMusic)
-	{
-		m_firstMusic = false;
-		//Sound::Play(Sound::MUSIC1);
-	}*/
 
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
@@ -376,7 +391,14 @@ void Engine::Render(float elapsedTime)
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
 		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 		{
-			Sound::Play(Sound::STEP1 + rand() % 6, 12);
+			if (m_world.GetPlayer()->footUnderwater())
+			{
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4, m_settings.m_soundvolume);
+			}
+			else
+			{
+				Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
+			}
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
@@ -422,15 +444,22 @@ void Engine::Render(float elapsedTime)
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
-	GetBlocAtCursor();
-	DrawEnvironement(gameTime);
+
+	if (!m_settings.m_isServer)
+	{
+		GetBlocAtCursor();
+		DrawEnvironement(gameTime);
+	}
 }
 
 void Engine::KeyPressEvent(unsigned char key)
 {
 
 	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
+	{
+
 		m_keyboard[key] = false;
+	}
 	else
 	{
 		//update le teableau
@@ -439,8 +468,9 @@ void Engine::KeyPressEvent(unsigned char key)
 
 
 	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
+	{
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
-
+	}
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -504,14 +534,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		//1 -> W_BLOCK 
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
-
-		//2 ->  W_PISTOL
-		if (m_keyboard[m_settings.m_inventory2])
-		{
-			m_world.GetPlayer()->SetWeapon(W_PISTOL);
-			Sound::Play(Sound::GUN_DRAW);
-
-		}
 		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory3])
 		{
@@ -528,11 +550,13 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{
 			for (int i = 0; i < MAX_MONSTER; i++)
+			{
 				if (!m_world.GetMonster()[i].GetisAlive())
 				{
 					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
+			}
 
 		}
 		//y -> toggle wireframe mode
@@ -549,7 +573,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_info])
 		{
 			displayInfo = !displayInfo;
-
 		}
 		//Lshift + F5 -> delete Cache
 		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
@@ -601,9 +624,6 @@ void Engine::KeyPressEvent(unsigned char key)
 			}
 	}
 }
-
-
-
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
@@ -723,6 +743,9 @@ void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
 
 bool Engine::LoadTexture(Texture& texture, const std::string& filename, bool stopOnError)
 {
+	if (m_settings.m_isServer)
+		return false;
+
 	texture.Load(filename);
 	if (!texture.IsValid())
 	{
