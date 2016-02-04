@@ -28,7 +28,7 @@ void Inventory::AddItemQ(BlockType type, int number)
 {
 	bool isAdded = false;
 
-	for each (Item var in m_objets)
+	for (Item var : m_objets)
 	{
 		if (var.GetType() == type)
 		{
@@ -40,7 +40,7 @@ void Inventory::AddItemQ(BlockType type, int number)
 
 	if (!isAdded)
 	{
-		for each (Item var in m_objets)
+		for (Item var : m_objets)
 		{
 			if (var.GetQuantity() == 0)
 			{
@@ -58,7 +58,7 @@ bool Inventory::RemoveItemQ(BlockType type)
 
 bool Inventory::RemoveItemQ(BlockType type, int number)
 {
-	for each (Item var in m_objets)
+	for (Item var : m_objets)
 	{
 		if (var.GetType() == type && var.GetQuantity() > 0)
 		{
@@ -72,7 +72,7 @@ bool Inventory::RemoveItemQ(BlockType type, int number)
 bool Inventory::RemoveItemALL(BlockType type)
 {
 	SortInventory();
-	for each (Item var in m_objets)
+	for  (Item var : m_objets)
 	{
 		if (var.GetType() == type && var.GetQuantity() > 0)
 		{
