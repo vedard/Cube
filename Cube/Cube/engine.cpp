@@ -350,9 +350,8 @@ void Engine::DrawEnvironement(float gameTime) {
 			DrawMenuPrincipal();
 		else if (m_menu->m_currentMenu == SM_SETTINGS)
 			DrawMenuSettings();
-
-		if (m_isTyping == true)
-			DrawCurrentSettingTyped();
+		else if (m_menu->m_currentMenu == SM_SETTING_CHOICES)
+			DrawMenuSettingSelected();
 	}
 }
 
@@ -470,7 +469,6 @@ void Engine::KeyPressEvent(unsigned char key)
 			{
 				m_isMenuOpen = false;
 				HideCursor();
-				m_menu->m_settingTyped = "";
 				m_isTyping = false;
 			}
 		}
@@ -495,7 +493,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		{
 			if (m_isTyping)
 			{
-				m_menu->m_settingTyped += key;
+				
 			}
 			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
@@ -1460,9 +1458,8 @@ void Engine::ManageMenuEnterKeyPress()
 			}
 			else if (m_menu->m_currentMenuItem == MS_WIDTH)
 			{
-				m_isTyping = true;
-				m_menu->m_settings = "Width";
-				m_menu->m_settingTyped = "";
+				m_menu = new Menu(SM_SETTING_CHOICES);
+				m_menu->m_setting = "Width";
 			}
 			else if (m_menu->m_currentMenuItem == MS_HEIGHT)
 			{
@@ -1502,11 +1499,13 @@ void Engine::ManageMenuEnterKeyPress()
 	}
 }
 
-void Engine::DrawCurrentSettingTyped()
+void Engine::DrawMenuSettingSelected(std::string options[], int size)
 {
 	// Menu specs
-	int menuWidth = 100;
-	int menuHeight = 40;
+	int menuWidth = 70;
+	int menuHeight = 120;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
 
 	glEnable(GL_TEXTURE_2D);
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -1521,8 +1520,12 @@ void Engine::DrawCurrentSettingTyped()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
 	// Zone menu
-	glColor4f(0.1f, 0.1f, 0.1f, 1.f);
+	glColor4f(0.f, 0.f, 0.f, 1.f);
 	glBegin(GL_QUADS);
 	glVertex2i(-menuWidth, -menuHeight);
 	glVertex2i(menuWidth, -menuHeight);
@@ -1532,13 +1535,12 @@ void Engine::DrawCurrentSettingTyped()
 
 	// Préparer le font pour écrire dans le menu
 	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
 
-	// Translate au centre pour y dessiner le menu
-	glLoadIdentity();
-	glColor3f(1.f, 0.f, 0.f);
-
-	PrintText(Width() / 2, Height() / 2, 16.f, m_menu->m_settings);
-	PrintText(Width() / 2 - menuWidth + 10, Height() / 2 - menuHeight, 12.f, m_menu->m_settingTyped);
+	for (size_t i = 0; i < size; i++)
+	{
+		
+	}
 
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);

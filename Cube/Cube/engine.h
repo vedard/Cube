@@ -62,7 +62,7 @@ private:
 	void DrawMenuSettings() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
 	void ManageMenuEnterKeyPress();
-	void DrawCurrentSettingTyped();
+	void DrawMenuSettingSelected(std::string options[], int size);
 
 private:
 	bool m_wireframe;

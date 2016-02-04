@@ -117,7 +117,8 @@ enum WEAPONS {
 enum SOUS_MENU {
 	SM_PRINCIPAL,
 	SM_CONTROLS,
-	SM_SETTINGS
+	SM_SETTINGS,
+	SM_SETTING_CHOICES
 };
 
 // Buttons/states du menu principal
@@ -138,6 +139,22 @@ enum MENU_SETTINGS {
 	MS_CROSSCOLOR_G,
 	MS_CROSSCOLOR_B,
 	MS_MOUSE_SENSITIVITY
+};
+
+enum GAME_WIDTH {
+	GW_1920,
+	GW_1600,
+	GW_1440,
+	GW_1366,
+	GW_1280
+};
+
+enum GAME_HEIGHT {
+	GH_1080,
+	GH_1024,
+	GH_960,
+	GH_900,
+	GH_768
 };
 
 #endif // DEFINE_H__
