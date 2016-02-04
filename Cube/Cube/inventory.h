@@ -3,6 +3,7 @@
 
 #include "item.h"
 #include "define.h"
+#include <iostream>
 
 class Inventory
 {

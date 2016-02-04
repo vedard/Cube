@@ -22,6 +22,8 @@ public:
 	void Remove();
 	void Remove(int number);
 
+	void Empty();
+
 private:
 	int m_quantity;
 	BlockType m_type;

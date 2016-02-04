@@ -57,3 +57,9 @@ void Item::Remove(int number)
 	if (m_quantity > 0)
 		m_quantity -= number;
 }
+
+void Item::Empty()
+{
+	m_quantity = 0;
+	m_type = BTYPE_AIR;
+}

@@ -15,7 +15,7 @@ Inventory::~Inventory()
 
 	delete[] * m_objetsFast;								//freed memory
 
-	for (size_t i = 0; i < sizeof(m_objetsFast); i++)	//pointed dangling ptr to NULL
+	for (size_t i = 0; i < sizeof(m_objetsFast); i++)		//pointed dangling ptr to NULL
 		m_objetsFast[i] = NULL;
 }
 
@@ -53,7 +53,7 @@ void Inventory::AddItemQ(BlockType type, int number)
 
 bool Inventory::RemoveItemQ(BlockType type)
 {
-	this->RemoveItemQ(type, 1);
+	return this->RemoveItemQ(type, 1);
 }
 
 bool Inventory::RemoveItemQ(BlockType type, int number)
@@ -63,9 +63,24 @@ bool Inventory::RemoveItemQ(BlockType type, int number)
 		if (var.GetType() == type && var.GetQuantity() > 0)
 		{
 			var.Remove(number);
-			break;
+			return true;
 		}
 	}
+	return false;
+}
+
+bool Inventory::RemoveItemALL(BlockType type)
+{
+	SortInventory();
+	for each (Item var in m_objets)
+	{
+		if (var.GetType() == type && var.GetQuantity() > 0)
+		{
+			var.Remove(var.GetQuantity());
+			return true;
+		}
+	}
+	return false;
 }
 
 void Inventory::ReassignItemShortcut(int index_itemFast, int index_item)
@@ -81,6 +96,38 @@ void Inventory::SwitchItems(int index_item1, int index_item2)
 		Item tempItem = m_objets[index_item1];
 		m_objets[index_item1] = m_objets[index_item2];
 		m_objets[index_item2] = tempItem;
+	}
+}
+
+void Inventory::SortInventory()
+{
+	for (size_t j = 0; j < INVENTORY_SIZE; j++)
+	{
+		for (size_t i = j; i < j; i++)
+		{
+			if (i != j)
+			{
+				if (m_objets[i].GetType() == BTYPE_AIR || m_objets[i].GetQuantity() <= 0)
+				{
+					m_objets[i].Empty();
+					continue;
+				}
+				if (m_objets[i].GetType() == m_objets[j].GetType())
+				{
+					m_objets[j].Add(m_objets[i].GetQuantity());
+					m_objets[i].Remove(m_objets[i].GetQuantity());
+					m_objets[i].Empty();
+					continue;
+				}
+				if (m_objets[i].GetType() != m_objets[j].GetType() && m_objets[i].GetType() > m_objets[j].GetType())
+				{
+					Item swapItem = m_objets[i];
+					m_objets[i] = m_objets[j];
+					m_objets[j] = swapItem;
+					continue;
+				}
+			}
+		}
 	}
 }
 
