@@ -36,7 +36,9 @@ Engine::~Engine()
 void Engine::Init()
 {
 	if (m_settings.m_isServer)
+	{
 		return;
+	}
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
@@ -106,6 +108,7 @@ void Engine::LoadResource()
 {
 
 
+
 	if (!m_settings.m_isServer)
 	{
 		//Load texture qui ne sont pas dans l'atlas
@@ -151,24 +154,24 @@ void Engine::LoadResource()
 		}
 
 		//Audio
-		std::cout << "Loading audio ..." << std::endl;
-		Sound::AddSound(Sound::M9_FIRE, AUDIO_PATH "glock18-1.wav");
-		Sound::AddSound(Sound::MP5K_FIRE, AUDIO_PATH "mp7-1.wav");
-		Sound::AddSound(Sound::AK47_FIRE, AUDIO_PATH "ak47-1.wav");
-		Sound::AddSound(Sound::GUN_DRAW, AUDIO_PATH "glock_draw.wav");
-		Sound::AddSound(Sound::FLESH_IMPACT, AUDIO_PATH "cowhurt3.ogg");
-		Sound::AddSound(Sound::MUSIC1, AUDIO_PATH "music.wav");
-
+		std::cout << " Loading audio ..." << std::endl;
+		Sound::AddSound(Sound::M9_FIRE, WEAPONS_PATH "glock18-1.wav");
+		Sound::AddSound(Sound::MP5K_FIRE, WEAPONS_PATH "mp7-1.wav");
+		Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
+		Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
+		Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
+		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
+		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
+		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
 
 		for (int i = 0; i < 6; i++)
-			Sound::AddSound(Sound::STEP1 + i, AUDIO_PATH "grass" + std::to_string(i + 1) + ".wav");
+			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
 
-		//if (!m_music.openFromFile(AUDIO_PATH "music.wav"))
-		//	abort();
-		//m_music.setLoop(true);
-		//m_music.setVolume(10);
-		//m_music.play();
-
+		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+			abort();
+		m_music.setLoop(true);
+		m_music.setVolume(m_settings.m_musicvolume);
+		m_music.play();
 
 		//Model 3d
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
@@ -368,11 +371,6 @@ void Engine::Render(float elapsedTime)
 		m_fps = (int)round(1.f / elapsedTime);
 
 	int loops = 0;
-	if (m_firstMusic)
-	{
-		m_firstMusic = false;
-		//Sound::Play(Sound::MUSIC1);
-	}
 
 	//Lock les mouvements a 50 fps
 	while (gameTime > nextGameUpdate && loops < 10)
@@ -383,7 +381,7 @@ void Engine::Render(float elapsedTime)
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
 		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 		{
-			Sound::Play(Sound::STEP1 + rand() % 6, 12);
+			Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
@@ -515,13 +513,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
 
-		//2 ->  W_PISTOL
-		if (m_keyboard[m_settings.m_inventory2])
-		{
-			m_world.GetPlayer()->SetWeapon(W_PISTOL);
-			Sound::Play(Sound::GUN_DRAW);
-
-		}
 		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory3])
 		{

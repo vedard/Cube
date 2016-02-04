@@ -62,6 +62,12 @@ typedef long long int64;
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
+#define MUSIC_PATH	"../Cube/media/audio/music/"
+#define WEAPONS_PATH	"../Cube/media/audio/weapons/"
+#define WALK_PATH	"../Cube/media/audio/walk/"
+#define HURT_PATH	"../Cube/media/audio/hurt/"
+
+
 #define MODEL_PATH	"../Cube/media/model/"
 #define TICK_DELAY .5f
 #define TICK_DELAY_WATER .2f

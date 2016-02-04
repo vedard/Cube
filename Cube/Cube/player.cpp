@@ -362,15 +362,32 @@ bool Player::Underwater() const { return m_headUnderwater; }
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
-	if (m_footUnderLava)
- 		GetDamage(5, true, m_godMode);
-	if (m_headUnderwater)
+	if (!m_godMode)
 	{
-		m_BreathCount++;
-		if (m_BreathCount > 15)
-			GetDamage(3, true, m_godMode);
+		if (m_footUnderLava)
+			GetDamage(5, true, m_godMode);
+		if (m_headUnderwater)
+		{
+			m_BreathCount++;
+			if (m_BreathCount > 15)
+			{
+				GetDamage(3, true, m_godMode);
+				std::cout << "Playing sound DROWNING" << std::endl;
+				Sound::PlayOnce(Sound::DROWNING);
+				m_headWasUnderwater = true;
+			}
+		}
+		else
+		{
+			m_BreathCount = 0;
+			if (m_headWasUnderwater)
+			{
+				m_headWasUnderwater = false;
+				std::cout << "Playing sound GASPING" << std::endl;
+				Sound::PlayOnce(Sound::GASPING);
+			}
+		}
 	}
-	else
-		m_BreathCount = 0;
+	
 
 }

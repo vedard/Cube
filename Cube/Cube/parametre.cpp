@@ -13,13 +13,11 @@ Parametre Parametre::m_instance = Parametre();
 
 Parametre::Parametre()
 {
-	cout << "Creation des paramètres" << endl;
 	Load();
 }
 
 Parametre::~Parametre()
 {
-	cout << "Destruction des paramètres" << endl;
 }
 
 Parametre& Parametre::GetInstance()
@@ -31,7 +29,7 @@ void Parametre::Save()
 {
 	ofstream myfile;
 	myfile.open("Cube.conf");
-	
+
 	std::cout << "Saving changes on config file" << std::endl;
 
 	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
@@ -42,7 +40,7 @@ void Parametre::Save()
 	myfile << "vsync " << ((m_vsync) ? "true" : "false") << "\n";
 	myfile << "render_distance " << m_renderdistance << "\n";
 	myfile << "cross_color_r " << m_crossred << "\n";
-	myfile << "cross_color_g "<< m_crossgreen << "\n";
+	myfile << "cross_color_g " << m_crossgreen << "\n";
 	myfile << "cross_color_b " << m_crossblue << "\n";
 	myfile << "mouse_sensibility " << m_mousesensibility << "\n";
 	myfile << "btnavancer " << m_avancer << "\n";
@@ -55,13 +53,15 @@ void Parametre::Save()
 	myfile << "btnrun " << m_run << "\n";
 	myfile << "btnjump " << m_jump << "\n";
 	myfile << "btnnoclip " << m_noclip << "\n";
-	myfile << "btninventory1 "<< m_inventory1 << "\n";
+	myfile << "btninventory1 " << m_inventory1 << "\n";
 	myfile << "btninventory2 " << m_inventory2 << "\n";
 	myfile << "btninventory3 " << m_inventory3 << "\n";
 	myfile << "btninventory4 " << m_inventory4 << "\n";
 	myfile << "btninventory " << m_openinventory << "\n";
 	myfile << "btnspawnmonster " << m_spawnmonster << "\n";
 	myfile << "btnwireframe " << m_wireframe << "\n";
+	myfile << "musicvolume " << m_musicvolume << "\n";
+	myfile << "soundvolume " << m_soundvolume << "\n";
 
 	myfile.close();
 	Load();
@@ -73,7 +73,7 @@ void Parametre::SaveDefault()
 	myfile.open("Cube.conf");
 	std::cout << "Creating config save file" << std::endl;
 
-	myfile << "server " << "false" << "\n";
+	myfile << "server" << "false" << "\n";
 	myfile << "fullscreen false \n";
 	myfile << "width 1360 \n";
 	myfile << "height 768 \n";
@@ -101,6 +101,9 @@ void Parametre::SaveDefault()
 	myfile << "btninventory 8 \n";
 	myfile << "btnspawnmonster 12 \n";
 	myfile << "btnwireframe 24 \n";
+	myfile << "musicvolume 10 \n";
+	myfile << "soundvolume 12 \n";
+
 
 	myfile.close();
 	Load();
@@ -125,7 +128,7 @@ void Parametre::Load()
 	}
 	else
 	{
-		Array2d<std::string> setting(28, 2);
+		Array2d<std::string> setting(100, 2);
 		setting.Reset("null");
 		setting.Get(0, 0) = "width";
 		setting.Get(1, 0) = "height";
@@ -155,6 +158,8 @@ void Parametre::Load()
 		setting.Get(25, 0) = "btnspawnmonster";
 		setting.Get(26, 0) = "btnwireframe";
 		setting.Get(27, 0) = "server";
+		setting.Get(28, 0) = "musicvolume";
+		setting.Get(29, 0) = "soundvolume";
 
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
@@ -176,7 +181,7 @@ void Parametre::Load()
 			if (index != -1)
 				ss >> setting.Get(setting.GetIndex(temp), 1);
 		}
-		if (cpt <= 27)
+		if (cpt <= 29)
 		{
 			cout << "File incomplete, recreating";
 			SaveDefault();
@@ -249,5 +254,9 @@ void Parametre::Load()
 			m_isServer = true;
 		else
 			m_isServer = false;
+		if (setting.Get(28, 1) != "null")
+			m_musicvolume = (sf::Keyboard::Key)atoi(setting.Get(27, 1).c_str());
+		if (setting.Get(29, 1) != "null")
+			m_soundvolume = (sf::Keyboard::Key)atoi(setting.Get(28, 1).c_str());
 	}
 }
