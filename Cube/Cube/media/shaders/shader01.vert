@@ -1,3 +1,4 @@
+# version 440 compatibility
 varying vec4 light;
 uniform float gameTime;
 attribute float type;
