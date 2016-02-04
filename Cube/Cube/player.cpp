@@ -246,6 +246,11 @@ void Player::CheckUnderLava(World &world)
 		m_footUnderLava = false;
 }
 
+void Player::ResetDeath()
+{
+	m_headWasUnderwater = false;
+}
+
 void Player::ApplyRotation() const
 {
 	glMatrixMode(GL_MODELVIEW);
@@ -359,13 +364,19 @@ bool Player::Shoot(World &world)
 }
 
 bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::footUnderwater() const { return m_footUnderwater; }
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
 	if (!m_godMode)
 	{
 		if (m_footUnderLava)
-			GetDamage(5, true, m_godMode);
+		{
+			if (GetDamage(5, true, m_godMode))
+			{
+
+			}
+		}
 		if (m_headUnderwater)
 		{
 			m_BreathCount++;
@@ -388,6 +399,4 @@ void Player::Tick()
 			}
 		}
 	}
-	
-
 }

@@ -149,7 +149,13 @@ void Engine::LoadResource()
 
 
 	for (int i = 0; i < 6; i++)
+	{
 		Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+		if (i < 4)
+		{
+			Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+		}
+	}
 
 	if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
 		abort();
@@ -369,7 +375,14 @@ void Engine::Render(float elapsedTime)
 		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
 		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 		{
-			Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
+			if (m_world.GetPlayer()->footUnderwater())
+			{
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4, m_settings.m_soundvolume);
+			}
+			else
+			{
+				Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
+			}
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
@@ -422,7 +435,10 @@ void Engine::Render(float elapsedTime)
 void Engine::KeyPressEvent(unsigned char key)
 {
 	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
+	{
+
 		m_keyboard[key] = false;
+	}
 	else
 	{
 		//update le teableau
@@ -431,8 +447,9 @@ void Engine::KeyPressEvent(unsigned char key)
 
 
 	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
+	{
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
-
+	}
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -496,9 +513,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		//1 -> W_BLOCK 
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
-
-					}
-		}
 		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory3])
 		{
@@ -515,11 +529,13 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{
 			for (int i = 0; i < MAX_MONSTER; i++)
+			{
 				if (!m_world.GetMonster()[i].GetisAlive())
 				{
 					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
+			}
 
 		}
 		//y -> toggle wireframe mode
@@ -536,7 +552,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_info])
 		{
 			displayInfo = !displayInfo;
-
 		}
 		//Lshift + F5 -> delete Cache
 		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
