@@ -27,6 +27,7 @@ public:
 	bool Shoot(World &world);
 
 	bool Underwater() const;
+	bool footUnderwater() const;
 	bool UnderLava() const;
 
 	BlockType GetBlock() const;
@@ -42,7 +43,7 @@ public:
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
-
+	void ResetDeath();
 private:
 	bool m_godMode;
 	time_t m_TickBegin;     //timer de tick
