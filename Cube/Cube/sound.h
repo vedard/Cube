@@ -1,5 +1,6 @@
 #ifndef SOUND_H__
 #define SOUND_H__
+#include "parametre.h"
 #include "define.h"
 #include "vector3.h"
 
