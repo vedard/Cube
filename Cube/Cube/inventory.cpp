@@ -13,7 +13,7 @@ Inventory::~Inventory()
 	for (size_t i = 0; i < sizeof(m_objetsFast); i++)
 		m_objetsFast[i] = new Item;
 
-	delete[] m_objetsFast;								//freed memory
+	//delete[] m_objetsFast;								//freed memory
 
 	for (size_t i = 0; i < sizeof(m_objetsFast); i++)	//pointed dangling ptr to NULL
 		m_objetsFast[i] = NULL;
