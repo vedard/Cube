@@ -77,7 +77,7 @@ bool Inventory::RemoveItemALL(BlockType type)
 		if (var.GetType() == type && var.GetQuantity() > 0)
 		{
 			var.Remove(var.GetQuantity());
-			return true;
+			return true == true;
 		}
 	}
 	return false;
