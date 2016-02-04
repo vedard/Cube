@@ -23,6 +23,8 @@ Engine::Engine() :
 	m_bInfo = new BlockInfo[256];
 
 	m_isMenuOpen = false;
+
+	m_isTyping = false;
 }
 
 Engine::~Engine()
@@ -1324,8 +1326,8 @@ void Engine::DrawMenuSettings() const
 	antiAliasing = std::to_string(m_settings.m_antialiasing) + "x";
 	renderDistance = std::to_string(m_settings.m_renderdistance);
 	rCrossColor = std::to_string(m_settings.m_crossred);
-	rCrossColor = std::to_string(m_settings.m_crossgreen);
-	rCrossColor = std::to_string(m_settings.m_crossblue);
+	gCrossColor = std::to_string(m_settings.m_crossgreen);
+	bCrossColor = std::to_string(m_settings.m_crossblue);
 	mouseSensivity = std::to_string(m_settings.m_mousesensibility);
 
 	if (m_settings.m_isfullscreen == true)
@@ -1367,6 +1369,10 @@ void Engine::DrawMenuSettings() const
 
 	// Préparer le font pour écrire dans le menu
 	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	// Dessiner le titre
+	PrintText(Width() / 2 - 60, (Height() / 2) + (menuHeight / 2) + (menuHeight / 4), 20.f, "Settings");
 
 	int column1Width = (Width() / 2) - menuWidth + 40;
 	int column2Width = (Width() / 2) - (menuWidth / 2);
@@ -1374,8 +1380,6 @@ void Engine::DrawMenuSettings() const
 	int column4Width = (Width() / 2) + menuWidth - (menuWidth / 4);
 
 	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
-	glColor3f(0.5f, 0.5f, 0.5f);
-
 	DrawMenuButton(MS_FULLSCREEN, "Fullscreen", column1Width, (Height() / 2) + (menuHeight / 2));
 	DrawMenuButton(MS_FULLSCREEN, fullscreen, column2Width, (Height() / 2) + (menuHeight / 2));
 	DrawMenuButton(MS_WIDTH, "Width", column1Width, (Height() / 2) + (menuHeight / 4));
@@ -1392,7 +1396,7 @@ void Engine::DrawMenuSettings() const
 	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2) + (menuHeight / 4));
 	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2) + (menuHeight / 4));
 	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2));
-	DrawMenuButton(MS_CROSSCOLOR_G, rCrossColor, column4Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_G, gCrossColor, column4Width, (Height() / 2));
 	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 4));
 	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
 	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
@@ -1443,7 +1447,7 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_WIDTH)
 		{
-
+			
 		}
 		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
 		{

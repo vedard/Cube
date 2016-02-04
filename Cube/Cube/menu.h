@@ -15,6 +15,10 @@ public:
 private:
 	int m_menuItemsAmount;
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
+
+	// Settings
+	int m_settingi; // Sera utilisé lorsque l'utilisateur changera n'importe quel setting int dans le menu
+	float m_settingf;
 };
 
 #endif
