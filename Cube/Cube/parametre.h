@@ -43,6 +43,11 @@ public:
 	float m_crossblue = 0.0f;
 
 	float m_mousesensibility = 0.1f;
+
+	//Sound
+	int m_musicvolume = 10;
+	int m_soundvolume = 12;
+
 	void Save();
 
 private:

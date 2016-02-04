@@ -51,6 +51,7 @@ private:
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
+	bool m_headWasUnderwater = false; // Si le joueur vient de sortir de l'eau.
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	bool m_headUnderLava; // Si le joueur est sous la lave
 	bool m_kneeUnderwater;  // Si le joueur est sous l'eau
