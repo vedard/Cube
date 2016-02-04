@@ -52,14 +52,14 @@ private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
+	void DrawHurtEffect() const;
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
-	void DrawMenu() const;
-	void DrawMenuButton(int translateX, int translateY, float r, float g, float b, int width, int height, std::string texte) const;
+	void DrawMenuPrincipal() const;
 
 private:
 	bool m_wireframe;
@@ -76,6 +76,7 @@ private:
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
+	Texture m_effectHurt;
 
 	int m_fastInventoryKeySelected;
 	

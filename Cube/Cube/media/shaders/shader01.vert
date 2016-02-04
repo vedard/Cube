@@ -1,3 +1,4 @@
+
 varying vec4 light;
 
 uniform float gameTime;
@@ -10,8 +11,7 @@ void main()
 	
     light = gl_Color;
     gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;		
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+
 	//Si le vertex est un BTYPE_WATER ou  on fait des vague
 	if(type == 16.0 )
 	{
