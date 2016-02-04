@@ -12,7 +12,9 @@ m_running(false),
 m_block(BTYPE_GRASS),
 m_footUnderwater(false),
 m_headUnderwater(false),
-m_HeadShake(0)
+m_HeadShake(0),
+isHurt(0),
+InvulnerabilityTimer(0)
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -167,7 +169,10 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
-					GetDamage(exp(m_vitesse.y * 6), false,m_godMode);
+				{
+					GetDamage(exp(m_vitesse.y * 6), false, m_godMode);
+					//isHurt = 20;
+				}
 			}
 			
 			//annule
@@ -368,35 +373,42 @@ bool Player::footUnderwater() const { return m_footUnderwater; }
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
-	if (!m_godMode)
-	{
-		if (m_footUnderLava)
-		{
-			if (GetDamage(5, true, m_godMode))
-			{
+	if (isHurt > 0)
+		isHurt--;
 
-			}
-		}
-		if (m_headUnderwater)
+
+	if (InvulnerabilityTimer > 0)
+		InvulnerabilityTimer -= TICK_DELAY;
+
+	if (m_footUnderLava)
+	{
+		GetDamage(2, true, m_godMode);
+		//isHurt = 20;
+	}
+	if (m_headUnderwater)
+	{
+		m_BreathCount++;
+		if (m_BreathCount > 30)
 		{
-			m_BreathCount++;
-			if (m_BreathCount > 15)
-			{
-				GetDamage(3, true, m_godMode);
-				std::cout << "Playing sound DROWNING" << std::endl;
-				Sound::PlayOnce(Sound::DROWNING);
-				m_headWasUnderwater = true;
-			}
-		}
-		else
-		{
-			m_BreathCount = 0;
-			if (m_headWasUnderwater)
-			{
-				m_headWasUnderwater = false;
-				std::cout << "Playing sound GASPING" << std::endl;
-				Sound::PlayOnce(Sound::GASPING);
-			}
+			GetDamage(1, true, m_godMode);
+			//isHurt = 20;
 		}
 	}
+
 }
+
+bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
+{
+	bool b = false;
+	if (InvulnerabilityTimer <= 0)
+	{
+		b = Character::GetDamage(damage, ignoreArmor, godMode);
+		if (!godMode)
+		{
+			isHurt = 20;
+			InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+		}
+	}
+	return b;
+}
+

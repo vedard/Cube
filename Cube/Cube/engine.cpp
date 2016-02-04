@@ -3,6 +3,7 @@
 Engine::Engine() :
 	m_wireframe(false),
 	m_shader01(),
+	m_shader02(),
 	m_textureAtlas(NUMBER_OF_BLOCK - 1),
 	m_world(),
 	m_currentBlock(-1, -1, -1),
@@ -106,6 +107,7 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
+	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
 
 
 
@@ -256,12 +258,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Update eau
-	if (gameTime - m_LastTickTimeWater >= TICK_DELAY_WATER)
-	{
-		m_LastTickTimeWater = gameTime;
-		//m_world
-	}
+
 
 }
 
@@ -295,6 +292,10 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
+
+	m_shader02.Use();
+
+
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
@@ -339,10 +340,13 @@ void Engine::DrawEnvironement(float gameTime) {
 		DrawFocusedBlock();
 
 
+
 	//Draw le hui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	DrawHud();
+	if (m_world.GetPlayer()->isHurt > 0)
+		DrawHurtEffect();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -450,6 +454,7 @@ void Engine::Render(float elapsedTime)
 
 void Engine::KeyPressEvent(unsigned char key)
 {
+
 	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
 	{
 
@@ -613,7 +618,10 @@ void Engine::KeyPressEvent(unsigned char key)
 
 		if (!m_world.GetPlayer()->GetisAlive())
 			if (m_keyboard[sf::Keyboard::Return])
+			{
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
+				m_world.GetPlayer()->isHurt = 0;
+			}
 	}
 }
 
@@ -1346,3 +1354,119 @@ void Engine::RenderFastInventory() const
 		glEnd();
 	}
 }
+
+
+void Engine::DrawHurtEffect() const
+{
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+
+	m_effectHurt.Bind();
+	//static const int crossSize = 800;
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+	int ishurt = m_world.GetPlayer()->isHurt;
+	int diviseur = 1;
+	switch (ishurt)
+	{
+	case 20:
+		diviseur = 54;
+		break;
+	case 19:
+		diviseur = 48;
+		break;
+	case 18:
+		diviseur = 40;
+		break;
+	case 17:
+		diviseur = 37;
+		break;
+	case 16:
+		diviseur = 35;
+		break;
+	case 15:
+		diviseur = 31;
+		break;
+	case 14:
+		diviseur = 29;
+		break;
+	case 13:
+		diviseur = 26;
+		break;
+	case 12:
+		diviseur = 24;
+		break;
+	case 11:
+		diviseur = 21;
+		break;
+	case 10:
+		diviseur = 19;
+		break;
+	case 9:
+		diviseur = 16;
+		break;
+	case 8:
+		diviseur = 14;
+		break;
+	case 7:
+		diviseur = 11;
+		break;
+	case 6:
+		diviseur = 9;
+		break;
+	case 5:
+		diviseur = 6;
+		break;
+	case 4:
+		diviseur = 4;
+		break;
+	case 3:
+		diviseur = 3;
+		break;
+	case 2:
+		diviseur = 2;
+		break;
+	case 1:
+		diviseur = 1;
+		break;
+
+
+
+
+
+	}
+	glTexCoord2f(0, 0);
+	glVertex2i(-(Width() / diviseur), -(Height() / diviseur));
+	glTexCoord2f(1, 0);
+	glVertex2i(Width() + (Width() / diviseur), -(Height() / diviseur));
+	glTexCoord2f(1, 1);
+	glVertex2i(Width() + (Width() / diviseur), Height() + (Height() / diviseur));
+	glTexCoord2f(0, 1);
+	glVertex2i(-(Width() / diviseur), Height() + (Height() / diviseur));
+	
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glEnable(GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	
+}
+

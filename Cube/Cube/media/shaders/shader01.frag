@@ -2,7 +2,7 @@ uniform sampler2D tex;
 varying vec4 light;
 uniform bool underwater;
 uniform bool underlava;
-
+uniform bool hurt;
 
 void main()
 {
@@ -32,6 +32,9 @@ void main()
 		texel.g -= 0.25;
 		texel.b -= 0.50;
 	}
+	if(hurt)
+	{
+	
+	}
     gl_FragColor = texel;
-
 }
