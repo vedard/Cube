@@ -310,9 +310,9 @@ void Player::AddToInventory(BlockType type)
 	m_inventory.get()->AddItemQ(type);
 }
 
-void Player::RemoveFromInventory(BlockType type)
+bool Player::RemoveFromInventory(BlockType type)
 {
-	m_inventory.get()->RemoveItemQ(type);
+	return m_inventory.get()->RemoveItemQ(type);
 }
 
 BlockType Player::GetBlock() const { return m_block; }

@@ -40,7 +40,7 @@ public:
 	void SetRunning(bool running);
 
 	void AddToInventory(BlockType type);
-	void RemoveFromInventory(BlockType type);
+	bool RemoveFromInventory(BlockType type);
 
 private:
 	void CheckUnderwater(World &world);

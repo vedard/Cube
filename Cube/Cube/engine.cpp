@@ -657,8 +657,9 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
 
 				//AddToInventory
-				//Add Block to Player Inventory BEFORE removal in the world
-				m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
+				//Add Block to Player Inventory BEFORE removal in the world. IF the inventory is not in creative mode
+				if (!IS_INVENTORY_CREATIVE)
+					m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 				m_Netctl.Send("m " +
@@ -680,20 +681,28 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				//Si le chunk existe on place le block
 				if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 				{
-					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
-
-					//Si ya collision on efface le block
-					if (m_world.GetPlayer()->CheckCollision(m_world))
-						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
-					else
+					bool removable = true;
+					if (!IS_INVENTORY_CREATIVE)
 					{
-						m_Netctl.Send("m " +
-							std::to_string(chunkPos.x) +
-							" " + std::to_string(chunkPos.z) +
-							" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
-							" " + std::to_string(newBlocPos.y) +
-							" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
-							" " + std::to_string(m_world.GetPlayer()->GetBlock()));
+						removable = m_world.GetPlayer()->RemoveFromInventory(m_world.GetPlayer()->GetBlock());
+					}
+					if (removable)
+					{
+						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
+
+						//Si ya collision on efface le block
+						if (m_world.GetPlayer()->CheckCollision(m_world))
+							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
+						else
+						{
+							m_Netctl.Send("m " +
+								std::to_string(chunkPos.x) +
+								" " + std::to_string(chunkPos.z) +
+								" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
+								" " + std::to_string(newBlocPos.y) +
+								" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
+								" " + std::to_string(m_world.GetPlayer()->GetBlock()));
+						}
 					}
 				}
 
