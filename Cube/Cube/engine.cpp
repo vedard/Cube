@@ -350,6 +350,9 @@ void Engine::DrawEnvironement(float gameTime) {
 			DrawMenuPrincipal();
 		else if (m_menu->m_currentMenu == SM_SETTINGS)
 			DrawMenuSettings();
+
+		if (m_isTyping == true)
+			DrawCurrentSettingTyped();
 	}
 }
 
@@ -467,6 +470,8 @@ void Engine::KeyPressEvent(unsigned char key)
 			{
 				m_isMenuOpen = false;
 				HideCursor();
+				m_menu->m_settingTyped = "";
+				m_isTyping = false;
 			}
 		}
 		else if (m_keyboard[sf::Keyboard::Return])
@@ -488,6 +493,10 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else
 		{
+			if (m_isTyping)
+			{
+				m_menu->m_settingTyped += key;
+			}
 			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
 
@@ -1425,65 +1434,120 @@ void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) 
 
 void Engine::ManageMenuEnterKeyPress()
 {
-	if (m_menu->m_currentMenu == SM_PRINCIPAL)
+	if (m_isTyping == true)
+		m_isTyping = false;
+	else
 	{
-		if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
+		if (m_menu->m_currentMenu == SM_PRINCIPAL)
 		{
-			m_world.m_threadcontinue = false;
-			Stop();
+			if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
+			{
+				m_world.m_threadcontinue = false;
+				Stop();
+			}
+			else if (m_menu->m_currentMenuItem == MP_SETTINGS)
+			{
+				m_menu = new Menu(SM_SETTINGS);
+			}
 		}
-		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
+		else if (m_menu->m_currentMenu == SM_SETTINGS)
 		{
-			m_menu = new Menu(SM_SETTINGS);
+			if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
+			{
+				m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+				m_settings.Save();
+				SetFullscreen(IsFullscreen());
+			}
+			else if (m_menu->m_currentMenuItem == MS_WIDTH)
+			{
+				m_isTyping = true;
+				m_menu->m_settings = "Width";
+				m_menu->m_settingTyped = "";
+			}
+			else if (m_menu->m_currentMenuItem == MS_HEIGHT)
+			{
+
+			}
+			else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
+			{
+
+			}
+			else if (m_menu->m_currentMenuItem == MS_VSYNC)
+			{
+				m_settings.m_vsync = !m_settings.m_vsync;
+				m_settings.Save();
+				m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+			}
+			else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
+			{
+
+			}
+			else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
+			{
+
+			}
+			else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
+			{
+
+			}
+			else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
+			{
+
+			}
+			else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
+			{
+
+			}
 		}
 	}
-	else if (m_menu->m_currentMenu == SM_SETTINGS)
-	{
-		if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
-		{
-			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
-			m_settings.Save();
-			SetFullscreen(IsFullscreen());
-		}
-		else if (m_menu->m_currentMenuItem == MS_WIDTH)
-		{
-			
-		}
-		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
-		{
+}
 
-		}
-		else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
-		{
+void Engine::DrawCurrentSettingTyped()
+{
+	// Menu specs
+	int menuWidth = 100;
+	int menuHeight = 40;
 
-		}
-		else if (m_menu->m_currentMenuItem == MS_VSYNC)
-		{
-			m_settings.m_vsync = !m_settings.m_vsync;
-			m_settings.Save();
-			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
-		}
-		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
-		{
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
 
-		}
-		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
-		{
+	// Zone menu
+	glColor4f(0.1f, 0.1f, 0.1f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
 
-		}
-		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
-		{
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
 
-		}
-		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
-		{
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glColor3f(1.f, 0.f, 0.f);
 
-		}
-		else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
-		{
+	PrintText(Width() / 2, Height() / 2, 16.f, m_menu->m_settings);
+	PrintText(Width() / 2 - menuWidth + 10, Height() / 2 - menuHeight, 12.f, m_menu->m_settingTyped);
 
-		}
-	}
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 }
 
 void Engine::RenderFastInventory() const
