@@ -466,6 +466,7 @@ void Engine::KeyPressEvent(unsigned char key)
 			if (m_isMenuOpen)
 			{
 				m_isMenuOpen = false;
+				m_menu = new Menu(SM_PRINCIPAL);
 				HideCursor();
 			}
 		}
@@ -481,10 +482,7 @@ void Engine::KeyPressEvent(unsigned char key)
 				HideCursor();
 			}
 			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
-			{
-				m_menu->SaveChanges();
 				m_menu = new Menu(SM_PRINCIPAL);
-			}
 			else
 				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
@@ -1466,7 +1464,20 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_HEIGHT)
+					m_menu->m_settingNewValue = MIN_HEIGHT;
 
+				m_settings.m_height = m_menu->m_settingNewValue;
+				m_settings.Save();
+				ChangeResolution();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
 		{
