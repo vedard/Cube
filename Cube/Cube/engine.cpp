@@ -1574,7 +1574,20 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float floatValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					floatValue = floatValue / 10;
 
+				m_settings.m_mousesensibility = floatValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 	}
 }
