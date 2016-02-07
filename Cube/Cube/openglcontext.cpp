@@ -120,7 +120,7 @@ bool OpenglContext::IsFullscreen() const
 	return m_settings.m_isfullscreen;
 }
 
-void OpenglContext::ChangeResolution()
+void OpenglContext::ResetScreen()
 {
 	DeInit();
 	InitWindow();

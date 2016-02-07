@@ -1456,7 +1456,7 @@ void Engine::ManageMenuEnterKeyPress()
 
 				m_settings.m_width = m_menu->m_settingNewValue;
 				m_settings.Save();
-				ChangeResolution();
+				ResetScreen();
 
 				m_menu->m_settingNewValue = 0;
 				m_menu->m_currentMenu = SM_SETTINGS;
@@ -1473,7 +1473,7 @@ void Engine::ManageMenuEnterKeyPress()
 
 				m_settings.m_height = m_menu->m_settingNewValue;
 				m_settings.Save();
-				ChangeResolution();
+				ResetScreen();
 
 				m_menu->m_settingNewValue = 0;
 				m_menu->m_currentMenu = SM_SETTINGS;
@@ -1481,7 +1481,24 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue == 0 ||
+					m_menu->m_settingNewValue == 2 ||
+					m_menu->m_settingNewValue == 4 ||
+					m_menu->m_settingNewValue == 8)
+				{
 
+					m_settings.m_antialiasing = m_menu->m_settingNewValue;
+					m_settings.Save();
+					ResetScreen();
+
+					m_menu->m_settingNewValue = 0;
+					m_menu->m_currentMenu = SM_SETTINGS;
+				}
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_VSYNC)
 		{

@@ -50,7 +50,7 @@ public:
 	void SetFullscreen(bool fullscreen);
 	bool IsFullscreen() const;
 
-	void ChangeResolution();
+	void ResetScreen();
 
 protected:
 	void CenterMouse();
