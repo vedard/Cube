@@ -144,20 +144,4 @@ enum MENU_SETTINGS {
 	MS_MOUSE_SENSITIVITY
 };
 
-enum GAME_WIDTH {
-	GW_1920,
-	GW_1600,
-	GW_1440,
-	GW_1366,
-	GW_1280
-};
-
-enum GAME_HEIGHT {
-	GH_1080,
-	GH_1024,
-	GH_960,
-	GH_900,
-	GH_768
-};
-
 #endif // DEFINE_H__
