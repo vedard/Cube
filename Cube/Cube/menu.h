@@ -12,9 +12,7 @@ public:
 	void SaveChanges();
 	int m_currentMenuItem;
 	SOUS_MENU m_currentMenu;
-
-	// Settings
-	std::string m_setting;
+	int m_settingNewValue = 0;
 private:
 	int m_menuItemsAmount;
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier

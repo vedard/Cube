@@ -350,7 +350,7 @@ void Engine::DrawEnvironement(float gameTime) {
 			DrawMenuPrincipal();
 		else if (m_menu->m_currentMenu == SM_SETTINGS)
 			DrawMenuSettings();
-		else if (m_menu->m_currentMenu == SM_SETTING_CHOICES)
+		else if (m_menu->m_currentMenu == SM_SETTING_SELECTED)
 			DrawMenuSettingSelected();
 	}
 }
@@ -483,11 +483,13 @@ void Engine::KeyPressEvent(unsigned char key)
 				m_isMenuOpen = false;
 				HideCursor();
 			}
-			else
+			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
 			{
 				m_menu->SaveChanges();
 				m_menu = new Menu(SM_PRINCIPAL);
 			}
+			else
+				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
 		else
 		{
@@ -1432,78 +1434,72 @@ void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) 
 
 void Engine::ManageMenuEnterKeyPress()
 {
-	if (m_isTyping == true)
-		m_isTyping = false;
-	else
+	if (m_menu->m_currentMenu == SM_PRINCIPAL)
 	{
-		if (m_menu->m_currentMenu == SM_PRINCIPAL)
+		if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
 		{
-			if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
-			{
-				m_world.m_threadcontinue = false;
-				Stop();
-			}
-			else if (m_menu->m_currentMenuItem == MP_SETTINGS)
-			{
-				m_menu = new Menu(SM_SETTINGS);
-			}
+			m_world.m_threadcontinue = false;
+			Stop();
 		}
-		else if (m_menu->m_currentMenu == SM_SETTINGS)
+		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 		{
-			if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
-			{
-				m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
-				m_settings.Save();
-				SetFullscreen(IsFullscreen());
-			}
-			else if (m_menu->m_currentMenuItem == MS_WIDTH)
-			{
-				m_menu = new Menu(SM_SETTING_CHOICES);
-				m_menu->m_setting = "Width";
-			}
-			else if (m_menu->m_currentMenuItem == MS_HEIGHT)
-			{
+			m_menu = new Menu(SM_SETTINGS);
+		}
+	}
+	else if (m_menu->m_currentMenu == SM_SETTINGS)
+	{
+		if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
+		{
+			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+			m_settings.Save();
+			SetFullscreen(IsFullscreen());
+		}
+		else if (m_menu->m_currentMenuItem == MS_WIDTH)
+		{
+			m_menu->m_currentMenu = SM_SETTING_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
+		{
 
-			}
-			else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
-			{
+		}
+		else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
+		{
 
-			}
-			else if (m_menu->m_currentMenuItem == MS_VSYNC)
-			{
-				m_settings.m_vsync = !m_settings.m_vsync;
-				m_settings.Save();
-				m_app.setVerticalSyncEnabled(m_settings.m_vsync);
-			}
-			else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
-			{
+		}
+		else if (m_menu->m_currentMenuItem == MS_VSYNC)
+		{
+			m_settings.m_vsync = !m_settings.m_vsync;
+			m_settings.Save();
+			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+		}
+		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
+		{
 
-			}
-			else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
-			{
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
+		{
 
-			}
-			else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
-			{
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
+		{
 
-			}
-			else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
-			{
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
+		{
 
-			}
-			else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
-			{
+		}
+		else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
+		{
 
-			}
 		}
 	}
 }
 
-void Engine::DrawMenuSettingSelected(std::string options[], int size)
+void Engine::DrawMenuSettingSelected()
 {
 	// Menu specs
-	int menuWidth = 70;
-	int menuHeight = 120;
+	int menuWidth = 100;
+	int menuHeight = 60;
 	int menuPositionX = Width() / 2;
 	int menuPositionY = Height() / 2;
 
@@ -1537,10 +1533,10 @@ void Engine::DrawMenuSettingSelected(std::string options[], int size)
 	m_textureFont.Bind();
 	glColor3f(0.7f, 0.7f, 0.7f);
 
-	for (size_t i = 0; i < size; i++)
-	{
-		
-	}
+	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
+	PrintText(Width() / 2 - 68, Height() / 2, 12.f, "Escape to cancel");
+	PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, "Enter to confirm");
+	PrintText(Width() / 2 - 70, Height() / 2 - menuHeight - menuHeight, 12.f, std::to_string(m_menu->m_settingNewValue));
 
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);

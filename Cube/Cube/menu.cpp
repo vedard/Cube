@@ -57,6 +57,39 @@ void Menu::OnKeyDown(unsigned char key)
 		if (m_currentMenuItem > m_menuItemsAmount)
 			m_currentMenuItem = 0;
 	}
+	
+	// Quand on modifie un settings dans le menu par clavier...
+	if (m_currentMenu == SM_SETTING_SELECTED)
+	{
+		if (m_keyboard[sf::Keyboard::BackSpace])
+			m_settingNewValue = m_settingNewValue / 10;
+		else
+		{
+			int value;
+			if (m_keyboard[sf::Keyboard::Num0])
+				value = 0;
+			else if (m_keyboard[sf::Keyboard::Num1])
+				value = 1;
+			else if (m_keyboard[sf::Keyboard::Num2])
+				value = 2;
+			else if (m_keyboard[sf::Keyboard::Num3])
+				value = 3;
+			else if (m_keyboard[sf::Keyboard::Num4])
+				value = 4;
+			else if (m_keyboard[sf::Keyboard::Num5])
+				value = 5;
+			else if (m_keyboard[sf::Keyboard::Num6])
+				value = 6;
+			else if (m_keyboard[sf::Keyboard::Num7])
+				value = 7;
+			else if (m_keyboard[sf::Keyboard::Num8])
+				value = 8;
+			else if (m_keyboard[sf::Keyboard::Num9])
+				value = 9;
+
+			m_settingNewValue = m_settingNewValue * 10 + value;
+		}
+	}
 
 	m_keyboard[key] = false;
 }

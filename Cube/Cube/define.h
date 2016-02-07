@@ -118,7 +118,7 @@ enum SOUS_MENU {
 	SM_PRINCIPAL,
 	SM_CONTROLS,
 	SM_SETTINGS,
-	SM_SETTING_CHOICES
+	SM_SETTING_SELECTED
 };
 
 // Buttons/states du menu principal
