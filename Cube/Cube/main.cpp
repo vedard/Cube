@@ -3,8 +3,6 @@
 #include "engine.h"
 #include "tool.h"
 
-
-
 int main()
 {
 	Parametre& m_settings = Parametre::GetInstance();
