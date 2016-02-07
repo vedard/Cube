@@ -50,6 +50,8 @@ public:
 	void SetFullscreen(bool fullscreen);
 	bool IsFullscreen() const;
 
+	void ChangeResolution();
+
 protected:
 	void CenterMouse();
 	void MakeRelativeToCenter(int& x, int& y) const;

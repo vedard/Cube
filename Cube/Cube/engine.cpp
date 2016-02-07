@@ -23,8 +23,6 @@ Engine::Engine() :
 	m_bInfo = new BlockInfo[256];
 
 	m_isMenuOpen = false;
-
-	m_isTyping = false;
 }
 
 Engine::~Engine()
@@ -469,7 +467,6 @@ void Engine::KeyPressEvent(unsigned char key)
 			{
 				m_isMenuOpen = false;
 				HideCursor();
-				m_isTyping = false;
 			}
 		}
 		else if (m_keyboard[sf::Keyboard::Return])
@@ -493,10 +490,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else
 		{
-			if (m_isTyping)
-			{
-				
-			}
 			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
 
@@ -1446,7 +1439,7 @@ void Engine::ManageMenuEnterKeyPress()
 			m_menu = new Menu(SM_SETTINGS);
 		}
 	}
-	else if (m_menu->m_currentMenu == SM_SETTINGS)
+	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
 	{
 		if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
 		{
@@ -1456,7 +1449,20 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_WIDTH)
 		{
-			m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_WIDTH)
+					m_menu->m_settingNewValue = MIN_WIDTH;
+
+				m_settings.m_width = m_menu->m_settingNewValue;
+				m_settings.Save();
+				ChangeResolution();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
 		{
@@ -1534,9 +1540,9 @@ void Engine::DrawMenuSettingSelected()
 	glColor3f(0.7f, 0.7f, 0.7f);
 
 	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
-	PrintText(Width() / 2 - 68, Height() / 2, 12.f, "Escape to cancel");
-	PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, "Enter to confirm");
-	PrintText(Width() / 2 - 70, Height() / 2 - menuHeight - menuHeight, 12.f, std::to_string(m_menu->m_settingNewValue));
+	PrintText(Width() / 2 - 68, Height() / 2 + 5, 12.f, "Escape to cancel");
+	PrintText(Width() / 2 - 70, Height() / 2 - 20, 12.f, "Enter to confirm");
+	PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, std::to_string(m_menu->m_settingNewValue));
 
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);

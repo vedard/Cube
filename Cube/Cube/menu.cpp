@@ -23,41 +23,6 @@ void Menu::OnKeyDown(unsigned char key)
 {
 	m_keyboard[key] = true;
 
-	if (m_keyboard[sf::Keyboard::Up])
-	{
-		m_currentMenuItem--;
-
-		if (m_currentMenuItem <= -1)
-			m_currentMenuItem = m_menuItemsAmount;
-	}
-	else if (m_keyboard[sf::Keyboard::Left])
-	{
-		if (m_currentMenu == SM_SETTINGS)
-		{
-			m_currentMenuItem -= ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
-
-			if (m_currentMenuItem < 0)
-				m_currentMenuItem += (m_menuItemsAmount + 1);
-		}
-	}
-	else if (m_keyboard[sf::Keyboard::Right])
-	{
-		if (m_currentMenu == SM_SETTINGS)
-		{
-			m_currentMenuItem += ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
-
-			if (m_currentMenuItem > m_menuItemsAmount)
-				m_currentMenuItem -= (m_menuItemsAmount + 1);
-		}
-	}
-	else if (m_keyboard[sf::Keyboard::Down])
-	{
-		m_currentMenuItem++;
-
-		if (m_currentMenuItem > m_menuItemsAmount)
-			m_currentMenuItem = 0;
-	}
-	
 	// Quand on modifie un settings dans le menu par clavier...
 	if (m_currentMenu == SM_SETTING_SELECTED)
 	{
@@ -88,6 +53,43 @@ void Menu::OnKeyDown(unsigned char key)
 				value = 9;
 
 			m_settingNewValue = m_settingNewValue * 10 + value;
+		}
+	}
+	else // Quand on navigue dans les menus
+	{
+		if (m_keyboard[sf::Keyboard::Up])
+		{
+			m_currentMenuItem--;
+
+			if (m_currentMenuItem <= -1)
+				m_currentMenuItem = m_menuItemsAmount;
+		}
+		else if (m_keyboard[sf::Keyboard::Left])
+		{
+			if (m_currentMenu == SM_SETTINGS)
+			{
+				m_currentMenuItem -= ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
+
+				if (m_currentMenuItem < 0)
+					m_currentMenuItem += (m_menuItemsAmount + 1);
+			}
+		}
+		else if (m_keyboard[sf::Keyboard::Right])
+		{
+			if (m_currentMenu == SM_SETTINGS)
+			{
+				m_currentMenuItem += ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
+
+				if (m_currentMenuItem > m_menuItemsAmount)
+					m_currentMenuItem -= (m_menuItemsAmount + 1);
+			}
+		}
+		else if (m_keyboard[sf::Keyboard::Down])
+		{
+			m_currentMenuItem++;
+
+			if (m_currentMenuItem > m_menuItemsAmount)
+				m_currentMenuItem = 0;
 		}
 	}
 

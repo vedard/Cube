@@ -74,6 +74,9 @@ typedef long long int64;
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
 
+#define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
+#define MIN_HEIGHT 600
+
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
 	BTYPE_AIR, 

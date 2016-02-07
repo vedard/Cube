@@ -115,9 +115,6 @@ private:
 
 	bool m_isMenuOpen;
 	Menu* m_menu;
-
-	// True quand l'utilisateur écrit (pour entrer des settings dans le menu)
-	bool m_isTyping;
 };
 
 #endif // ENGINE_H__
