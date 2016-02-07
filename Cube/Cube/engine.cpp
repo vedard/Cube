@@ -1508,7 +1508,18 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				m_settings.m_renderdistance = m_menu->m_settingNewValue;
+				m_settings.Save();
 
+				m_world.SetUpdateDistance(m_settings.m_renderdistance);
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
 		{
