@@ -382,18 +382,20 @@ void Player::Tick()
 
 	if (m_footUnderLava)
 	{
-		GetDamage(2, true, m_godMode);
+		GetDamage(8, true, m_godMode);
 		//isHurt = 20;
 	}
 	if (m_headUnderwater)
 	{
 		m_BreathCount++;
-		if (m_BreathCount > 30)
+		if (m_BreathCount > 75)
 		{
-			GetDamage(1, true, m_godMode);
+			GetDamage(3, true, m_godMode);
 			//isHurt = 20;
 		}
 	}
+	else
+		m_BreathCount = 0;
 
 }
 
@@ -405,7 +407,7 @@ bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
 		b = Character::GetDamage(damage, ignoreArmor, godMode);
 		if (!godMode)
 		{
-			isHurt = 20;
+			isHurt = HURT_TIME;
 			InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
 		}
 	}

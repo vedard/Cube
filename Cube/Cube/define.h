@@ -55,7 +55,7 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 10
+#define MAX_MONSTER 0
 #define MAX_COW 30
 #define PI 3.14159265358f
 #define MAX_BULLET 500
@@ -71,7 +71,10 @@ typedef long long int64;
 
 #define MODEL_PATH	"../Cube/media/model/"
 #define TICK_DELAY .100f
+
 #define INVULNERABILITY_PLAYER_TIME .300f
+#define HURT_TIME 20
+#define DAY_LENGTH 100
 
 #define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes

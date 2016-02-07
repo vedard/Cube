@@ -67,26 +67,29 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
-	glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.2f, 0.2f, 0.2f, 1 };
-	GLint fogmode = GL_EXP;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, 0.07f);
-	glFogf(GL_FOG_START, .04f);
-	glFogf(GL_FOG_END, 9.0f);
+	//glEnable(GL_FOG);
+	//GLfloat fogcolor[4] = { 0.2f, 0.2f, 0.2f, 1 };
+	//GLint fogmode = GL_EXP;
+	//glFogi(GL_FOG_MODE, fogmode);
+	//glFogfv(GL_FOG_COLOR, fogcolor);
+	//glFogf(GL_FOG_DENSITY, 0.07f);
+	//glFogf(GL_FOG_START, .04f);
+	//glFogf(GL_FOG_END, 9.0f);
 
 	// Light
-	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
-	GLfloat light0Amb[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
+	//GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
+	/*GLfloat light0Pos[4] = { 100 , -100.0f, 400.0f, 0.0f };
+	GLfloat light0Amb[4] = { 2.f, 2.f, 2.f, 1.0f };
 	GLfloat light0Diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat light0Spec[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
 
+	
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);*/
+
 
 	//Shader
 	std::cout << "Loading and compiling shaders ..." << std::endl;
@@ -108,6 +111,7 @@ void Engine::DeInit()
 void Engine::LoadResource()
 {
 	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
+	LoadTexture(m_sun, EFFECTS_PATH "sun.png");
 
 
 
@@ -217,7 +221,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-
+	SetLightSource(gameTime);
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -301,6 +305,8 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
 
+	DrawSunMoon(gameTime);
+
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
 	//Draw Monstres
@@ -311,6 +317,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetAnimal()[i].Draw(m_modelCow);
 
 	m_playerActor.Draw(m_modelRaptor);
+
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
@@ -1384,18 +1391,23 @@ void Engine::DrawHurtEffect() const
 	{
 	case 20:
 		diviseur = 54;
+		glDisable(GL_BLEND);
 		break;
 	case 19:
 		diviseur = 48;
+		glDisable(GL_BLEND);
 		break;
 	case 18:
 		diviseur = 40;
+		glDisable(GL_BLEND);
 		break;
 	case 17:
 		diviseur = 37;
+		glDisable(GL_BLEND);
 		break;
 	case 16:
 		diviseur = 35;
+		glDisable(GL_BLEND);
 		break;
 	case 15:
 		diviseur = 31;
@@ -1469,4 +1481,91 @@ void Engine::DrawHurtEffect() const
 	glPopMatrix();
 	
 }
+
+void Engine::DrawSunMoon(float gametime) const {
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glTranslatef(m_world.GetPlayer()->GetPosition().x, 0, m_world.GetPlayer()->GetPosition().z);
+
+	glRotatef(gametime * 1.1f, 0.f, 1.f, 0.f);
+
+	m_sun.Bind();
+	//static const int crossSize = 800;
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+	int ishurt = m_world.GetPlayer()->isHurt;
+	glTexCoord2f(0, 0);
+	glVertex2i(50, 50);
+	glTexCoord2f(1, 0);
+	glVertex2i(150, 50);
+	glTexCoord2f(1, 1);
+	glVertex2i(150, 150);
+	glTexCoord2f(0, 1);
+	glVertex2i(50, 150);
+
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glEnable(GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+}
+
+void Engine::SetLightSource(float gametime)
+{
+	int daytime = (int)gametime % DAY_LENGTH;
+	float positionX;
+	float positionY;
+	if (daytime / (DAY_LENGTH / 4) == 0)
+	{ 
+		positionX = (DAY_LENGTH / 4) - daytime;
+		positionY = daytime;
+	}
+	else if (daytime / (DAY_LENGTH / 4) == 1)
+	{ 
+		positionX = (DAY_LENGTH / 4) - daytime;
+		positionX = (DAY_LENGTH / 4) - positionX;
+	}
+	else if (daytime / (DAY_LENGTH / 4) == 2)
+	{
+		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
+		positionY = daytime - (DAY_LENGTH / 2);
+	}
+	else
+	{
+		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
+		positionX = (DAY_LENGTH / 4) - positionX;
+	}
+
+	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x + positionX ,  m_world.GetPlayer()->GetPosition().y + positionY, 0.0f, 0.0f };
+	GLfloat light0Amb[4] = { 5.f, 5.f, 5.f, 1.0f };
+	GLfloat light0Diff[4] = { 5.0f, 5.0f, 5.0f, 1.0f };
+	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
+
+
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
+
+}
+
+
 
