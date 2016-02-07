@@ -349,7 +349,10 @@ void Engine::DrawEnvironement(float gameTime) {
 		else if (m_menu->m_currentMenu == SM_SETTINGS)
 			DrawMenuSettings();
 		else if (m_menu->m_currentMenu == SM_SETTING_SELECTED)
-			DrawMenuSettingSelected();
+			if (m_menu->m_currentMenuItem >= MS_CROSSCOLOR_R)
+				DrawMenuSettingSelected(true);
+			else
+				DrawMenuSettingSelected(false);
 	}
 }
 
@@ -1592,7 +1595,7 @@ void Engine::ManageMenuEnterKeyPress()
 	}
 }
 
-void Engine::DrawMenuSettingSelected()
+void Engine::DrawMenuSettingSelected(bool isFloat)
 {
 	// Menu specs
 	int menuWidth = 100;
@@ -1633,7 +1636,10 @@ void Engine::DrawMenuSettingSelected()
 	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
 	PrintText(Width() / 2 - 68, Height() / 2 + 5, 12.f, "Escape to cancel");
 	PrintText(Width() / 2 - 70, Height() / 2 - 20, 12.f, "Enter to confirm");
-	PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, std::to_string(m_menu->m_settingNewValue));
+	if (isFloat == true)
+		PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, "0." + std::to_string(m_menu->m_settingNewValue));
+	else
+		PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, std::to_string(m_menu->m_settingNewValue));
 
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
