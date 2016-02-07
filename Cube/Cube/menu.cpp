@@ -27,9 +27,17 @@ void Menu::OnKeyDown(unsigned char key)
 	if (m_currentMenu == SM_SETTING_SELECTED)
 	{
 		if (m_keyboard[sf::Keyboard::BackSpace])
-			m_settingNewValue = m_settingNewValue / 10;
+		{
+			if (m_settingNewValue > 0)
+			{
+				m_digitCount--;
+				m_settingNewValue = m_settingNewValue / 10;
+			}
+		}
 		else
 		{
+			m_digitCount++;
+
 			int value;
 			if (m_keyboard[sf::Keyboard::Num0])
 				value = 0;
@@ -51,6 +59,8 @@ void Menu::OnKeyDown(unsigned char key)
 				value = 8;
 			else if (m_keyboard[sf::Keyboard::Num9])
 				value = 9;
+			else // Si ce n'est pas un chiffre qui a été cliqué...
+				m_digitCount--;
 
 			m_settingNewValue = m_settingNewValue * 10 + value;
 		}

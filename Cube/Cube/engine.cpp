@@ -1523,15 +1523,54 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float rValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					rValue = rValue / 10;
 
+				m_settings.m_crossred = rValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float rValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					rValue = rValue / 10;
 
+				m_settings.m_crossgreen = rValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
 		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float rValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					rValue = rValue / 10;
 
+				m_settings.m_crossblue = rValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
 		}
 		else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
 		{
