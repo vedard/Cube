@@ -1688,7 +1688,83 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MC_GAUCHE)
 		{
-
+			m_menu->m_controlSelected = "Left";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_RECULER)
+		{
+			m_menu->m_controlSelected = "Backward";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_DROITE)
+		{
+			m_menu->m_controlSelected = "Right";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_FULLSCREEN)
+		{
+			m_menu->m_controlSelected = "Fullscreen";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INFO)
+		{
+			m_menu->m_controlSelected = "Info";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_CROUCH)
+		{
+			m_menu->m_controlSelected = "Crouch";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_RUN)
+		{
+			m_menu->m_controlSelected = "Run";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_JUMP)
+		{
+			m_menu->m_controlSelected = "Jump";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_NOCLIP)
+		{
+			m_menu->m_controlSelected = "No Clip";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY1)
+		{
+			m_menu->m_controlSelected = "Inventory 1";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY2)
+		{
+			m_menu->m_controlSelected = "Inventory 2";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY3)
+		{
+			m_menu->m_controlSelected = "Inventory 3";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY4)
+		{
+			m_menu->m_controlSelected = "Inventory 4";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY)
+		{
+			m_menu->m_controlSelected = "Inventory";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_SPAWNMONSTER)
+		{
+			m_menu->m_controlSelected = "Spawn Monster";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_WIREFRAME)
+		{
+			m_menu->m_controlSelected = "Wireframe";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
 		}
 	}
 }
