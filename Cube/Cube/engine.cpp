@@ -355,6 +355,8 @@ void Engine::DrawEnvironement(float gameTime) {
 				DrawMenuSettingSelected(true);
 			else
 				DrawMenuSettingSelected(false);
+		else if (m_menu->m_currentMenu == SM_CONTROL_SELECTED)
+			DrawMenuControlSelected();
 	}
 }
 
@@ -494,6 +496,9 @@ void Engine::KeyPressEvent(unsigned char key)
 		else
 		{
 			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+
+			if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
+				m_menu = new Menu(SM_CONTROLS);
 		}
 
 	}
@@ -1678,7 +1683,8 @@ void Engine::ManageMenuEnterKeyPress()
 	{
 		if (m_menu->m_currentMenuItem == MC_AVANCER)
 		{
-
+			m_menu->m_controlSelected = "Forward";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
 		}
 		else if (m_menu->m_currentMenuItem == MC_GAUCHE)
 		{
@@ -1732,6 +1738,60 @@ void Engine::DrawMenuSettingSelected(bool isFloat)
 		PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, "0." + std::to_string(m_menu->m_settingNewValue));
 	else
 		PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, std::to_string(m_menu->m_settingNewValue));
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void Engine::DrawMenuControlSelected()
+{
+	// Menu specs
+	std::string str = KEY_ALREADY_BOUND;
+	int menuWidth = str.length() * 6 + 10;
+	int menuHeight = 20;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(1.f, 0.f, 0.f);
+
+	if (m_menu->m_controlSelected == KEY_ALREADY_BOUND)
+		PrintText(Width() / 2 - (m_menu->m_controlSelected.length() * 6), Height() / 2 + menuHeight - 30, 16.f, m_menu->m_controlSelected);
+	else
+		PrintText(Width() / 2 - (m_menu->m_controlSelected.length() * 6), Height() / 2 + menuHeight - 30, 16.f, m_menu->m_controlSelected);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);

@@ -168,7 +168,7 @@ void Parametre::Load()
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
 
-		//Read All file
+		//Read whole file
 		std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		std::stringstream ss(str);
 		//Close it

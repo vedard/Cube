@@ -77,6 +77,9 @@ typedef long long int64;
 #define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
 #define MIN_HEIGHT 600
 
+#define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
+#define KEY_ALREADY_BOUND "This key is already bound"
+
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
 	BTYPE_AIR, 

@@ -67,6 +67,60 @@ void Menu::OnKeyDown(unsigned char key)
 			m_settingNewValue = m_settingNewValue * 10 + value;
 		}
 	}
+	else if (m_currentMenu == SM_CONTROL_SELECTED)
+	{
+		// Vérifier si la touche est déjà utilisée
+		if (m_keyboard[m_settings.m_avancer] || m_keyboard[m_settings.m_gauche] ||
+			m_keyboard[m_settings.m_reculer] || m_keyboard[m_settings.m_droite] ||
+			m_keyboard[m_settings.m_fullscreen] || m_keyboard[m_settings.m_info] ||
+			m_keyboard[m_settings.m_crouch] || m_keyboard[m_settings.m_run] ||
+			m_keyboard[m_settings.m_jump] || m_keyboard[m_settings.m_noclip] ||
+			m_keyboard[m_settings.m_inventory1] || m_keyboard[m_settings.m_inventory2] ||
+			m_keyboard[m_settings.m_inventory3] || m_keyboard[m_settings.m_inventory4] ||
+			m_keyboard[m_settings.m_openinventory] || m_keyboard[m_settings.m_spawnmonster] ||
+			m_keyboard[m_settings.m_wireframe])
+			m_controlSelected = KEY_ALREADY_BOUND;
+		else
+		{
+			if (m_currentMenuItem == MC_AVANCER)
+				m_settings.m_avancer = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_GAUCHE)
+				m_settings.m_gauche = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_RECULER)
+				m_settings.m_reculer = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_DROITE)
+				m_settings.m_droite = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_FULLSCREEN)
+				m_settings.m_fullscreen = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_INFO)
+				m_settings.m_info = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_CROUCH)
+				m_settings.m_crouch = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_RUN)
+				m_settings.m_run = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_JUMP)
+				m_settings.m_jump = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_NOCLIP)
+				m_settings.m_noclip = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_INVENTORY1)
+				m_settings.m_inventory1 = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_INVENTORY2)
+				m_settings.m_inventory2 = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_INVENTORY3)
+				m_settings.m_inventory3 = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_INVENTORY4)
+				m_settings.m_inventory4 = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_INVENTORY)
+				m_settings.m_openinventory = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_SPAWNMONSTER)
+				m_settings.m_spawnmonster = (sf::Keyboard::Key)key;
+			else if (m_currentMenuItem == MC_WIREFRAME)
+				m_settings.m_wireframe = (sf::Keyboard::Key)key;
+
+			m_settings.Save();
+			m_controlSelected = KEY_BINDED_SUCCESSFULLY;
+		}
+	}
 	else // Quand on navigue dans les menus
 	{
 		if (m_keyboard[sf::Keyboard::Up])

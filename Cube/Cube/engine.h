@@ -64,6 +64,7 @@ private:
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
 	void ManageMenuEnterKeyPress();
 	void DrawMenuSettingSelected(bool isFloat);
+	void DrawMenuControlSelected();
 
 private:
 	bool m_wireframe;
