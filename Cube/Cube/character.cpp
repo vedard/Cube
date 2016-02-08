@@ -1,5 +1,5 @@
 #include "character.h"
-
+#include "sound.h"
 
 Character::Character() :
 	m_pos(0, 128, 0),
@@ -191,9 +191,9 @@ bool Character::Attack(Character * character)
 	return Attack(character, m_AttackDamage);
 }
 
-void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
+bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
-	if (!godMode)
+	if (!godMode && m_isAlive)
 	{
 		if (!ignoreArmor)
 		{
@@ -212,9 +212,11 @@ void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 		if (m_health <= 0)
 		{
 			m_isAlive = false;
+			Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
 			std::cout << m_Name << " died." << std::endl;
 		}
 	}
+	return m_isAlive;
 }
 
 void Character::Jump()

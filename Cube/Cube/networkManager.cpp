@@ -15,7 +15,7 @@ NetworkManager::NetworkManager()
 	m_socketHandle = socket(AF_INET, SOCK_DGRAM, 0);
 	if (m_socketHandle <= 0)
 	{
-		std::cout << "failed to create socket" << std::endl;
+		std::cout << "Failed to create socket" << std::endl;
 		exit(1);
 	}
 
@@ -27,18 +27,18 @@ NetworkManager::NetworkManager()
 	//Bind
 	if (bind(m_socketHandle, (const sockaddr*)&m_address, sizeof(sockaddr_in)) < 0)
 	{
-		std::cout << "failed to bind socket" << std::endl;
+		std::cout << "Failed to bind socket" << std::endl;
 		exit(1);
 	}
 
 	//Set the socket to non-blocking mode
 	if (SetSocketNonBlocking() == false)
 	{
-		std::cout << "failed to set non-blocking" << std::endl;
+		std::cout << "Failed to set non-blocking" << std::endl;
 		exit(1);
 	}
 
-	std::cout << "	Network is ok" << std::endl;
+	std::cout << "Network is ok" << std::endl;
 
 }
 

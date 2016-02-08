@@ -55,16 +55,28 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 0
-#define MAX_COW 30
+#define MAX_MONSTER 100
+#define MAX_COW 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
+#define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
+#define MUSIC_PATH	"../Cube/media/audio/music/"
+#define WEAPONS_PATH	"../Cube/media/audio/weapons/"
+#define WALK_PATH	"../Cube/media/audio/walk/"
+#define HURT_PATH	"../Cube/media/audio/hurt/"
+#define DEATH_PATH  "../Cube/media/audio/death/"
+#define LEAVE_PATH	"../Cube/media/audio/leave/"
+
+
 #define MODEL_PATH	"../Cube/media/model/"
-#define TICK_DELAY .5f
-#define TICK_DELAY_WATER .2f
+#define TICK_DELAY .100f
+
+#define INVULNERABILITY_PLAYER_TIME .300f
+#define HURT_TIME 20
+#define DAY_LENGTH 100
 
 #define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes

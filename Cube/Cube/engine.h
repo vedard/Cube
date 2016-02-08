@@ -52,6 +52,8 @@ private:
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
+	void DrawHurtEffect() const;
+	void DrawSunMoon(float gametime) const;
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
@@ -65,6 +67,7 @@ private:
 	void ManageMenuEnterKeyPress();
 	void DrawMenuSettingSelected(bool isFloat);
 	void DrawMenuControlSelected();
+	void SetLightSource(float gametime);
 
 private:
 	bool m_wireframe;
@@ -81,10 +84,13 @@ private:
 	TextureAtlas m_textureAtlas;
 	Texture m_textureSky;
 	Texture m_textureFont;
+	Texture m_effectHurt;
+	Texture m_sun;
 
 	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
+	Shader m_shader02;
 	World m_world;
 
 	//Indexe de la texutre dans l'atlas

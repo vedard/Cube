@@ -8,6 +8,8 @@ class Item
 {
 public:
 	Item();
+	Item(BlockType type);
+	Item(BlockType type, int number);
 	~Item();
 
 	int GetQuantity();
@@ -15,12 +17,16 @@ public:
 
 	void Add();
 	void Add(int number);
+	void AddNew(BlockType type, int number);
 
 	void Remove();
 	void Remove(int number);
 
+	void Empty();
+
 private:
 	int m_quantity;
+	BlockType m_type;
 	bool m_isselected;
 	bool m_isfast;
 
