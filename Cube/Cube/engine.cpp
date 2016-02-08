@@ -360,6 +360,13 @@ void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
+	
+	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	{
+		DrawEnvironement(gameTime);
+		return;
+	}
+
 	gameTime += elapsedTime;
 
 	//gestion des ticks
@@ -622,6 +629,10 @@ void Engine::KeyPressEvent(unsigned char key)
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 				m_world.GetPlayer()->isHurt = 0;
 			}
+		if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		{
+			ShowCursor();
+		}
 	}
 }
 
@@ -646,7 +657,7 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 void Engine::MouseMoveEvent(int x, int y)
 {
-	if (!m_isMenuOpen)
+	if (!m_isMenuOpen && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{
 		// Centrer la souris seulement si elle n'est pas déjà centrée
 		// Il est nécessaire de faire la vérification pour éviter de tomber
@@ -865,46 +876,7 @@ void Engine::DrawHud() const
 	// Affichage du crosshair
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
-
-	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
-	{	// show inventory hud
-		glLoadIdentity();
-		glTranslated(Width() / 2, Height() / 2, 0);
-		glColor3f(0.f, 0.f, 0.f);
-		glBegin(GL_QUADS);
-		glVertex2i(-(Width() / 4), -(Height() / 4));
-		glVertex2i(+(Width() / 4), -(Height() / 4));
-		glVertex2i(+(Width() / 4), +(Height() / 4));
-		glVertex2i(-(Width() / 4), +(Height() / 4));
-		glEnd();
-
-
-		int inventaire_longueur = Width() / 2;
-		int inventaire_hauteur = Height() / 2;
-
-		int incrementeur_hauteur = inventaire_hauteur / 3;
-		int incrementeur_longueur = inventaire_longueur / 5;
-
-		glTranslated(-(Width() / 4), -(Height() / 4), 0);
-
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 5; j++)
-			{
-				glColor3f(20.f, 20.f, 20.f);
-				glBegin(GL_QUADS);
-				glVertex2i(0, 0);
-				glVertex2i(incrementeur_longueur * 0.9, 0);
-				glVertex2i(incrementeur_longueur * 0.9, incrementeur_hauteur * 0.9);
-				glVertex2i(0, incrementeur_hauteur * 0.9);
-				glEnd();
-				glTranslated(incrementeur_longueur, 0, 0.1);
-			}
-			glTranslated(-(incrementeur_longueur * 5), incrementeur_hauteur, 0);
-		}
-	}
-	else
-	{
+	
 		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 		{
 			//Block selectionne
@@ -940,8 +912,7 @@ void Engine::DrawHud() const
 			glDisable(GL_TEXTURE_2D);
 		}
 
-		RenderFastInventory();
-	}
+	RenderFastInventory();
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -1329,29 +1300,44 @@ void Engine::RenderFastInventory() const
 
 	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
 
-	for (int i = 0; i < 3; i++)
+	glTranslated(0,-64,0);
+	
+	for(int j = 0; j < 5; j++)
 	{
-		glTranslated(-64, 0, 0);
+		glTranslated(0,64,0);
+		for (int i = 0; i < 3; i++)
+		{
+			glTranslated(-64, 0, 0);
+	
+			if (j == 0 && keys[i] == m_fastInventoryKeySelected)
+				glColor3f(128.f, 0.f, 0.f);
+			else
+				glColor3f(0.f, 0.f, 0.f);
+	
+			glBegin(GL_QUADS);
+			glVertex2i(-2, -2);
+			glVertex2i(50, -2);
+			glVertex2i(50, 50);
+			glVertex2i(-2, 50);
+			glEnd();
+			
+			if(j == 0)
+				glColor3f(255.f, 128.f, 0.f);
+			else
+				glColor3f(229.f, 218.f, 144.f);
+			
+			glBegin(GL_QUADS);
+			glVertex2i(0, 0);
+			glVertex2i(48, 0);
+			glVertex2i(48, 48);
+			glVertex2i(0, 48);
+			glEnd();
+		}
 
-		if (keys[i] == m_fastInventoryKeySelected)
-			glColor3f(128.f, 0.f, 0.f);
-		else
-			glColor3f(0.f, 0.f, 0.f);
-
-		glBegin(GL_QUADS);
-		glVertex2i(-2, -2);
-		glVertex2i(50, -2);
-		glVertex2i(50, 50);
-		glVertex2i(-2, 50);
-		glEnd();
-
-		glColor3f(255.f, 128.f, 0.f);
-		glBegin(GL_QUADS);
-		glVertex2i(0, 0);
-		glVertex2i(48, 0);
-		glVertex2i(48, 48);
-		glVertex2i(0, 48);
-		glEnd();
+		if(j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+			break;
+		
+		glTranslated(+64 * 3, 0 , 0); 
 	}
 }
 
