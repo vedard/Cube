@@ -315,6 +315,16 @@ void Player::SetRunning(bool running)
 		m_running = running;
 }
 
+void Player::AddToInventory(BlockType type)
+{
+	m_inventory.get()->AddItemQ(type);
+}
+
+bool Player::RemoveFromInventory(BlockType type)
+{
+	return m_inventory.get()->RemoveItemQ(type);
+}
+
 BlockType Player::GetBlock() const { return m_block; }
 
 int Player::GetWeapon() const { return m_weapon; }

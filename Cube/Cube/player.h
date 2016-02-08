@@ -42,6 +42,9 @@ public:
 
 	bool GetDamage(float damage, bool ignoreArmor, bool godMode) override;
 
+	void AddToInventory(BlockType type);
+	bool RemoveFromInventory(BlockType type);
+
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
