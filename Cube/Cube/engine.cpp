@@ -348,6 +348,8 @@ void Engine::DrawEnvironement(float gameTime) {
 			DrawMenuPrincipal();
 		else if (m_menu->m_currentMenu == SM_SETTINGS)
 			DrawMenuSettings();
+		else if (m_menu->m_currentMenu == SM_CONTROLS)
+			DrawMenuControls();
 		else if (m_menu->m_currentMenu == SM_SETTING_SELECTED)
 			if (m_menu->m_currentMenuItem >= MS_CROSSCOLOR_R)
 				DrawMenuSettingSelected(true);
@@ -1416,6 +1418,85 @@ void Engine::DrawMenuSettings() const
 	glPopMatrix();
 }
 
+void Engine::DrawMenuControls() const
+{
+	// Menu specs
+	int menuHeight = 300;
+	int menuWidth = 400;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	// Dessiner le titre
+	PrintText(Width() / 2 - 60, (Height() / 2) + (menuHeight / 2) + (menuHeight / 4), 20.f, "Controls");
+
+	int column1Width = (Width() / 2) - menuWidth + 40;
+	int column2Width = (Width() / 2) - (menuWidth / 2);
+	int column3Width = (Width() / 2) + (menuWidth / 6);
+	int column4Width = (Width() / 2) + menuWidth - (menuWidth / 2);
+
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
+	DrawMenuButton(MC_AVANCER, "Forward", column1Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_GAUCHE, "Left", column1Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MC_RECULER, "Backward", column1Width, (Height() / 2));
+	DrawMenuButton(MC_DROITE, "Right", column1Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MC_FULLSCREEN, "Fullscreen", column1Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MC_INFO, "Info", column2Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_CROUCH, "Crouch", column2Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MC_RUN, "Run", column2Width, (Height() / 2));
+	DrawMenuButton(MC_JUMP, "Jump", column2Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MC_NOCLIP, "No Clip", column2Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MC_INVENTORY1, "Inventory 1", column3Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_INVENTORY2, "Inventory 2", column3Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MC_INVENTORY3, "Inventory 3", column3Width, (Height() / 2));
+	DrawMenuButton(MC_INVENTORY4, "Inventory 4", column3Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MC_INVENTORY, "Inventory", column3Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MC_SPAWNMONSTER, "Spawn Monster", column4Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_WIREFRAME, "Wireframe", column4Width, (Height() / 2) + (menuHeight / 4));
+
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
 void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const
 {
 	if (m_menu->m_currentMenuItem == menuItem)
@@ -1436,9 +1517,9 @@ void Engine::ManageMenuEnterKeyPress()
 			Stop();
 		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
-		{
 			m_menu = new Menu(SM_SETTINGS);
-		}
+		else if (m_menu->m_currentMenu == MP_CONTROLS)
+			m_menu = new Menu(SM_CONTROLS);
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
 	{
@@ -1591,6 +1672,17 @@ void Engine::ManageMenuEnterKeyPress()
 				m_menu->m_settingNewValue = 0;
 				m_menu->m_currentMenu = SM_SETTINGS;
 			}
+		}
+	}
+	else if (m_menu->m_currentMenu == SM_CONTROLS || m_menu->m_currentMenu == SM_CONTROL_SELECTED)
+	{
+		if (m_menu->m_currentMenuItem == MC_AVANCER)
+		{
+
+		}
+		else if (m_menu->m_currentMenuItem == MC_GAUCHE)
+		{
+
 		}
 	}
 }

@@ -8,6 +8,8 @@ Menu::Menu(SOUS_MENU currentMenu) : m_currentMenu(currentMenu)
 		m_menuItemsAmount = 2; // Starts at 0
 	else if (m_currentMenu == SM_SETTINGS)
 		m_menuItemsAmount = 9;
+	else if (m_currentMenu == SM_CONTROLS)
+		m_menuItemsAmount = 16;
 
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -83,12 +85,36 @@ void Menu::OnKeyDown(unsigned char key)
 				if (m_currentMenuItem < 0)
 					m_currentMenuItem += (m_menuItemsAmount + 1);
 			}
+			else if (m_currentMenu == SM_CONTROLS)
+			{
+				if (m_currentMenuItem < 2) // Nombre d'items dans la derniere colonne
+					m_currentMenuItem += 3; // Nombre d'items par colonne - nombre d'items dans la derniere colonne
+				else if (m_currentMenuItem < 5) // Nombre d'items par colonne
+					m_currentMenuItem -= 2;
+
+				m_currentMenuItem -= 5; // Nombre d'items par colonne
+
+				if (m_currentMenuItem < 0)
+					m_currentMenuItem += (m_menuItemsAmount + 1);
+			}
 		}
 		else if (m_keyboard[sf::Keyboard::Right])
 		{
 			if (m_currentMenu == SM_SETTINGS)
 			{
 				m_currentMenuItem += ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
+
+				if (m_currentMenuItem > m_menuItemsAmount)
+					m_currentMenuItem -= (m_menuItemsAmount + 1);
+			}
+			else if (m_currentMenu == SM_CONTROLS)
+			{
+				if (m_currentMenuItem >= 15)
+					m_currentMenuItem -= 3; // Nombre d'items par colonne - nombre d'items dans la derniere colonne
+				else if (m_currentMenuItem >= 12)
+					m_currentMenuItem += 2;
+
+				m_currentMenuItem += 5; // Nombre d'items par colonne
 
 				if (m_currentMenuItem > m_menuItemsAmount)
 					m_currentMenuItem -= (m_menuItemsAmount + 1);

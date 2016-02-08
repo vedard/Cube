@@ -60,6 +60,7 @@ private:
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;
 	void DrawMenuSettings() const;
+	void DrawMenuControls() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
 	void ManageMenuEnterKeyPress();
 	void DrawMenuSettingSelected(bool isFloat);
