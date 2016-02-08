@@ -148,9 +148,20 @@ void Engine::LoadResource()
 
 
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+		if (i < 9)
+		{
+			Sound::AddSound(Sound::DEATH1 + i, DEATH_PATH "death" + std::to_string(i + 1) + ".wav");
+		}
+		if (i < 6)
+		{
+			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+		}
+		if (i < 5)
+		{
+			Sound::AddSound(Sound::LEAVE1 + i, LEAVE_PATH "leave" + std::to_string(i + 1) + ".wav");
+		}
 		if (i < 4)
 		{
 			Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
@@ -466,6 +477,8 @@ void Engine::KeyPressEvent(unsigned char key)
 			if (m_menu->m_currentMenuItem == 2)
 			{
 				m_world.m_threadcontinue = false;
+				int sound = Sound::LEAVE1 + rand() % 5;
+				Sound::PlayAndWait(sound);
 				Stop();
 			}
 		}

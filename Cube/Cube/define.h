@@ -66,6 +66,8 @@ typedef long long int64;
 #define WEAPONS_PATH	"../Cube/media/audio/weapons/"
 #define WALK_PATH	"../Cube/media/audio/walk/"
 #define HURT_PATH	"../Cube/media/audio/hurt/"
+#define DEATH_PATH  "../Cube/media/audio/death/"
+#define LEAVE_PATH	"../Cube/media/audio/leave/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"

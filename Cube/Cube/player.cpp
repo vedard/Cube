@@ -372,9 +372,9 @@ void Player::Tick()
 	{
 		if (m_footUnderLava)
 		{
-			if (GetDamage(5, true, m_godMode))
+			if (!GetDamage(5, true, m_godMode))
 			{
-
+				ResetDeath();
 			}
 		}
 		if (m_headUnderwater)
@@ -382,7 +382,10 @@ void Player::Tick()
 			m_BreathCount++;
 			if (m_BreathCount > 15)
 			{
-				GetDamage(3, true, m_godMode);
+				if (!GetDamage(3, true, m_godMode))
+				{
+					ResetDeath();
+				}
 				std::cout << "Playing sound DROWNING" << std::endl;
 				Sound::PlayOnce(Sound::DROWNING);
 				m_headWasUnderwater = true;
