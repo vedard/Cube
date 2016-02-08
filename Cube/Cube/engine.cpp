@@ -1569,7 +1569,7 @@ void Engine::SetLightSource(float gametime)
 	}
 
 	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x + positionX ,  m_world.GetPlayer()->GetPosition().y + positionY, 0.0f, 0.0f };
-	GLfloat light0Amb[4] = { 5.f, 5.f, 5.f, 1.0f };
+	GLfloat light0Amb[4] = { 2.f, 2.f, 2.f, 1.0f };
 	GLfloat light0Diff[4] = { 5.0f, 5.0f, 5.0f, 1.0f };
 	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
 
