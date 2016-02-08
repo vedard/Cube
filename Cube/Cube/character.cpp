@@ -212,7 +212,6 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 		if (m_health <= 0)
 		{
 			m_isAlive = false;
-			Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
 			std::cout << m_Name << " died." << std::endl;
 		}
 	}

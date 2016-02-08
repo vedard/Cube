@@ -55,7 +55,7 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 100
+#define MAX_MONSTER 0
 #define MAX_COW 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500

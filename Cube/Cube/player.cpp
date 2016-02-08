@@ -392,7 +392,7 @@ void Player::Tick()
 
 	if (m_footUnderLava)
 	{
-		if (GetDamage(8, true, m_godMode))
+		if (!GetDamage(8, true, m_godMode))
 		{
 			ResetDeath();
 		}
@@ -426,16 +426,26 @@ void Player::Tick()
 
 	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
 	{
-		bool b = false;
+		bool b = true;
 		if (InvulnerabilityTimer <= 0)
 		{
-			b = Character::GetDamage(damage, ignoreArmor, godMode);
-			if (!godMode)
+			b = Character::GetisAlive();
+			if (b)
 			{
-				isHurt = HURT_TIME;
-				InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+				b = Character::GetDamage(damage, ignoreArmor, godMode);
+				if (!godMode)
+				{
+					isHurt = HURT_TIME;
+					InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+				}
+				if (!b)
+				{
+					Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
+				}
 			}
+			
 		}
+		
 		return b;
 	}
 
