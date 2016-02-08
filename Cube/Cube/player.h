@@ -27,6 +27,7 @@ public:
 	bool Shoot(World &world);
 
 	bool Underwater() const;
+	bool footUnderwater() const;
 	bool UnderLava() const;
 
 	BlockType GetBlock() const;
@@ -39,10 +40,15 @@ public:
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode) override;
+
+	void AddToInventory(BlockType type);
+	bool RemoveFromInventory(BlockType type);
+
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
-
+	void ResetDeath();
 private:
 	bool m_godMode;
 	time_t m_TickBegin;     //timer de tick
@@ -52,6 +58,7 @@ private:
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
+	bool m_headWasUnderwater = false; // Si le joueur vient de sortir de l'eau.
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	bool m_headUnderLava; // Si le joueur est sous la lave
 	bool m_kneeUnderwater;  // Si le joueur est sous l'eau
@@ -59,12 +66,16 @@ private:
 	bool m_footUnderLava;  // Si le joueur est sous la lave
 	BlockType m_block;// Prochain block que le joueur peut placer
 	Gun * Guns;
+	float InvulnerabilityTimer;
 	
 	int m_weapon;			// current weapon
 
 	float m_HeadShake;		// Shake la camera a chaque pas
 
 	std::unique_ptr<Inventory> m_inventory;	//Inventaire du joueur
+
+public:
+	int isHurt;
 };
 
 #endif

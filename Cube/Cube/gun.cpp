@@ -16,13 +16,17 @@ Gun::~Gun()
 }
 
 
-void Gun::Init(std::string modelPath, std::string texturePath, int sound, bool isAuto, float RPM, float damage, float aimHeight)
+void Gun::InitRessource(std::string modelPath, std::string texturePath, int sound)
 {
 	m_sound = sound;
+	m_model.LoadOBJ(modelPath, texturePath);
+}
+
+void Gun::InitStat(bool isAuto, float RPM, float damage, float aimHeight)
+{
 	m_damage = damage;
 	m_isAutomatic = isAuto;
 	m_cooldown = 1 / (RPM / 60);
-	m_model.LoadOBJ(modelPath, texturePath);
 	m_aimingHeight = aimHeight;
 }
 
