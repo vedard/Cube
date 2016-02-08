@@ -1,4 +1,4 @@
-# version 440 compatibility
+# version 330 compatibility
 out vec4 light;
 uniform float gameTime;
 in float type;
@@ -22,9 +22,9 @@ out vec4 viewSpace;
 
 void main()
 {	
-    light = gl_Color;
+	light = gl_Color;
 	gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 
 	//used for lighting models
 	world_pos = (model_matrix * vec4(in_position,1)).xyz;
