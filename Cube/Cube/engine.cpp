@@ -61,26 +61,24 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
+	// Le fog
 	glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.2f, 0.2f, 0.2f, 1 };
-	GLint fogmode = GL_EXP;
+	GLfloat fogcolor[4] = { 0.1f, 0.1f, 0.14f, 1 };
+	GLint fogmode = GL_EXP2;
 	glFogi(GL_FOG_MODE, fogmode);
 	glFogfv(GL_FOG_COLOR, fogcolor);
 	glFogf(GL_FOG_DENSITY, 0.07f);
-	glFogf(GL_FOG_START, .04f);
-	glFogf(GL_FOG_END, 9.0f);
+	glFogf(GL_FOG_START, 16.f);
+	glFogf(GL_FOG_END, 21.f);
 
-	// Light
-	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
-	GLfloat light0Amb[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
-	GLfloat light0Diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat light0Spec[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	// La lumiere
+	GLfloat light0Amb[4] = { 5.f, 4.f, 3.f, 7.f };
+	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
 
-	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 
 	CenterMouse();
 	HideCursor();
@@ -160,9 +158,9 @@ void Engine::LoadResource()
 	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
 	//Gun
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100, 0.2);
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 80, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 110, 0.4);
 
 	//Shader
 	std::cout << " Loading and compiling shaders ..." << std::endl;
@@ -244,6 +242,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	}
 
 }
+
 void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
@@ -268,7 +267,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_world.GetPlayer()->ApplyRotation();
 	float shake = m_world.GetPlayer()->ApplyTranslation();
 
-
 	//Activation des shaders
 	m_shader01.Use();
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
@@ -281,14 +279,15 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Draw(m_modelRaptor, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetAnimal()[i].Draw(m_modelCow);
-
-	m_playerActor.Draw(m_modelRaptor);
+	/// Position des lumières autour pour éclairer le joueur et les monstres
+	// Position de la lumière 1
+	GLfloat light0Pos1[4] = {
+		m_world.GetPlayer()->GetPosition().x,
+		m_world.GetPlayer()->GetPosition().y + 25,
+		m_world.GetPlayer()->GetPosition().z - 50,
+		1.f };
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
@@ -298,11 +297,18 @@ void Engine::DrawEnvironement(float gameTime) {
 			m_world.GetPlayer()->GetPosition().z,
 			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
 
-
-
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+
+	//Draw Monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_world.GetMonster()[i].Draw(m_modelRaptor, false);
+
+	for (int i = 0; i < MAX_COW; i++)
+		m_world.GetAnimal()[i].Draw(m_modelCow);
+
+	m_playerActor.Draw(m_modelRaptor);
 
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
@@ -592,9 +598,6 @@ void Engine::KeyPressEvent(unsigned char key)
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 	}
 }
-
-
-
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {

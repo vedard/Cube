@@ -18,7 +18,6 @@ out vec3 world_normal;
 out vec2 texcoord;
 out vec4 viewSpace;
 
-
 void main()
 {	
     light = gl_Color;
