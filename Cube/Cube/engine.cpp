@@ -3,7 +3,6 @@
 Engine::Engine() :
 	m_wireframe(false),
 	m_shader01(),
-	m_shader02(),
 	m_textureAtlas(NUMBER_OF_BLOCK - 1),
 	m_world(),
 	m_currentBlock(-1, -1, -1),
@@ -83,7 +82,7 @@ void Engine::Init()
 	GLfloat light0Diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
 
-	
+
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
@@ -152,66 +151,74 @@ void Engine::LoadResource()
 		AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 		AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 
-
 		if (!m_textureAtlas.Generate(64, false))
 		{
 			std::cout << "Unable to generate texture atlas ..." << std::endl;
 			abort();
 		}
-
-	for (int i = 0; i < 9; i++)
-	{
-		if (i < 9)
+		//Audio
+		std::cout << " Loading audio ..." << std::endl;
+		Sound::AddSound(Sound::M9_FIRE, WEAPONS_PATH "glock18-1.wav");
+		Sound::AddSound(Sound::MP5K_FIRE, WEAPONS_PATH "mp7-1.wav");
+		Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
+		Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
+		Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
+		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
+		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
+		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		for (int i = 0; i < 9; i++)
 		{
-			Sound::AddSound(Sound::DEATH1 + i, DEATH_PATH "death" + std::to_string(i + 1) + ".wav");
-		}
-		if (i < 6)
-		{
-			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
-		}
-		if (i < 5)
-		{
-			Sound::AddSound(Sound::LEAVE1 + i, LEAVE_PATH "leave" + std::to_string(i + 1) + ".wav");
-		}
-		if (i < 4)
-		{
-			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+			if (i < 9)
+			{
+				Sound::AddSound(Sound::DEATH1 + i, DEATH_PATH "death" + std::to_string(i + 1) + ".wav");
+			}
+			if (i < 6)
+			{
+				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+			}
+			if (i < 5)
+			{
+				Sound::AddSound(Sound::LEAVE1 + i, LEAVE_PATH "leave" + std::to_string(i + 1) + ".wav");
+			}
 			if (i < 4)
 			{
-				Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				if (i < 4)
+				{
+					Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+				}
 			}
+
+			if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+				abort();
+			m_music.setLoop(true);
+			m_music.setVolume(m_settings.m_musicvolume);
+			m_music.play();
+
+
+			//Model 3d
+			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+			m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 		}
 
-		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
-			abort();
-		m_music.setLoop(true);
-		m_music.setVolume(m_settings.m_musicvolume);
-		m_music.play();
+		//Gun
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 40, 0.4);
 
+		//Load la map
+		m_world.LoadMap("map.sav", m_bInfo);
+		m_world.SetUpdateDistance(m_settings.m_renderdistance);
+		m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-		//Model 3d
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+		//Entity
+
+		// -- Player
+		m_world.GetPlayer()->SetName("Vincent Suce");
 	}
-
-	//Gun
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
-	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 40, 0.4);
-
-	//Load la map
-	m_world.LoadMap("map.sav", m_bInfo);
-	m_world.SetUpdateDistance(m_settings.m_renderdistance);
-	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
-
-	//Entity
-
-	// -- Player
-	m_world.GetPlayer()->SetName("Vincent Suce");
-
 }
 
 void Engine::UnloadResource()
@@ -372,8 +379,8 @@ void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
-	
-	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+
+	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{
 		DrawEnvironement(gameTime);
 		return;
@@ -643,7 +650,7 @@ void Engine::KeyPressEvent(unsigned char key)
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 				m_world.GetPlayer()->isHurt = 0;
 			}
-		if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 		{
 			ShowCursor();
 		}
@@ -904,41 +911,41 @@ void Engine::DrawHud() const
 	// Affichage du crosshair
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
-	
-		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
-		{
-			//Block selectionne
-			glLoadIdentity();
-			glTranslated(Width() - 64, 16, 0);
 
-			//contour 	
-			glColor3f(0.f, 0.f, 0.f);
-			glBegin(GL_QUADS);
-			glVertex2i(-2, -2);
-			glVertex2i(50, -2);
-			glVertex2i(50, 50);
-			glVertex2i(-2, 50);
-			glEnd();
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+	{
+		//Block selectionne
+		glLoadIdentity();
+		glTranslated(Width() - 64, 16, 0);
+
+		//contour 	
+		glColor3f(0.f, 0.f, 0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
 
 
-			//block
-			m_textureAtlas.Bind();
-			glEnable(GL_TEXTURE_2D);
-			glColor3f(1.f, 1.f, 1.f);
+		//block
+		m_textureAtlas.Bind();
+		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.f, 1.f, 1.f);
 
-			glBegin(GL_QUADS);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-			glVertex2i(0, 0);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-			glVertex2i(48, 0);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-			glVertex2i(48, 48);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-			glVertex2i(0, 48);
+		glBegin(GL_QUADS);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(0, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(48, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(48, 48);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(0, 48);
 
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-		}
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+	}
 
 	RenderFastInventory();
 
@@ -1328,32 +1335,32 @@ void Engine::RenderFastInventory() const
 
 	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
 
-	glTranslated(0,-64,0);
-	
-	for(int j = 0; j < 5; j++)
+	glTranslated(0, -64, 0);
+
+	for (int j = 0; j < 5; j++)
 	{
-		glTranslated(0,64,0);
+		glTranslated(0, 64, 0);
 		for (int i = 0; i < 3; i++)
 		{
 			glTranslated(-64, 0, 0);
-	
+
 			if (j == 0 && keys[i] == m_fastInventoryKeySelected)
 				glColor3f(128.f, 0.f, 0.f);
 			else
 				glColor3f(0.f, 0.f, 0.f);
-	
+
 			glBegin(GL_QUADS);
 			glVertex2i(-2, -2);
 			glVertex2i(50, -2);
 			glVertex2i(50, 50);
 			glVertex2i(-2, 50);
 			glEnd();
-			
-			if(j == 0)
+
+			if (j == 0)
 				glColor3f(255.f, 128.f, 0.f);
 			else
 				glColor3f(229.f, 218.f, 144.f);
-			
+
 			glBegin(GL_QUADS);
 			glVertex2i(0, 0);
 			glVertex2i(48, 0);
@@ -1362,10 +1369,10 @@ void Engine::RenderFastInventory() const
 			glEnd();
 		}
 
-		if(j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		if (j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 			break;
-		
-		glTranslated(+64 * 3, 0 , 0); 
+
+		glTranslated(+64 * 3, 0, 0);
 	}
 }
 
@@ -1475,7 +1482,7 @@ void Engine::DrawHurtEffect() const
 	glVertex2i(Width() + (Width() / diviseur), Height() + (Height() / diviseur));
 	glTexCoord2f(0, 1);
 	glVertex2i(-(Width() / diviseur), Height() + (Height() / diviseur));
-	
+
 	glEnd();
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
@@ -1486,7 +1493,7 @@ void Engine::DrawHurtEffect() const
 	glMatrixMode(GL_MODELVIEW);
 	glDisable(GL_BLEND);
 	glPopMatrix();
-	
+
 }
 
 void Engine::DrawSunMoon(float gametime) const {
@@ -1540,12 +1547,12 @@ void Engine::SetLightSource(float gametime)
 	float positionX;
 	float positionY;
 	if (daytime / (DAY_LENGTH / 4) == 0)
-	{ 
+	{
 		positionX = (DAY_LENGTH / 4) - daytime;
 		positionY = daytime;
 	}
 	else if (daytime / (DAY_LENGTH / 4) == 1)
-	{ 
+	{
 		positionX = (DAY_LENGTH / 4) - daytime;
 		positionX = (DAY_LENGTH / 4) - positionX;
 	}
@@ -1573,6 +1580,7 @@ void Engine::SetLightSource(float gametime)
 	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 
 }
+
 
 
 
