@@ -215,3 +215,10 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#Game config
+*.conf
+
+#Map save
+*.sav
+/Cube/Cube/Cube.conf

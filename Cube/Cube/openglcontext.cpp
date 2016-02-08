@@ -19,52 +19,62 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 	LoadResource();
 	sf::Clock clock;
 
-	while (m_app.isOpen())
-	{
-		clock.restart();
-
-		sf::Event Event;
-		while (m_app.pollEvent(Event))
+	if (m_settings.m_isServer)
+	{ 
+		while (true)
 		{
-			switch (Event.type)
-			{
-			case sf::Event::Closed:
-				m_app.close();
-				break;
-			case sf::Event::Resized:
-				//DeInit();
-				//InitWindow(Event.size.width, Event.size.height);
-				//Init();
-				break;
-			case sf::Event::KeyPressed:
-				KeyPressEvent(Event.key.code);
-				break;
-			case sf::Event::KeyReleased:
-				KeyReleaseEvent(Event.key.code);
-				break;
-			case sf::Event::MouseMoved:
-				MouseMoveEvent(Event.mouseMove.x, Event.mouseMove.y);
-				break;
-			case sf::Event::MouseButtonPressed:
-				MousePressEvent(ConvertMouseButton(Event.mouseButton.button), Event.mouseButton.x, Event.mouseButton.y);
-				break;
-			case sf::Event::MouseButtonReleased:
-				MouseReleaseEvent(ConvertMouseButton(Event.mouseButton.button), Event.mouseButton.x, Event.mouseButton.y);
-				break;
-			case sf::Event::MouseWheelMoved:
-				if (Event.mouseWheel.delta > 0)
-					MousePressEvent(MOUSE_BUTTON_WHEEL_UP, Event.mouseButton.x, Event.mouseButton.y);
-				else
-					MousePressEvent(MOUSE_BUTTON_WHEEL_DOWN, Event.mouseButton.x, Event.mouseButton.y);
-				break;
-			}
+			Render(m_lastFrameTime);
 		}
+	}
+	else
+	{
+		while (m_app.isOpen())
+		{
+			clock.restart();
 
-		m_app.setActive();
-		Render(m_lastFrameTime);
-		m_app.display();
+			sf::Event Event;
+			while (m_app.pollEvent(Event))
+			{
+				switch (Event.type)
+				{
+				case sf::Event::Closed:
+					m_app.close();
+					break;
+				case sf::Event::Resized:
+					//DeInit();
+					//InitWindow(Event.size.width, Event.size.height);
+					//Init();
+					break;
+				case sf::Event::KeyPressed:
+					KeyPressEvent(Event.key.code);
+					break;
+				case sf::Event::KeyReleased:
+					KeyReleaseEvent(Event.key.code);
+					break;
+				case sf::Event::MouseMoved:
+					MouseMoveEvent(Event.mouseMove.x, Event.mouseMove.y);
+					break;
+				case sf::Event::MouseButtonPressed:
+					MousePressEvent(ConvertMouseButton(Event.mouseButton.button), Event.mouseButton.x, Event.mouseButton.y);
+					break;
+				case sf::Event::MouseButtonReleased:
+					MouseReleaseEvent(ConvertMouseButton(Event.mouseButton.button), Event.mouseButton.x, Event.mouseButton.y);
+					break;
+				case sf::Event::MouseWheelMoved:
+					if (Event.mouseWheel.delta > 0)
+						MousePressEvent(MOUSE_BUTTON_WHEEL_UP, Event.mouseButton.x, Event.mouseButton.y);
+					else
+						MousePressEvent(MOUSE_BUTTON_WHEEL_DOWN, Event.mouseButton.x, Event.mouseButton.y);
+					break;
+				}
+			}
 
-		m_lastFrameTime = clock.getElapsedTime().asSeconds();
+			m_app.setActive();
+			Render(m_lastFrameTime);
+			m_app.display();
+
+			m_lastFrameTime = clock.getElapsedTime().asSeconds();
+		}
 	}
 
 	UnloadResource();
@@ -143,6 +153,8 @@ void OpenglContext::ShowCrossCursor() const
 void OpenglContext::InitWindow(int width, int height)
 {
 	//Lis le fichier de configuration si il na pas deja ete lu
+	if (m_settings.m_isServer)
+		return;
 
 	std::cout << sf::VideoMode::getDesktopMode().width << std::endl;
 

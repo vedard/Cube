@@ -4,6 +4,8 @@
 class Creeper : public Monster
 {
 public:
+	Creeper();
+	~Creeper();
 private:
 };
 #endif // !

@@ -7,7 +7,7 @@ class Cow : public Animal
 {
 public:
 	Cow();
-	Cow~();
+	~Cow();
 private:
 };
 #endif // !COW_H__

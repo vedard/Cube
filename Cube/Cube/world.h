@@ -43,7 +43,7 @@ public:
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);
 	void RemoveLava(Vector3<float> vf);
-
+ 
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
 	void AddTree(Chunk * &chunk, int x, int y, int z);
@@ -59,7 +59,8 @@ private:
 
 	Player* m_player;
 	Monster* m_monster;
-	Animal* m_cow;
+	Cow* m_cow;
+	Bear* m_bear;
 
 	int UpdateDistance;
 	int	m_seed;

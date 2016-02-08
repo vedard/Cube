@@ -4,6 +4,7 @@
 #include "chunkmesh.h"
 #include "vector3.h"
 #include "blockinfo.h"
+#include "parametre.h"
 #include <stdlib.h>
 #include <sstream>
 #include <string>

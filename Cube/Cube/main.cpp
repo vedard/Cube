@@ -3,8 +3,6 @@
 #include "engine.h"
 #include "tool.h"
 
-
-
 int main()
 {
 	Parametre& m_settings = Parametre::GetInstance();
@@ -12,5 +10,4 @@ int main()
 	Engine engine;
 	engine.SetMaxFps(0);
 	engine.Start("Cube");
-	
 }

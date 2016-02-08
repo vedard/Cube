@@ -13,49 +13,74 @@ Inventory::~Inventory()
 	for (size_t i = 0; i < sizeof(m_objetsFast); i++)
 		m_objetsFast[i] = new Item;
 
-	delete[] *m_objetsFast;								//freed memory
+	delete[] * m_objetsFast;								//freed memory
 
-	for (size_t i = 0; i < sizeof(m_objetsFast); i++)	//pointed dangling ptr to NULL
+	for (size_t i = 0; i < sizeof(m_objetsFast); i++)		//pointed dangling ptr to NULL
 		m_objetsFast[i] = NULL;
 }
 
-void Inventory::AddItemQ(Item type)
+void Inventory::AddItemQ(BlockType type)
 {
 	this->AddItemQ(type, 1);
 }
 
-void Inventory::AddItemQ(Item type, int number)
+void Inventory::AddItemQ(BlockType type, int number)
 {
-	for (size_t i = 0; i < sizeof(m_objets); i++)
+	bool isAdded = false;
+
+	for (Item var : m_objets)
 	{
-		if (m_objets[i].GetType() == type.GetType())
+		if (var.GetType() == type)
 		{
-			m_objets[i].Add(number);
+			var.Add(number);
+			isAdded = true;
 			break;
-		} 
-		if (m_objets[i].GetQuantity() == 0)
+		}
+	}
+
+	if (!isAdded)
+	{
+		for (Item var : m_objets)
 		{
-			m_objets[i] = type;
-			break;
+			if (var.GetQuantity() == 0)
+			{
+				var.AddNew(type, number);
+				break;
+			}
 		}
 	}
 }
 
-void Inventory::RemoveItemQ(Item type)
+bool Inventory::RemoveItemQ(BlockType type)
 {
-	this->RemoveItemQ(type, 1);
+	return this->RemoveItemQ(type, 1);
 }
 
-void Inventory::RemoveItemQ(Item type, int number)
+bool Inventory::RemoveItemQ(BlockType type, int number)
 {
-	for (size_t i = 0; i < sizeof(m_objets); i++)
+	for (Item var : m_objets)
 	{
-		if (m_objets[i].GetType() == type.GetType() && m_objets[i].GetQuantity() > 0)
+		if (var.GetType() == type && var.GetQuantity() > 0)
 		{
-			m_objets[i].Remove(number);
-			break;
+			var.Remove(number);
+			return true;
 		}
 	}
+	return false;
+}
+
+bool Inventory::RemoveItemALL(BlockType type)
+{
+	SortInventory();
+	for  (Item var : m_objets)
+	{
+		if (var.GetType() == type && var.GetQuantity() > 0)
+		{
+			var.Remove(var.GetQuantity());
+			return true;
+		}
+	}
+	return false;
 }
 
 void Inventory::ReassignItemShortcut(int index_itemFast, int index_item)
@@ -71,6 +96,38 @@ void Inventory::SwitchItems(int index_item1, int index_item2)
 		Item tempItem = m_objets[index_item1];
 		m_objets[index_item1] = m_objets[index_item2];
 		m_objets[index_item2] = tempItem;
+	}
+}
+
+void Inventory::SortInventory()
+{
+	for (size_t j = 0; j < INVENTORY_SIZE; j++)
+	{
+		for (size_t i = j; i < j; i++)
+		{
+			if (i != j)
+			{
+				if (m_objets[i].GetType() == BTYPE_AIR || m_objets[i].GetQuantity() <= 0)
+				{
+					m_objets[i].Empty();
+					continue;
+				}
+				if (m_objets[i].GetType() == m_objets[j].GetType())
+				{
+					m_objets[j].Add(m_objets[i].GetQuantity());
+					m_objets[i].Remove(m_objets[i].GetQuantity());
+					m_objets[i].Empty();
+					continue;
+				}
+				if (m_objets[i].GetType() != m_objets[j].GetType() && m_objets[i].GetType() > m_objets[j].GetType())
+				{
+					Item swapItem = m_objets[i];
+					m_objets[i] = m_objets[j];
+					m_objets[j] = swapItem;
+					continue;
+				}
+			}
+		}
 	}
 }
 

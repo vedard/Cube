@@ -1,8 +1,7 @@
 #include "menu.h"
 
-Menu::Menu(SOUS_MENU currentMenu)
+Menu::Menu(SOUS_MENU currentMenu) : m_currentMenu(currentMenu)
 {
-	m_currentMenu = currentMenu;
 	m_currentMenuItem = 0;
 
 	if (m_currentMenu == SM_PRINCIPAL)
@@ -28,6 +27,8 @@ void Menu::OnKeyDown(unsigned char key)
 
 		if (m_currentMenuItem <= -1)
 			m_currentMenuItem = m_menuItemsAmount;
+		
+		m_keyboard[key] = false;
 	}
 	else if (m_keyboard[sf::Keyboard::Return])
 	{
@@ -51,5 +52,7 @@ void Menu::OnKeyDown(unsigned char key)
 
 		if (m_currentMenuItem > m_menuItemsAmount)
 			m_currentMenuItem = 0;
+
+		m_keyboard[key] = false;
 	}
 }

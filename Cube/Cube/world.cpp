@@ -15,6 +15,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 
 	// Initialise les monstres et animaux.
 	m_cow = new Cow[MAX_COW];
+	m_bear = new Bear[MAX_BEAR];
 
 	m_monster = new Creeper[MAX_MONSTER];
 	m_player = new Player;
@@ -48,8 +49,8 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 		}
 	m_threadChunks = std::thread(&World::RunWater, this);
 	//m_threadChunksEnvers = std::thread(&World::RunWater, this);
-	/*m_threadChunks.detach();
-	m_threadChunksEnvers.detach();*/
+	m_threadChunks.detach();
+	//m_threadChunksEnvers.detach();
 	
 }
 

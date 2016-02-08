@@ -19,6 +19,7 @@ Character::Character() :
 	m_Name = "Character ";
 	for (int i = 0; i < 5; i++)
 		m_Name += std::to_string(std::rand() % 10);
+	m_health = 100;
 
 
 }
@@ -30,7 +31,6 @@ Character::~Character()
 void Character::Spawn(World &world, int x, int z)
 {
 	m_isAlive = true;
-	m_health = 100;
 	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
 	m_pos.z = (float)z;
@@ -191,7 +191,7 @@ bool Character::Attack(Character * character)
 	return Attack(character, m_AttackDamage);
 }
 
-void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
+bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
 	if (!godMode)
 	{
@@ -215,6 +215,7 @@ void Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 			std::cout << m_Name << " died." << std::endl;
 		}
 	}
+	return m_isAlive;
 }
 
 void Character::Jump()

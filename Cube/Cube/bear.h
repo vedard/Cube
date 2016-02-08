@@ -8,7 +8,10 @@
 
 class Bear : public Animal
 {
-
+public:
+	Bear();
+	~Bear();
+	private:
 
 };
 
