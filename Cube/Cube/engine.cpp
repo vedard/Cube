@@ -111,7 +111,7 @@ void Engine::DeInit()
 void Engine::LoadResource()
 {
 	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
-	LoadTexture(m_sun, EFFECTS_PATH "sun.png");
+	//LoadTexture(m_sun, EFFECTS_PATH "sun.png");
 
 
 
