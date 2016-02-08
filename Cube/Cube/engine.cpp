@@ -3,6 +3,7 @@
 Engine::Engine() :
 	m_wireframe(false),
 	m_shader01(),
+	m_shader02(),
 	m_textureAtlas(NUMBER_OF_BLOCK - 1),
 	m_world(),
 	m_currentBlock(-1, -1, -1),
@@ -35,6 +36,11 @@ Engine::~Engine()
 
 void Engine::Init()
 {
+	if (m_settings.m_isServer)
+	{
+		return;
+	}
+
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
@@ -71,16 +77,27 @@ void Engine::Init()
 	glFogf(GL_FOG_END, 9.0f);
 
 	// Light
-	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
-	GLfloat light0Amb[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
+	//GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x , CHUNK_SIZE_Y, 500.0f, 0.0f };
+	/*GLfloat light0Pos[4] = { 100 , -100.0f, 400.0f, 0.0f };
+	GLfloat light0Amb[4] = { 2.f, 2.f, 2.f, 1.0f };
 	GLfloat light0Diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat light0Spec[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
 
+	
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);*/
+
+
+	//Shader
+	std::cout << "Loading and compiling shaders ..." << std::endl;
+	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
+	{
+		std::cout << "Failed to load shader " << std::endl;
+		exit(1);
+	}
 
 	CenterMouse();
 	HideCursor();
@@ -93,60 +110,54 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
-	//Load texture qui ne sont pas dans l'atlas
-	LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
-	LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
-
-	//Load texture dans l'atlas
-	AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
-	AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp", 1);
-	AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp", 1);
-	AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp", 1);
-	AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp", 1);
-	AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp", 1);
-	AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp", 1);
-	AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp", 1);
-	AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp", 1);
-	AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp", 1);
-	AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp", 1);
-	AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp", 1);
-	AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp", 1);
-	AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp", 1);
-	AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png", 1);
-	AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png", 1);
-	AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp", 1);
-	AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
-	AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
-
-	AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
-	AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
-	AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
-	AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
-
-	AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .90f);
-	AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
-	AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
-	AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
+	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
+	//LoadTexture(m_sun, EFFECTS_PATH "sun.png");
 
 
-	if (!m_textureAtlas.Generate(64, false))
+
+	if (!m_settings.m_isServer)
 	{
-		std::cout << " Unable to generate texture atlas ..." << std::endl;
-		abort();
-	}
+		//Load texture qui ne sont pas dans l'atlas
+		LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
+		LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
 
-	//Audio
-	std::cout << " Loading audio ..." << std::endl;
-	Sound::AddSound(Sound::M9_FIRE, WEAPONS_PATH "glock18-1.wav");
-	Sound::AddSound(Sound::MP5K_FIRE, WEAPONS_PATH "mp7-1.wav");
-	Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
-	Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
-	Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
-	Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
-	Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
-	Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		//Load texture dans l'atlas
+		AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
+		AddTextureToAtlas(BTYPE_TEST, "Test", TEXTURE_PATH "block_test.bmp", 1);
+		AddTextureToAtlas(BTYPE_STONE, "Stone", TEXTURE_PATH "block_stone.bmp", 1);
+		AddTextureToAtlas(BTYPE_WOOD_PLANK, "Grass", TEXTURE_PATH "block_wood_plank.bmp", 1);
+		AddTextureToAtlas(BTYPE_CHEST, "Grass", TEXTURE_PATH "block_chest.bmp", 1);
+		AddTextureToAtlas(BTYPE_BED_ROCK, "Grass", TEXTURE_PATH "block_bed_rock.bmp", 1);
+		AddTextureToAtlas(BTYPE_DIRT, "Grass", TEXTURE_PATH "block_dirt.bmp", 1);
+		AddTextureToAtlas(BTYPE_IRON, "Grass", TEXTURE_PATH "block_iron.bmp", 1);
+		AddTextureToAtlas(BTYPE_COAL, "Grass", TEXTURE_PATH "block_coal.bmp", 1);
+		AddTextureToAtlas(BTYPE_DIAMOND, "Grass", TEXTURE_PATH "block_diamond.bmp", 1);
+		AddTextureToAtlas(BTYPE_GOLD, "Grass", TEXTURE_PATH "block_gold.bmp", 1);
+		AddTextureToAtlas(BTYPE_REDSTONE, "Grass", TEXTURE_PATH "block_redstone.bmp", 1);
+		AddTextureToAtlas(BTYPE_LAPIS_LAZULI, "Grass", TEXTURE_PATH "block_lapis_lazuli.bmp", 1);
+		AddTextureToAtlas(BTYPE_WOOD, "Grass", TEXTURE_PATH "block_wood.bmp", 1);
+		AddTextureToAtlas(BTYPE_LEAVE, "Grass", TEXTURE_PATH "block_leave.png", 1);
+		AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png", 1);
+		AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp", 1);
+		AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
+		AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
+
+		AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
+		AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
+		AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
+		AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
+
+		AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .90f);
+		AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
+		AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
+		AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 
 
+		if (!m_textureAtlas.Generate(64, false))
+		{
+			std::cout << "Unable to generate texture atlas ..." << std::endl;
+			abort();
+		}
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -164,33 +175,32 @@ void Engine::LoadResource()
 		}
 		if (i < 4)
 		{
-			Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+			if (i < 4)
+			{
+				Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+			}
 		}
+
+		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+			abort();
+		m_music.setLoop(true);
+		m_music.setVolume(m_settings.m_musicvolume);
+		m_music.play();
+
+
+		//Model 3d
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 	}
-
-	if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
-		abort();
-	m_music.setLoop(true);
-	m_music.setVolume(m_settings.m_musicvolume);
-	m_music.play();
-
-
-	//Model 3d
-	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 
 	//Gun
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100, 0.2);
-	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].Init(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE, true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].Init(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE, true, 600, 40, 0.4);
-
-	//Shader
-	std::cout << " Loading and compiling shaders ..." << std::endl;
-	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
-	{
-		std::cout << " Failed to load shader " << std::endl;
-		exit(1);
-	}
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
+	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 40, 0.4);
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
@@ -215,7 +225,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-
+	SetLightSource(gameTime);
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -256,14 +266,10 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Update eau
-	if (gameTime - m_LastTickTimeWater >= TICK_DELAY_WATER)
-	{
-		m_LastTickTimeWater = gameTime;
-		//m_world
-	}
+
 
 }
+
 void Engine::DrawEnvironement(float gameTime) {
 
 	//Clear 
@@ -295,9 +301,16 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
+	m_shader02.Use();
+
+
+
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
+
+	//Cycle jour/nuit TODO
+	//DrawSunMoon(gameTime);
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
@@ -309,6 +322,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetAnimal()[i].Draw(m_modelCow);
 
 	m_playerActor.Draw(m_modelRaptor);
+
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
@@ -338,10 +352,13 @@ void Engine::DrawEnvironement(float gameTime) {
 		DrawFocusedBlock();
 
 
+
 	//Draw le hui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	DrawHud();
+	if (m_world.GetPlayer()->isHurt > 0)
+		DrawHurtEffect();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -355,6 +372,13 @@ void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
+	
+	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	{
+		DrawEnvironement(gameTime);
+		return;
+	}
+
 	gameTime += elapsedTime;
 
 	//gestion des ticks
@@ -439,12 +463,17 @@ void Engine::Render(float elapsedTime)
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
-	GetBlocAtCursor();
-	DrawEnvironement(gameTime);
+
+	if (!m_settings.m_isServer)
+	{
+		GetBlocAtCursor();
+		DrawEnvironement(gameTime);
+	}
 }
 
 void Engine::KeyPressEvent(unsigned char key)
 {
+
 	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
 	{
 
@@ -610,12 +639,16 @@ void Engine::KeyPressEvent(unsigned char key)
 
 		if (!m_world.GetPlayer()->GetisAlive())
 			if (m_keyboard[sf::Keyboard::Return])
+			{
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
+				m_world.GetPlayer()->isHurt = 0;
+			}
+		if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		{
+			ShowCursor();
+		}
 	}
 }
-
-
-
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
@@ -638,7 +671,7 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 void Engine::MouseMoveEvent(int x, int y)
 {
-	if (!m_isMenuOpen)
+	if (!m_isMenuOpen && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{
 		// Centrer la souris seulement si elle n'est pas déjà centrée
 		// Il est nécessaire de faire la vérification pour éviter de tomber
@@ -676,6 +709,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			if (button == 1 && m_currentBlock.x != -1)
 			{
 				Vector3<int> chunkPos(m_currentBlock.x / CHUNK_SIZE_X, 0, m_currentBlock.z / CHUNK_SIZE_Z);
+
+				//AddToInventory
+				//Add Block to Player Inventory BEFORE removal in the world. IF the inventory is not in creative mode
+				if (!IS_INVENTORY_CREATIVE)
+					m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
+
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 				m_Netctl.Send("m " +
 					std::to_string(chunkPos.x) +
@@ -696,20 +735,28 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				//Si le chunk existe on place le block
 				if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 				{
-					m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
-
-					//Si ya collision on efface le block
-					if (m_world.GetPlayer()->CheckCollision(m_world))
-						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
-					else
+					bool removable = true;
+					if (!IS_INVENTORY_CREATIVE)
 					{
-						m_Netctl.Send("m " +
-							std::to_string(chunkPos.x) +
-							" " + std::to_string(chunkPos.z) +
-							" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
-							" " + std::to_string(newBlocPos.y) +
-							" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
-							" " + std::to_string(m_world.GetPlayer()->GetBlock()));
+						removable = m_world.GetPlayer()->RemoveFromInventory(m_world.GetPlayer()->GetBlock());
+					}
+					if (removable)
+					{
+						m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->PlaceBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), m_world.GetPlayer()->GetBlock());
+
+						//Si ya collision on efface le block
+						if (m_world.GetPlayer()->CheckCollision(m_world))
+							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
+						else
+						{
+							m_Netctl.Send("m " +
+								std::to_string(chunkPos.x) +
+								" " + std::to_string(chunkPos.z) +
+								" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
+								" " + std::to_string(newBlocPos.y) +
+								" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
+								" " + std::to_string(m_world.GetPlayer()->GetBlock()));
+						}
 					}
 				}
 
@@ -735,6 +782,9 @@ void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
 
 bool Engine::LoadTexture(Texture& texture, const std::string& filename, bool stopOnError)
 {
+	if (m_settings.m_isServer)
+		return false;
+
 	texture.Load(filename);
 	if (!texture.IsValid())
 	{
@@ -854,46 +904,7 @@ void Engine::DrawHud() const
 	// Affichage du crosshair
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
-
-	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
-	{	// show inventory hud
-		glLoadIdentity();
-		glTranslated(Width() / 2, Height() / 2, 0);
-		glColor3f(0.f, 0.f, 0.f);
-		glBegin(GL_QUADS);
-		glVertex2i(-(Width() / 4), -(Height() / 4));
-		glVertex2i(+(Width() / 4), -(Height() / 4));
-		glVertex2i(+(Width() / 4), +(Height() / 4));
-		glVertex2i(-(Width() / 4), +(Height() / 4));
-		glEnd();
-
-
-		int inventaire_longueur = Width() / 2;
-		int inventaire_hauteur = Height() / 2;
-
-		int incrementeur_hauteur = inventaire_hauteur / 3;
-		int incrementeur_longueur = inventaire_longueur / 5;
-
-		glTranslated(-(Width() / 4), -(Height() / 4), 0);
-
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 5; j++)
-			{
-				glColor3f(20.f, 20.f, 20.f);
-				glBegin(GL_QUADS);
-				glVertex2i(0, 0);
-				glVertex2i(incrementeur_longueur * 0.9, 0);
-				glVertex2i(incrementeur_longueur * 0.9, incrementeur_hauteur * 0.9);
-				glVertex2i(0, incrementeur_hauteur * 0.9);
-				glEnd();
-				glTranslated(incrementeur_longueur, 0, 0.1);
-			}
-			glTranslated(-(incrementeur_longueur * 5), incrementeur_hauteur, 0);
-		}
-	}
-	else
-	{
+	
 		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 		{
 			//Block selectionne
@@ -929,8 +940,7 @@ void Engine::DrawHud() const
 			glDisable(GL_TEXTURE_2D);
 		}
 
-		RenderFastInventory();
-	}
+	RenderFastInventory();
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -1318,28 +1328,251 @@ void Engine::RenderFastInventory() const
 
 	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
 
-	for (int i = 0; i < 3; i++)
+	glTranslated(0,-64,0);
+	
+	for(int j = 0; j < 5; j++)
 	{
-		glTranslated(-64, 0, 0);
+		glTranslated(0,64,0);
+		for (int i = 0; i < 3; i++)
+		{
+			glTranslated(-64, 0, 0);
+	
+			if (j == 0 && keys[i] == m_fastInventoryKeySelected)
+				glColor3f(128.f, 0.f, 0.f);
+			else
+				glColor3f(0.f, 0.f, 0.f);
+	
+			glBegin(GL_QUADS);
+			glVertex2i(-2, -2);
+			glVertex2i(50, -2);
+			glVertex2i(50, 50);
+			glVertex2i(-2, 50);
+			glEnd();
+			
+			if(j == 0)
+				glColor3f(255.f, 128.f, 0.f);
+			else
+				glColor3f(229.f, 218.f, 144.f);
+			
+			glBegin(GL_QUADS);
+			glVertex2i(0, 0);
+			glVertex2i(48, 0);
+			glVertex2i(48, 48);
+			glVertex2i(0, 48);
+			glEnd();
+		}
 
-		if (keys[i] == m_fastInventoryKeySelected)
-			glColor3f(128.f, 0.f, 0.f);
-		else
-			glColor3f(0.f, 0.f, 0.f);
-
-		glBegin(GL_QUADS);
-		glVertex2i(-2, -2);
-		glVertex2i(50, -2);
-		glVertex2i(50, 50);
-		glVertex2i(-2, 50);
-		glEnd();
-
-		glColor3f(255.f, 128.f, 0.f);
-		glBegin(GL_QUADS);
-		glVertex2i(0, 0);
-		glVertex2i(48, 0);
-		glVertex2i(48, 48);
-		glVertex2i(0, 48);
-		glEnd();
+		if(j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+			break;
+		
+		glTranslated(+64 * 3, 0 , 0); 
 	}
 }
+
+
+void Engine::DrawHurtEffect() const
+{
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+
+	m_effectHurt.Bind();
+	//static const int crossSize = 800;
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+	int ishurt = m_world.GetPlayer()->isHurt;
+	int diviseur = 1;
+	switch (ishurt)
+	{
+	case 20:
+		diviseur = 54;
+		glDisable(GL_BLEND);
+		break;
+	case 19:
+		diviseur = 48;
+		glDisable(GL_BLEND);
+		break;
+	case 18:
+		diviseur = 40;
+		glDisable(GL_BLEND);
+		break;
+	case 17:
+		diviseur = 37;
+		glDisable(GL_BLEND);
+		break;
+	case 16:
+		diviseur = 35;
+		glDisable(GL_BLEND);
+		break;
+	case 15:
+		diviseur = 31;
+		break;
+	case 14:
+		diviseur = 29;
+		break;
+	case 13:
+		diviseur = 26;
+		break;
+	case 12:
+		diviseur = 24;
+		break;
+	case 11:
+		diviseur = 21;
+		break;
+	case 10:
+		diviseur = 19;
+		break;
+	case 9:
+		diviseur = 16;
+		break;
+	case 8:
+		diviseur = 14;
+		break;
+	case 7:
+		diviseur = 11;
+		break;
+	case 6:
+		diviseur = 9;
+		break;
+	case 5:
+		diviseur = 6;
+		break;
+	case 4:
+		diviseur = 4;
+		break;
+	case 3:
+		diviseur = 3;
+		break;
+	case 2:
+		diviseur = 2;
+		break;
+	case 1:
+		diviseur = 1;
+		break;
+
+
+
+
+
+	}
+	glTexCoord2f(0, 0);
+	glVertex2i(-(Width() / diviseur), -(Height() / diviseur));
+	glTexCoord2f(1, 0);
+	glVertex2i(Width() + (Width() / diviseur), -(Height() / diviseur));
+	glTexCoord2f(1, 1);
+	glVertex2i(Width() + (Width() / diviseur), Height() + (Height() / diviseur));
+	glTexCoord2f(0, 1);
+	glVertex2i(-(Width() / diviseur), Height() + (Height() / diviseur));
+	
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glEnable(GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	
+}
+
+void Engine::DrawSunMoon(float gametime) const {
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glTranslatef(m_world.GetPlayer()->GetPosition().x, 0, m_world.GetPlayer()->GetPosition().z);
+
+	glRotatef(gametime * 1.1f, 0.f, 1.f, 0.f);
+
+	m_sun.Bind();
+	//static const int crossSize = 800;
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+	int ishurt = m_world.GetPlayer()->isHurt;
+	glTexCoord2f(0, 0);
+	glVertex2i(50, 50);
+	glTexCoord2f(1, 0);
+	glVertex2i(150, 50);
+	glTexCoord2f(1, 1);
+	glVertex2i(150, 150);
+	glTexCoord2f(0, 1);
+	glVertex2i(50, 150);
+
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glEnable(GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+}
+
+void Engine::SetLightSource(float gametime)
+{
+	int daytime = (int)gametime % DAY_LENGTH;
+	float positionX;
+	float positionY;
+	if (daytime / (DAY_LENGTH / 4) == 0)
+	{ 
+		positionX = (DAY_LENGTH / 4) - daytime;
+		positionY = daytime;
+	}
+	else if (daytime / (DAY_LENGTH / 4) == 1)
+	{ 
+		positionX = (DAY_LENGTH / 4) - daytime;
+		positionX = (DAY_LENGTH / 4) - positionX;
+	}
+	else if (daytime / (DAY_LENGTH / 4) == 2)
+	{
+		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
+		positionY = daytime - (DAY_LENGTH / 2);
+	}
+	else
+	{
+		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
+		positionX = (DAY_LENGTH / 4) - positionX;
+	}
+
+	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x + positionX ,  m_world.GetPlayer()->GetPosition().y + positionY, 0.0f, 0.0f };
+	GLfloat light0Amb[4] = { 2.f, 2.f, 2.f, 1.0f };
+	GLfloat light0Diff[4] = { 5.0f, 5.0f, 5.0f, 1.0f };
+	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
+
+
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
+
+}
+
+
+

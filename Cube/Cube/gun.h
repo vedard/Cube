@@ -12,7 +12,8 @@ class Gun
 public:
 	Gun();
 	~Gun();
-	void Init(std::string modelPath, std::string texturePath, int sound, bool isAuto, float RPM, float damage, float aimHeight);
+	void InitRessource(std::string modelPath, std::string texturePath, int sound);
+	void InitStat(bool isAuto, float RPM, float damage, float aimHeight);
 	void Draw(float x, float y, float z, float rotX, float rotY) const;
 	void Update();
 	bool Shoot(float x, float y, float z, float rotX, float rotY);

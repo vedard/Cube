@@ -1,11 +1,12 @@
-varying vec4 light;
+# version 330 compatibility
+out vec4 light;
 uniform float gameTime;
-attribute float type;
+in float type;
 
-varying float atten; 
-varying float fogFactor; 
-varying vec3 lightVec, viewVec; 
-attribute vec3 tangent; 
+out float atten; 
+out float fogFactor; 
+out vec3 lightVec, viewVec; 
+in vec3 tangent; 
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
@@ -21,9 +22,9 @@ out vec4 viewSpace;
 
 void main()
 {	
-    light = gl_Color;
+	light = gl_Color;
 	gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 
 	//used for lighting models
 	world_pos = (model_matrix * vec4(in_position,1)).xyz;

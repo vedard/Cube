@@ -13,13 +13,11 @@ Parametre Parametre::m_instance = Parametre();
 
 Parametre::Parametre()
 {
-	cout << "Creation des paramètres" << endl;
 	Load();
 }
 
 Parametre::~Parametre()
 {
-	cout << "Destruction des paramètres" << endl;
 }
 
 Parametre& Parametre::GetInstance()
@@ -31,29 +29,18 @@ void Parametre::Save()
 {
 	ofstream myfile;
 	myfile.open("Cube.conf");
+
 	std::cout << "Saving changes on config file" << std::endl;
-	if (m_isfullscreen)
-	{
-		myfile << "fullscreen " << "true" << "\n";
-	}
-	else
-	{
-		myfile << "fullscreen " << "false" << "\n";
-	}
+
+	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
+	myfile << "fullscreen " << ((m_fullscreen) ? "true" : "false") << "\n";
 	myfile << "width " << m_width << "\n";
 	myfile << "height " << m_height << "\n";
 	myfile << "antialiasing " << m_antialiasing << "\n";
-	if (m_vsync)
-	{
-		myfile << "vsync " << "true" << "\n";
-	}
-	else
-	{
-		myfile << "vsync " << "false" << "\n";
-	}
+	myfile << "vsync " << ((m_vsync) ? "true" : "false") << "\n";
 	myfile << "render_distance " << m_renderdistance << "\n";
 	myfile << "cross_color_r " << m_crossred << "\n";
-	myfile << "cross_color_g "<< m_crossgreen << "\n";
+	myfile << "cross_color_g " << m_crossgreen << "\n";
 	myfile << "cross_color_b " << m_crossblue << "\n";
 	myfile << "mouse_sensibility " << m_mousesensibility << "\n";
 	myfile << "btnavancer " << m_avancer << "\n";
@@ -66,7 +53,7 @@ void Parametre::Save()
 	myfile << "btnrun " << m_run << "\n";
 	myfile << "btnjump " << m_jump << "\n";
 	myfile << "btnnoclip " << m_noclip << "\n";
-	myfile << "btninventory1 "<< m_inventory1 << "\n";
+	myfile << "btninventory1 " << m_inventory1 << "\n";
 	myfile << "btninventory2 " << m_inventory2 << "\n";
 	myfile << "btninventory3 " << m_inventory3 << "\n";
 	myfile << "btninventory4 " << m_inventory4 << "\n";
@@ -74,7 +61,7 @@ void Parametre::Save()
 	myfile << "btnspawnmonster " << m_spawnmonster << "\n";
 	myfile << "btnwireframe " << m_wireframe << "\n";
 	myfile << "musicvolume " << m_musicvolume << "\n";
-	myfile << "soundvolume " << m_soundvolume <<"\n";
+	myfile << "soundvolume " << m_soundvolume << "\n";
 
 	myfile.close();
 	Load();
@@ -86,6 +73,7 @@ void Parametre::SaveDefault()
 	myfile.open("Cube.conf");
 	std::cout << "Creating config save file" << std::endl;
 
+	myfile << "server" << "false" << "\n";
 	myfile << "fullscreen false \n";
 	myfile << "width 1360 \n";
 	myfile << "height 768 \n";
@@ -140,7 +128,7 @@ void Parametre::Load()
 	}
 	else
 	{
-		Array2d<std::string> setting(29, 2);
+		Array2d<std::string> setting(100, 2);
 		setting.Reset("null");
 		setting.Get(0, 0) = "width";
 		setting.Get(1, 0) = "height";
@@ -169,9 +157,9 @@ void Parametre::Load()
 		setting.Get(24, 0) = "btninventory";
 		setting.Get(25, 0) = "btnspawnmonster";
 		setting.Get(26, 0) = "btnwireframe";
-		setting.Get(27, 0) = "musicvolume";
-		setting.Get(28, 0) = "soundvolume";
-
+		setting.Get(27, 0) = "server";
+		setting.Get(28, 0) = "musicvolume";
+		setting.Get(29, 0) = "soundvolume";
 
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
@@ -262,9 +250,13 @@ void Parametre::Load()
 			m_spawnmonster = (sf::Keyboard::Key)atoi(setting.Get(25, 1).c_str());
 		if (setting.Get(26, 1) != "null")
 			m_wireframe = (sf::Keyboard::Key)atoi(setting.Get(26, 1).c_str());
-		if (setting.Get(27, 1) != "null")
-			m_musicvolume = (sf::Keyboard::Key)atoi(setting.Get(27, 1).c_str());
+		if (setting.Get(27, 1) == "true" || setting.Get(27, 1) == "1")
+			m_isServer = true;
+		else
+			m_isServer = false;
 		if (setting.Get(28, 1) != "null")
+			m_musicvolume = (sf::Keyboard::Key)atoi(setting.Get(27, 1).c_str());
+		if (setting.Get(29, 1) != "null")
 			m_soundvolume = (sf::Keyboard::Key)atoi(setting.Get(28, 1).c_str());
 	}
 }

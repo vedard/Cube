@@ -3,6 +3,7 @@
 
 #include "item.h"
 #include "define.h"
+#include <iostream>
 
 class Inventory
 {
@@ -10,14 +11,16 @@ public:
 	Inventory();
 	~Inventory();
 
-	void AddItemQ(Item type);
-	void AddItemQ(Item type, int number);
+	void AddItemQ(BlockType type);
+	void AddItemQ(BlockType type, int number);
 
-	void RemoveItemQ(Item type);
-	void RemoveItemQ(Item type, int number);
+	bool RemoveItemQ(BlockType type);
+	bool RemoveItemQ(BlockType type, int number);
+	bool RemoveItemALL(BlockType type);	//TODO: Remove all of this item from inventory
 
 	void ReassignItemShortcut(int index_itemFast, int index_item);
 	void SwitchItems(int index_item1, int index_item2);
+	void SortInventory();	//TODO: Sort inventory to eliminate & fuse possible doubled stacks as well as ordering them by BlockType
 
 	Item* GetItems();
 private:
