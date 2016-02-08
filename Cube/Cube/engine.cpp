@@ -134,12 +134,12 @@ void Engine::LoadResource()
 	AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
 	AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
 
-	AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
+	AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .75f);
 	AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
 	AddTextureToAtlas(BTYPE_RWATER3, "Grass", TEXTURE_PATH "block_rwater3.bmp", .25f);
 	AddTextureToAtlas(BTYPE_FWATER, "Grass", TEXTURE_PATH "block_fwater.bmp", 1);
 
-	AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .90f);
+	AddTextureToAtlas(BTYPE_RLAVA1, "Grass", TEXTURE_PATH "block_rlava1.bmp", .75f);
 	AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
 	AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 	AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
@@ -168,12 +168,13 @@ void Engine::LoadResource()
 		abort();
 	m_music.setLoop(true);
 	m_music.setVolume(10);
-	m_music.play();
+	//m_music.play();
 
 
 	//Model 3d
 	m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-	m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+	m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+	m_modelBear.LoadOBJ(MODEL_PATH "bear2.obj", TEXTURE_PATH "bear.png");
 
 	//Gun
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].Init(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE, false, 400, 100, 0.2);
@@ -271,6 +272,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		DrawDeathScreen();
 		return;
 	}
+	
 
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	glColor3f(1.f, 1.f, 1.f);
@@ -291,6 +293,8 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
+	
+
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
@@ -299,12 +303,31 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	//Draw Monstres
 	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Draw(m_modelRaptor, false);
+	{
+		Monster monst = m_world.GetMonster()[i];
+		MONSTER_TYPE type = monst.GetType();
+		m_world.GetMonster()[i].Draw(m_modelCreeper, false);
+	}
+		
 
 	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetAnimal()[i].Draw(m_modelCow);
+	{
+		Animal anim = m_world.GetAnimal()[i];
+		ANIMAL_TYPE type = anim.GetType();
+		switch (type)
+		{
+		case A_BEAR:anim.Draw(m_modelBear);
+			break;
+		case A_COW: anim.Draw(m_modelCow);
+		default:
+			break;
+		}
+		
+	}
+		
 
-	m_playerActor.Draw(m_modelRaptor);
+	m_playerActor.Draw(m_modelCreeper);
+	
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
@@ -345,6 +368,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_isMenuOpen)
 		DrawMenu();
 
+	
 }
 
 void Engine::Render(float elapsedTime)
@@ -1272,6 +1296,8 @@ void Engine::DrawMenu() const
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	if (m_menu->m_currentMenuItem == 0)
+
+ 
 		glColor3f(1.f, 0.f, 0.f);
 	else
 		glColor3f(0.5f, 0.5f, 0.5f);

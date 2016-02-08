@@ -59,7 +59,7 @@ private:
 
 	Player* m_player;
 	Monster* m_monster;
-	Animal* m_animal;
+	Animal* m_cow;
 
 	int UpdateDistance;
 	int	m_seed;

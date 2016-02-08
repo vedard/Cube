@@ -99,7 +99,8 @@ private:
 
 	//Model
 	Model3d m_modelCow;
-	Model3d m_modelRaptor;
+	Model3d m_modelCreeper;
+	Model3d m_modelBear;
 
 	//Gun 
 	Gun * playerGun;

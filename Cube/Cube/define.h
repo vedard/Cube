@@ -55,7 +55,7 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 0
+#define MAX_MONSTER 1
 #define MAX_COW 30
 #define PI 3.14159265358f
 #define MAX_BULLET 500
@@ -127,5 +127,14 @@ enum MENU_PRINCIPAL {
 	MP_EXIT_GAME
 };
 
+enum ANIMAL_TYPE
+{
+	A_BEAR,
+	A_COW
+};
+
+enum MONSTER_TYPE {
+	M_Creeper
+};
 
 #endif // DEFINE_H__
