@@ -378,7 +378,7 @@ bool Player::Shoot(World &world)
 		return false;
 }
 
-bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::Underwater() const {return m_headUnderwater;}
 bool Player::footUnderwater() const { return m_footUnderwater; }
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
@@ -396,7 +396,6 @@ void Player::Tick()
 		{
 			ResetDeath();
 		}
-		//isHurt = 20;
 	}
 	if (m_headUnderwater)
 	{
@@ -409,7 +408,6 @@ void Player::Tick()
 			{
 				ResetDeath();
 			}
-			//isHurt = 20;
 		}
 	}
 	else

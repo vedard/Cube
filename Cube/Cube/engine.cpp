@@ -250,6 +250,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
+
 }
 
 void Engine::DrawEnvironement(float gameTime) {
@@ -276,12 +277,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_world.GetPlayer()->ApplyRotation();
 	float shake = m_world.GetPlayer()->ApplyTranslation();
 
-	//Activation des shaders
-	m_shader01.Use();
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
-
+	
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
@@ -301,11 +297,19 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
-		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
+			m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon()-1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
 			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake,
 			m_world.GetPlayer()->GetPosition().z,
 			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
+
+	//Activation des shaders
+	m_shader01.Use();
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
+	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
+
+	
 
 	//Draw Chunks
 	m_textureAtlas.Bind();
@@ -320,10 +324,15 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	m_playerActor.Draw(m_modelRaptor);
 
+
+	
+
+	//J ai commenter ca et ca rien changer... je sais po sa fait quoi heheheheh
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
+	
 	//Draw Bullets
 	for (int j = 0; j < 3; j++)
 		for (int i = 0; i < MAX_BULLET; i++)
@@ -461,13 +470,7 @@ void Engine::Render(float elapsedTime)
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
-		////Tirer
-		//if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK)
-		//{
-		//	playerGun[m_world.GetPlayer()->GetWeapon() - 1].Shoot(m_world.GetPlayer()->GetPosition().x, m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y, m_world.GetPlayer()->GetPosition().z, m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
-		//	(playerGun[m_world.GetPlayer()->GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
-		//}
-
+		
 		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
 			m_mouseButton[1] = false;
 
@@ -612,6 +615,11 @@ void Engine::KeyPressEvent(unsigned char key)
 		//1 -> W_BLOCK 
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
+		if (m_keyboard[m_settings.m_inventory2])
+		{
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
+			Sound::Play(Sound::GUN_DRAW);
+		}
 		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory3])
 		{
