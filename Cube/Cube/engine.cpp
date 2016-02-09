@@ -374,8 +374,21 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	// Draw le menu
 	if (m_isMenuOpen)
-		DrawMenuPrincipal();
-
+	{
+		if (m_menu->m_currentMenu == SM_PRINCIPAL)
+			DrawMenuPrincipal();
+		else if (m_menu->m_currentMenu == SM_SETTINGS)
+			DrawMenuSettings();
+		else if (m_menu->m_currentMenu == SM_CONTROLS)
+			DrawMenuControls();
+		else if (m_menu->m_currentMenu == SM_SETTING_SELECTED)
+			if (m_menu->m_currentMenuItem >= MS_CROSSCOLOR_R)
+				DrawMenuSettingSelected(true);
+			else
+				DrawMenuSettingSelected(false);
+		else if (m_menu->m_currentMenu == SM_CONTROL_SELECTED)
+			DrawMenuControlSelected();
+	}
 }
 
 void Engine::Render(float elapsedTime)
@@ -500,6 +513,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	{
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
+	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
 	if (m_isMenuOpen)
 	{
 		// Fermer menu
@@ -508,22 +522,37 @@ void Engine::KeyPressEvent(unsigned char key)
 			if (m_isMenuOpen)
 			{
 				m_isMenuOpen = false;
+				m_menu = new Menu(SM_PRINCIPAL);
 				HideCursor();
 			}
 		}
 		else if (m_keyboard[sf::Keyboard::Return])
 		{
-			if (m_menu->m_currentMenuItem == 2)
+			ManageMenuEnterKeyPress();
+		}
+		else if (m_keyboard[sf::Keyboard::BackSpace])
+		{
+			if (m_menu->m_currentMenu == SM_PRINCIPAL)
 			{
-				m_world.m_threadcontinue = false;
-				int sound = Sound::LEAVE1 + rand() % 5;
-				Sound::PlayAndWait(sound);
-				Stop();
+				m_isMenuOpen = false;
+				m_menu = new Menu(SM_PRINCIPAL);
+				HideCursor();
 			}
+			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
+				m_menu = new Menu(SM_PRINCIPAL);
+			else
+				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 		}
 		else
 		{
 			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+
+			if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
+			{
+				int lastMenuItem = m_menu->m_currentMenuItem;
+				m_menu = new Menu(SM_CONTROLS);
+				m_menu->m_currentMenuItem = lastMenuItem;
+			}
 		}
 
 	}
@@ -1291,32 +1320,581 @@ void Engine::DrawMenuPrincipal() const
 	glEnd();
 
 
-	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
-	if (m_menu->m_currentMenuItem == 0)
+	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2));
+	DrawMenuButton(MP_EXIT_GAME, "Exit Game", Width() / 2 - 40, (Height() / 2) - (menuHeight / 2));
+
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void Engine::DrawMenuSettings() const
+{
+	// Menu stats/info
+	std::string fullscreen;
+	std::string gameWidth;
+	std::string gameHeight;
+	std::string antiAliasing;
+	std::string vSync;
+	std::string renderDistance;
+	std::string rCrossColor;
+	std::string gCrossColor;
+	std::string bCrossColor;
+	std::string mouseSensivity;
+
+	// Menu specs
+	int menuHeight = 300;
+	int menuWidth = 400;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	// Mettre les stats/infos en string
+	gameWidth = std::to_string(m_settings.m_width);
+	gameHeight = std::to_string(m_settings.m_height);
+	antiAliasing = std::to_string(m_settings.m_antialiasing) + "x";
+	renderDistance = std::to_string(m_settings.m_renderdistance);
+	rCrossColor = std::to_string(m_settings.m_crossred);
+	gCrossColor = std::to_string(m_settings.m_crossgreen);
+	bCrossColor = std::to_string(m_settings.m_crossblue);
+	mouseSensivity = std::to_string(m_settings.m_mousesensibility);
+
+	if (m_settings.m_isfullscreen == true)
+		fullscreen = "True";
+	else
+		fullscreen = "False";
+
+	if (m_settings.m_vsync == true)
+		vSync = "True";
+	else
+		vSync = "False";
+
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	// Dessiner le titre
+	PrintText(Width() / 2 - 60, (Height() / 2) + (menuHeight / 2) + (menuHeight / 4), 20.f, "Settings");
+
+	int column1Width = (Width() / 2) - menuWidth + 40;
+	int column2Width = (Width() / 2) - (menuWidth / 2);
+	int column3Width = (Width() / 2) + (menuWidth / 4);
+	int column4Width = (Width() / 2) + menuWidth - (menuWidth / 4);
+
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
+	DrawMenuButton(MS_FULLSCREEN, "Fullscreen", column1Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_FULLSCREEN, fullscreen, column2Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_WIDTH, "Width", column1Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_WIDTH, gameWidth, column2Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_HEIGHT, "Height", column1Width, (Height() / 2));
+	DrawMenuButton(MS_HEIGHT, gameHeight, column2Width, (Height() / 2));
+	DrawMenuButton(MS_ANTI_ALIASING, "Anti-Aliasing", column1Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_ANTI_ALIASING, antiAliasing, column2Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_VSYNC, "V-Sync", column1Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_VSYNC, vSync, column2Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MS_RENDER_DISTANCE, "Render Distance", column3Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_RENDER_DISTANCE, renderDistance, column4Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_G, gCrossColor, column4Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight / 2));
+
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void Engine::DrawMenuControls() const
+{
+	// Menu specs
+	int menuHeight = 300;
+	int menuWidth = 400;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	// Dessiner le titre
+	PrintText(Width() / 2 - 60, (Height() / 2) + (menuHeight / 2) + (menuHeight / 4), 20.f, "Controls");
+
+	int column1Width = (Width() / 2) - menuWidth + 40;
+	int column2Width = (Width() / 2) - (menuWidth / 2);
+	int column3Width = (Width() / 2) + (menuWidth / 6);
+	int column4Width = (Width() / 2) + menuWidth - (menuWidth / 2);
+
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
+	DrawMenuButton(MC_AVANCER, "Forward", column1Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_GAUCHE, "Left", column1Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MC_RECULER, "Backward", column1Width, (Height() / 2));
+	DrawMenuButton(MC_DROITE, "Right", column1Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MC_FULLSCREEN, "Fullscreen", column1Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MC_INFO, "Info", column2Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_CROUCH, "Crouch", column2Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MC_RUN, "Run", column2Width, (Height() / 2));
+	DrawMenuButton(MC_JUMP, "Jump", column2Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MC_NOCLIP, "No Clip", column2Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MC_INVENTORY1, "Inventory 1", column3Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_INVENTORY2, "Inventory 2", column3Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MC_INVENTORY3, "Inventory 3", column3Width, (Height() / 2));
+	DrawMenuButton(MC_INVENTORY4, "Inventory 4", column3Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MC_INVENTORY, "Inventory", column3Width, (Height() / 2) - (menuHeight / 2));
+
+	DrawMenuButton(MC_SPAWNMONSTER, "Spawn Monster", column4Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MC_WIREFRAME, "Wireframe", column4Width, (Height() / 2) + (menuHeight / 4));
+
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const
+{
+	if (m_menu->m_currentMenuItem == menuItem)
 		glColor3f(1.f, 0.f, 0.f);
 	else
 		glColor3f(0.5f, 0.5f, 0.5f);
-	ss << "Controls";
-	PrintText(Width() / 2 - 35, (Height() / 2) + (menuHeight / 2), 12.f, ss.str());
 
-	if (m_menu->m_currentMenuItem == 1)
-		glColor3f(1.f, 0.f, 0.f);
+	PrintText(xPos, yPos, 12.f, text);
+}
+
+void Engine::ManageMenuEnterKeyPress()
+{
+	if (m_menu->m_currentMenu == SM_PRINCIPAL)
+	{
+		if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
+		{
+			CloseGame();
+		}
+		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
+			m_menu = new Menu(SM_SETTINGS);
+		else if (m_menu->m_currentMenu == MP_CONTROLS)
+			m_menu = new Menu(SM_CONTROLS);
+	}
+	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
+	{
+		if (m_menu->m_currentMenuItem == MS_FULLSCREEN)
+		{
+			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
+			m_settings.Save();
+			SetFullscreen(IsFullscreen());
+		}
+		else if (m_menu->m_currentMenuItem == MS_WIDTH)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_WIDTH)
+					m_menu->m_settingNewValue = MIN_WIDTH;
+
+				m_settings.m_width = m_menu->m_settingNewValue;
+				m_settings.Save();
+				ResetScreen();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_HEIGHT)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_HEIGHT)
+					m_menu->m_settingNewValue = MIN_HEIGHT;
+
+				m_settings.m_height = m_menu->m_settingNewValue;
+				m_settings.Save();
+				ResetScreen();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_ANTI_ALIASING)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue == 0 ||
+					m_menu->m_settingNewValue == 2 ||
+					m_menu->m_settingNewValue == 4 ||
+					m_menu->m_settingNewValue == 8)
+				{
+
+					m_settings.m_antialiasing = m_menu->m_settingNewValue;
+					m_settings.Save();
+					ResetScreen();
+
+					m_menu->m_settingNewValue = 0;
+					m_menu->m_currentMenu = SM_SETTINGS;
+				}
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_VSYNC)
+		{
+			m_settings.m_vsync = !m_settings.m_vsync;
+			m_settings.Save();
+			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+		}
+		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				m_settings.m_renderdistance = m_menu->m_settingNewValue;
+				m_settings.Save();
+
+				m_world.SetUpdateDistance(m_settings.m_renderdistance);
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_R)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float rValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					rValue = rValue / 10;
+
+				m_settings.m_crossred = rValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_G)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float rValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					rValue = rValue / 10;
+
+				m_settings.m_crossgreen = rValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_CROSSCOLOR_B)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float rValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					rValue = rValue / 10;
+
+				m_settings.m_crossblue = rValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_MOUSE_SENSITIVITY)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				float floatValue = m_menu->m_settingNewValue;
+				for (size_t i = 0; i < m_menu->m_digitCount; i++)
+					floatValue = floatValue / 10;
+
+				m_settings.m_mousesensibility = floatValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+	}
+	else if (m_menu->m_currentMenu == SM_CONTROLS || m_menu->m_currentMenu == SM_CONTROL_SELECTED)
+	{
+		if (m_menu->m_currentMenuItem == MC_AVANCER)
+		{
+			m_menu->m_controlSelected = "Forward";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_GAUCHE)
+		{
+			m_menu->m_controlSelected = "Left";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_RECULER)
+		{
+			m_menu->m_controlSelected = "Backward";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_DROITE)
+		{
+			m_menu->m_controlSelected = "Right";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_FULLSCREEN)
+		{
+			m_menu->m_controlSelected = "Fullscreen";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INFO)
+		{
+			m_menu->m_controlSelected = "Info";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_CROUCH)
+		{
+			m_menu->m_controlSelected = "Crouch";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_RUN)
+		{
+			m_menu->m_controlSelected = "Run";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_JUMP)
+		{
+			m_menu->m_controlSelected = "Jump";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_NOCLIP)
+		{
+			m_menu->m_controlSelected = "No Clip";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY1)
+		{
+			m_menu->m_controlSelected = "Inventory 1";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY2)
+		{
+			m_menu->m_controlSelected = "Inventory 2";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY3)
+		{
+			m_menu->m_controlSelected = "Inventory 3";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY4)
+		{
+			m_menu->m_controlSelected = "Inventory 4";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_INVENTORY)
+		{
+			m_menu->m_controlSelected = "Inventory";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_SPAWNMONSTER)
+		{
+			m_menu->m_controlSelected = "Spawn Monster";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+		else if (m_menu->m_currentMenuItem == MC_WIREFRAME)
+		{
+			m_menu->m_controlSelected = "Wireframe";
+			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
+		}
+	}
+}
+
+void Engine::DrawMenuSettingSelected(bool isFloat)
+{
+	// Menu specs
+	int menuWidth = 100;
+	int menuHeight = 60;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
+	PrintText(Width() / 2 - 68, Height() / 2 + 5, 12.f, "Escape to cancel");
+	PrintText(Width() / 2 - 70, Height() / 2 - 20, 12.f, "Enter to confirm");
+	if (isFloat == true)
+		PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, "0." + std::to_string(m_menu->m_settingNewValue));
 	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss.str("");
-	ss << "Settings";
-	PrintText(Width() / 2 - 35, (Height() / 2), 12.f, ss.str());
+		PrintText(Width() / 2 - 70, Height() / 2 - menuHeight + 8, 12.f, std::to_string(m_menu->m_settingNewValue));
 
-	if (m_menu->m_currentMenuItem == 2)
-		glColor3f(1.f, 0.f, 0.f);
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void Engine::DrawMenuControlSelected()
+{
+	// Menu specs
+	std::string str = KEY_ALREADY_BOUND;
+	int menuWidth = str.length() * 6 + 10;
+	int menuHeight = 20;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(1.f, 0.f, 0.f);
+
+	if (m_menu->m_controlSelected == KEY_ALREADY_BOUND)
+		PrintText(Width() / 2 - (m_menu->m_controlSelected.length() * 6), Height() / 2 + menuHeight - 30, 16.f, m_menu->m_controlSelected);
 	else
-		glColor3f(0.5f, 0.5f, 0.5f);
-	ss.str("");
-	ss << "Exit Game";
-	PrintText(Width() / 2 - 40, (Height() / 2) - (menuHeight / 2), 12.f, ss.str());
-
+		PrintText(Width() / 2 - (m_menu->m_controlSelected.length() * 6), Height() / 2 + menuHeight - 30, 16.f, m_menu->m_controlSelected);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
@@ -1584,6 +2162,10 @@ void Engine::SetLightSource(float gametime)
 
 }
 
-
-
-
+void Engine::CloseGame()
+{
+	m_world.m_threadcontinue = false;
+	int sound = Sound::LEAVE1 + rand() % 5;
+	Sound::PlayAndWait(sound);
+	Stop();
+}
