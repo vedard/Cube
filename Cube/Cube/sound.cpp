@@ -56,6 +56,26 @@ void Sound::PlayOnce(int soundbuffer)
 	}
 }
 
+void Sound::PlayAndWait(int soundbuffer)
+{
+	Parametre& m_settings = Parametre::GetInstance();
+	for (int i = 0; i < 200; i++)
+	{
+		if (m_Sound[i].getStatus() == sf::Sound::Status::Stopped)
+		{
+			m_Sound[i].setBuffer(m_SoundBuffers[soundbuffer]);
+			m_Sound[i].setVolume((float)m_settings.m_soundvolume);
+			m_Sound[i].play();
+			m_listbuffer[i] = soundbuffer;
+			while (m_Sound[i].getStatus() == sf::Sound::Status::Playing)
+			{
+
+			}
+			break;
+		}
+	}
+}
+
 void Sound::DeInit()
 {
 	delete[] m_Sound;

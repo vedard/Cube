@@ -32,8 +32,8 @@ void Parametre::Save()
 
 	std::cout << "Saving changes on config file" << std::endl;
 
-	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
-	myfile << "fullscreen " << ((m_fullscreen) ? "true" : "false") << "\n";
+	myfile << "server " << ((m_isServer) ? "true" : "false") << "\n";
+	myfile << "fullscreen " << ((m_isfullscreen) ? "true" : "false") << "\n";
 	myfile << "width " << m_width << "\n";
 	myfile << "height " << m_height << "\n";
 	myfile << "antialiasing " << m_antialiasing << "\n";
@@ -164,7 +164,7 @@ void Parametre::Load()
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
 
-		//Read All file
+		//Read whole file
 		std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		std::stringstream ss(str);
 		//Close it

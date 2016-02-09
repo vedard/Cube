@@ -61,9 +61,15 @@ private:
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;
+	void DrawMenuSettings() const;
+	void DrawMenuControls() const;
+	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
+	void ManageMenuEnterKeyPress();
+	void DrawMenuSettingSelected(bool isFloat);
+	void DrawMenuControlSelected();
 	void SetLightSource(float gametime);
-	void SetDayOrNight(float gametime);
 
+	void CloseGame();	void SetDayOrNight(float gametime);
 private:
 	bool m_wireframe;
 	float m_LastTickTime;

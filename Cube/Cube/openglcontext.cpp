@@ -130,6 +130,13 @@ bool OpenglContext::IsFullscreen() const
 	return m_settings.m_isfullscreen;
 }
 
+void OpenglContext::ResetScreen()
+{
+	DeInit();
+	InitWindow();
+	Init();
+}
+
 void OpenglContext::MakeRelativeToCenter(int& x, int& y) const
 {
 	x = x - (Width() / 2);
@@ -164,7 +171,7 @@ void OpenglContext::InitWindow(int width, int height)
 			sf::Style::Fullscreen,
 			sf::ContextSettings(32, 8, m_settings.m_antialiasing));
 	else
-		m_app.create(sf::VideoMode((m_settings.m_width != 0) ? m_settings.m_width : 800, (m_settings.m_height != 0) ? m_settings.m_height : 600, 32),
+		m_app.create(sf::VideoMode((m_settings.m_width != 0) ? m_settings.m_width : MIN_WIDTH, (m_settings.m_height != 0) ? m_settings.m_height : MIN_HEIGHT, 32),
 			m_title.c_str(),
 			sf::Style::Close,
 			sf::ContextSettings(32, 8, m_settings.m_antialiasing));
