@@ -32,7 +32,7 @@ void Parametre::Save()
 
 	std::cout << "Saving changes on config file" << std::endl;
 
-	myfile << "server " << ((m_isServer) ? "true" : "false") << "\n";
+	
 	myfile << "fullscreen " << ((m_isfullscreen) ? "true" : "false") << "\n";
 	myfile << "width " << m_width << "\n";
 	myfile << "height " << m_height << "\n";
@@ -60,6 +60,7 @@ void Parametre::Save()
 	myfile << "btninventory " << m_openinventory << "\n";
 	myfile << "btnspawnmonster " << m_spawnmonster << "\n";
 	myfile << "btnwireframe " << m_wireframe << "\n";
+	myfile << "server " << ((m_isServer) ? "true" : "false") << "\n";
 	myfile << "musicvolume " << m_musicvolume << "\n";
 	myfile << "soundvolume " << m_soundvolume << "\n";
 
@@ -73,7 +74,7 @@ void Parametre::SaveDefault()
 	myfile.open("Cube.conf");
 	std::cout << "Creating config save file" << std::endl;
 
-	myfile << "server" << "false" << "\n";
+	
 	myfile << "fullscreen false \n";
 	myfile << "width 1360 \n";
 	myfile << "height 768 \n";
@@ -101,6 +102,7 @@ void Parametre::SaveDefault()
 	myfile << "btninventory 8 \n";
 	myfile << "btnspawnmonster 12 \n";
 	myfile << "btnwireframe 24 \n";
+	myfile << "server" << "false" << "\n";
 	myfile << "musicvolume 10 \n";
 	myfile << "soundvolume 12 \n";
 
@@ -255,8 +257,8 @@ void Parametre::Load()
 		else
 			m_isServer = false;
 		if (setting.Get(28, 1) != "null")
-			m_musicvolume = (sf::Keyboard::Key)atoi(setting.Get(27, 1).c_str());
+			m_musicvolume = atoi(setting.Get(28, 1).c_str());
 		if (setting.Get(29, 1) != "null")
-			m_soundvolume = (sf::Keyboard::Key)atoi(setting.Get(28, 1).c_str());
+			m_soundvolume = atoi(setting.Get(29, 1).c_str());
 	}
 }

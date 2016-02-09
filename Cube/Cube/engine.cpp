@@ -1309,10 +1309,10 @@ void Engine::DrawMenuSettings() const
 	std::string antiAliasing;
 	std::string vSync;
 	std::string renderDistance;
+	std::string mouseSensivity;
 	std::string rCrossColor;
 	std::string gCrossColor;
 	std::string bCrossColor;
-	std::string mouseSensivity;
 
 	// Menu specs
 	int menuHeight = 300;
@@ -1390,17 +1390,21 @@ void Engine::DrawMenuSettings() const
 	DrawMenuButton(MS_ANTI_ALIASING, antiAliasing, column2Width, (Height() / 2) - (menuHeight / 4));
 	DrawMenuButton(MS_VSYNC, "V-Sync", column1Width, (Height() / 2) - (menuHeight / 2));
 	DrawMenuButton(MS_VSYNC, vSync, column2Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_RENDER_DISTANCE, "Render Distance", column1Width, (Height() / 2) - (menuHeight * 3 / 4));
+	DrawMenuButton(MS_RENDER_DISTANCE, renderDistance, column2Width, (Height() / 2) - (menuHeight * 3 / 4));
 
-	DrawMenuButton(MS_RENDER_DISTANCE, "Render Distance", column3Width, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MS_RENDER_DISTANCE, renderDistance, column4Width, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2) + (menuHeight / 4));
-	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2) + (menuHeight / 4));
-	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2));
-	DrawMenuButton(MS_CROSSCOLOR_G, gCrossColor, column4Width, (Height() / 2));
-	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 4));
-	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
-	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
-	DrawMenuButton(MS_MOUSE_SENSITIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_SOUND_VOLUME, "Sound Volume", column3Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_SOUND_VOLUME, std::to_string(m_settings.m_soundvolume), column4Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_MUSIC_VOLUME, "Music Volume", column3Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_MUSIC_VOLUME, std::to_string(m_settings.m_musicvolume), column4Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_G, gCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight * 3 / 4));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight * 3 / 4));
 
 
 	glDisable(GL_BLEND);
@@ -1636,6 +1640,43 @@ void Engine::ManageMenuEnterKeyPress()
 				m_settings.Save();
 
 				m_world.SetUpdateDistance(m_settings.m_renderdistance);
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_SOUND_VOLUME)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_VOLUME)
+					m_menu->m_settingNewValue = MIN_VOLUME;
+				else if (m_menu->m_settingNewValue > MAX_VOLUME)
+					m_menu->m_settingNewValue = MAX_VOLUME;
+
+				m_settings.m_soundvolume = m_menu->m_settingNewValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_MUSIC_VOLUME)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_VOLUME)
+					m_menu->m_settingNewValue = MIN_VOLUME;
+				else if (m_menu->m_settingNewValue > MAX_VOLUME)
+					m_menu->m_settingNewValue = MAX_VOLUME;
+
+				m_settings.m_musicvolume = m_menu->m_settingNewValue;
+				m_settings.Save();
+				m_music.setVolume(m_settings.m_musicvolume);
 
 				m_menu->m_settingNewValue = 0;
 				m_menu->m_currentMenu = SM_SETTINGS;

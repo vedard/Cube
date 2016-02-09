@@ -38,7 +38,7 @@ public:
 	int m_renderdistance = 6;
 
 	//Crosshair
-
+	
 	float m_crossred = 0.0f;
 	float m_crossgreen = 0.9f;
 	float m_crossblue = 0.0f;

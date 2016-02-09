@@ -88,6 +88,8 @@ typedef long long int64;
 
 #define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
 #define MIN_HEIGHT 600
+#define MAX_VOLUME 100 // Valeurs du sf::Sound
+#define MIN_VOLUME 0
 
 #define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
 #define KEY_ALREADY_BOUND "This key is already bound"
@@ -154,6 +156,8 @@ enum MENU_SETTINGS {
 	MS_ANTI_ALIASING,
 	MS_VSYNC,
 	MS_RENDER_DISTANCE,
+	MS_SOUND_VOLUME,
+	MS_MUSIC_VOLUME,
 	MS_CROSSCOLOR_R,
 	MS_CROSSCOLOR_G,
 	MS_CROSSCOLOR_B,
