@@ -86,6 +86,12 @@ typedef long long int64;
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
 
+#define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
+#define MIN_HEIGHT 600
+
+#define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
+#define KEY_ALREADY_BOUND "This key is already bound"
+
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
 	BTYPE_AIR, 
@@ -129,7 +135,9 @@ enum WEAPONS {
 enum SOUS_MENU {
 	SM_PRINCIPAL,
 	SM_CONTROLS,
-	SM_SETTINGS
+	SM_SETTINGS,
+	SM_SETTING_SELECTED,
+	SM_CONTROL_SELECTED
 };
 
 // Buttons/states du menu principal
@@ -139,5 +147,37 @@ enum MENU_PRINCIPAL {
 	MP_EXIT_GAME
 };
 
+enum MENU_SETTINGS {
+	MS_FULLSCREEN,
+	MS_WIDTH,
+	MS_HEIGHT,
+	MS_ANTI_ALIASING,
+	MS_VSYNC,
+	MS_RENDER_DISTANCE,
+	MS_CROSSCOLOR_R,
+	MS_CROSSCOLOR_G,
+	MS_CROSSCOLOR_B,
+	MS_MOUSE_SENSITIVITY
+};
+
+enum MENU_CONTROLS {
+	MC_AVANCER,
+	MC_GAUCHE,
+	MC_RECULER,
+	MC_DROITE,
+	MC_FULLSCREEN,
+	MC_INFO,
+	MC_CROUCH,
+	MC_RUN,
+	MC_JUMP,
+	MC_NOCLIP,
+	MC_INVENTORY1,
+	MC_INVENTORY2,
+	MC_INVENTORY3,
+	MC_INVENTORY4,
+	MC_INVENTORY,
+	MC_SPAWNMONSTER,
+	MC_WIREFRAME
+};
 
 #endif // DEFINE_H__
