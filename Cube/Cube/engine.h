@@ -62,6 +62,7 @@ private:
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;
 	void SetLightSource(float gametime);
+	void SetDayOrNight(float gametime);
 
 private:
 	bool m_wireframe;
@@ -71,6 +72,12 @@ private:
 	int m_musiclist [6] = {};
 	float m_LastTickTimeWater;
 	PlayerActor m_playerActor;
+
+	GLfloat m_nightLightAmb[4] = { 5.f, 4.f, 3.f, 7.f };
+	GLfloat m_dayLightAmb[4] = { 5.f, 5.f, 5.f, 7.f };
+	GLfloat m_nightFogColors[4] = { 0.1f, 0.1f, 0.14f, 1 };
+	GLfloat m_dayFogColors[4] = { 0.74f, 0.76f, 0.73f, 1 };
+
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 	bool m_mouseButton[sf::Mouse::ButtonCount]; //tableau de toutes les touches du clavier
@@ -114,6 +121,16 @@ private:
 	// Parametres
 
 	Parametre& m_settings = Parametre::GetInstance();
+
+	// Valeurs pour le jour et la nuit
+	float m_redLight;
+	float m_greenLight;
+	float m_blueLight;
+	float m_redFog;
+	float m_greenFog;
+	float m_blueFog;
+	float m_fogDensity;
+	float m_fogStart;
 
 	bool m_isMenuOpen;
 	Menu* m_menu;

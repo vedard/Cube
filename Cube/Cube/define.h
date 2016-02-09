@@ -53,9 +53,10 @@ typedef long long int64;
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
 #define WORLD_SIZE 70
+#define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 100
+#define MAX_MONSTER 10
 #define MAX_COW 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500

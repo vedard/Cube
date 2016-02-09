@@ -67,26 +67,6 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
-	// Le fog
-	glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.1f, 0.1f, 0.14f, 1 };
-	GLint fogmode = GL_EXP2;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, 0.07f);
-	glFogf(GL_FOG_START, 16.f);
-	glFogf(GL_FOG_END, 21.f);
-
-
-	// La lumiere
-	GLfloat light0Amb[4] = { 5.f, 4.f, 3.f, 7.f };
-	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-
-
 	//Shader
 	std::cout << "Loading and compiling shaders ..." << std::endl;
 	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
@@ -193,7 +173,7 @@ void Engine::LoadResource()
 
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 1800, 120, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
@@ -218,7 +198,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-	
+
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -259,8 +239,6 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-
-
 }
 
 void Engine::DrawEnvironement(float gameTime) {
@@ -293,15 +271,9 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
-	
-
-
-
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
-
-
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
@@ -313,7 +285,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetPlayer()->GetPosition().z - 50,
 		1.f };
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
 
 
 	//Draw guns
@@ -367,12 +339,62 @@ void Engine::DrawEnvironement(float gameTime) {
 
 }
 
+void Engine::SetDayOrNight(float gametime)
+{
+	float time = sin(gametime / DAY_TIME);
+
+	std::cout << m_fogDensity << std::endl;
+
+	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
+
+	// Controle les cycles de couleurs de la lumière
+	m_redLight = 5.f;
+	m_greenLight = 0.48f * sin(time) + 4.5f;
+	m_blueLight = 0.95f * sin(time) + 3.8;
+
+	// Controle les cycles de couleurs du fog
+	m_redFog = 0.5f * sin(time) + 0.45f;
+	m_greenFog = 0.5f * sin(time) + 0.45f;
+	m_blueFog = 0.5f * sin(time) + 0.48f;
+
+	// Controle le cycle de densite du fog
+	m_fogDensity = -0.031f * sin(time) + 0.052f;
+	m_fogStart = 1.68f * sin(time) + 16;
+
+	light0Amb[0] = m_redLight;
+	light0Amb[1] = m_greenLight;
+	light0Amb[2] = m_blueLight;
+	light0Amb[3] = 7.f;
+
+	fogcolor[0] = m_redFog;
+	fogcolor[1] = m_greenFog;
+	fogcolor[2] = m_blueFog;
+	fogcolor[3] = 1;
+
+	// Le fog
+	glEnable(GL_FOG);
+	GLint fogmode = GL_EXP2;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, m_fogDensity);
+	glFogf(GL_FOG_START, m_fogStart);
+	glFogf(GL_FOG_END, 24.f);
+
+	// La lumiere
+	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+}
+
 void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
-	
-	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+
+	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{
 		DrawEnvironement(gameTime);
 		return;
@@ -388,7 +410,7 @@ void Engine::Render(float elapsedTime)
 	}
 
 	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 1000 == 0)
+	if ((int)(gameTime * 100) % 10 == 0)
 		m_world.SpawnAnimals();
 
 	if ((int)(gameTime * 100) % 100 == 0)
@@ -455,6 +477,7 @@ void Engine::Render(float elapsedTime)
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
 			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt, ' ');
 		}
+		SetDayOrNight(gameTime);
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -640,7 +663,7 @@ void Engine::KeyPressEvent(unsigned char key)
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 				m_world.GetPlayer()->isHurt = 0;
 			}
-		if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 		{
 			ShowCursor();
 		}
@@ -901,41 +924,41 @@ void Engine::DrawHud() const
 	// Affichage du crosshair
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
-	
-		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
-		{
-			//Block selectionne
-			glLoadIdentity();
-			glTranslated(Width() - 64, 16, 0);
 
-			//contour 	
-			glColor3f(0.f, 0.f, 0.f);
-			glBegin(GL_QUADS);
-			glVertex2i(-2, -2);
-			glVertex2i(50, -2);
-			glVertex2i(50, 50);
-			glVertex2i(-2, 50);
-			glEnd();
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+	{
+		//Block selectionne
+		glLoadIdentity();
+		glTranslated(Width() - 64, 16, 0);
+
+		//contour 	
+		glColor3f(0.f, 0.f, 0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
 
 
-			//block
-			m_textureAtlas.Bind();
-			glEnable(GL_TEXTURE_2D);
-			glColor3f(1.f, 1.f, 1.f);
+		//block
+		m_textureAtlas.Bind();
+		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.f, 1.f, 1.f);
 
-			glBegin(GL_QUADS);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-			glVertex2i(0, 0);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-			glVertex2i(48, 0);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-			glVertex2i(48, 48);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-			glVertex2i(0, 48);
+		glBegin(GL_QUADS);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(0, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(48, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(48, 48);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(0, 48);
 
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-		}
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+	}
 
 	RenderFastInventory();
 
@@ -1325,32 +1348,32 @@ void Engine::RenderFastInventory() const
 
 	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
 
-	glTranslated(0,-64,0);
-	
-	for(int j = 0; j < 5; j++)
+	glTranslated(0, -64, 0);
+
+	for (int j = 0; j < 5; j++)
 	{
-		glTranslated(0,64,0);
+		glTranslated(0, 64, 0);
 		for (int i = 0; i < 3; i++)
 		{
 			glTranslated(-64, 0, 0);
-	
+
 			if (j == 0 && keys[i] == m_fastInventoryKeySelected)
 				glColor3f(128.f, 0.f, 0.f);
 			else
 				glColor3f(0.f, 0.f, 0.f);
-	
+
 			glBegin(GL_QUADS);
 			glVertex2i(-2, -2);
 			glVertex2i(50, -2);
 			glVertex2i(50, 50);
 			glVertex2i(-2, 50);
 			glEnd();
-			
-			if(j == 0)
+
+			if (j == 0)
 				glColor3f(255.f, 128.f, 0.f);
 			else
 				glColor3f(229.f, 218.f, 144.f);
-			
+
 			glBegin(GL_QUADS);
 			glVertex2i(0, 0);
 			glVertex2i(48, 0);
@@ -1359,10 +1382,10 @@ void Engine::RenderFastInventory() const
 			glEnd();
 		}
 
-		if(j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		if (j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 			break;
-		
-		glTranslated(+64 * 3, 0 , 0); 
+
+		glTranslated(+64 * 3, 0, 0);
 	}
 }
 
@@ -1472,7 +1495,7 @@ void Engine::DrawHurtEffect() const
 	glVertex2i(Width() + (Width() / diviseur), Height() + (Height() / diviseur));
 	glTexCoord2f(0, 1);
 	glVertex2i(-(Width() / diviseur), Height() + (Height() / diviseur));
-	
+
 	glEnd();
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
@@ -1483,7 +1506,7 @@ void Engine::DrawHurtEffect() const
 	glMatrixMode(GL_MODELVIEW);
 	glDisable(GL_BLEND);
 	glPopMatrix();
-	
+
 }
 
 void Engine::DrawSunMoon(float gametime) const {
@@ -1537,12 +1560,12 @@ void Engine::SetLightSource(float gametime)
 	float positionX;
 	float positionY;
 	if (daytime / (DAY_LENGTH / 4) == 0)
-	{ 
+	{
 		positionX = (DAY_LENGTH / 4) - daytime;
 		positionY = daytime;
 	}
 	else if (daytime / (DAY_LENGTH / 4) == 1)
-	{ 
+	{
 		positionX = (DAY_LENGTH / 4) - daytime;
 		positionX = (DAY_LENGTH / 4) - positionX;
 	}
