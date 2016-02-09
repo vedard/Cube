@@ -184,21 +184,22 @@ void Engine::LoadResource()
 					Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
 				}
 			}
-
-			if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
-				abort();
-			m_music.setLoop(true);
-			m_music.setVolume(m_settings.m_musicvolume);
-			m_music.play();
-
-
-			//Model 3d
-			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-			m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 		}
+
+		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+			abort();
+		m_music.setLoop(true);
+		m_music.setVolume(m_settings.m_musicvolume);
+		m_music.play();
+
+
+		//Model 3d
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+	}
 
 	//Gun
 
@@ -206,16 +207,15 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 1800, 120, 0.4);
 
-		//Load la map
-		m_world.LoadMap("map.sav", m_bInfo);
-		m_world.SetUpdateDistance(m_settings.m_renderdistance);
-		m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
+	//Load la map
+	m_world.LoadMap("map.sav", m_bInfo);
+	m_world.SetUpdateDistance(m_settings.m_renderdistance);
+	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-		//Entity
+	//Entity
 
-		// -- Player
-		m_world.GetPlayer()->SetName("Vincent Suce");
-	}
+	// -- Player
+	m_world.GetPlayer()->SetName("Vincent Suce");
 }
 
 void Engine::UnloadResource()
@@ -229,7 +229,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-	
+
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -304,7 +304,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
-	
+
 
 
 
@@ -324,7 +324,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetPlayer()->GetPosition().z - 50,
 		1.f };
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
 
 
 	//Draw guns
