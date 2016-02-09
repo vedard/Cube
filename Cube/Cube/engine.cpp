@@ -535,11 +535,9 @@ void Engine::KeyPressEvent(unsigned char key)
 			if (m_menu->m_currentMenu == SM_PRINCIPAL)
 			{
 				m_isMenuOpen = false;
+				m_menu = new Menu(SM_PRINCIPAL);
 				HideCursor();
-				m_world.m_threadcontinue = false;
-				int sound = Sound::LEAVE1 + rand() % 5;
-				Sound::PlayAndWait(sound);
-				Stop();			}
+			}
 			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
 				m_menu = new Menu(SM_PRINCIPAL);
 			else
@@ -550,7 +548,11 @@ void Engine::KeyPressEvent(unsigned char key)
 			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
 
 			if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
+			{
+				int lastMenuItem = m_menu->m_currentMenuItem;
 				m_menu = new Menu(SM_CONTROLS);
+				m_menu->m_currentMenuItem = lastMenuItem;
+			}
 		}
 
 	}
@@ -1544,8 +1546,7 @@ void Engine::ManageMenuEnterKeyPress()
 	{
 		if (m_menu->m_currentMenuItem == MP_EXIT_GAME)
 		{
-			m_world.m_threadcontinue = false;
-			Stop();
+			CloseGame();
 		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 			m_menu = new Menu(SM_SETTINGS);
@@ -2161,6 +2162,10 @@ void Engine::SetLightSource(float gametime)
 
 }
 
-
-
-
+void Engine::CloseGame()
+{
+	m_world.m_threadcontinue = false;
+	int sound = Sound::LEAVE1 + rand() % 5;
+	Sound::PlayAndWait(sound);
+	Stop();
+}

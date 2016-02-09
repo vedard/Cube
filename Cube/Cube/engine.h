@@ -68,6 +68,7 @@ private:
 	void DrawMenuSettingSelected(bool isFloat);
 	void DrawMenuControlSelected();
 	void SetLightSource(float gametime);
+	void CloseGame();
 
 private:
 	bool m_wireframe;

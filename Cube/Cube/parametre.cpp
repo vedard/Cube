@@ -32,8 +32,8 @@ void Parametre::Save()
 
 	std::cout << "Saving changes on config file" << std::endl;
 
-	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
-	myfile << "fullscreen " << ((m_fullscreen) ? "true" : "false") << "\n";
+	myfile << "server " << ((m_isServer) ? "true" : "false") << "\n";
+	myfile << "fullscreen " << ((m_isfullscreen) ? "true" : "false") << "\n";
 	myfile << "width " << m_width << "\n";
 	myfile << "height " << m_height << "\n";
 	myfile << "antialiasing " << m_antialiasing << "\n";
