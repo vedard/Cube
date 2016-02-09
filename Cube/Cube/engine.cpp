@@ -516,45 +516,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
 	if (m_isMenuOpen)
 	{
-		// Fermer menu
-		if (m_keyboard[m_settings.m_menu])
-		{
-			if (m_isMenuOpen)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-		}
-		else if (m_keyboard[sf::Keyboard::Return])
-		{
-			ManageMenuEnterKeyPress();
-		}
-		else if (m_keyboard[sf::Keyboard::BackSpace])
-		{
-			if (m_menu->m_currentMenu == SM_PRINCIPAL)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
-				m_menu = new Menu(SM_PRINCIPAL);
-			else
-				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
-		else
-		{
-			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-
-			if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
-			{
-				int lastMenuItem = m_menu->m_currentMenuItem;
-				m_menu = new Menu(SM_CONTROLS);
-				m_menu->m_currentMenuItem = lastMenuItem;
-			}
-		}
-
+		ManageAllMenuKeys(key);
 	}
 	else
 	{
@@ -1538,6 +1500,48 @@ void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) 
 		glColor3f(0.5f, 0.5f, 0.5f);
 
 	PrintText(xPos, yPos, 12.f, text);
+}
+
+void Engine::ManageAllMenuKeys(unsigned char key)
+{
+	// Fermer menu
+	if (m_keyboard[m_settings.m_menu])
+	{
+		if (m_isMenuOpen)
+		{
+			m_isMenuOpen = false;
+			m_menu = new Menu(SM_PRINCIPAL);
+			HideCursor();
+		}
+	}
+	else if (m_keyboard[sf::Keyboard::Return])
+	{
+		ManageMenuEnterKeyPress();
+	}
+	else if (m_keyboard[sf::Keyboard::BackSpace])
+	{
+		if (m_menu->m_currentMenu == SM_PRINCIPAL)
+		{
+			m_isMenuOpen = false;
+			m_menu = new Menu(SM_PRINCIPAL);
+			HideCursor();
+		}
+		else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
+			m_menu = new Menu(SM_PRINCIPAL);
+		else
+			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+	}
+	else
+	{
+		m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+
+		if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
+		{
+			int lastMenuItem = m_menu->m_currentMenuItem;
+			m_menu = new Menu(SM_CONTROLS);
+			m_menu->m_currentMenuItem = lastMenuItem;
+		}
+	}
 }
 
 void Engine::ManageMenuEnterKeyPress()
