@@ -392,7 +392,10 @@ void Player::Tick()
 
 	if (m_footUnderLava)
 	{
-		GetDamage(8, true, m_godMode);
+		if (!GetDamage(8, true, m_godMode))
+		{
+			ResetDeath();
+		}
 		//isHurt = 20;
 	}
 	if (m_headUnderwater)
@@ -400,27 +403,49 @@ void Player::Tick()
 		m_BreathCount++;
 		if (m_BreathCount > 75)
 		{
-			GetDamage(3, true, m_godMode);
+			Sound::PlayOnce(Sound::DROWNING);
+			m_headWasUnderwater = true;
+			if (GetDamage(3, true, m_godMode))
+			{
+				ResetDeath();
+			}
 			//isHurt = 20;
 		}
 	}
 	else
-		m_BreathCount = 0;
-
-}
-
-bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
-{
-	bool b = false;
-	if (InvulnerabilityTimer <= 0)
 	{
-		b = Character::GetDamage(damage, ignoreArmor, godMode);
-		if (!godMode)
+		m_BreathCount = 0;
+		if (m_headWasUnderwater)
 		{
-			isHurt = HURT_TIME;
-			InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+			m_headWasUnderwater = false;
+			std::cout << "Playing sound GASPING" << std::endl;
+			Sound::PlayOnce(Sound::GASPING);
 		}
 	}
-	return b;
 }
+
+	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
+	{
+		bool b = true;
+		if (InvulnerabilityTimer <= 0)
+		{
+			b = Character::GetisAlive();
+			if (b)
+			{
+				b = Character::GetDamage(damage, ignoreArmor, godMode);
+				if (!godMode)
+				{
+					isHurt = HURT_TIME;
+					InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+				}
+				if (!b)
+				{
+					Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
+				}
+			}
+			
+		}
+		
+		return b;
+	}
 

@@ -3,7 +3,7 @@
 Cow::Cow():Animal(A_COW)
 {
 	m_health = 140;
-	m_dimension = Vector3<float>(3.f, 4.6f, 4.8f);
+	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
 }
 
 Cow::~Cow()

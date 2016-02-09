@@ -1,5 +1,5 @@
 #include "character.h"
-
+#include "sound.h"
 
 Character::Character() :
 	m_pos(0, 128, 0),
@@ -193,7 +193,7 @@ bool Character::Attack(Character * character)
 
 bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
-	if (!godMode)
+	if (!godMode && m_isAlive)
 	{
 		if (!ignoreArmor)
 		{

@@ -59,7 +59,8 @@ World::~World()
 	m_threadcontinue = false;
 }
 
-Animal* World::GetAnimal() const { return m_cow; }
+Animal* World::GetCow() const { return m_cow; }
+Animal* World::GetBear() const { return m_bear; }
 Monster* World::GetMonster() const { return m_monster; }
 Player* World::GetPlayer() const { return m_player; }
 
@@ -629,12 +630,22 @@ void World::SetUpdateDistance(int updateDist)
 		UpdateDistance = updateDist;
 }
 
-void World::SpawnAnimals()
+void World::SpawnCows()
 {
 	for (int i = 0; i < MAX_COW; i++)
 		if (!m_cow[i].GetisAlive())
 		{
 			m_cow[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			break;
+		}
+}
+
+void World::SpawnBears()
+{
+	for (int i = 0; i < MAX_BEAR; i++)
+		if (!m_bear[i].GetisAlive())
+		{
+			m_bear[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
 			break;
 		}
 }

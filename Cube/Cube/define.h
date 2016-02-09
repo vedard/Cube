@@ -55,9 +55,9 @@ typedef long long int64;
 #define WORLD_SIZE 70
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 1
-#define MAX_COW 30
-#define MAX_BEAR 5
+#define MAX_MONSTER 0
+#define MAX_COW 100
+#define MAX_BEAR 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
@@ -68,6 +68,8 @@ typedef long long int64;
 #define WEAPONS_PATH	"../Cube/media/audio/weapons/"
 #define WALK_PATH	"../Cube/media/audio/walk/"
 #define HURT_PATH	"../Cube/media/audio/hurt/"
+#define DEATH_PATH  "../Cube/media/audio/death/"
+#define LEAVE_PATH	"../Cube/media/audio/leave/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
