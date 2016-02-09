@@ -162,6 +162,8 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
+
 		for (int i = 0; i < 9; i++)
 		{
 			if (i < 9)
@@ -170,7 +172,7 @@ void Engine::LoadResource()
 			}
 			if (i < 6)
 			{
-				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "step" + std::to_string(i + 1) + ".wav");
 			}
 			if (i < 5)
 			{
@@ -178,11 +180,12 @@ void Engine::LoadResource()
 			}
 			if (i < 4)
 			{
-				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
-				if (i < 4)
-				{
-					Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
-				}
+				Sound::AddSound(Sound::GRASSSTEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::SANDSTEP1 + i, WALK_PATH "sand" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STONESTEP1 + i, WALK_PATH "stone" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::WOODSTEP1 + i, WALK_PATH "wood" + std::to_string(i + 1) + ".wav");
+
 			}
 
 			if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
@@ -200,11 +203,11 @@ void Engine::LoadResource()
 			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 		}
 
-	//Gun
+		//Gun
 
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
-	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 1800, 120, 0.4);
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 1800, 120, 0.4);
 
 		//Load la map
 		m_world.LoadMap("map.sav", m_bInfo);
@@ -229,7 +232,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-	
+
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -304,7 +307,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
-	
+
 
 
 
@@ -324,7 +327,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetPlayer()->GetPosition().z - 50,
 		1.f };
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
 
 
 	//Draw guns
@@ -422,11 +425,55 @@ void Engine::Render(float elapsedTime)
 		{
 			if (m_world.GetPlayer()->footUnderwater())
 			{
-				Sound::Play(Sound::WATERSTEP1 + rand() % 4, m_settings.m_soundvolume);
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 			}
 			else
 			{
-				Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
+				switch (m_world.GetPlayer()->blockUnderPlayer())
+				{
+				case 1: // GRASS
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 3: // STONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 5: // WOOD PLANK
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 7: // DIRT
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 8: // IRON
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 9: // COAL
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 10: // DIAMOND
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 11: // GOLD
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 12: // REDSTONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 13: // LAPIS
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 14: // WOOD
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 15: // LEAVE
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 26: // SAND
+					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+					break;
+				default:
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				}
 			}
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}

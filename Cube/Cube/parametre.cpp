@@ -32,7 +32,6 @@ void Parametre::Save()
 
 	std::cout << "Saving changes on config file" << std::endl;
 
-	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
 	myfile << "fullscreen " << ((m_fullscreen) ? "true" : "false") << "\n";
 	myfile << "width " << m_width << "\n";
 	myfile << "height " << m_height << "\n";
@@ -62,6 +61,7 @@ void Parametre::Save()
 	myfile << "btnwireframe " << m_wireframe << "\n";
 	myfile << "musicvolume " << m_musicvolume << "\n";
 	myfile << "soundvolume " << m_soundvolume << "\n";
+	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
 
 	myfile.close();
 	Load();
@@ -73,7 +73,7 @@ void Parametre::SaveDefault()
 	myfile.open("Cube.conf");
 	std::cout << "Creating config save file" << std::endl;
 
-	myfile << "server" << "false" << "\n";
+	myfile << "server " << "false" << "\n";
 	myfile << "fullscreen false \n";
 	myfile << "width 1360 \n";
 	myfile << "height 768 \n";
@@ -181,7 +181,7 @@ void Parametre::Load()
 			if (index != -1)
 				ss >> setting.Get(setting.GetIndex(temp), 1);
 		}
-		if (cpt <= 29)
+		if (cpt <= 30)
 		{
 			cout << "File incomplete, recreating";
 			SaveDefault();
