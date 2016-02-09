@@ -66,26 +66,6 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
-	// Le fog
-	glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.1f, 0.1f, 0.14f, 1 };
-	GLint fogmode = GL_EXP2;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, 0.07f);
-	glFogf(GL_FOG_START, 16.f);
-	glFogf(GL_FOG_END, 21.f);
-
-
-	// La lumiere
-	GLfloat light0Amb[4] = { 5.f, 4.f, 3.f, 7.f };
-	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-
-
 	//Shader
 	std::cout << "Loading and compiling shaders ..." << std::endl;
 	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
@@ -162,6 +142,8 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
+
 		for (int i = 0; i < 9; i++)
 		{
 			if (i < 9)
@@ -170,7 +152,7 @@ void Engine::LoadResource()
 			}
 			if (i < 6)
 			{
-				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "step" + std::to_string(i + 1) + ".wav");
 			}
 			if (i < 5)
 			{
@@ -178,44 +160,45 @@ void Engine::LoadResource()
 			}
 			if (i < 4)
 			{
-				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
-				if (i < 4)
-				{
-					Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
-				}
+				Sound::AddSound(Sound::GRASSSTEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::SANDSTEP1 + i, WALK_PATH "sand" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STONESTEP1 + i, WALK_PATH "stone" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::WOODSTEP1 + i, WALK_PATH "wood" + std::to_string(i + 1) + ".wav");
+
 			}
-
-			if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
-				abort();
-			m_music.setLoop(true);
-			m_music.setVolume(m_settings.m_musicvolume);
-			m_music.play();
-
-
-			//Model 3d
-			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-			m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 		}
 
-	//Gun
+		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+			abort();
+		m_music.setLoop(true);
+		m_music.setVolume(m_settings.m_musicvolume);
+		m_music.play();
+
+
+		//Model 3d
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+	}
+
+		//Gun
 
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 1800, 120, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
 
-		//Load la map
-		m_world.LoadMap("map.sav", m_bInfo);
-		m_world.SetUpdateDistance(m_settings.m_renderdistance);
-		m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
+	//Load la map
+	m_world.LoadMap("map.sav", m_bInfo);
+	m_world.SetUpdateDistance(m_settings.m_renderdistance);
+	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-		//Entity
+	//Entity
 
-		// -- Player
-		m_world.GetPlayer()->SetName("Vincent Suce");
-	}
+	// -- Player
+	m_world.GetPlayer()->SetName("Vincent Suce");
 }
 
 void Engine::UnloadResource()
@@ -229,7 +212,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-	
+
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -270,8 +253,6 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-
-
 }
 
 void Engine::DrawEnvironement(float gameTime) {
@@ -304,27 +285,22 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
-	
-
 
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
 
-
-
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
-	/// Position des lumières autour pour éclairer le joueur et les monstres
-	// Position de la lumière 1
+	// Position des lumières autour pour éclairer le joueur et les monstres
 	GLfloat light0Pos1[4] = {
 		m_world.GetPlayer()->GetPosition().x,
 		m_world.GetPlayer()->GetPosition().y + 25,
 		m_world.GetPlayer()->GetPosition().z - 50,
 		1.f };
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
 
 
 	//Draw guns
@@ -361,8 +337,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 		DrawFocusedBlock();
 
-
-
 	//Draw le hui
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -391,11 +365,58 @@ void Engine::DrawEnvironement(float gameTime) {
 	}
 }
 
+void Engine::SetDayOrNight(float gametime)
+{
+	float time = sin(gametime / DAY_TIME);
+
+	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
+
+	// Controle les cycles de couleurs de la lumière
+	m_redLight = 5.f;
+	m_greenLight = 0.48f * sin(time) + 4.5f;
+	m_blueLight = 0.95f * sin(time) + 3.8;
+
+	// Controle les cycles de couleurs du fog
+	m_redFog = 0.5f * sin(time) + 0.45f;
+	m_greenFog = 0.5f * sin(time) + 0.45f;
+	m_blueFog = 0.5f * sin(time) + 0.48f;
+
+	// Controle le cycle de densite du fog
+	m_fogDensity = -0.031f * sin(time) + 0.052f;
+	m_fogStart = 1.68f * sin(time) + 16;
+
+	light0Amb[0] = m_redLight;
+	light0Amb[1] = m_greenLight;
+	light0Amb[2] = m_blueLight;
+	light0Amb[3] = 7.f;
+
+	fogcolor[0] = m_redFog;
+	fogcolor[1] = m_greenFog;
+	fogcolor[2] = m_blueFog;
+	fogcolor[3] = 1;
+
+	// Le fog
+	glEnable(GL_FOG);
+	GLint fogmode = GL_EXP2;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, m_fogDensity);
+	glFogf(GL_FOG_START, m_fogStart);
+	glFogf(GL_FOG_END, 24.f);
+
+	// La lumiere
+	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+}
+
 void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
-
 	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{
 		DrawEnvironement(gameTime);
@@ -412,7 +433,7 @@ void Engine::Render(float elapsedTime)
 	}
 
 	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 1000 == 0)
+	if ((int)(gameTime * 100) % 10 == 0)
 		m_world.SpawnAnimals();
 
 	if ((int)(gameTime * 100) % 100 == 0)
@@ -435,11 +456,55 @@ void Engine::Render(float elapsedTime)
 		{
 			if (m_world.GetPlayer()->footUnderwater())
 			{
-				Sound::Play(Sound::WATERSTEP1 + rand() % 4, m_settings.m_soundvolume);
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 			}
 			else
 			{
-				Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
+				switch (m_world.GetPlayer()->blockUnderPlayer())
+				{
+				case 1: // GRASS
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 3: // STONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 5: // WOOD PLANK
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 7: // DIRT
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 8: // IRON
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 9: // COAL
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 10: // DIAMOND
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 11: // GOLD
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 12: // REDSTONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 13: // LAPIS
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 14: // WOOD
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 15: // LEAVE
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 26: // SAND
+					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+					break;
+				default:
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				}
 			}
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
@@ -479,6 +544,7 @@ void Engine::Render(float elapsedTime)
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
 			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt, ' ');
 		}
+		SetDayOrNight(gameTime);
 		UpdateEnvironement(gameTime);
 
 		//Time control

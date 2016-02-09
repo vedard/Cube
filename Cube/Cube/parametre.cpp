@@ -102,7 +102,7 @@ void Parametre::SaveDefault()
 	myfile << "btninventory 8 \n";
 	myfile << "btnspawnmonster 12 \n";
 	myfile << "btnwireframe 24 \n";
-	myfile << "server" << "false" << "\n";
+	myfile << "server" << " false" << "\n";
 	myfile << "musicvolume 10 \n";
 	myfile << "soundvolume 12 \n";
 
