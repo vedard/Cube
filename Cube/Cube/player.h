@@ -41,6 +41,7 @@ public:
 	void SetRunning(bool running);
 
 	bool GetDamage(float damage, bool ignoreArmor, bool godMode) override;
+	bool GetIsSneaked();
 
 	void AddToInventory(BlockType type);
 	bool RemoveFromInventory(BlockType type);

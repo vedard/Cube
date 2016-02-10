@@ -449,3 +449,8 @@ void Player::Tick()
 		return b;
 	}
 
+	bool Player::GetIsSneaked()
+	{
+		return m_sneaked;
+	}
+

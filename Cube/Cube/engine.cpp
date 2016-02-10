@@ -330,7 +330,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
-			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake,
+			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake - ((m_world.GetPlayer()->GetIsSneaked()) ? 0.2 : 0),
 			m_world.GetPlayer()->GetPosition().z,
 			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
 
