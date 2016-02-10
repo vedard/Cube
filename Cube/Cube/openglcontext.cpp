@@ -24,6 +24,7 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 		while (true)
 		{
 			Render(m_lastFrameTime);
+			m_lastFrameTime = clock.getElapsedTime().asSeconds();
 		}
 	}
 	else

@@ -13,11 +13,9 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
-    <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="playerActor.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -27,6 +25,7 @@
     <ClCompile Include="world.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="network.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -46,10 +45,8 @@
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
-    <ClInclude Include="networkManager.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="playerActor.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="sound.h" />
@@ -58,6 +55,8 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="networkevent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

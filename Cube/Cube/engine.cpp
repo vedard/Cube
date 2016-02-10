@@ -7,7 +7,8 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_fastInventoryKeySelected(0)
+	m_fastInventoryKeySelected(0),
+	m_network()
 {
 	m_LastTickTime = 0.0f;
 	m_LastTickTimeWater = 0.0f;
@@ -270,8 +271,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-
-
+	m_network.Fetch();
 }
 
 void Engine::DrawEnvironement(float gameTime) {
@@ -345,7 +345,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	for (int i = 0; i < MAX_COW; i++)
 		m_world.GetAnimal()[i].Draw(m_modelCow);
 
-	m_playerActor.Draw(m_modelRaptor);
 
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
@@ -452,30 +451,6 @@ void Engine::Render(float elapsedTime)
 			m_mouseButton[1] = false;
 
 
-		//Net
-		static int sdf = 0;
-		if (sdf++ % 3 == 0)
-		{
-			m_Netctl.Send("p " + Tool::VectorToString(m_world.GetPlayer()->GetPosition()));
-			m_Netctl.Send("h " + std::to_string(m_world.GetPlayer()->GetHorizontalRotation()));
-		}
-
-		std::string packetBuffer = m_Netctl.Receive();
-		if (packetBuffer[0] == 'p')
-			m_playerActor.SetPos(Tool::StringToVector(packetBuffer.substr(2)));
-		else if (packetBuffer[0] == 'h')
-			m_playerActor.SetRot((float)atof(packetBuffer.substr(2).c_str()));
-		else if (packetBuffer[0] == 'm')
-		{
-			std::cout << packetBuffer << std::endl;
-			std::stringstream ss(packetBuffer);
-			char a;
-			int cx, cz, bx, by, bz;
-			int bt;
-			ss >> a >> cx >> cz >> bx >> by >> bz >> bt;
-			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
-			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt, ' ');
-		}
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -510,6 +485,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	{
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
+
 	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
 	if (m_isMenuOpen)
 	{
@@ -562,6 +538,16 @@ void Engine::KeyPressEvent(unsigned char key)
 			m_menu = new Menu(SM_PRINCIPAL);
 		}
 
+		//f6 -> connect
+		else if (m_keyboard[sf::Keyboard::F6])
+		{
+			m_network.Connect("localhost", 1234);
+		}
+		//f7 -> send packet
+		else if (m_keyboard[sf::Keyboard::F7])
+		{
+			m_network.Send("Poke");
+		}
 
 		//f10 -> toggle fulscreen mode
 		else if (m_keyboard[m_settings.m_fullscreen])
@@ -752,13 +738,6 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 					m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-				m_Netctl.Send("m " +
-					std::to_string(chunkPos.x) +
-					" " + std::to_string(chunkPos.z) +
-					" " + std::to_string(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X)) +
-					" " + std::to_string(m_currentBlock.y) +
-					" " + std::to_string(m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)) +
-					" " + "0");
 			}
 
 			//Right Click
@@ -783,16 +762,6 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 						//Si ya collision on efface le block
 						if (m_world.GetPlayer()->CheckCollision(m_world))
 							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
-						else
-						{
-							m_Netctl.Send("m " +
-								std::to_string(chunkPos.x) +
-								" " + std::to_string(chunkPos.z) +
-								" " + std::to_string(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X)) +
-								" " + std::to_string(newBlocPos.y) +
-								" " + std::to_string(newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X)) +
-								" " + std::to_string(m_world.GetPlayer()->GetBlock()));
-						}
 					}
 				}
 

@@ -18,15 +18,16 @@
 #include "vector3.h"
 #include "gun.h"
 #include "sound.h"
-#include "networkManager.h"
-#include "playerActor.h"
+#include "parametre.h"
+#include "menu.h"
+#include "network.h"
+
+
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <cmath>
 #include <thread>
-#include "parametre.h"
-#include "menu.h"
 
 
 class Engine : public OpenglContext
@@ -77,7 +78,6 @@ private:
 	int m_cptTick = 0;
 	int m_musiclist [6] = {};
 	float m_LastTickTimeWater;
-	PlayerActor m_playerActor;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 	bool m_mouseButton[sf::Mouse::ButtonCount]; //tableau de toutes les touches du clavier
@@ -113,13 +113,12 @@ private:
 	Model3d m_modelCow;
 	Model3d m_modelRaptor;
 
+	Network m_network;
+
 	//Gun 
 	Gun * playerGun;
 
-	//NetworkManager
-	NetworkManager m_Netctl;
 	// Parametres
-
 	Parametre& m_settings = Parametre::GetInstance();
 
 	bool m_isMenuOpen;
