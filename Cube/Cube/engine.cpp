@@ -66,15 +66,7 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
-	// Le fog
-	/*glEnable(GL_FOG);
-	GLfloat fogcolor[4] = { 0.1f, 0.1f, 0.14f, 1 };
-	GLint fogmode = GL_EXP2;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, 0.07f);
-	glFogf(GL_FOG_START, 16.f);
-	glFogf(GL_FOG_END, 21.f);*/
+	
 
 
 	// La lumiere
@@ -163,6 +155,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
 
 		for (int i = 0; i < 9; i++)
 		{
@@ -172,7 +165,7 @@ void Engine::LoadResource()
 			}
 			if (i < 6)
 			{
-				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "step" + std::to_string(i + 1) + ".wav");
 			}
 			if (i < 5)
 			{
@@ -180,25 +173,26 @@ void Engine::LoadResource()
 			}
 			if (i < 4)
 			{
-				Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
-				if (i < 4)
-				{
-					Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
-				}
+				Sound::AddSound(Sound::GRASSSTEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::SANDSTEP1 + i, WALK_PATH "sand" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::STONESTEP1 + i, WALK_PATH "stone" + std::to_string(i + 1) + ".wav");
+				Sound::AddSound(Sound::WOODSTEP1 + i, WALK_PATH "wood" + std::to_string(i + 1) + ".wav");
+
 			}
 
 
 
-
+		}
 
 			//Model 3d
 			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 			m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-			m_modelBear.LoadOBJ(MODEL_PATH "bear2.obj", TEXTURE_PATH "bear.png");
+			m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
-		}
+		
 
 		//Gun
 
@@ -206,8 +200,9 @@ void Engine::LoadResource()
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
 
-
+		
 	}
+
 
 
 
@@ -301,6 +296,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	float shake = m_world.GetPlayer()->ApplyTranslation();
 
 
+
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
@@ -343,9 +339,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
-	
-	
 
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
@@ -458,9 +451,9 @@ void Engine::Render(float elapsedTime)
 	}
 
 	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 1000 == 0)
+	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnCows();
-	if ((int)(gameTime * 100) % 1000 == 0)
+	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnBears();
 
 	if ((int)(gameTime * 100) % 100 == 0)
@@ -483,11 +476,55 @@ void Engine::Render(float elapsedTime)
 		{
 			if (m_world.GetPlayer()->footUnderwater())
 			{
-				Sound::Play(Sound::WATERSTEP1 + rand() % 4, m_settings.m_soundvolume);
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 			}
 			else
 			{
-				Sound::Play(Sound::STEP1 + rand() % 6, m_settings.m_soundvolume);
+				switch (m_world.GetPlayer()->blockUnderPlayer())
+				{
+				case 1: // GRASS
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 3: // STONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 5: // WOOD PLANK
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 7: // DIRT
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 8: // IRON
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 9: // COAL
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 10: // DIAMOND
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 11: // GOLD
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 12: // REDSTONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 13: // LAPIS
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 14: // WOOD
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 15: // LEAVE
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 26: // SAND
+					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+					break;
+				default:
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				}
 			}
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
@@ -521,7 +558,7 @@ void Engine::Render(float elapsedTime)
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
 			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt, ' ');
 		}
-		SetDayOrNight(gameTime);
+		//SetDayOrNight(gameTime);
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -1358,10 +1395,10 @@ void Engine::DrawMenuSettings() const
 	std::string antiAliasing;
 	std::string vSync;
 	std::string renderDistance;
+	std::string mouseSensivity;
 	std::string rCrossColor;
 	std::string gCrossColor;
 	std::string bCrossColor;
-	std::string mouseSensivity;
 
 	// Menu specs
 	int menuHeight = 300;
@@ -1439,17 +1476,21 @@ void Engine::DrawMenuSettings() const
 	DrawMenuButton(MS_ANTI_ALIASING, antiAliasing, column2Width, (Height() / 2) - (menuHeight / 4));
 	DrawMenuButton(MS_VSYNC, "V-Sync", column1Width, (Height() / 2) - (menuHeight / 2));
 	DrawMenuButton(MS_VSYNC, vSync, column2Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_RENDER_DISTANCE, "Render Distance", column1Width, (Height() / 2) - (menuHeight * 3 / 4));
+	DrawMenuButton(MS_RENDER_DISTANCE, renderDistance, column2Width, (Height() / 2) - (menuHeight * 3 / 4));
 
-	DrawMenuButton(MS_RENDER_DISTANCE, "Render Distance", column3Width, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MS_RENDER_DISTANCE, renderDistance, column4Width, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2) + (menuHeight / 4));
-	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2) + (menuHeight / 4));
-	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2));
-	DrawMenuButton(MS_CROSSCOLOR_G, gCrossColor, column4Width, (Height() / 2));
-	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 4));
-	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
-	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight / 2));
-	DrawMenuButton(MS_MOUSE_SENSITIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_SOUND_VOLUME, "Sound Volume", column3Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_SOUND_VOLUME, std::to_string(m_settings.m_soundvolume), column4Width, (Height() / 2) + (menuHeight / 2));
+	DrawMenuButton(MS_MUSIC_VOLUME, "Music Volume", column3Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_MUSIC_VOLUME, std::to_string(m_settings.m_musicvolume), column4Width, (Height() / 2) + (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_R, "Cross Color R", column3Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_R, rCrossColor, column4Width, (Height() / 2));
+	DrawMenuButton(MS_CROSSCOLOR_G, "Cross Color G", column3Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_G, gCrossColor, column4Width, (Height() / 2) - (menuHeight / 4));
+	DrawMenuButton(MS_CROSSCOLOR_B, "Cross Color B", column3Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_CROSSCOLOR_B, bCrossColor, column4Width, (Height() / 2) - (menuHeight / 2));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, "Mouse Sensivity", column3Width, (Height() / 2) - (menuHeight * 3 / 4));
+	DrawMenuButton(MS_MOUSE_SENSITIVITY, mouseSensivity, column4Width, (Height() / 2) - (menuHeight * 3 / 4));
 
 
 	glDisable(GL_BLEND);
@@ -1551,6 +1592,48 @@ void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) 
 	PrintText(xPos, yPos, 12.f, text);
 }
 
+void Engine::ManageAllMenuKeys(unsigned char key)
+{
+	// Fermer menu
+	if (m_keyboard[m_settings.m_menu])
+	{
+		if (m_isMenuOpen)
+		{
+			m_isMenuOpen = false;
+			m_menu = new Menu(SM_PRINCIPAL);
+			HideCursor();
+		}
+	}
+	else if (m_keyboard[sf::Keyboard::Return])
+	{
+		ManageMenuEnterKeyPress();
+	}
+	else if (m_keyboard[sf::Keyboard::BackSpace])
+	{
+		if (m_menu->m_currentMenu == SM_PRINCIPAL)
+		{
+			m_isMenuOpen = false;
+			m_menu = new Menu(SM_PRINCIPAL);
+			HideCursor();
+		}
+		else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
+			m_menu = new Menu(SM_PRINCIPAL);
+		else
+			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+	}
+	else
+	{
+		m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+
+		if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
+		{
+			int lastMenuItem = m_menu->m_currentMenuItem;
+			m_menu = new Menu(SM_CONTROLS);
+			m_menu->m_currentMenuItem = lastMenuItem;
+		}
+	}
+}
+
 void Engine::ManageMenuEnterKeyPress()
 {
 	if (m_menu->m_currentMenu == SM_PRINCIPAL)
@@ -1643,6 +1726,43 @@ void Engine::ManageMenuEnterKeyPress()
 				m_settings.Save();
 
 				m_world.SetUpdateDistance(m_settings.m_renderdistance);
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_SOUND_VOLUME)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_VOLUME)
+					m_menu->m_settingNewValue = MIN_VOLUME;
+				else if (m_menu->m_settingNewValue > MAX_VOLUME)
+					m_menu->m_settingNewValue = MAX_VOLUME;
+
+				m_settings.m_soundvolume = m_menu->m_settingNewValue;
+				m_settings.Save();
+
+				m_menu->m_settingNewValue = 0;
+				m_menu->m_currentMenu = SM_SETTINGS;
+			}
+		}
+		else if (m_menu->m_currentMenuItem == MS_MUSIC_VOLUME)
+		{
+			if (m_menu->m_currentMenu == SM_SETTINGS)
+				m_menu->m_currentMenu = SM_SETTING_SELECTED;
+			else
+			{
+				if (m_menu->m_settingNewValue < MIN_VOLUME)
+					m_menu->m_settingNewValue = MIN_VOLUME;
+				else if (m_menu->m_settingNewValue > MAX_VOLUME)
+					m_menu->m_settingNewValue = MAX_VOLUME;
+
+				m_settings.m_musicvolume = m_menu->m_settingNewValue;
+				m_settings.Save();
+				m_music.setVolume(m_settings.m_musicvolume);
 
 				m_menu->m_settingNewValue = 0;
 				m_menu->m_currentMenu = SM_SETTINGS;
@@ -2181,44 +2301,3 @@ void Engine::CloseGame()
 }
 
 
-void Engine::ManageAllMenuKeys(unsigned char key)
-{
-	// Fermer menu
-	if (m_keyboard[m_settings.m_menu])
-	{
-		if (m_isMenuOpen)
-		{
-			m_isMenuOpen = false;
-			m_menu = new Menu(SM_PRINCIPAL);
-			HideCursor();
-		}
-	}
-	else if (m_keyboard[sf::Keyboard::Return])
-	{
-		ManageMenuEnterKeyPress();
-	}
-	else if (m_keyboard[sf::Keyboard::BackSpace])
-	{
-		if (m_menu->m_currentMenu == SM_PRINCIPAL)
-		{
-			m_isMenuOpen = false;
-			m_menu = new Menu(SM_PRINCIPAL);
-			HideCursor();
-		}
-		else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
-			m_menu = new Menu(SM_PRINCIPAL);
-		else
-			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-	}
-	else
-	{
-		m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-
-		if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
-		{
-			int lastMenuItem = m_menu->m_currentMenuItem;
-			m_menu = new Menu(SM_CONTROLS);
-			m_menu->m_currentMenuItem = lastMenuItem;
-		}
-	}
-}

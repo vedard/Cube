@@ -56,9 +56,9 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 0
+#define MAX_MONSTER 10
 #define MAX_COW 10
-#define MAX_BEAR 10
+#define MAX_BEAR 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
@@ -90,6 +90,8 @@ typedef long long int64;
 
 #define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
 #define MIN_HEIGHT 600
+#define MAX_VOLUME 100 // Valeurs du sf::Sound
+#define MIN_VOLUME 0
 
 #define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
 #define KEY_ALREADY_BOUND "This key is already bound"
@@ -156,6 +158,8 @@ enum MENU_SETTINGS {
 	MS_ANTI_ALIASING,
 	MS_VSYNC,
 	MS_RENDER_DISTANCE,
+	MS_SOUND_VOLUME,
+	MS_MUSIC_VOLUME,
 	MS_CROSSCOLOR_R,
 	MS_CROSSCOLOR_G,
 	MS_CROSSCOLOR_B,

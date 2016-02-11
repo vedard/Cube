@@ -21,5 +21,13 @@ private:
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 	Parametre& m_settings = Parametre::GetInstance();
 };
+// POUR AJOUTER UN SETTING...
+// Ajouter un setting dans la classe parametre (et toutes ses méthodes)
+// Ajouter une valeur dans l'énum du sous-menu désiré dans define.h
+// Ajuster le nombre d'éléments menu dans le constructeur menu.cpp
+// Ajouter les boutons dans DrawMenuSettings/Controls de engine.cpp
+// Ajuster la méthode OnKeyDown de menu.cpp aux flèches droite et gauche pour la navigation si elle n'est plus correcte
+// Modifier la méthode ManageMenuEnterKeyPress de engine.cpp
+// Modifier la méthode OnKeyDown de  menu.cpp si un nouveau controle a été ajouté
 
 #endif

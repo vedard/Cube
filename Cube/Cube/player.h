@@ -28,6 +28,7 @@ public:
 
 	bool Underwater() const;
 	bool footUnderwater() const;
+	BlockType blockUnderPlayer() const;
 	bool UnderLava() const;
 
 	BlockType GetBlock() const;
@@ -48,6 +49,7 @@ public:
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
+	void CheckBlockUnder(World &world);
 	void ResetDeath();
 private:
 	bool m_godMode;
@@ -65,6 +67,7 @@ private:
 	bool m_kneeUnderLava;  // Si le joueur est sous la lave
 	bool m_footUnderLava;  // Si le joueur est sous la lave
 	BlockType m_block;// Prochain block que le joueur peut placer
+	BlockType m_blockUnder; // Bloc en dessous du joueur
 	Gun * Guns;
 	float InvulnerabilityTimer;
 	
