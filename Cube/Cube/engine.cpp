@@ -144,6 +144,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
 		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
 		Sound::AddSound(Sound::HITMARK, WEAPONS_PATH "hitmarker.wav");
+		Sound::AddSound(Sound::AWP_FIRE, WEAPONS_PATH "awp.wav");
 
 		for (int i = 0; i < 9; i++)
 		{
@@ -180,14 +181,16 @@ void Engine::LoadResource()
 		//Model 3d
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		//m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
+
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 	}
 
 	//Gun
 
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 50, 300, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
 
@@ -638,6 +641,12 @@ void Engine::KeyPressEvent(unsigned char key)
 		//1 -> W_BLOCK 
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
+		//3 ->  W_SUBMACHINE_GUN
+		if (m_keyboard[m_settings.m_inventory2])
+		{
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
+			Sound::Play(Sound::GUN_DRAW);
+		}
 		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory3])
 		{
@@ -1192,7 +1201,7 @@ void Engine::GetBlocAtCursor()
 
 void Engine::DrawCross(float r, float g, float b) const
 {
-	glPushMatrix();
+	//glPushMatrix();
 	glLoadIdentity();
 	glTranslated(Width() / 2, Height() / 2, 0);
 	glColor3f(r, g, b);
@@ -1219,7 +1228,7 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(25, -1);
 
 	glEnd();
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 void Engine::DrawSky(float gameTime) const
@@ -2276,7 +2285,7 @@ void Engine::DrawHitMarker() const
 	m_hitMarker.Bind();
 	//static const int crossSize = 800;
 	glLoadIdentity();
-	glTranslated(Width() / 2 - 3, Height() / 2 - 2, 0);
+	glTranslated(Width() / 2, Height() / 2 - 2, 0);
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0, 0);

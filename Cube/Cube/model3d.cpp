@@ -94,9 +94,6 @@ void Model3d::Render(float x, float y, float z, float rotH, float rotV, float r,
 	{
 		m_texture.Bind();
 
-		if (m_numFace > 20000)
-			std::cout << "allo" << std::endl;
-
 		glPushMatrix();
 
 		//Tanslation et rotation
