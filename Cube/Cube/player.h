@@ -41,7 +41,7 @@ public:
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 
-	bool GetDamage(float damage, bool ignoreArmor, bool godMode) override;
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son = Sound::HURT, bool playonce = false) override;
 
 	void AddToInventory(BlockType type);
 	bool RemoveFromInventory(BlockType type);

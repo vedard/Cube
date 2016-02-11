@@ -411,9 +411,8 @@ void Player::Tick()
 		m_BreathCount++;
 		if (m_BreathCount > 75)
 		{
-			Sound::PlayOnce(Sound::DROWNING);
 			m_headWasUnderwater = true;
-			if (!GetDamage(3, true, m_godMode))
+			if (!GetDamage(3, true, m_godMode, Sound::DROWNING, true))
 			{
 				ResetDeath();
 			}
@@ -432,7 +431,7 @@ void Player::Tick()
 	}
 }
 
-	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
+	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 	{
 		bool b = true;
 		if (InvulnerabilityTimer <= 0)
@@ -443,7 +442,15 @@ void Player::Tick()
 				b = Character::GetDamage(damage, ignoreArmor, godMode);
 				if (!godMode)
 				{
-					Sound::Play(Sound::HURT);
+					if (playonce)
+					{
+						Sound::PlayOnce(son);
+					}
+					else
+					{
+						Sound::Play(son);
+
+					}
 					isHurt = HURT_TIME;
 					InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
 				}

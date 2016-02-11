@@ -169,8 +169,9 @@ void Engine::LoadResource()
 			}
 		}
 
-		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
+		if (!m_music.openFromFile(MUSIC_PATH "music1.wav"))
 			abort();
+
 		m_music.setLoop(true);
 		m_music.setVolume(m_settings.m_musicvolume);
 		m_music.play();
