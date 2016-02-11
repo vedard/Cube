@@ -472,6 +472,7 @@ void Engine::Render(float elapsedTime)
 	//gestion des ticks
 	if (gameTime - m_LastTickTime >= TICK_DELAY)
 	{
+		m_music.PlayNext();
 		m_LastTickTime = gameTime;
 		m_world.GetPlayer()->Tick();
 	}

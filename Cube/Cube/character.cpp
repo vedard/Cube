@@ -1,5 +1,4 @@
 #include "character.h"
-#include "sound.h"
 
 Character::Character() :
 	m_pos(0, 128, 0),
@@ -100,7 +99,7 @@ bool Character::CheckCollision(World &world) const
 					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 
 				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
-				if (bt1 != BTYPE_AIR && (bt1<16 || bt1>25))
+				if (bt1 != BTYPE_AIR && (bt1 < 16 || bt1>25))
 					return true;
 			}
 
@@ -178,7 +177,7 @@ bool Character::Attack(Character * character, float damage)
 				+ pow(character->GetPosition().z - m_pos.z, 2)) < m_AttackRange)
 			{
 				std::cout << m_Name << " attack " << character->GetName() << "." << std::endl;
-				character->GetDamage(damage,false,false);
+				character->GetDamage(damage, false, false);
 				m_cooldownAttackTimer.restart();
 				return true;
 			}
@@ -191,7 +190,7 @@ bool Character::Attack(Character * character)
 	return Attack(character, m_AttackDamage);
 }
 
-bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
+bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 {
 	if (!godMode && m_isAlive)
 	{
@@ -199,11 +198,11 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 		{
 			//Reduction par l'armur
 			if (m_Armor > 0)
-				damage /= m_Armor;
+				damage = damage / m_Armor;
 
-			//Toujours un minimun de 1 damange
+				//Toujours un minimun de 1 damange
 
-			damage = (damage < 1) ? 1 : damage;
+				damage = (damage < 1) ? 1 : damage;
 		}
 		m_health -= damage;
 
