@@ -16,17 +16,24 @@ public:
 
 	bool RemoveItemQ(BlockType type);
 	bool RemoveItemQ(BlockType type, int number);
-	bool RemoveItemALL(BlockType type);	//TODO: Remove all of this item from inventory
-
-	void ReassignItemShortcut(int index_itemFast, int index_item);
+	bool RemoveItemALL(BlockType type);
+	
 	void SwitchItems(int index_item1, int index_item2);
-	void SortInventory();	//TODO: Sort inventory to eliminate & fuse possible doubled stacks as well as ordering them by BlockType
 
 	Item* GetItems();
-private:
 
+	void OnKeyDown(unsigned char key);
+
+	int GetCurrentIndex();
+	void SetCurrentIndex(int currentIndex);
+
+	int GetCurrentMoveIndex();
+	void Init();
+	
+private:
+	int m_currentIndex;
+	int m_currentMoveIndex;
 	Item m_objets [INVENTORY_SIZE];
-	Item *m_objetsFast[FAST_INVENTORY_SIZE];
 };
 
 #endif //INVENTORY_H__

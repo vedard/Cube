@@ -36,6 +36,7 @@ public:
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
+	void SetBlockDirect(BlockType blockType);
 	void SetWeapon(int mode);
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
@@ -44,6 +45,7 @@ public:
 
 	void AddToInventory(BlockType type);
 	bool RemoveFromInventory(BlockType type);
+	Inventory* GetInventory();
 
 private:
 	void CheckUnderwater(World &world);

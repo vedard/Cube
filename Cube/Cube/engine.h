@@ -117,6 +117,8 @@ private:
 
 	bool m_isMenuOpen;
 	Menu* m_menu;
+
+	bool m_isInventoryOpen;
 };
 
 #endif // ENGINE_H__

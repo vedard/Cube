@@ -55,4 +55,4 @@ void Menu::OnKeyDown(unsigned char key)
 
 		m_keyboard[key] = false;
 	}
-}
+ }

@@ -14,7 +14,8 @@ m_footUnderwater(false),
 m_headUnderwater(false),
 m_HeadShake(0),
 isHurt(0),
-InvulnerabilityTimer(0)
+InvulnerabilityTimer(0),
+m_inventory(new Inventory())
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -346,6 +347,10 @@ void Player::SetBlock(int direction)
 		m_block = 1;
 }
 
+void Player::SetBlockDirect(BlockType blockType) {
+	m_block = blockType;
+}
+
 void Player::SetWeapon(int mode)
 {
 	if (mode >= 0 && mode <= 3)
@@ -424,3 +429,7 @@ bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
 	return b;
 }
 
+Inventory* Player::GetInventory()
+{
+	return m_inventory.get();
+}

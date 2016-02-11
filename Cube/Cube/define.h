@@ -76,13 +76,15 @@ typedef long long int64;
 #define HURT_TIME 20
 #define DAY_LENGTH 100
 
-#define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
+#define INVENTORY_SIZE 15		//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
-#define IS_INVENTORY_CREATIVE true	//If the inventory is in creative mode(infinite everything)
+#define IS_INVENTORY_CREATIVE false	//If the inventory is in creative mode(infinite everything)
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
+#define INVENTORY_MOVE_ITEM_KEY		sf::Keyboard::B
+#define INVENTORY_DELETE_ITEM_KEY	sf::Keyboard::E
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 

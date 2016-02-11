@@ -8,7 +8,8 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_fastInventoryKeySelected(0)
+	m_fastInventoryKeySelected(-1),
+	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
 	m_LastTickTimeWater = 0.0f;
@@ -28,7 +29,6 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
-
 	m_world.SaveMap("map.sav");
 	Sound::DeInit();
 	delete[] m_bInfo;
@@ -372,7 +372,7 @@ void Engine::Render(float elapsedTime)
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
 	
-	if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	if(m_isInventoryOpen)
 	{
 		DrawEnvironement(gameTime);
 		return;
@@ -472,189 +472,115 @@ void Engine::Render(float elapsedTime)
 
 void Engine::KeyPressEvent(unsigned char key)
 {
-
-	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
-	{
-
-		m_keyboard[key] = false;
-	}
-	else
-	{
-		//update le teableau
-		m_keyboard[key] = true;
-	}
+	//update le teableau
+	m_keyboard[key] = true;
 
 
-	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
-	{
+	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY)) {		
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
-	if (m_isMenuOpen)
-	{
-		// Fermer menu
-		if (m_keyboard[m_settings.m_menu])
-		{
-			if (m_isMenuOpen)
-			{
-				m_isMenuOpen = false;
-				HideCursor();
-			}
-		}
-		else if (m_keyboard[sf::Keyboard::Return])
-		{
-			if (m_menu->m_currentMenuItem == 2)
-			{
-				m_world.m_threadcontinue = false;
-				Stop();
-			}
-		}
-		else
-		{
-			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
 
-	}
-	else
-	{
-		if (m_keyboard[m_settings.m_menu])
-		{
+	if(m_isInventoryOpen) {
+		if(m_keyboard[m_settings.m_openinventory]) {
+			m_isInventoryOpen = false;
+			m_world.GetPlayer()->GetInventory()->Init();
+		} else {
+			m_world.GetPlayer()->GetInventory()->OnKeyDown(key);		
+		}
+	} else if(m_isMenuOpen) {
+		if(m_keyboard[m_settings.m_menu]) {
+			m_isMenuOpen = false;
+			HideCursor();		
+		} else if (m_keyboard[sf::Keyboard::Return] && m_menu->m_currentMenuItem == 2) {
+			m_world.m_threadcontinue = false;
+			Stop();
+		} else {
+			m_menu->OnKeyDown(key);
+		}
+	} else {
+		if(m_keyboard[m_settings.m_openinventory] && !m_settings.m_inventaire_creatif) {
+			m_isInventoryOpen = true;
+		} else if (m_keyboard[m_settings.m_menu]) {
 			m_isMenuOpen = true;
 			ShowCursor();
 			m_menu = new Menu(SM_PRINCIPAL);
-		}
-
-
-		//f10 -> toggle fulscreen mode
-		else if (m_keyboard[m_settings.m_fullscreen])
-		{
+		} else if (m_keyboard[m_settings.m_fullscreen]) { //f10 -> toggle fulscreen mode
 			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
 			m_settings.Save();
 			SetFullscreen(IsFullscreen());
 			m_keyboard[key] = false;
-		}
-
-		//V -> toogle noclip mode
-		else if (m_keyboard[m_settings.m_noclip])
+		} else if (m_keyboard[m_settings.m_noclip]) { //V -> toogle noclip mode
 			m_world.GetPlayer()->ToggleNoClip();
-
-		//Lctr -> Sneak
-		else if (m_keyboard[m_settings.m_crouch])
+		} else if (m_keyboard[m_settings.m_crouch]) { //Lctr -> Sneak
 			m_world.GetPlayer()->SetSneak(true);
-
-		//LSHIFT -> RUN
-		else if (m_keyboard[m_settings.m_run])
+		} else if (m_keyboard[m_settings.m_run]) { //LSHIFT -> RUN
 			m_world.GetPlayer()->SetRunning(true);
-
-		//space -> jump
-		if (m_keyboard[m_settings.m_jump])
-			m_world.GetPlayer()->Jump();
-
-		//1 -> W_BLOCK 
-		if (m_keyboard[m_settings.m_inventory1])
+		}
+				 
+		if (m_keyboard[m_settings.m_inventory1]) { //1 -> W_BLOCK
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
-		//3 ->  W_SUBMACHINE_GUN
-		if (m_keyboard[m_settings.m_inventory3])
-		{
+		} else if (m_keyboard[m_settings.m_inventory3]) { //3 ->  W_SUBMACHINE_GUN
 			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
 			Sound::Play(Sound::GUN_DRAW);
-		}
-		//4 ->  W_ASSAULT_RIFLE
-		if (m_keyboard[m_settings.m_inventory4])
-		{
+		} else if (m_keyboard[m_settings.m_inventory4]) { //4 ->  W_ASSAULT_RIFLE
 			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
 			Sound::Play(Sound::GUN_DRAW);
-		}
-		//M -> spawn monster
-		else if (m_keyboard[m_settings.m_spawnmonster])
-		{
-			for (int i = 0; i < MAX_MONSTER; i++)
-			{
-				if (!m_world.GetMonster()[i].GetisAlive())
-				{
+		} else if (m_keyboard[m_settings.m_spawnmonster]) { //M -> spawn monster
+			for (int i = 0; i < MAX_MONSTER; i++) {
+				if (!m_world.GetMonster()[i].GetisAlive()) {
 					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
 			}
-
-		}
-		//y -> toggle wireframe mode
-		else if (m_keyboard[m_settings.m_wireframe])
-		{
-
+		} else if (m_keyboard[m_settings.m_wireframe]) { //y -> toggle wireframe mode
 			m_wireframe = !m_wireframe;
-			if (m_wireframe)
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		//F3 -> toggle info
-		else if (m_keyboard[m_settings.m_info])
-		{
+			glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
+		} else if (m_keyboard[m_settings.m_info]) { //F3 -> toggle info
 			displayInfo = !displayInfo;
-		}
-		//Lshift + F5 -> delete Cache
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
-		{
-			for (int i = 0; i < WORLD_SIZE; i++)
-				for (int j = 0; j < WORLD_SIZE; j++)
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5]) { //Lshift + F5 -> delete Cache
+			for (int i = 0; i < WORLD_SIZE; i++) { 
+				for (int j = 0; j < WORLD_SIZE; j++) { 
 					m_world.ChunkAt((float)i, (float)j)->DeleteCache();
-
-		}
-		//Lshift + O -> open map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
-		{
+				}
+			}
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O]) { //Lshift + O -> open map
 			//m_world.LoadMap("map.sav", m_bInfo);
 			std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
 			t.detach();
 			//m_world.GetPlayer()->Spawn(m_world);
-		}
-		//Lshift + W -> Write map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
-		{
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W]) { //Lshift + W -> Write map
 			//m_world.SaveMap("map.sav");
 			std::thread t(&World::SaveMap, &m_world, "map.sav");
 			t.detach();
-		}
-
-		//Lshift + R -> Random map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
-		{
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R]) { //Lshift + R -> Random map
 			//m_world.InitMap(time(NULL));
 			std::thread t(&World::InitMap, &m_world, time(NULL));
 			t.detach();
 			//m_world.GetPlayer()->Spawn(m_world);
-		}
-
-		//Lshift + F -> Flat map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
-		{
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F]) { //Lshift + F -> Flat map
 			//m_world.InitMap(0);
 			std::thread t(&World::InitMap, &m_world, 0);
 			t.detach();
 			//m_world.GetPlayer()->Spawn(m_world);
 		}
 
-		if (!m_world.GetPlayer()->GetisAlive())
-			if (m_keyboard[sf::Keyboard::Return])
-			{
+		if (!m_world.GetPlayer()->GetisAlive()) {
+			if (m_keyboard[sf::Keyboard::Return]) {
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 				m_world.GetPlayer()->isHurt = 0;
 			}
-		if(m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
-		{
-			ShowCursor();
+		}
+		
+		if (m_keyboard[m_settings.m_jump]) { //space -> jump
+			m_world.GetPlayer()->Jump();
 		}
 	}
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
-	if (key == OPEN_CLOSE_INVENTORY_KEY) {}
-	else
-	{
-		// update le tableau
-		m_keyboard[key] = false;
-	}
+	// update le tableau
+	m_keyboard[key] = false;
 
 	//end sneak
 	if (!m_keyboard[sf::Keyboard::LControl])
@@ -668,7 +594,7 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 void Engine::MouseMoveEvent(int x, int y)
 {
-	if (!m_isMenuOpen && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	if (!m_isMenuOpen)
 	{
 		// Centrer la souris seulement si elle n'est pas déjà centrée
 		// Il est nécessaire de faire la vérification pour éviter de tomber
@@ -682,21 +608,19 @@ void Engine::MouseMoveEvent(int x, int y)
 		float relativeX, relativeY;
 		relativeX = (float)(x - Width() / 2);
 		relativeY = (float)(y - Height() / 2);
-
-		m_world.GetPlayer()->TurnLeftRight(relativeX * m_settings.m_mousesensibility);
-		m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
+		
+		if(!m_isInventoryOpen) {
+			m_world.GetPlayer()->TurnLeftRight(relativeX * m_settings.m_mousesensibility);
+			m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
+		}
 	}
 
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	if (m_isMenuOpen)
-	{
-
-	}
-	else
-	{
+	if (m_isMenuOpen || m_isInventoryOpen) {
+	} else {
 		//update le teableau
 		m_mouseButton[button] = true;
 
@@ -709,8 +633,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 				//AddToInventory
 				//Add Block to Player Inventory BEFORE removal in the world. IF the inventory is not in creative mode
-				if (!IS_INVENTORY_CREATIVE)
-					m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
+				if (!m_settings.m_inventaire_creatif)
+				{
+					BlockType btype = m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+					if(btype != 0)					
+						m_world.GetPlayer()->AddToInventory(btype);
+				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 				m_Netctl.Send("m " +
@@ -733,7 +661,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 				{
 					bool removable = true;
-					if (!IS_INVENTORY_CREATIVE)
+					if (!m_settings.m_inventaire_creatif)
 					{
 						removable = m_world.GetPlayer()->RemoveFromInventory(m_world.GetPlayer()->GetBlock());
 					}
@@ -759,13 +687,17 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 
 			}
-			//Scroll Up
-			if (button == 8)
-				m_world.GetPlayer()->SetBlock(1);
 
-			//Scroll Down
-			else if (button == 16)
-				m_world.GetPlayer()->SetBlock(-1);
+			if(m_settings.m_inventaire_creatif)
+			{
+				//Scroll Up
+				if (button == 8)
+					m_world.GetPlayer()->SetBlock(1);
+
+				//Scroll Down
+				else if (button == 16)
+					m_world.GetPlayer()->SetBlock(-1);
+			}
 		}
 	}
 
@@ -902,42 +834,41 @@ void Engine::DrawHud() const
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
 	
-		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
-		{
-			//Block selectionne
-			glLoadIdentity();
-			glTranslated(Width() - 64, 16, 0);
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK && m_settings.m_inventaire_creatif)
+	{
+		//Block selectionne
+		glLoadIdentity();
+		glTranslated(Width() - 64, 16, 0);
 
-			//contour 	
-			glColor3f(0.f, 0.f, 0.f);
-			glBegin(GL_QUADS);
-			glVertex2i(-2, -2);
-			glVertex2i(50, -2);
-			glVertex2i(50, 50);
-			glVertex2i(-2, 50);
-			glEnd();
+		//contour 	
+		glColor3f(0.f, 0.f, 0.f);
+		glBegin(GL_QUADS);
+		glVertex2i(-2, -2);
+		glVertex2i(50, -2);
+		glVertex2i(50, 50);
+		glVertex2i(-2, 50);
+		glEnd();
 
+		//block
+		m_textureAtlas.Bind();
+		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.f, 1.f, 1.f);
 
-			//block
-			m_textureAtlas.Bind();
-			glEnable(GL_TEXTURE_2D);
-			glColor3f(1.f, 1.f, 1.f);
+		glBegin(GL_QUADS);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(0, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
+		glVertex2i(48, 0);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(48, 48);
+		glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
+		glVertex2i(0, 48);
 
-			glBegin(GL_QUADS);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-			glVertex2i(0, 0);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .50f);
-			glVertex2i(48, 0);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .00f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-			glVertex2i(48, 48);
-			glTexCoord2f(m_bInfo[m_world.GetPlayer()->GetBlock()].u + m_bInfo[m_world.GetPlayer()->GetBlock()].w * .50f, m_bInfo[m_world.GetPlayer()->GetBlock()].v + m_bInfo[m_world.GetPlayer()->GetBlock()].h * .75f);
-			glVertex2i(0, 48);
-
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-		}
-
-	RenderFastInventory();
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(!m_settings.m_inventaire_creatif)
+		RenderFastInventory();
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -1317,28 +1248,61 @@ void Engine::DrawMenuPrincipal() const
 
 void Engine::RenderFastInventory() const
 {
-	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
+	int position = 0;	
+	int quantity = 0;
+	std::ostringstream oss;
+	Inventory* inv = m_world.GetPlayer()->GetInventory(); 
+	Item* items = inv->GetItems();
+	BlockType bloctype = BTYPE_AIR;
+	int x = 0;
+	int y = 0;
+	float size = 10.f;
+	std::string t = "99+";
+		
+	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK || !m_settings.m_inventaire_creatif)
 	{
 		glLoadIdentity();
 		glTranslated(Width(), 16, 0);
 	}
-
-	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
-
-	glTranslated(0,-64,0);
 	
+	glTranslated(0,-64,0);
+
+	if(m_fastInventoryKeySelected == -1)
+		m_world.GetPlayer()->SetBlockDirect(BTYPE_AIR);
+
 	for(int j = 0; j < 5; j++)
 	{
 		glTranslated(0,64,0);
 		for (int i = 0; i < 3; i++)
 		{
+			position = j*3+i;
 			glTranslated(-64, 0, 0);
+
+			bloctype = items[position].GetType();
+			quantity = items[position].GetQuantity();
 	
-			if (j == 0 && keys[i] == m_fastInventoryKeySelected)
-				glColor3f(128.f, 0.f, 0.f);
-			else
+			if(inv->GetCurrentIndex() == position)
+				glColor3f(0.f,0.f,1.f);
+			else if(inv->GetCurrentMoveIndex() == position)
+				glColor3f(102.f/255.f,102.f/255.f,1.f);
+			else if (j == 0 && keys[i] == m_fastInventoryKeySelected) {
+				glColor3f(1.f, 0.f, 0.f);
+				if(m_world.GetPlayer()->GetBlock() != bloctype) {
+					m_world.GetPlayer()->SetBlockDirect(bloctype);
+				}
+			} else
 				glColor3f(0.f, 0.f, 0.f);
-	
+
+			if(quantity > 99)
+				t = "99+";
+			else
+			{
+				oss.str("");
+				oss << quantity;
+				t = oss.str();
+			}
+
 			glBegin(GL_QUADS);
 			glVertex2i(-2, -2);
 			glVertex2i(50, -2);
@@ -1346,20 +1310,66 @@ void Engine::RenderFastInventory() const
 			glVertex2i(-2, 50);
 			glEnd();
 			
-			if(j == 0)
-				glColor3f(255.f, 128.f, 0.f);
+			if(quantity == 0)			
+			{
+				if(j == 0) {
+					glColor3f(1.f,1.f,0.f);
+				} else {
+					glColor3f(1.f,1.f,77.f/255.f);
+				}
+				glBegin(GL_QUADS);
+				glVertex2i(00, 00);
+				glVertex2i(48, 00);
+				glVertex2i(48, 48);
+				glVertex2i(00, 48);
+				glEnd();
+			}
 			else
-				glColor3f(229.f, 218.f, 144.f);
+			{
+				//block
+				m_textureAtlas.Bind();
+				glEnable(GL_TEXTURE_2D);
+				glColor3f(1.f, 1.f, 1.f);
+
+				glBegin(GL_QUADS);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .50f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .50f);
+				glVertex2i(0, 0);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .00f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .50f);
+				glVertex2i(48, 0);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .00f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .75f);
+				glVertex2i(48, 48);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .50f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .75f);
+				glVertex2i(0, 48);		
+				glEnd();
 			
-			glBegin(GL_QUADS);
-			glVertex2i(0, 0);
-			glVertex2i(48, 0);
-			glVertex2i(48, 48);
-			glVertex2i(0, 48);
-			glEnd();
+				m_textureFont.Bind();
+			
+				glPushMatrix();			
+				glTranslated(x, y, 0);
+				for (unsigned int i = 0; i < t.length(); ++i)
+				{
+					float left = (float)((t[i] - 32) % 16) / 16.0f;
+					float top = (float)((t[i] - 175) / 16) / 16.0f;
+	
+					top += 0.5f;
+					glBegin(GL_QUADS);
+					glTexCoord2f(left, 1.0f - top - 0.0625f);
+					glVertex2f(0, 0);
+					glTexCoord2f(left + 0.0625f, 1.0f - top - 0.0625f);
+					glVertex2f(size, 0);
+					glTexCoord2f(left + 0.0625f, 1.0f - top);
+					glVertex2f(size, size);
+					glTexCoord2f(left, 1.0f - top);
+					glVertex2f(0, size);
+					glEnd();
+					glTranslated(size - (size / 4), 0, 0);
+				}
+				glPopMatrix();
+			}
+			glDisable(GL_TEXTURE_2D);
 		}
 
-		if(j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		if(j == 0 && !m_isInventoryOpen)
 			break;
 		
 		glTranslated(+64 * 3, 0 , 0); 
