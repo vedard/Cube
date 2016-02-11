@@ -53,7 +53,6 @@ private:
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
 	void DrawHurtEffect() const;
-	void DrawSunMoon(float gametime) const;
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
@@ -61,7 +60,7 @@ private:
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;
-	void SetLightSource(float gametime);
+	void DrawHitMarker() const;
 
 private:
 	bool m_wireframe;
@@ -79,7 +78,7 @@ private:
 	Texture m_textureSky;
 	Texture m_textureFont;
 	Texture m_effectHurt;
-	Texture m_sun;
+	Texture m_hitMarker;
 
 	int m_fastInventoryKeySelected;
 	

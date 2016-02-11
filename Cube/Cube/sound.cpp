@@ -14,13 +14,17 @@ void Sound::AddSound(int soundbuffer, std::string path)
 
 void Sound::Play(int soundbuffer, int volume, const Vector3<float> pos)
 {
+
 	Parametre& m_settings = Parametre::GetInstance();
+	int volumeSound = m_settings.m_soundvolume;
+	if (volume > m_settings.m_soundvolume)
+		volumeSound = volume;
 	for (int i = 0; i < 200; i++)
 	{
 		if (m_Sound[i].getStatus() == sf::Sound::Status::Stopped)
 		{
 			m_Sound[i].setBuffer(m_SoundBuffers[soundbuffer]);
-			m_Sound[i].setVolume((float)m_settings.m_soundvolume);
+			m_Sound[i].setVolume((float)volumeSound);
 			m_Sound[i].setPosition(pos.x, pos.y, pos.z);
 			m_Sound[i].play();
 			m_listbuffer[i] = soundbuffer;

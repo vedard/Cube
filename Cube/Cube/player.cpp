@@ -14,7 +14,8 @@ m_footUnderwater(false),
 m_headUnderwater(false),
 m_HeadShake(0),
 isHurt(0),
-InvulnerabilityTimer(0)
+InvulnerabilityTimer(0),
+hasHit(0)
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -25,7 +26,7 @@ InvulnerabilityTimer(0)
 	m_isAlive = false;
 	m_godMode = false;
 	
-	Guns = new Gun[3];	
+	Guns = new Gun[GUN_NUMBER];	
 }
 
 Player::~Player()
@@ -348,7 +349,7 @@ void Player::SetBlock(int direction)
 
 void Player::SetWeapon(int mode)
 {
-	if (mode >= 0 && mode <= 3)
+	if (mode >= 0 && mode <= GUN_NUMBER)
 		m_weapon = mode;
 }
 
@@ -386,7 +387,8 @@ void Player::Tick()
 	if (isHurt > 0)
 		isHurt--;
 
-
+	if (hasHit > 0)
+		hasHit--;
 	if (InvulnerabilityTimer > 0)
 		InvulnerabilityTimer -= TICK_DELAY;
 

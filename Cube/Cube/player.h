@@ -76,6 +76,7 @@ private:
 
 public:
 	int isHurt;
+	float hasHit;
 };
 
 #endif

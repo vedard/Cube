@@ -106,16 +106,14 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
-	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
-	LoadTexture(m_sun, EFFECTS_PATH "sun.png");
-
-
-
 	if (!m_settings.m_isServer)
 	{
 		//Load texture qui ne sont pas dans l'atlas
 		LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 		LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
+		LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
+		LoadTexture(m_hitMarker, EFFECTS_PATH "HitMarker.png");
+
 
 		//Load texture dans l'atlas
 		AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
@@ -165,6 +163,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+		Sound::AddSound(Sound::HITMARK, WEAPONS_PATH "hitmarker.wav");
 		for (int i = 0; i < 6; i++)
 		{
 			Sound::AddSound(Sound::STEP1 + i, WALK_PATH "grass" + std::to_string(i + 1) + ".wav");
@@ -184,7 +183,8 @@ void Engine::LoadResource()
 		//Model 3d
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		//m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "P90V2.obj", TEXTURE_PATH "P90.bmp", Sound::AK47_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 	}
@@ -194,6 +194,8 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 1800, 120, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(false, 60, 220, 0.4);
+
 
 	//Load la map
 	m_world.LoadMap("map.sav", m_bInfo);
@@ -233,11 +235,24 @@ void Engine::UpdateEnvironement(float gameTime)
 		{
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
 
-			//Check si y a collision
+			Parametre& m_settings = Parametre::GetInstance();
+			//Check s'il y a collision
 			for (int j = 0; j < MAX_MONSTER; j++)
-				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]);
+			{
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+			}
 			for (int j = 0; j < MAX_COW; j++)
-				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]);
+			{
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+			}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
 
@@ -360,6 +375,8 @@ void Engine::DrawEnvironement(float gameTime) {
 		DrawHurtEffect();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (m_world.GetPlayer()->hasHit > 0)
+		DrawHitMarker();
 
 	// Draw le menu
 	if (m_isMenuOpen)
@@ -552,6 +569,12 @@ void Engine::KeyPressEvent(unsigned char key)
 		//1 -> W_BLOCK 
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
+		//2 -> W_PISTOL
+		if (m_keyboard[m_settings.m_inventory2])
+		{
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
+			Sound::Play(Sound::GUN_DRAW);
+		}
 		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory3])
 		{
@@ -564,6 +587,7 @@ void Engine::KeyPressEvent(unsigned char key)
 			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
 			Sound::Play(Sound::GUN_DRAW);
 		}
+
 		//M -> spawn monster
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{
@@ -899,9 +923,12 @@ void Engine::DrawHud() const
 	glDisable(GL_TEXTURE_2D);
 
 	// Affichage du crosshair
-	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
+	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming() && m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+	{
+		//DrawHitMarker();
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
-	
+	}
+		
 		if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
 		{
 			//Block selectionne
@@ -1136,6 +1163,7 @@ void Engine::DrawCross(float r, float g, float b) const
 
 void Engine::DrawSky(float gameTime) const
 {
+
 	glPushMatrix();
 	glTranslatef(m_world.GetPlayer()->GetPosition().x, 0, m_world.GetPlayer()->GetPosition().z);
 
@@ -1486,8 +1514,9 @@ void Engine::DrawHurtEffect() const
 	
 }
 
-void Engine::DrawSunMoon(float gametime) const {
-	// Setter le blend function , tout ce qui sera noir sera transparent
+
+void Engine::DrawHitMarker() const
+{
 	glDisable(GL_LIGHTING);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -1500,24 +1529,25 @@ void Engine::DrawSunMoon(float gametime) const {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glTranslatef(m_world.GetPlayer()->GetPosition().x, 0, m_world.GetPlayer()->GetPosition().z);
 
-	glRotatef(gametime * 1.1f, 0.f, 1.f, 0.f);
 
-	m_sun.Bind();
+	m_hitMarker.Bind();
 	//static const int crossSize = 800;
 	glLoadIdentity();
+	glTranslated(Width() / 2 - 2, Height() / 2 - 1, 0);
 	glBegin(GL_QUADS);
-	int ishurt = m_world.GetPlayer()->isHurt;
+
 	glTexCoord2f(0, 0);
-	glVertex2i(50, 50);
+	glVertex2i(-30, -30);
 	glTexCoord2f(1, 0);
-	glVertex2i(150, 50);
+	glVertex2i(30, -30);
+
 	glTexCoord2f(1, 1);
-	glVertex2i(150, 150);
+	glVertex2i(30, 30);
+
 	glTexCoord2f(0, 1);
-	glVertex2i(50, 150);
+	glVertex2i(-30, 30);
+
 
 	glEnd();
 	glEnable(GL_LIGHTING);
@@ -1531,45 +1561,6 @@ void Engine::DrawSunMoon(float gametime) const {
 	glPopMatrix();
 }
 
-void Engine::SetLightSource(float gametime)
-{
-	int daytime = (int)gametime % DAY_LENGTH;
-	float positionX;
-	float positionY;
-	if (daytime / (DAY_LENGTH / 4) == 0)
-	{ 
-		positionX = (DAY_LENGTH / 4) - daytime;
-		positionY = daytime;
-	}
-	else if (daytime / (DAY_LENGTH / 4) == 1)
-	{ 
-		positionX = (DAY_LENGTH / 4) - daytime;
-		positionX = (DAY_LENGTH / 4) - positionX;
-	}
-	else if (daytime / (DAY_LENGTH / 4) == 2)
-	{
-		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
-		positionY = daytime - (DAY_LENGTH / 2);
-	}
-	else
-	{
-		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
-		positionX = (DAY_LENGTH / 4) - positionX;
-	}
-
-	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x + positionX ,  m_world.GetPlayer()->GetPosition().y + positionY, 0.0f, 0.0f };
-	GLfloat light0Amb[4] = { 2.f, 2.f, 2.f, 1.0f };
-	GLfloat light0Diff[4] = { 5.0f, 5.0f, 5.0f, 1.0f };
-	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
-
-
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
-
-}
 
 
 
