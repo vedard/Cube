@@ -272,6 +272,11 @@ void Engine::UpdateEnvironement(float gameTime)
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
 	m_network.Fetch();
+	if (Parametre::GetInstance().m_isServer)
+	{
+		if ((int)(gameTime * 100) % 100 == 0)
+			m_network.Send("Hi !!!");
+	}
 }
 
 void Engine::DrawEnvironement(float gameTime) {
@@ -1922,7 +1927,6 @@ void Engine::RenderFastInventory() const
 		glTranslated(+64 * 3, 0, 0);
 	}
 }
-
 
 void Engine::DrawHurtEffect() const
 {

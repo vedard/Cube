@@ -42,6 +42,7 @@ private:
 	ENetHost *	m_ENetHost;
 	ENetEvent	m_ENetEvent;
 	ENetAddress	m_ENetAddress;
+	ENetPeer *	m_EnetPeerServer;
 
 	// Hérité via NetworkEvent
 	virtual void OnConnect() override;

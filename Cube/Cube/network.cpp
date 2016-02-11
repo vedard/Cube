@@ -59,31 +59,32 @@ void Network::Connect(const char *ip, uint16 port)
 	enet_address_set_host(&m_ENetAddress, ip);
 	m_ENetAddress.port = port;
 
-	ENetPeer * peer = enet_host_connect(m_ENetHost, &m_ENetAddress, 2, 0);
-
-	if (peer == NULL)
-		std::cout << "Couldn't connect to the server" << std::endl;
+	m_EnetPeerServer = enet_host_connect(m_ENetHost, &m_ENetAddress, 2, 0);
 }
 
 void Network::Disconnect()
 {
-	if (m_isServer)
+	if (m_isServer || m_EnetPeerServer == NULL)
 		return;
 	
-	for (auto c : m_lstClient)
-		enet_peer_disconnect(c.peer, 0);
+	enet_peer_disconnect(m_EnetPeerServer, 0);
 
-	m_lstClient.clear();
+
 }
 
 bool Network::Send(string data)
 {
-	for (auto c : m_lstClient)
-	{
-		ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, ENET_PACKET_FLAG_RELIABLE);
-		enet_peer_send(c.peer, 0, packet);
-		enet_host_flush(m_ENetHost);
-	}
+
+	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, ENET_PACKET_FLAG_RELIABLE);
+
+	// Broadcast a tous les client si on est un serveur
+	// Send au serveur si on est un client
+	if (m_isServer)
+		enet_host_broadcast(m_ENetHost, 0, packet);
+	else if(m_EnetPeerServer)
+		enet_peer_send(m_EnetPeerServer, 0, packet);
+
+	enet_host_flush(m_ENetHost);
 
 	return false;
 }
@@ -97,6 +98,9 @@ void Network::OnConnect()
 void Network::OnDisconnect()
 {
 	std::cout << "Disconnected event happens" << std::endl;
+
+	if(!m_isServer)
+		m_lstClient.clear();
 }
 
 void Network::OnPacketReceive()
