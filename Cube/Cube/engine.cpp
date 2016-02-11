@@ -610,7 +610,6 @@ void Engine::KeyPressEvent(unsigned char key)
 	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY)) {		
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
-<<<<<<< HEAD
 
 	if(m_isInventoryOpen) {
 		if(m_keyboard[m_settings.m_openinventory]) {
