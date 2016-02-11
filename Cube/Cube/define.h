@@ -53,10 +53,12 @@ typedef long long int64;
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
 #define WORLD_SIZE 70
+#define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 100
-#define MAX_COW 100
+#define MAX_MONSTER 10
+#define MAX_COW 10
+#define MAX_BEAR 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
@@ -67,6 +69,8 @@ typedef long long int64;
 #define WEAPONS_PATH	"../Cube/media/audio/weapons/"
 #define WALK_PATH	"../Cube/media/audio/walk/"
 #define HURT_PATH	"../Cube/media/audio/hurt/"
+#define DEATH_PATH  "../Cube/media/audio/death/"
+#define LEAVE_PATH	"../Cube/media/audio/leave/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
@@ -75,6 +79,7 @@ typedef long long int64;
 #define INVULNERABILITY_PLAYER_TIME .300f
 #define HURT_TIME 20
 #define DAY_LENGTH 100
+#define GUN_NUMBER 4
 
 #define INVENTORY_SIZE 15		//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
@@ -85,6 +90,14 @@ typedef long long int64;
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
 #define INVENTORY_MOVE_ITEM_KEY		sf::Keyboard::B
 #define INVENTORY_DELETE_ITEM_KEY	sf::Keyboard::E
+
+#define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
+#define MIN_HEIGHT 600
+#define MAX_VOLUME 100 // Valeurs du sf::Sound
+#define MIN_VOLUME 0
+
+#define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
+#define KEY_ALREADY_BOUND "This key is already bound"
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
@@ -122,14 +135,17 @@ enum WEAPONS {
 	W_BLOCK,
 	W_PISTOL,
 	W_SUBMACHINE_GUN,
-	W_ASSAULT_RIFLE
+	W_ASSAULT_RIFLE,
+	W_SNIPER
 };
 
 // Pour savoir sur quel menu nous nous situons
 enum SOUS_MENU {
 	SM_PRINCIPAL,
 	SM_CONTROLS,
-	SM_SETTINGS
+	SM_SETTINGS,
+	SM_SETTING_SELECTED,
+	SM_CONTROL_SELECTED
 };
 
 // Buttons/states du menu principal
@@ -139,5 +155,48 @@ enum MENU_PRINCIPAL {
 	MP_EXIT_GAME
 };
 
+enum MENU_SETTINGS {
+	MS_FULLSCREEN,
+	MS_WIDTH,
+	MS_HEIGHT,
+	MS_ANTI_ALIASING,
+	MS_VSYNC,
+	MS_RENDER_DISTANCE,
+	MS_SOUND_VOLUME,
+	MS_MUSIC_VOLUME,
+	MS_CROSSCOLOR_R,
+	MS_CROSSCOLOR_G,
+	MS_CROSSCOLOR_B,
+	MS_MOUSE_SENSITIVITY
+};
+enum ANIMAL_TYPE
+{
+	A_BEAR,
+	A_COW
+};
+
+enum MENU_CONTROLS {
+	MC_AVANCER,
+	MC_GAUCHE,
+	MC_RECULER,
+	MC_DROITE,
+	MC_FULLSCREEN,
+	MC_INFO,
+	MC_CROUCH,
+	MC_RUN,
+	MC_JUMP,
+	MC_NOCLIP,
+	MC_INVENTORY1,
+	MC_INVENTORY2,
+	MC_INVENTORY3,
+	MC_INVENTORY4,
+	MC_INVENTORY,
+	MC_SPAWNMONSTER,
+	MC_WIREFRAME
+};
+
+enum MONSTER_TYPE {
+	M_Creeper
+};
 
 #endif // DEFINE_H__

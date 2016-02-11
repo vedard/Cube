@@ -1,5 +1,5 @@
 #include "character.h"
-
+#include "sound.h"
 
 Character::Character() :
 	m_pos(0, 128, 0),
@@ -19,6 +19,7 @@ Character::Character() :
 	m_Name = "Character ";
 	for (int i = 0; i < 5; i++)
 		m_Name += std::to_string(std::rand() % 10);
+	m_health = 100;
 
 
 }
@@ -30,7 +31,6 @@ Character::~Character()
 void Character::Spawn(World &world, int x, int z)
 {
 	m_isAlive = true;
-	m_health = 100;
 	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
 	m_pos.z = (float)z;
@@ -193,7 +193,7 @@ bool Character::Attack(Character * character)
 
 bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode)
 {
-	if (!godMode)
+	if (!godMode && m_isAlive)
 	{
 		if (!ignoreArmor)
 		{

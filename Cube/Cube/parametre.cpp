@@ -32,8 +32,8 @@ void Parametre::Save()
 
 	std::cout << "Saving changes on config file" << std::endl;
 
-	myfile << "server " << ((m_vsync) ? "true" : "false") << "\n";
-	myfile << "fullscreen " << ((m_fullscreen) ? "true" : "false") << "\n";
+	
+	myfile << "fullscreen " << ((m_isfullscreen) ? "true" : "false") << "\n";
 	myfile << "width " << m_width << "\n";
 	myfile << "height " << m_height << "\n";
 	myfile << "antialiasing " << m_antialiasing << "\n";
@@ -60,6 +60,7 @@ void Parametre::Save()
 	myfile << "btninventory " << m_openinventory << "\n";
 	myfile << "btnspawnmonster " << m_spawnmonster << "\n";
 	myfile << "btnwireframe " << m_wireframe << "\n";
+	myfile << "server " << ((m_isServer) ? "true" : "false") << "\n";
 	myfile << "musicvolume " << m_musicvolume << "\n";
 	myfile << "soundvolume " << m_soundvolume << "\n";
 	myfile << "inventaire_rapide1 " << m_inventaire_rapide1 << "\n";
@@ -79,7 +80,7 @@ void Parametre::SaveDefault()
 	myfile.open("Cube.conf");
 	std::cout << "Creating config save file" << std::endl;
 
-	myfile << "server" << "false" << "\n";
+	
 	myfile << "fullscreen false \n";
 	myfile << "width 1360 \n";
 	myfile << "height 768 \n";
@@ -107,6 +108,7 @@ void Parametre::SaveDefault()
 	myfile << "btninventory 8 \n";
 	myfile << "btnspawnmonster 12 \n";
 	myfile << "btnwireframe 24 \n";
+	myfile << "server" << " false" << "\n";
 	myfile << "musicvolume 10 \n";
 	myfile << "soundvolume 12 \n";
 	myfile << "inventaire_rapide1 " << FIRST_FAST_INVENTORY_KEY << "\n";
@@ -182,7 +184,7 @@ void Parametre::Load()
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
 
-		//Read All file
+		//Read whole file
 		std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		std::stringstream ss(str);
 		//Close it
@@ -273,9 +275,9 @@ void Parametre::Load()
 		else
 			m_isServer = false;
 		if (setting.Get(28, 1) != "null")
-			m_musicvolume = (sf::Keyboard::Key)atoi(setting.Get(27, 1).c_str());
+			m_musicvolume = atoi(setting.Get(28, 1).c_str());
 		if (setting.Get(29, 1) != "null")
-			m_soundvolume = (sf::Keyboard::Key)atoi(setting.Get(28, 1).c_str());
+			m_soundvolume = atoi(setting.Get(29, 1).c_str());
 		if (setting.Get(30, 1) != "null")
 			m_inventaire_rapide1 = (sf::Keyboard::Key)atoi(setting.Get(30, 1).c_str());
 		if (setting.Get(31, 1) != "null")
@@ -287,6 +289,5 @@ void Parametre::Load()
 		if (setting.Get(34, 1) != "null")
 			m_inventaire_enlever_element = (sf::Keyboard::Key)atoi(setting.Get(34, 1).c_str());
 		m_inventaire_creatif = (setting.Get(35, 1) == "true" || setting.Get(35,1) == "1");
-		
 	}
 }

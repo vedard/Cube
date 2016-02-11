@@ -28,6 +28,7 @@ public:
 
 	bool Underwater() const;
 	bool footUnderwater() const;
+	BlockType blockUnderPlayer() const;
 	bool UnderLava() const;
 
 	BlockType GetBlock() const;
@@ -50,6 +51,7 @@ public:
 private:
 	void CheckUnderwater(World &world);
 	void CheckUnderLava(World &world);
+	void CheckBlockUnder(World &world);
 	void ResetDeath();
 private:
 	bool m_godMode;
@@ -60,13 +62,14 @@ private:
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
-	bool m_headWasUnderwater = false; // Si le joueur vient de sortir de l'eau.
+	bool m_headWasUnderwater; // Si le joueur vient de sortir de l'eau.
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	bool m_headUnderLava; // Si le joueur est sous la lave
 	bool m_kneeUnderwater;  // Si le joueur est sous l'eau
 	bool m_kneeUnderLava;  // Si le joueur est sous la lave
 	bool m_footUnderLava;  // Si le joueur est sous la lave
 	BlockType m_block;// Prochain block que le joueur peut placer
+	BlockType m_blockUnder; // Bloc en dessous du joueur
 	Gun * Guns;
 	float InvulnerabilityTimer;
 	
@@ -78,6 +81,7 @@ private:
 
 public:
 	int isHurt;
+	float hasHit;
 };
 
 #endif

@@ -15,7 +15,8 @@ m_headUnderwater(false),
 m_HeadShake(0),
 isHurt(0),
 InvulnerabilityTimer(0),
-m_inventory(new Inventory())
+m_inventory(new Inventory()),
+hasHit(0)
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -26,7 +27,7 @@ m_inventory(new Inventory())
 	m_isAlive = false;
 	m_godMode = false;
 	
-	Guns = new Gun[3];	
+	Guns = new Gun[GUN_NUMBER];	
 }
 
 Player::~Player()
@@ -198,6 +199,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_vitesse.y = 0.08f;
 	//si le player est en dessous de la lave
 	CheckUnderLava(world);
+	CheckBlockUnder(world);
 
 	if (m_footUnderLava)
 		if (m_vitesse.y > 0.08f)
@@ -207,7 +209,6 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 void Player::CheckUnderwater(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
-
 	if (bt1 > 15 && bt1 < 21)
 		m_headUnderwater = true;
 	else
@@ -245,11 +246,15 @@ void Player::CheckUnderLava(World &world)
 		m_kneeUnderLava = false;
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
-
 	if (bt1 > 20 && bt1 < 26)
 		m_footUnderLava = true;
 	else
 		m_footUnderLava = false;
+}
+
+void Player::CheckBlockUnder(World & world)
+{
+	m_blockUnder = world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z);
 }
 
 void Player::ResetDeath()
@@ -353,7 +358,7 @@ void Player::SetBlockDirect(BlockType blockType) {
 
 void Player::SetWeapon(int mode)
 {
-	if (mode >= 0 && mode <= 3)
+	if (mode >= 0 && mode <= GUN_NUMBER)
 		m_weapon = mode;
 }
 
@@ -383,22 +388,30 @@ bool Player::Shoot(World &world)
 		return false;
 }
 
-bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::Underwater() const {return m_headUnderwater;}
 bool Player::footUnderwater() const { return m_footUnderwater; }
+BlockType Player::blockUnderPlayer() const
+{
+	return m_blockUnder;
+}
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
 	if (isHurt > 0)
 		isHurt--;
 
-
+	if (hasHit > 0)
+		hasHit--;
 	if (InvulnerabilityTimer > 0)
 		InvulnerabilityTimer -= TICK_DELAY;
 
 	if (m_footUnderLava)
 	{
 		GetDamage(8, true, m_godMode);
-		//isHurt = 20;
+		if (!GetDamage(8, true, m_godMode))
+		{
+			ResetDeath();
+		}
 	}
 	if (m_headUnderwater)
 	{
@@ -406,28 +419,51 @@ void Player::Tick()
 		if (m_BreathCount > 75)
 		{
 			GetDamage(3, true, m_godMode);
-			//isHurt = 20;
+			Sound::PlayOnce(Sound::DROWNING);
+			m_headWasUnderwater = true;
+			if (!GetDamage(3, true, m_godMode))
+			{
+				ResetDeath();
+			}
 		}
 	}
 	else
-		m_BreathCount = 0;
-
-}
-
-bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
-{
-	bool b = false;
-	if (InvulnerabilityTimer <= 0)
 	{
-		b = Character::GetDamage(damage, ignoreArmor, godMode);
-		if (!godMode)
+		m_BreathCount = 0;
+		if (m_headWasUnderwater)
 		{
-			isHurt = HURT_TIME;
-			InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+			m_headWasUnderwater = false;
+			std::cout << "Playing sound GASPING" << std::endl;
+			Sound::PlayOnce(Sound::GASPING);
 		}
 	}
-	return b;
 }
+
+	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
+	{
+		bool b = true;
+		if (InvulnerabilityTimer <= 0)
+		{
+			b = Character::GetisAlive();
+			if (b)
+			{
+				b = Character::GetDamage(damage, ignoreArmor, godMode);
+				if (!godMode)
+				{
+					Sound::Play(Sound::HURT);
+					isHurt = HURT_TIME;
+					InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
+				}
+				if (!b)
+				{
+					Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
+				}
+			}
+			
+		}
+		
+		return b;
+	}
 
 Inventory* Player::GetInventory()
 {
