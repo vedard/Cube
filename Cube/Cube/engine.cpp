@@ -169,13 +169,6 @@ void Engine::LoadResource()
 			}
 		}
 
-		if (!m_music.openFromFile(MUSIC_PATH "music1.wav"))
-			abort();
-
-		m_music.setLoop(true);
-		m_music.setVolume(m_settings.m_musicvolume);
-		m_music.play();
-
 
 		//Model 3d
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
@@ -429,6 +422,7 @@ void Engine::Render(float elapsedTime)
 	//gestion des ticks
 	if (gameTime - m_LastTickTime >= TICK_DELAY)
 	{
+		m_music.PlayNext();
 		m_LastTickTime = gameTime;
 		m_world.GetPlayer()->Tick();
 	}
@@ -1177,6 +1171,7 @@ void Engine::GetBlocAtCursor()
 
 void Engine::DrawCross(float r, float g, float b) const
 {
+	glPushMatrix();
 	glLoadIdentity();
 	glTranslated(Width() / 2, Height() / 2, 0);
 	glColor3f(r, g, b);
@@ -1203,6 +1198,7 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(25, -1);
 
 	glEnd();
+	glPopMatrix();
 }
 
 void Engine::DrawSky(float gameTime) const

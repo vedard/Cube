@@ -3,7 +3,6 @@
 #include "parametre.h"
 #include "define.h"
 #include "vector3.h"
-#include "parametre.h"
 
 class Sound
 {

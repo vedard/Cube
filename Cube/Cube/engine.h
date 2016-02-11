@@ -27,6 +27,7 @@
 #include <thread>
 #include "parametre.h"
 #include "menu.h"
+#include "music.h"
 
 
 class Engine : public OpenglContext
@@ -74,9 +75,7 @@ private:
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
-	bool m_firstMusic = true;
 	int m_cptTick = 0;
-	int m_musiclist [6] = {};
 	float m_LastTickTimeWater;
 	PlayerActor m_playerActor;
 
@@ -113,8 +112,9 @@ private:
 	int m_fps;
 	int m_chunkToUpdate;
 	bool displayInfo;
+	Music& m_music = Music::GetInstance();
 
-	sf::Music m_music;
+
 
 	//Model
 	Model3d m_modelCow;
@@ -126,7 +126,6 @@ private:
 	//NetworkManager
 	NetworkManager m_Netctl;
 	// Parametres
-
 	Parametre& m_settings = Parametre::GetInstance();
 
 	// Valeurs pour le jour et la nuit

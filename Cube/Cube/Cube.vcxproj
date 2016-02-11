@@ -106,6 +106,7 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
+    <ClCompile Include="music.cpp" />
     <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
@@ -134,6 +135,7 @@
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="music.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
