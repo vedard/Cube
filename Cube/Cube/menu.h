@@ -1,4 +1,4 @@
-#ifndef MENU_H__
+ï»¿#ifndef MENU_H__
 #define MENU_H__
 
 #include "define.h"
@@ -14,7 +14,7 @@ public:
 	int m_currentMenuItem;
 	SOUS_MENU m_currentMenu;
 	int m_settingNewValue = 0;
-	int m_digitCount = 0; // Compte le nombre de chiffre insérés dans m_settingNewValue pour pouvoir le transférer en float
+	int m_digitCount = 0; // Compte le nombre de chiffre insï¿½rï¿½s dans m_settingNewValue pour pouvoir le transfï¿½rer en float
 	std::string m_controlSelected;
 private:
 	int m_menuItemsAmount;
@@ -22,12 +22,12 @@ private:
 	Parametre& m_settings = Parametre::GetInstance();
 };
 // POUR AJOUTER UN SETTING...
-// Ajouter un setting dans la classe parametre (et toutes ses méthodes)
-// Ajouter une valeur dans l'énum du sous-menu désiré dans define.h
-// Ajuster le nombre d'éléments menu dans le constructeur menu.cpp
+// Ajouter un setting dans la classe parametre (et toutes ses mï¿½thodes)
+// Ajouter une valeur dans l'ï¿½num du sous-menu dï¿½sirï¿½ dans define.h
+// Ajuster le nombre d'ï¿½lï¿½ments menu dans le constructeur menu.cpp
 // Ajouter les boutons dans DrawMenuSettings/Controls de engine.cpp
-// Ajuster la méthode OnKeyDown de menu.cpp aux flèches droite et gauche pour la navigation si elle n'est plus correcte
-// Modifier la méthode ManageMenuEnterKeyPress de engine.cpp
-// Modifier la méthode OnKeyDown de  menu.cpp si un nouveau controle a été ajouté
+// Ajuster la mï¿½thode OnKeyDown de menu.cpp aux flï¿½ches droite et gauche pour la navigation si elle n'est plus correcte
+// Modifier la mï¿½thode ManageMenuEnterKeyPress de engine.cpp
+// Modifier la mï¿½thode OnKeyDown de  menu.cpp si un nouveau controle a ï¿½tï¿½ ajoutï¿½
 
 #endif

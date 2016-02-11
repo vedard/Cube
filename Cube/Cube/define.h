@@ -57,7 +57,8 @@ typedef long long int64;
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
 #define MAX_MONSTER 25
-#define MAX_COW 100
+#define MAX_COW 10
+#define MAX_BEAR 100
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define MUSIC_MAX 5
@@ -79,6 +80,7 @@ typedef long long int64;
 #define INVULNERABILITY_PLAYER_TIME .300f
 #define HURT_TIME 20
 #define DAY_LENGTH 100
+#define GUN_NUMBER 4
 
 #define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
@@ -132,7 +134,8 @@ enum WEAPONS {
 	W_BLOCK,
 	W_PISTOL,
 	W_SUBMACHINE_GUN,
-	W_ASSAULT_RIFLE
+	W_ASSAULT_RIFLE,
+	W_SNIPER
 };
 
 // Pour savoir sur quel menu nous nous situons
@@ -165,6 +168,11 @@ enum MENU_SETTINGS {
 	MS_CROSSCOLOR_B,
 	MS_MOUSE_SENSITIVITY
 };
+enum ANIMAL_TYPE
+{
+	A_BEAR,
+	A_COW
+};
 
 enum MENU_CONTROLS {
 	MC_AVANCER,
@@ -184,6 +192,10 @@ enum MENU_CONTROLS {
 	MC_INVENTORY,
 	MC_SPAWNMONSTER,
 	MC_WIREFRAME
+};
+
+enum MONSTER_TYPE {
+	M_Creeper
 };
 
 #endif // DEFINE_H__

@@ -14,7 +14,8 @@ m_footUnderwater(false),
 m_headUnderwater(false),
 m_HeadShake(0),
 isHurt(0),
-InvulnerabilityTimer(0)
+InvulnerabilityTimer(0),
+hasHit(0)
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -25,7 +26,7 @@ InvulnerabilityTimer(0)
 	m_isAlive = false;
 	m_godMode = false;
 	
-	Guns = new Gun[3];	
+	Guns = new Gun[GUN_NUMBER];	
 }
 
 Player::~Player()
@@ -352,7 +353,7 @@ void Player::SetBlock(int direction)
 
 void Player::SetWeapon(int mode)
 {
-	if (mode >= 0 && mode <= 3)
+	if (mode >= 0 && mode <= GUN_NUMBER)
 		m_weapon = mode;
 }
 
@@ -382,7 +383,7 @@ bool Player::Shoot(World &world)
 		return false;
 }
 
-bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::Underwater() const {return m_headUnderwater;}
 bool Player::footUnderwater() const { return m_footUnderwater; }
 BlockType Player::blockUnderPlayer() const
 {
@@ -394,17 +395,18 @@ void Player::Tick()
 	if (isHurt > 0)
 		isHurt--;
 
-
+	if (hasHit > 0)
+		hasHit--;
 	if (InvulnerabilityTimer > 0)
 		InvulnerabilityTimer -= TICK_DELAY;
 
 	if (m_footUnderLava)
 	{
+		GetDamage(8, true, m_godMode);
 		if (!GetDamage(8, true, m_godMode))
 		{
 			ResetDeath();
 		}
-		//isHurt = 20;
 	}
 	if (m_headUnderwater)
 	{
@@ -416,7 +418,6 @@ void Player::Tick()
 			{
 				ResetDeath();
 			}
-			//isHurt = 20;
 		}
 	}
 	else

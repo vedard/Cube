@@ -54,14 +54,14 @@ private:
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
 	void DrawHurtEffect() const;
-	void DrawSunMoon(float gametime) const;
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
-	void DrawMenuPrincipal() const;
+	void DrawMenuPrincipal() const;;
+	void DrawHitMarker() const;
 	void DrawMenuSettings() const;
 	void DrawMenuControls() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
@@ -71,7 +71,8 @@ private:
 	void DrawMenuControlSelected();
 	void SetLightSource(float gametime);
 
-	void CloseGame();	void SetDayOrNight(float gametime);
+	void CloseGame();
+	void SetDayOrNight(float gametime);
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
@@ -92,12 +93,11 @@ private:
 	Texture m_textureSky;
 	Texture m_textureFont;
 	Texture m_effectHurt;
-	Texture m_sun;
+	Texture m_hitMarker;
 
 	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
-	Shader m_shader02;
 	World m_world;
 
 	//Indexe de la texutre dans l'atlas
@@ -118,7 +118,8 @@ private:
 
 	//Model
 	Model3d m_modelCow;
-	Model3d m_modelRaptor;
+	Model3d m_modelCreeper;
+	Model3d m_modelBear;
 
 	//Gun 
 	Gun * playerGun;
