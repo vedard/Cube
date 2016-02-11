@@ -97,7 +97,7 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
-	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
+
 
 
 
@@ -106,6 +106,8 @@ void Engine::LoadResource()
 	if (!m_settings.m_isServer)
 	{
 		//Load texture qui ne sont pas dans l'atlas
+		LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
+		LoadTexture(m_hitMarker, EFFECTS_PATH "HitMarker.png");
 		LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 		LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
 
@@ -156,6 +158,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
 		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
+		Sound::AddSound(Sound::HITMARK, WEAPONS_PATH "hitmarker.wav");
 
 		for (int i = 0; i < 9; i++)
 		{
@@ -196,6 +199,7 @@ void Engine::LoadResource()
 
 		//Gun
 
+		
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
@@ -234,19 +238,37 @@ void Engine::UpdateEnvironement(float gameTime)
 		for (int i = 0; i < MAX_BULLET; i++)
 		{
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
+			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
 			for (int j = 0; j < MAX_MONSTER; j++)
-				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]);
+			{
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+			}
 			for (int j = 0; j < MAX_COW; j++)
-				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]);
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+
+
 			for (int j = 0; j < MAX_BEAR; j++)
-				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]);
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
 
 		}
 	}
+	
 
 	//Update les monstres
 	for (int i = 0; i < MAX_MONSTER; i++)
@@ -254,6 +276,7 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
+
 		m_world.GetCow()[i].Move(m_world);
 
 	//Update les Bear
@@ -340,6 +363,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
+	
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
@@ -360,6 +384,8 @@ void Engine::DrawEnvironement(float gameTime) {
 	DrawHud();
 	if (m_world.GetPlayer()->isHurt > 0)
 		DrawHurtEffect();
+	if (m_world.GetPlayer()->hasHit > 0)
+		DrawHitMarker();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -558,7 +584,7 @@ void Engine::Render(float elapsedTime)
 			std::cout << cx << " " << cz << " " << bx << " " << by << " " << bz << " " << bt << " " << std::endl;
 			m_world.ChunkAt((float)cx, (float)cz)->SetBlock(bx, by, bz, bt, ' ');
 		}
-		//SetDayOrNight(gameTime);
+		SetDayOrNight(gameTime);
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -1196,6 +1222,7 @@ void Engine::GetBlocAtCursor()
 
 void Engine::DrawCross(float r, float g, float b) const
 {
+	glPushMatrix();
 	glLoadIdentity();
 	glTranslated(Width() / 2, Height() / 2, 0);
 	glColor3f(r, g, b);
@@ -1222,6 +1249,7 @@ void Engine::DrawCross(float r, float g, float b) const
 	glVertex2i(25, -1);
 
 	glEnd();
+	glPopMatrix();
 }
 
 void Engine::DrawSky(float gameTime) const
@@ -1368,7 +1396,7 @@ void Engine::DrawMenuPrincipal() const
 	glEnd();
 
 
-	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
+	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
@@ -2207,50 +2235,6 @@ void Engine::DrawHurtEffect() const
 
 }
 
-void Engine::DrawSunMoon(float gametime) const {
-	// Setter le blend function , tout ce qui sera noir sera transparent
-	glDisable(GL_LIGHTING);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	//glEnable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, Width(), 0, Height(), -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glTranslatef(m_world.GetPlayer()->GetPosition().x, 0, m_world.GetPlayer()->GetPosition().z);
-
-	glRotatef(gametime * 1.1f, 0.f, 1.f, 0.f);
-
-	m_sun.Bind();
-	//static const int crossSize = 800;
-	glLoadIdentity();
-	glBegin(GL_QUADS);
-	int ishurt = m_world.GetPlayer()->isHurt;
-	glTexCoord2f(0, 0);
-	glVertex2i(50, 50);
-	glTexCoord2f(1, 0);
-	glVertex2i(150, 50);
-	glTexCoord2f(1, 1);
-	glVertex2i(150, 150);
-	glTexCoord2f(0, 1);
-	glVertex2i(50, 150);
-
-	glEnd();
-	glEnable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST);
-	glMatrixMode(GL_PROJECTION);
-	glDisable(GL_BLEND);
-	glPopMatrix();
-	glEnable(GL_BLEND);
-	glMatrixMode(GL_MODELVIEW);
-	glDisable(GL_BLEND);
-	glPopMatrix();
-}
 
 void Engine::SetLightSource(float gametime)
 {
@@ -2300,4 +2284,51 @@ void Engine::CloseGame()
 	Stop();
 }
 
+void Engine::DrawHitMarker() const
+{
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
+
+	m_hitMarker.Bind();
+	//static const int crossSize = 800;
+	glLoadIdentity();
+	glTranslated(Width() / 2 - 3, Height() / 2 - 2, 0);
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(0, 0);
+	glVertex2i(-30, -30);
+
+	glTexCoord2f(1, 0);
+	glVertex2i(30, -30);
+
+	glTexCoord2f(1, 1);
+	glVertex2i(30, 30);
+
+	glTexCoord2f(0, 1);
+	glVertex2i(-30, 30);
+
+
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glEnable(GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+}
