@@ -61,6 +61,7 @@ private:
 	Monster* m_monster;
 	Animal* m_animal;
 
+
 	int UpdateDistance;
 	int	m_seed;
 

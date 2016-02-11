@@ -53,6 +53,7 @@ typedef long long int64;
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
 #define WORLD_SIZE 70
+#define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
 #define MAX_MONSTER 100
@@ -67,6 +68,8 @@ typedef long long int64;
 #define WEAPONS_PATH	"../Cube/media/audio/weapons/"
 #define WALK_PATH	"../Cube/media/audio/walk/"
 #define HURT_PATH	"../Cube/media/audio/hurt/"
+#define DEATH_PATH  "../Cube/media/audio/death/"
+#define LEAVE_PATH	"../Cube/media/audio/leave/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
@@ -84,6 +87,14 @@ typedef long long int64;
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
+
+#define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
+#define MIN_HEIGHT 600
+#define MAX_VOLUME 100 // Valeurs du sf::Sound
+#define MIN_VOLUME 0
+
+#define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
+#define KEY_ALREADY_BOUND "This key is already bound"
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
@@ -129,7 +140,9 @@ enum WEAPONS {
 enum SOUS_MENU {
 	SM_PRINCIPAL,
 	SM_CONTROLS,
-	SM_SETTINGS
+	SM_SETTINGS,
+	SM_SETTING_SELECTED,
+	SM_CONTROL_SELECTED
 };
 
 // Buttons/states du menu principal
@@ -139,5 +152,39 @@ enum MENU_PRINCIPAL {
 	MP_EXIT_GAME
 };
 
+enum MENU_SETTINGS {
+	MS_FULLSCREEN,
+	MS_WIDTH,
+	MS_HEIGHT,
+	MS_ANTI_ALIASING,
+	MS_VSYNC,
+	MS_RENDER_DISTANCE,
+	MS_SOUND_VOLUME,
+	MS_MUSIC_VOLUME,
+	MS_CROSSCOLOR_R,
+	MS_CROSSCOLOR_G,
+	MS_CROSSCOLOR_B,
+	MS_MOUSE_SENSITIVITY
+};
+
+enum MENU_CONTROLS {
+	MC_AVANCER,
+	MC_GAUCHE,
+	MC_RECULER,
+	MC_DROITE,
+	MC_FULLSCREEN,
+	MC_INFO,
+	MC_CROUCH,
+	MC_RUN,
+	MC_JUMP,
+	MC_NOCLIP,
+	MC_INVENTORY1,
+	MC_INVENTORY2,
+	MC_INVENTORY3,
+	MC_INVENTORY4,
+	MC_INVENTORY,
+	MC_SPAWNMONSTER,
+	MC_WIREFRAME
+};
 
 #endif // DEFINE_H__

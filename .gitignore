@@ -221,3 +221,4 @@ pip-log.txt
 
 #Map save
 *.sav
+/Cube/Cube/Cube.conf

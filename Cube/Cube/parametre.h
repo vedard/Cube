@@ -31,14 +31,14 @@ public:
 	// Display
 	bool m_isfullscreen = false;
 	bool m_isServer = false;
-	int m_width = 1600;
-	int m_height = 900;
+	int m_width = 1360;
+	int m_height = 768;
 	int m_antialiasing = 0;
 	bool m_vsync = false;
 	int m_renderdistance = 6;
 
 	//Crosshair
-
+	
 	float m_crossred = 0.0f;
 	float m_crossgreen = 0.9f;
 	float m_crossblue = 0.0f;
