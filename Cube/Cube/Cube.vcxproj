@@ -93,10 +93,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="animal.cpp" />
+    <ClCompile Include="bear.cpp" />
     <ClCompile Include="blockinfo.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="chunkmesh.cpp" />
+    <ClCompile Include="cow.cpp" />
+    <ClCompile Include="creeper.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="gun.cpp" />
     <ClCompile Include="inventory.cpp" />
@@ -106,6 +109,7 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
+    <ClCompile Include="music.cpp" />
     <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
@@ -123,10 +127,13 @@
     <ClInclude Include="animal.h" />
     <ClInclude Include="array2d.h" />
     <ClInclude Include="array3d.h" />
+    <ClInclude Include="bear.h" />
     <ClInclude Include="blockinfo.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="chunk.h" />
     <ClInclude Include="chunkmesh.h" />
+    <ClInclude Include="cow.h" />
+    <ClInclude Include="creeper.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
@@ -134,6 +141,7 @@
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="music.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />

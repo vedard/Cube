@@ -37,14 +37,16 @@ public:
 
 	// negative < 0 < positif
 	void SetBlock(int direction);
+	void SetBlockDirect(BlockType blockType);
 	void SetWeapon(int mode);
 	void SetSneak(bool sneak);
 	void SetRunning(bool running);
 
-	bool GetDamage(float damage, bool ignoreArmor, bool godMode) override;
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son = Sound::HURT, bool playonce = false) override;
 
 	void AddToInventory(BlockType type);
 	bool RemoveFromInventory(BlockType type);
+	Inventory* GetInventory();
 
 private:
 	void CheckUnderwater(World &world);
@@ -60,7 +62,7 @@ private:
 	bool m_sneaked;			// Si on est penché
 	bool m_running;			// Si le joueur cour
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
-	bool m_headWasUnderwater = false; // Si le joueur vient de sortir de l'eau.
+	bool m_headWasUnderwater; // Si le joueur vient de sortir de l'eau.
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
 	bool m_headUnderLava; // Si le joueur est sous la lave
 	bool m_kneeUnderwater;  // Si le joueur est sous l'eau

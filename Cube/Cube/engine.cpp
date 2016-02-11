@@ -7,7 +7,8 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_fastInventoryKeySelected(0)
+	m_fastInventoryKeySelected(-1),
+	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
 	m_LastTickTimeWater = 0.0f;
@@ -27,7 +28,6 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
-
 	m_world.SaveMap("map.sav");
 	Sound::DeInit();
 	delete[] m_bInfo;
@@ -66,6 +66,18 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
+	
+
+
+	// La lumiere
+	GLfloat light0Amb[4] = { 5.f, 4.f, 3.f, 7.f };
+	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+
+
 	//Shader
 	std::cout << "Loading and compiling shaders ..." << std::endl;
 	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
@@ -85,6 +97,9 @@ void Engine::DeInit()
 
 void Engine::LoadResource()
 {
+
+
+
 
 
 
@@ -169,40 +184,33 @@ void Engine::LoadResource()
 				Sound::AddSound(Sound::WOODSTEP1 + i, WALK_PATH "wood" + std::to_string(i + 1) + ".wav");
 
 			}
+
+
+
 		}
 
-		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
-			abort();
-		m_music.setLoop(true);
-		m_music.setVolume(m_settings.m_musicvolume);
-		m_music.play();
+			//Model 3d
+			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+			m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+			m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
+			//m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
+
+			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+
+		//Gun
 
 
-		//Model 3d
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-		//m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
-
-		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 	}
 
-	//Gun
 
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 50, 300, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 120, 0.4);
 
-	//Load la map
-	m_world.LoadMap("map.sav", m_bInfo);
-	m_world.SetUpdateDistance(m_settings.m_renderdistance);
-	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-	//Entity
-
-	// -- Player
-	m_world.GetPlayer()->SetName("Vincent Suce");
+	
 }
 
 void Engine::UnloadResource()
@@ -216,7 +224,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-
+	
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -242,18 +250,25 @@ void Engine::UpdateEnvironement(float gameTime)
 				}
 			}
 			for (int j = 0; j < MAX_COW; j++)
-			{
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
+
+
+			for (int j = 0; j < MAX_BEAR; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
 
 		}
 	}
+	
 
 	//Update les monstres
 	for (int i = 0; i < MAX_MONSTER; i++)
@@ -261,7 +276,12 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetAnimal()[i].Move(m_world);
+
+		m_world.GetCow()[i].Move(m_world);
+
+	//Update les Bear
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear()[i].Move(m_world);
 
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
@@ -269,6 +289,7 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+
 
 }
 
@@ -283,6 +304,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		DrawDeathScreen();
 		return;
 	}
+	
 
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	glColor3f(1.f, 1.f, 1.f);
@@ -296,29 +318,38 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_world.GetPlayer()->ApplyRotation();
 	float shake = m_world.GetPlayer()->ApplyTranslation();
 
-	//Activation des shaders
-	m_shader01.Use();
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
-
 
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
 
+
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
-	// Position des lumières autour pour éclairer le joueur et les monstres
+	
+		
+	/// Position des lumières autour pour éclairer le joueur et les monstres
+	// Position de la lumière 1
 	GLfloat light0Pos1[4] = {
 		m_world.GetPlayer()->GetPosition().x,
 		m_world.GetPlayer()->GetPosition().y + 25,
 		m_world.GetPlayer()->GetPosition().z - 50,
 		1.f };
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
 
+
+	for (int i = 0; i < MAX_COW; i++)
+		m_world.GetCow()[i].Draw(m_modelCow);
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear()[i].Draw(m_modelBear);
+
+	//Draw Monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_world.GetMonster()[i].Draw(m_modelCreeper, false);
+
+	
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
@@ -332,19 +363,12 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Draw(m_modelRaptor, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetAnimal()[i].Draw(m_modelCow);
-
-	m_playerActor.Draw(m_modelRaptor);
-
+	
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
+	
 	//Draw Bullets
 	for (int j = 0; j < 3; j++)
 		for (int i = 0; i < MAX_BULLET; i++)
@@ -436,7 +460,8 @@ void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
-	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+
+	if(m_isInventoryOpen)
 	{
 		DrawEnvironement(gameTime);
 		return;
@@ -447,13 +472,16 @@ void Engine::Render(float elapsedTime)
 	//gestion des ticks
 	if (gameTime - m_LastTickTime >= TICK_DELAY)
 	{
+		m_music.PlayNext();
 		m_LastTickTime = gameTime;
 		m_world.GetPlayer()->Tick();
 	}
 
 	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 10 == 0)
-		m_world.SpawnAnimals();
+	if ((int)(gameTime * 100) % 100 == 0)
+		m_world.SpawnCows();
+	if ((int)(gameTime * 100) % 100 == 0)
+		m_world.SpawnBears();
 
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnMonsters();
@@ -528,13 +556,7 @@ void Engine::Render(float elapsedTime)
 			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
-		////Tirer
-		//if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK)
-		//{
-		//	playerGun[m_world.GetPlayer()->GetWeapon() - 1].Shoot(m_world.GetPlayer()->GetPosition().x, m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y, m_world.GetPlayer()->GetPosition().z, m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
-		//	(playerGun[m_world.GetPlayer()->GetWeapon() - 1].GetIsAuto()) ? false : m_mouseButton[1] = false;
-		//}
-
+		
 		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
 			m_mouseButton[1] = false;
 
@@ -581,175 +603,117 @@ void Engine::Render(float elapsedTime)
 
 void Engine::KeyPressEvent(unsigned char key)
 {
-
-	if (m_keyboard[key] && key == OPEN_CLOSE_INVENTORY_KEY)
-	{
-
-		m_keyboard[key] = false;
-	}
-	else
-	{
-		//update le teableau
-		m_keyboard[key] = true;
-	}
+	//update le teableau
+	m_keyboard[key] = true;
 
 
-	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY))
-	{
+	if ((key == FIRST_FAST_INVENTORY_KEY || key == SECOND_FAST_INVENTORY_KEY || key == THIRD_FAST_INVENTORY_KEY)) {		
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
-	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
-	if (m_isMenuOpen)
-	{
+
+	if(m_isInventoryOpen) {
+		if(m_keyboard[m_settings.m_openinventory]) {
+			m_isInventoryOpen = false;
+			m_world.GetPlayer()->GetInventory()->Init();
+		} else {
+			m_world.GetPlayer()->GetInventory()->OnKeyDown(key);		
+		}
+	} else if(m_isMenuOpen) {
 		ManageAllMenuKeys(key);
-	}
-	else
-	{
-		if (m_keyboard[m_settings.m_menu])
-		{
+	} else {
+		if(m_keyboard[m_settings.m_openinventory] && !m_settings.m_inventaire_creatif) {
+			m_isInventoryOpen = true;
+		} else if (m_keyboard[m_settings.m_menu]) {
 			m_isMenuOpen = true;
 			ShowCursor();
 			m_menu = new Menu(SM_PRINCIPAL);
-		}
-
-
-		//f10 -> toggle fulscreen mode
-		else if (m_keyboard[m_settings.m_fullscreen])
-		{
+		} else if (m_keyboard[m_settings.m_fullscreen]) { //f10 -> toggle fulscreen mode
 			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
 			m_settings.Save();
 			SetFullscreen(IsFullscreen());
 			m_keyboard[key] = false;
+		} else if (m_keyboard[m_settings.m_noclip]) { //V -> toogle noclip mode
+			m_world.GetPlayer()->ToggleNoClip();
+		} else if (m_keyboard[m_settings.m_crouch]) { //Lctr -> Sneak
+			m_world.GetPlayer()->SetSneak(true);
+		} else if (m_keyboard[m_settings.m_run]) { //LSHIFT -> RUN
+			m_world.GetPlayer()->SetRunning(true);
+		}
+				 
+		if (m_keyboard[m_settings.m_inventory1]) { //1 -> W_BLOCK
+			m_world.GetPlayer()->SetWeapon(W_BLOCK);
 		}
 
-		//V -> toogle noclip mode
-		else if (m_keyboard[m_settings.m_noclip])
-			m_world.GetPlayer()->ToggleNoClip();
-
-		//Lctr -> Sneak
-		else if (m_keyboard[m_settings.m_crouch])
-			m_world.GetPlayer()->SetSneak(true);
-
-		//LSHIFT -> RUN
-		else if (m_keyboard[m_settings.m_run])
-			m_world.GetPlayer()->SetRunning(true);
-
-		//space -> jump
-		if (m_keyboard[m_settings.m_jump])
-			m_world.GetPlayer()->Jump();
-
-		//1 -> W_BLOCK 
-		if (m_keyboard[m_settings.m_inventory1])
-			m_world.GetPlayer()->SetWeapon(W_BLOCK);
-		//3 ->  W_SUBMACHINE_GUN
 		if (m_keyboard[m_settings.m_inventory2])
 		{
 			m_world.GetPlayer()->SetWeapon(W_PISTOL);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		//3 ->  W_SUBMACHINE_GUN
-		if (m_keyboard[m_settings.m_inventory3])
-		{
+		if (m_keyboard[m_settings.m_inventory3]) {
 			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
 			Sound::Play(Sound::GUN_DRAW);
 		}
-		//4 ->  W_ASSAULT_RIFLE
-		if (m_keyboard[m_settings.m_inventory4])
-		{
+		else if (m_keyboard[m_settings.m_inventory4]) { //4 ->  W_ASSAULT_RIFLE
 			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
 			Sound::Play(Sound::GUN_DRAW);
 		}
-		//M -> spawn monster
-		else if (m_keyboard[m_settings.m_spawnmonster])
-		{
-			for (int i = 0; i < MAX_MONSTER; i++)
-			{
-				if (!m_world.GetMonster()[i].GetisAlive())
-				{
+		else if (m_keyboard[m_settings.m_spawnmonster]) { //M -> spawn monster
+			for (int i = 0; i < MAX_MONSTER; i++) {
+				if (!m_world.GetMonster()[i].GetisAlive()) {
 					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
 			}
-
-		}
-		//y -> toggle wireframe mode
-		else if (m_keyboard[m_settings.m_wireframe])
-		{
-
+		} else if (m_keyboard[m_settings.m_wireframe]) { //y -> toggle wireframe mode
 			m_wireframe = !m_wireframe;
-			if (m_wireframe)
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		//F3 -> toggle info
-		else if (m_keyboard[m_settings.m_info])
-		{
+			glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
+		} else if (m_keyboard[m_settings.m_info]) { //F3 -> toggle info
 			displayInfo = !displayInfo;
-		}
-		//Lshift + F5 -> delete Cache
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5])
-		{
-			for (int i = 0; i < WORLD_SIZE; i++)
-				for (int j = 0; j < WORLD_SIZE; j++)
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F5]) { //Lshift + F5 -> delete Cache
+			for (int i = 0; i < WORLD_SIZE; i++) { 
+				for (int j = 0; j < WORLD_SIZE; j++) { 
 					m_world.ChunkAt((float)i, (float)j)->DeleteCache();
-
-		}
-		//Lshift + O -> open map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O])
-		{
+				}
+			}
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::O]) { //Lshift + O -> open map
 			//m_world.LoadMap("map.sav", m_bInfo);
 			std::thread t(std::bind(&World::LoadMap, &m_world, "map.sav", m_bInfo));
 			t.detach();
 			//m_world.GetPlayer()->Spawn(m_world);
-		}
-		//Lshift + W -> Write map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W])
-		{
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::W]) { //Lshift + W -> Write map
 			//m_world.SaveMap("map.sav");
 			std::thread t(&World::SaveMap, &m_world, "map.sav");
 			t.detach();
-		}
-
-		//Lshift + R -> Random map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R])
-		{
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::R]) { //Lshift + R -> Random map
 			//m_world.InitMap(time(NULL));
 			std::thread t(&World::InitMap, &m_world, time(NULL));
 			t.detach();
 			//m_world.GetPlayer()->Spawn(m_world);
-		}
-
-		//Lshift + F -> Flat map
-		else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F])
-		{
+		} else if (m_keyboard[sf::Keyboard::RShift] && m_keyboard[sf::Keyboard::F]) { //Lshift + F -> Flat map
 			//m_world.InitMap(0);
 			std::thread t(&World::InitMap, &m_world, 0);
 			t.detach();
 			//m_world.GetPlayer()->Spawn(m_world);
 		}
 
-		if (!m_world.GetPlayer()->GetisAlive())
-			if (m_keyboard[sf::Keyboard::Return])
-			{
+		if (!m_world.GetPlayer()->GetisAlive()) {
+			if (m_keyboard[sf::Keyboard::Return]) {
 				m_world.GetPlayer()->Spawn(m_world, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
 				m_world.GetPlayer()->isHurt = 0;
 			}
-		if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
-		{
-			ShowCursor();
+		}
+		
+		if (m_keyboard[m_settings.m_jump]) { //space -> jump
+			m_world.GetPlayer()->Jump();
 		}
 	}
 }
 
 void Engine::KeyReleaseEvent(unsigned char key)
 {
-	if (key == OPEN_CLOSE_INVENTORY_KEY) {}
-	else
-	{
-		// update le tableau
-		m_keyboard[key] = false;
-	}
+	// update le tableau
+	m_keyboard[key] = false;
 
 	//end sneak
 	if (!m_keyboard[sf::Keyboard::LControl])
@@ -763,7 +727,7 @@ void Engine::KeyReleaseEvent(unsigned char key)
 
 void Engine::MouseMoveEvent(int x, int y)
 {
-	if (!m_isMenuOpen && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+	if (!m_isMenuOpen)
 	{
 		// Centrer la souris seulement si elle n'est pas déjà centrée
 		// Il est nécessaire de faire la vérification pour éviter de tomber
@@ -777,21 +741,19 @@ void Engine::MouseMoveEvent(int x, int y)
 		float relativeX, relativeY;
 		relativeX = (float)(x - Width() / 2);
 		relativeY = (float)(y - Height() / 2);
-
-		m_world.GetPlayer()->TurnLeftRight(relativeX * m_settings.m_mousesensibility);
-		m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
+		
+		if(!m_isInventoryOpen) {
+			m_world.GetPlayer()->TurnLeftRight(relativeX * m_settings.m_mousesensibility);
+			m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
+		}
 	}
 
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 {
-	if (m_isMenuOpen)
-	{
-
-	}
-	else
-	{
+	if (m_isMenuOpen || m_isInventoryOpen) {
+	} else {
 		//update le teableau
 		m_mouseButton[button] = true;
 
@@ -804,8 +766,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 				//AddToInventory
 				//Add Block to Player Inventory BEFORE removal in the world. IF the inventory is not in creative mode
-				if (!IS_INVENTORY_CREATIVE)
-					m_world.GetPlayer()->AddToInventory(m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X)));
+				if (!m_settings.m_inventaire_creatif)
+				{
+					BlockType btype = m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->GetBlock(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+					if(btype != 0)					
+						m_world.GetPlayer()->AddToInventory(btype);
+				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
 				m_Netctl.Send("m " +
@@ -828,7 +794,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				if (m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z) && newBlocPos.x >= 0 && newBlocPos.z >= 0 && newBlocPos.y >= 0)
 				{
 					bool removable = true;
-					if (!IS_INVENTORY_CREATIVE)
+					if (!m_settings.m_inventaire_creatif)
 					{
 						removable = m_world.GetPlayer()->RemoveFromInventory(m_world.GetPlayer()->GetBlock());
 					}
@@ -854,13 +820,17 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 
 
 			}
-			//Scroll Up
-			if (button == 8)
-				m_world.GetPlayer()->SetBlock(1);
 
-			//Scroll Down
-			else if (button == 16)
-				m_world.GetPlayer()->SetBlock(-1);
+			if(m_settings.m_inventaire_creatif)
+			{
+				//Scroll Up
+				if (button == 8)
+					m_world.GetPlayer()->SetBlock(1);
+
+				//Scroll Down
+				else if (button == 16)
+					m_world.GetPlayer()->SetBlock(-1);
+			}
 		}
 	}
 
@@ -997,7 +967,7 @@ void Engine::DrawHud() const
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
 
-	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK)
+	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK && m_settings.m_inventaire_creatif)
 	{
 		//Block selectionne
 		glLoadIdentity();
@@ -1011,7 +981,6 @@ void Engine::DrawHud() const
 		glVertex2i(50, 50);
 		glVertex2i(-2, 50);
 		glEnd();
-
 
 		//block
 		m_textureAtlas.Bind();
@@ -1031,8 +1000,8 @@ void Engine::DrawHud() const
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
 	}
-
-	RenderFastInventory();
+	if(!m_settings.m_inventaire_creatif)
+		RenderFastInventory();
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -1432,7 +1401,6 @@ void Engine::DrawMenuSettings() const
 		vSync = "True";
 	else
 		vSync = "False";
-
 
 	glEnable(GL_TEXTURE_2D);
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -2046,27 +2014,60 @@ void Engine::DrawMenuControlSelected()
 
 void Engine::RenderFastInventory() const
 {
-	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
+	int position = 0;	
+	int quantity = 0;
+	std::ostringstream oss;
+	Inventory* inv = m_world.GetPlayer()->GetInventory(); 
+	Item* items = inv->GetItems();
+	BlockType bloctype = BTYPE_AIR;
+	int x = 0;
+	int y = 0;
+	float size = 10.f;
+	std::string t = "99+";
+		
+	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK || !m_settings.m_inventaire_creatif)
 	{
 		glLoadIdentity();
 		glTranslated(Width(), 16, 0);
 	}
+	
+	glTranslated(0,-64,0);
 
-	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
+	if(m_fastInventoryKeySelected == -1)
+		m_world.GetPlayer()->SetBlockDirect(BTYPE_AIR);
 
-	glTranslated(0, -64, 0);
-
-	for (int j = 0; j < 5; j++)
+	for(int j = 0; j < 5; j++)
 	{
-		glTranslated(0, 64, 0);
+		glTranslated(0,64,0);
 		for (int i = 0; i < 3; i++)
 		{
+			position = j*3+i;
 			glTranslated(-64, 0, 0);
 
-			if (j == 0 && keys[i] == m_fastInventoryKeySelected)
-				glColor3f(128.f, 0.f, 0.f);
-			else
+			bloctype = items[position].GetType();
+			quantity = items[position].GetQuantity();
+	
+			if(inv->GetCurrentIndex() == position)
+				glColor3f(0.f,0.f,1.f);
+			else if(inv->GetCurrentMoveIndex() == position)
+				glColor3f(102.f/255.f,102.f/255.f,1.f);
+			else if (j == 0 && keys[i] == m_fastInventoryKeySelected) {
+				glColor3f(1.f, 0.f, 0.f);
+				if(m_world.GetPlayer()->GetBlock() != bloctype) {
+					m_world.GetPlayer()->SetBlockDirect(bloctype);
+				}
+			} else
 				glColor3f(0.f, 0.f, 0.f);
+
+			if(quantity > 99)
+				t = "99+";
+			else
+			{
+				oss.str("");
+				oss << quantity;
+				t = oss.str();
+			}
 
 			glBegin(GL_QUADS);
 			glVertex2i(-2, -2);
@@ -2074,26 +2075,73 @@ void Engine::RenderFastInventory() const
 			glVertex2i(50, 50);
 			glVertex2i(-2, 50);
 			glEnd();
-
-			if (j == 0)
-				glColor3f(255.f, 128.f, 0.f);
+			
+			if(quantity == 0)			
+			{
+				if(j == 0) {
+					glColor3f(1.f,1.f,0.f);
+				} else {
+					glColor3f(1.f,1.f,77.f/255.f);
+				}
+				glBegin(GL_QUADS);
+				glVertex2i(00, 00);
+				glVertex2i(48, 00);
+				glVertex2i(48, 48);
+				glVertex2i(00, 48);
+				glEnd();
+			}
 			else
-				glColor3f(229.f, 218.f, 144.f);
+			{
+				//block
+				m_textureAtlas.Bind();
+				glEnable(GL_TEXTURE_2D);
+				glColor3f(1.f, 1.f, 1.f);
 
-			glBegin(GL_QUADS);
-			glVertex2i(0, 0);
-			glVertex2i(48, 0);
-			glVertex2i(48, 48);
-			glVertex2i(0, 48);
-			glEnd();
+				glBegin(GL_QUADS);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .50f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .50f);
+				glVertex2i(0, 0);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .00f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .50f);
+				glVertex2i(48, 0);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .00f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .75f);
+				glVertex2i(48, 48);
+				glTexCoord2f(m_bInfo[bloctype].u + m_bInfo[bloctype].w * .50f, m_bInfo[bloctype].v + m_bInfo[bloctype].h * .75f);
+				glVertex2i(0, 48);		
+				glEnd();
+			
+				m_textureFont.Bind();
+			
+				glPushMatrix();			
+				glTranslated(x, y, 0);
+				for (unsigned int i = 0; i < t.length(); ++i)
+				{
+					float left = (float)((t[i] - 32) % 16) / 16.0f;
+					float top = (float)((t[i] - 175) / 16) / 16.0f;
+	
+					top += 0.5f;
+					glBegin(GL_QUADS);
+					glTexCoord2f(left, 1.0f - top - 0.0625f);
+					glVertex2f(0, 0);
+					glTexCoord2f(left + 0.0625f, 1.0f - top - 0.0625f);
+					glVertex2f(size, 0);
+					glTexCoord2f(left + 0.0625f, 1.0f - top);
+					glVertex2f(size, size);
+					glTexCoord2f(left, 1.0f - top);
+					glVertex2f(0, size);
+					glEnd();
+					glTranslated(size - (size / 4), 0, 0);
+				}
+				glPopMatrix();
+			}
+			glDisable(GL_TEXTURE_2D);
 		}
 
-		if (j == 0 && !m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
+		if(j == 0 && !m_isInventoryOpen)
 			break;
-
-		glTranslated(+64 * 3, 0, 0);
+		
+		glTranslated(+64 * 3, 0 , 0); 
 	}
 }
+
 
 
 void Engine::DrawHurtEffect() const

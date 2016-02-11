@@ -63,6 +63,12 @@ void Parametre::Save()
 	myfile << "server " << ((m_isServer) ? "true" : "false") << "\n";
 	myfile << "musicvolume " << m_musicvolume << "\n";
 	myfile << "soundvolume " << m_soundvolume << "\n";
+	myfile << "inventaire_rapide1 " << m_inventaire_rapide1 << "\n";
+	myfile << "inventaire_rapide2 " << m_inventaire_rapide2 << "\n";
+	myfile << "inventaire_rapide3 " << m_inventaire_rapide3 << "\n";
+	myfile << "inventaire_bouger_element " << m_inventaire_bouger_element << "\n";
+	myfile << "inventaire_enlever_element " << m_inventaire_enlever_element << "\n";
+	myfile << "inventaire_creatif " << m_inventaire_creatif << "\n";
 
 	myfile.close();
 	Load();
@@ -105,6 +111,12 @@ void Parametre::SaveDefault()
 	myfile << "server" << " false" << "\n";
 	myfile << "musicvolume 10 \n";
 	myfile << "soundvolume 12 \n";
+	myfile << "inventaire_rapide1 " << FIRST_FAST_INVENTORY_KEY << "\n";
+	myfile << "inventaire_rapide2 " << SECOND_FAST_INVENTORY_KEY << "\n";
+	myfile << "inventaire_rapide3 " << THIRD_FAST_INVENTORY_KEY << "\n";
+	myfile << "inventaire_bouger_element " << INVENTORY_MOVE_ITEM_KEY << "\n";
+	myfile << "inventaire_enlever_element " << INVENTORY_DELETE_ITEM_KEY << "\n";
+	myfile << "inventaire_creatif " << IS_INVENTORY_CREATIVE << "\n";
 
 
 	myfile.close();
@@ -162,6 +174,12 @@ void Parametre::Load()
 		setting.Get(27, 0) = "server";
 		setting.Get(28, 0) = "musicvolume";
 		setting.Get(29, 0) = "soundvolume";
+		setting.Get(30, 0) = "inventaire_rapide1";
+		setting.Get(31, 0) = "inventaire_rapide2";
+		setting.Get(32, 0) = "inventaire_rapide3";
+		setting.Get(33, 0) = "inventaire_bouger_element";
+		setting.Get(34, 0) = "inventaire_enlever_element";
+		setting.Get(35, 0) = "inventaire_creatif";
 
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
@@ -183,7 +201,7 @@ void Parametre::Load()
 			if (index != -1)
 				ss >> setting.Get(setting.GetIndex(temp), 1);
 		}
-		if (cpt <= 29)
+		if (cpt <= 35)
 		{
 			cout << "File incomplete, recreating";
 			SaveDefault();
@@ -260,5 +278,16 @@ void Parametre::Load()
 			m_musicvolume = atoi(setting.Get(28, 1).c_str());
 		if (setting.Get(29, 1) != "null")
 			m_soundvolume = atoi(setting.Get(29, 1).c_str());
+		if (setting.Get(30, 1) != "null")
+			m_inventaire_rapide1 = (sf::Keyboard::Key)atoi(setting.Get(30, 1).c_str());
+		if (setting.Get(31, 1) != "null")
+			m_inventaire_rapide2 = (sf::Keyboard::Key)atoi(setting.Get(31, 1).c_str());
+		if (setting.Get(32, 1) != "null")
+			m_inventaire_rapide3 = (sf::Keyboard::Key)atoi(setting.Get(32, 1).c_str());
+		if (setting.Get(33, 1) != "null")
+			m_inventaire_bouger_element = (sf::Keyboard::Key)atoi(setting.Get(33, 1).c_str());
+		if (setting.Get(34, 1) != "null")
+			m_inventaire_enlever_element = (sf::Keyboard::Key)atoi(setting.Get(34, 1).c_str());
+		m_inventaire_creatif = (setting.Get(35, 1) == "true" || setting.Get(35,1) == "1");
 	}
 }

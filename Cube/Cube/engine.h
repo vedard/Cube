@@ -27,6 +27,7 @@
 #include <thread>
 #include "parametre.h"
 #include "menu.h"
+#include "music.h"
 
 
 class Engine : public OpenglContext
@@ -75,9 +76,7 @@ private:
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
-	bool m_firstMusic = true;
 	int m_cptTick = 0;
-	int m_musiclist [6] = {};
 	float m_LastTickTimeWater;
 	PlayerActor m_playerActor;
 
@@ -99,7 +98,6 @@ private:
 	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
-	Shader m_shader02;
 	World m_world;
 
 	//Indexe de la texutre dans l'atlas
@@ -114,12 +112,14 @@ private:
 	int m_fps;
 	int m_chunkToUpdate;
 	bool displayInfo;
+	Music& m_music = Music::GetInstance();
 
-	sf::Music m_music;
+
 
 	//Model
 	Model3d m_modelCow;
-	Model3d m_modelRaptor;
+	Model3d m_modelCreeper;
+	Model3d m_modelBear;
 
 	//Gun 
 	Gun * playerGun;
@@ -127,7 +127,6 @@ private:
 	//NetworkManager
 	NetworkManager m_Netctl;
 	// Parametres
-
 	Parametre& m_settings = Parametre::GetInstance();
 
 	// Valeurs pour le jour et la nuit
@@ -142,6 +141,8 @@ private:
 
 	bool m_isMenuOpen;
 	Menu* m_menu;
+
+	bool m_isInventoryOpen;
 };
 
 #endif // ENGINE_H__
