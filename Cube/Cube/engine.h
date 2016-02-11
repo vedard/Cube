@@ -64,6 +64,7 @@ private:
 	void DrawMenuSettings() const;
 	void DrawMenuControls() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
+	void ManageAllMenuKeys(unsigned char key);
 	void ManageMenuEnterKeyPress();
 	void DrawMenuSettingSelected(bool isFloat);
 	void DrawMenuControlSelected();
@@ -116,7 +117,8 @@ private:
 
 	//Model
 	Model3d m_modelCow;
-	Model3d m_modelRaptor;
+	Model3d m_modelCreeper;
+	Model3d m_modelBear;
 
 	//Gun 
 	Gun * playerGun;

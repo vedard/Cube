@@ -66,6 +66,26 @@ void Engine::Init()
 
 	glEnable(GL_CULL_FACE);
 
+	// Le fog
+	/*glEnable(GL_FOG);
+	GLfloat fogcolor[4] = { 0.1f, 0.1f, 0.14f, 1 };
+	GLint fogmode = GL_EXP2;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, 0.07f);
+	glFogf(GL_FOG_START, 16.f);
+	glFogf(GL_FOG_END, 21.f);*/
+
+
+	// La lumiere
+	GLfloat light0Amb[4] = { 5.f, 4.f, 3.f, 7.f };
+	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+
+
 	//Shader
 	std::cout << "Loading and compiling shaders ..." << std::endl;
 	if (!m_shader01.Load(SHADER_PATH "shader01.vert", SHADER_PATH "shader01.frag", true))
@@ -86,7 +106,8 @@ void Engine::DeInit()
 void Engine::LoadResource()
 {
 	LoadTexture(m_effectHurt, EFFECTS_PATH "HurtBlack.png");
-	LoadTexture(m_sun, EFFECTS_PATH "sun.png");
+
+
 
 
 
@@ -142,6 +163,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
+
 		for (int i = 0; i < 9; i++)
 		{
 			if (i < 9)
@@ -164,38 +186,32 @@ void Engine::LoadResource()
 					Sound::AddSound(Sound::WATERSTEP1 + i, WALK_PATH "waterstep" + std::to_string(i + 1) + ".wav");
 				}
 			}
+
+
+
+
+
+			//Model 3d
+			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+			m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+			m_modelBear.LoadOBJ(MODEL_PATH "bear2.obj", TEXTURE_PATH "bear.png");
+			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 		}
 
-		if (!m_music.openFromFile(MUSIC_PATH "music.wav"))
-			abort();
-		m_music.setLoop(true);
-		m_music.setVolume(m_settings.m_musicvolume);
-		m_music.play();
+		//Gun
+
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
 
 
-		//Model 3d
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-		m_modelRaptor.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 	}
 
-	//Gun
 
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 100, 0.2);
-	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 2400, 120, 0.4);
 
-	//Load la map
-	m_world.LoadMap("map.sav", m_bInfo);
-	m_world.SetUpdateDistance(m_settings.m_renderdistance);
-	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
-
-	//Entity
-
-	// -- Player
-	m_world.GetPlayer()->SetName("Vincent Suce");
+	
 }
 
 void Engine::UnloadResource()
@@ -209,7 +225,7 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update le player
 	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
-
+	
 	// Update Guns
 	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
@@ -228,7 +244,9 @@ void Engine::UpdateEnvironement(float gameTime)
 			for (int j = 0; j < MAX_MONSTER; j++)
 				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]);
 			for (int j = 0; j < MAX_COW; j++)
-				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetAnimal()[j]);
+				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]);
+			for (int j = 0; j < MAX_BEAR; j++)
+				m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]);
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
 
@@ -241,7 +259,11 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetAnimal()[i].Move(m_world);
+		m_world.GetCow()[i].Move(m_world);
+
+	//Update les Bear
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear()[i].Move(m_world);
 
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
@@ -264,6 +286,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		DrawDeathScreen();
 		return;
 	}
+	
 
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	glColor3f(1.f, 1.f, 1.f);
@@ -277,57 +300,53 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_world.GetPlayer()->ApplyRotation();
 	float shake = m_world.GetPlayer()->ApplyTranslation();
 
-	
 
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
 
+
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
-	// Position des lumières autour pour éclairer le joueur et les monstres
+	
+		
+	/// Position des lumières autour pour éclairer le joueur et les monstres
+	// Position de la lumière 1
 	GLfloat light0Pos1[4] = {
 		m_world.GetPlayer()->GetPosition().x,
 		m_world.GetPlayer()->GetPosition().y + 25,
 		m_world.GetPlayer()->GetPosition().z - 50,
 		1.f };
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1); 
 
+
+	for (int i = 0; i < MAX_COW; i++)
+		m_world.GetCow()[i].Draw(m_modelCow);
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear()[i].Draw(m_modelBear);
+
+	//Draw Monstres
+	for (int i = 0; i < MAX_MONSTER; i++)
+		m_world.GetMonster()[i].Draw(m_modelCreeper, false);
+
+	
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
-			m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon()-1].Draw(
+		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
 			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake,
 			m_world.GetPlayer()->GetPosition().z,
 			m_world.GetPlayer()->GetHorizontalRotation(), m_world.GetPlayer()->GetVerticalRotation());
 
-	//Activation des shaders
-	m_shader01.Use();
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "gameTime"), gameTime);
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
-	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
-
-	
-
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Draw(m_modelRaptor, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetAnimal()[i].Draw(m_modelCow);
-
-	m_playerActor.Draw(m_modelRaptor);
-
-
+	
 	
 
-	//J ai commenter ca et ca rien changer... je sais po sa fait quoi heheheheh
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
@@ -422,6 +441,7 @@ void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
+
 	if (m_keyboard[OPEN_CLOSE_INVENTORY_KEY])
 	{
 		DrawEnvironement(gameTime);
@@ -438,8 +458,10 @@ void Engine::Render(float elapsedTime)
 	}
 
 	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 10 == 0)
-		m_world.SpawnAnimals();
+	if ((int)(gameTime * 100) % 1000 == 0)
+		m_world.SpawnCows();
+	if ((int)(gameTime * 100) % 1000 == 0)
+		m_world.SpawnBears();
 
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnMonsters();
@@ -537,45 +559,7 @@ void Engine::KeyPressEvent(unsigned char key)
 	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
 	if (m_isMenuOpen)
 	{
-		// Fermer menu
-		if (m_keyboard[m_settings.m_menu])
-		{
-			if (m_isMenuOpen)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-		}
-		else if (m_keyboard[sf::Keyboard::Return])
-		{
-			ManageMenuEnterKeyPress();
-		}
-		else if (m_keyboard[sf::Keyboard::BackSpace])
-		{
-			if (m_menu->m_currentMenu == SM_PRINCIPAL)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
-				m_menu = new Menu(SM_PRINCIPAL);
-			else
-				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
-		else
-		{
-			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-
-			if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
-			{
-				int lastMenuItem = m_menu->m_currentMenuItem;
-				m_menu = new Menu(SM_CONTROLS);
-				m_menu->m_currentMenuItem = lastMenuItem;
-			}
-		}
-
+		ManageAllMenuKeys(key);
 	}
 	else
 	{
@@ -615,6 +599,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		//1 -> W_BLOCK 
 		if (m_keyboard[m_settings.m_inventory1])
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
+
 		if (m_keyboard[m_settings.m_inventory2])
 		{
 			m_world.GetPlayer()->SetWeapon(W_PISTOL);
@@ -1004,7 +989,7 @@ void Engine::DrawHud() const
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
 	}
-
+		
 	RenderFastInventory();
 
 	glEnable(GL_TEXTURE_2D);
@@ -1346,7 +1331,7 @@ void Engine::DrawMenuPrincipal() const
 	glEnd();
 
 
-	// Dessiner les boutons et mettre une couleur unique au bouton sélectionné.
+	// Dessiner les trois boutons et mettre une couleur unique au bouton sélectionné.
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
@@ -1939,11 +1924,10 @@ void Engine::RenderFastInventory() const
 		glLoadIdentity();
 		glTranslated(Width(), 16, 0);
 	}
-
+	glTranslated(0, -64, 0);
 	int keys[3] = { THIRD_FAST_INVENTORY_KEY, SECOND_FAST_INVENTORY_KEY, FIRST_FAST_INVENTORY_KEY };
 
-	glTranslated(0, -64, 0);
-
+	
 	for (int j = 0; j < 5; j++)
 	{
 		glTranslated(0, 64, 0);
@@ -2194,4 +2178,47 @@ void Engine::CloseGame()
 	int sound = Sound::LEAVE1 + rand() % 5;
 	Sound::PlayAndWait(sound);
 	Stop();
+}
+
+
+void Engine::ManageAllMenuKeys(unsigned char key)
+{
+	// Fermer menu
+	if (m_keyboard[m_settings.m_menu])
+	{
+		if (m_isMenuOpen)
+		{
+			m_isMenuOpen = false;
+			m_menu = new Menu(SM_PRINCIPAL);
+			HideCursor();
+		}
+	}
+	else if (m_keyboard[sf::Keyboard::Return])
+	{
+		ManageMenuEnterKeyPress();
+	}
+	else if (m_keyboard[sf::Keyboard::BackSpace])
+	{
+		if (m_menu->m_currentMenu == SM_PRINCIPAL)
+		{
+			m_isMenuOpen = false;
+			m_menu = new Menu(SM_PRINCIPAL);
+			HideCursor();
+		}
+		else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
+			m_menu = new Menu(SM_PRINCIPAL);
+		else
+			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+	}
+	else
+	{
+		m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
+
+		if (m_menu->m_currentMenu == SM_CONTROL_SELECTED && m_menu->m_controlSelected == KEY_BINDED_SUCCESSFULLY)
+		{
+			int lastMenuItem = m_menu->m_currentMenuItem;
+			m_menu = new Menu(SM_CONTROLS);
+			m_menu->m_currentMenuItem = lastMenuItem;
+		}
+	}
 }

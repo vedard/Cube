@@ -27,6 +27,9 @@
     <ClCompile Include="world.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="bear.cpp" />
+    <ClCompile Include="cow.cpp" />
+    <ClCompile Include="creeper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -58,6 +61,9 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
+    <ClInclude Include="bear.h" />
+    <ClInclude Include="cow.h" />
+    <ClInclude Include="creeper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

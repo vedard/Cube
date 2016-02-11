@@ -56,8 +56,9 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 10
-#define MAX_COW 100
+#define MAX_MONSTER 0
+#define MAX_COW 10
+#define MAX_BEAR 10
 #define PI 3.14159265358f
 #define MAX_BULLET 500
 #define TEXTURE_PATH	"../Cube/media/textures/"
@@ -160,6 +161,11 @@ enum MENU_SETTINGS {
 	MS_CROSSCOLOR_B,
 	MS_MOUSE_SENSITIVITY
 };
+enum ANIMAL_TYPE
+{
+	A_BEAR,
+	A_COW
+};
 
 enum MENU_CONTROLS {
 	MC_AVANCER,
@@ -179,6 +185,10 @@ enum MENU_CONTROLS {
 	MC_INVENTORY,
 	MC_SPAWNMONSTER,
 	MC_WIREFRAME
+};
+
+enum MONSTER_TYPE {
+	M_Creeper
 };
 
 #endif // DEFINE_H__

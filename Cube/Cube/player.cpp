@@ -392,6 +392,7 @@ void Player::Tick()
 
 	if (m_footUnderLava)
 	{
+		GetDamage(8, true, m_godMode);
 		if (!GetDamage(8, true, m_godMode))
 		{
 			ResetDeath();
@@ -402,6 +403,7 @@ void Player::Tick()
 		m_BreathCount++;
 		if (m_BreathCount > 75)
 		{
+			GetDamage(3, true, m_godMode);
 			Sound::PlayOnce(Sound::DROWNING);
 			m_headWasUnderwater = true;
 			if (GetDamage(3, true, m_godMode))
