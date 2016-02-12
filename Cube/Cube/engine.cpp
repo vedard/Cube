@@ -621,42 +621,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
 
-	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
-	if (m_isMenuOpen)
-	{
-		// Fermer menu
-		if (m_keyboard[m_settings.m_menu])
-		{
-			if (m_isMenuOpen)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-		}
-		else if (m_keyboard[sf::Keyboard::Return])
-		{
-			ManageMenuEnterKeyPress();
-		}
-		else if (m_keyboard[sf::Keyboard::BackSpace])
-		{
-			if (m_menu->m_currentMenu == SM_PRINCIPAL)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
-				m_menu = new Menu(SM_PRINCIPAL);
-			else
-				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
-		else
-		{
-			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
-	}
-
 	//Si linventaire est ouvert
 	if (m_isInventoryOpen)
 	{
