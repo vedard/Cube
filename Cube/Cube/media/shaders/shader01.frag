@@ -1,3 +1,4 @@
+# version 330 compatibility
 uniform sampler2D tex;
 varying vec4 light;
 uniform bool underwater;
