@@ -42,13 +42,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\assimp311\include;external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(IncludePath)</IncludePath>
-    <LibraryPath>external/glew vstudio2k10/lib;external\assimp311\lib;external\devil178\lib;external\sfml20\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>external\assimp311\include;external/glew vstudio2k10/include;external\devil178\include;C:\Users\vincent\Desktop\HellRain\Cube\Cube\external\enet\include;external\sfml20\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\vincent\Desktop\HellRain\Cube\Cube\external\enet\lib;external/glew vstudio2k10/lib;external\assimp311\lib;external\devil178\lib;external\sfml20\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;C:\Users\Mikael\Desktop\Cegep\Session 6\Projet\HellRain\Cube\Cube\external\boost_1_60;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <IncludePath>C:\Users\vincent\Desktop\HellRain\Cube\Cube\external\enet\include;external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\vincent\Desktop\HellRain\Cube\Cube\external\enet\lib;external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -66,7 +66,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wsock32.lib;glew32.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;GlU32.Lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;Winmm.lib;enet.lib;wsock32.lib;glew32.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;GlU32.Lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -87,8 +87,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>wsock32.lib;glew32.lib;sfml-system.lib;sfml-audio.lib;sfml-window.lib;sfml-graphics.lib;GlU32.Lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;Winmm.lib;enet.lib;wsock32.lib;glew32.lib;sfml-system.lib;sfml-audio.lib;sfml-window.lib;sfml-graphics.lib;GlU32.Lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -110,11 +111,10 @@
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
     <ClCompile Include="music.cpp" />
-    <ClCompile Include="networkManager.cpp" />
+    <ClCompile Include="network.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="playerActor.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -142,13 +142,13 @@
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="music.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="networkevent.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
-    <ClInclude Include="networkManager.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="playerActor.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="sound.h" />

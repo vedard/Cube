@@ -56,12 +56,12 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 25
+#define MAX_MONSTER 0
 #define MAX_COW 10
-#define MAX_BEAR 100
+#define MAX_BEAR 10
 #define PI 3.14159265358f
 #define MAX_BULLET 500
-#define MUSIC_MAX 5
+#define MUSIC_MAX 2
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"

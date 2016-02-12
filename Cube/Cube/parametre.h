@@ -43,9 +43,10 @@ public:
 	int m_antialiasing = 0;
 	bool m_vsync = false;
 	int m_renderdistance = 6;
+	
+	std::string m_PlayerName = "Player1";
 
 	//Crosshair
-	
 	float m_crossred = 0.0f;
 	float m_crossgreen = 0.9f;
 	float m_crossblue = 0.0f;

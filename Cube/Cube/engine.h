@@ -18,8 +18,11 @@
 #include "vector3.h"
 #include "gun.h"
 #include "sound.h"
-#include "networkManager.h"
-#include "playerActor.h"
+#include "parametre.h"
+#include "menu.h"
+#include "network.h"
+
+
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -49,6 +52,7 @@ public:
 
 private:
 	void UpdateEnvironement(float gameTime);
+	void SyncWithServer();
 	void RenderFastInventory() const;
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
@@ -78,7 +82,6 @@ private:
 	float m_LastTickTime;
 	int m_cptTick = 0;
 	float m_LastTickTimeWater;
-	PlayerActor m_playerActor;
 
 	GLfloat m_nightLightAmb[4] = { 5.f, 4.f, 3.f, 7.f };
 	GLfloat m_dayLightAmb[4] = { 5.f, 5.f, 5.f, 7.f };
@@ -121,11 +124,11 @@ private:
 	Model3d m_modelCreeper;
 	Model3d m_modelBear;
 
+	Network m_network;
+
 	//Gun 
 	Gun * playerGun;
 
-	//NetworkManager
-	NetworkManager m_Netctl;
 	// Parametres
 	Parametre& m_settings = Parametre::GetInstance();
 
