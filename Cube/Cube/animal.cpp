@@ -1,7 +1,7 @@
 #include "animal.h"
 
 
-Animal::Animal()
+Animal::Animal(ANIMAL_TYPE typ)
 {
 	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
 	m_AttackRange = (int)5.2;
@@ -12,6 +12,7 @@ Animal::Animal()
 	m_HorizontalRot = (float)(rand() % 180);
 	m_isAlive = false;
 	m_timeNextTarget = 3;
+	type = typ;
 
 }
 
@@ -132,4 +133,9 @@ void Animal::GetDamage(float damage)
 	if (rand() % 100 > 66)
 		Sound::Play(Sound::FLESH_IMPACT);
 	Character::GetDamage(damage,false,false);
+}
+
+ANIMAL_TYPE Animal::GetType()
+{
+	return type;
 }

@@ -8,11 +8,14 @@
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="gun.cpp" />
+    <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
+    <ClCompile Include="network.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
@@ -23,9 +26,10 @@
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
     <ClCompile Include="world.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="inventory.cpp" />
-    <ClCompile Include="network.cpp" />
+    <ClCompile Include="creeper.cpp" />
+    <ClCompile Include="bear.cpp" />
+    <ClCompile Include="cow.cpp" />
+    <ClCompile Include="music.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -42,6 +46,8 @@
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="networkevent.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
@@ -55,8 +61,10 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
-    <ClInclude Include="network.h" />
-    <ClInclude Include="networkevent.h" />
+    <ClInclude Include="creeper.h" />
+    <ClInclude Include="bear.h" />
+    <ClInclude Include="cow.h" />
+    <ClInclude Include="music.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

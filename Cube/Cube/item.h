@@ -27,8 +27,6 @@ public:
 private:
 	int m_quantity;
 	BlockType m_type;
-	bool m_isselected;
-	bool m_isfast;
 
 };
 

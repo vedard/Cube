@@ -1,27 +1,12 @@
 #include "item.h"
 
-Item::Item()
-{
-	m_quantity = 0;
-	m_type = BTYPE_AIR;
-}
+Item::Item() : m_quantity(0), m_type(BTYPE_AIR) { }
 
-Item::Item(BlockType type)
-{
-	m_quantity = 1;
-	m_type = type;
-}
+Item::Item(BlockType type) : m_quantity(1), m_type(type) { }
 
-Item::Item(BlockType type, int number)
-{
-	m_quantity = number;
-	m_type = type;
-}
+Item::Item(BlockType type, int number) : m_quantity(number), m_type(type) { }
 
-
-Item::~Item()
-{
-}
+Item::~Item() { }
 
 int Item::GetQuantity()
 {
@@ -35,7 +20,7 @@ BlockType Item::GetType() const
 
 void Item::Add()
 {
-	this->Add(1);
+	Add(1);
 }
 
 void Item::Add(int number)
@@ -45,17 +30,22 @@ void Item::Add(int number)
 
 void Item::AddNew(BlockType type, int number)
 {
+	m_quantity = number;
+	m_type = type;
 }
 
 void Item::Remove()
 {
-	this->Remove(1);
+	Remove(1);
 }
 
 void Item::Remove(int number)
 {
 	if (m_quantity > 0)
 		m_quantity -= number;
+
+	if(m_quantity == 0)
+		Empty();
 }
 
 void Item::Empty()

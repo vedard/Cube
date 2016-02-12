@@ -53,12 +53,15 @@ typedef long long int64;
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
 #define WORLD_SIZE 70
+#define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
 #define MAX_MONSTER 0
-#define MAX_COW 100
+#define MAX_COW 10
+#define MAX_BEAR 10
 #define PI 3.14159265358f
 #define MAX_BULLET 500
+#define MUSIC_MAX 2
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"
@@ -77,17 +80,22 @@ typedef long long int64;
 #define INVULNERABILITY_PLAYER_TIME .300f
 #define HURT_TIME 20
 #define DAY_LENGTH 100
+#define GUN_NUMBER 4
 
-#define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
+#define INVENTORY_SIZE 15		//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
-#define IS_INVENTORY_CREATIVE true	//If the inventory is in creative mode(infinite everything)
+#define IS_INVENTORY_CREATIVE false	//If the inventory is in creative mode(infinite everything)
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
+#define INVENTORY_MOVE_ITEM_KEY		sf::Keyboard::B
+#define INVENTORY_DELETE_ITEM_KEY	sf::Keyboard::E
 
 #define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
 #define MIN_HEIGHT 600
+#define MAX_VOLUME 100 // Valeurs du sf::Sound
+#define MIN_VOLUME 0
 
 #define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
 #define KEY_ALREADY_BOUND "This key is already bound"
@@ -128,7 +136,8 @@ enum WEAPONS {
 	W_BLOCK,
 	W_PISTOL,
 	W_SUBMACHINE_GUN,
-	W_ASSAULT_RIFLE
+	W_ASSAULT_RIFLE,
+	W_SNIPER
 };
 
 // Pour savoir sur quel menu nous nous situons
@@ -154,10 +163,17 @@ enum MENU_SETTINGS {
 	MS_ANTI_ALIASING,
 	MS_VSYNC,
 	MS_RENDER_DISTANCE,
+	MS_SOUND_VOLUME,
+	MS_MUSIC_VOLUME,
 	MS_CROSSCOLOR_R,
 	MS_CROSSCOLOR_G,
 	MS_CROSSCOLOR_B,
 	MS_MOUSE_SENSITIVITY
+};
+enum ANIMAL_TYPE
+{
+	A_BEAR,
+	A_COW
 };
 
 enum MENU_CONTROLS {
@@ -178,6 +194,10 @@ enum MENU_CONTROLS {
 	MC_INVENTORY,
 	MC_SPAWNMONSTER,
 	MC_WIREFRAME
+};
+
+enum MONSTER_TYPE {
+	M_Creeper
 };
 
 #endif // DEFINE_H__

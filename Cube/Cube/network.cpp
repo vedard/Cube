@@ -108,7 +108,6 @@ void Network::OnDisconnect()
 void Network::OnPacketReceive()
 {
 	//std::cout << "Packet Received: "<< m_ENetEvent.packet->data << std::endl;
-
 	Client tmpClient;
 
 	try
