@@ -47,8 +47,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\vincent\Desktop\HellRain\Cube\Cube\external\enet\include;external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\vincent\Desktop\HellRain\Cube\Cube\external\enet\lib;external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <IncludePath>external\enet\include;external/glew vstudio2k10/include;external\devil178\include;external\sfml20\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>external\enet\lib;external/glew vstudio2k10/lib;external\devil178\lib;external\sfml20\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
