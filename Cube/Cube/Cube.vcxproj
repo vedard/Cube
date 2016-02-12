@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="animal.cpp" />
     <ClCompile Include="blockinfo.cpp" />
+    <ClCompile Include="bloodMoon.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="chunkmesh.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="array2d.h" />
     <ClInclude Include="array3d.h" />
     <ClInclude Include="blockinfo.h" />
+    <ClInclude Include="bloodMoon.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="chunk.h" />
     <ClInclude Include="chunkmesh.h" />
@@ -153,6 +155,7 @@
   <ItemGroup>
     <None Include="Cube.conf" />
     <None Include="media\shaders\shader01.frag" />
+    <None Include="media\shaders\shader01.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

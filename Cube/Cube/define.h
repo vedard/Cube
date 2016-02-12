@@ -58,8 +58,10 @@ typedef long long int64;
 #define NUMBER_OF_BLOCK 28
 #define MAX_MONSTER 10
 #define MAX_COW 100
+#define BLOODMOON_PROBABILITY 100
+#define BLOODMOON_DURATION 2500
 #define PI 3.14159265358f
-#define MAX_BULLET 500
+#define MAX_BULLET 120
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"
@@ -75,9 +77,8 @@ typedef long long int64;
 #define MODEL_PATH	"../Cube/media/model/"
 #define TICK_DELAY .100f
 
-#define INVULNERABILITY_PLAYER_TIME .300f
+#define INVULNERABILITY_PLAYER_TIME .250f
 #define HURT_TIME 20
-#define DAY_LENGTH 100
 
 #define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
@@ -90,7 +91,7 @@ typedef long long int64;
 #define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
 #define MIN_HEIGHT 600
 
-#define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
+#define KEY_BINDED_SUCCESSFULLY "The key was bound successfully"
 #define KEY_ALREADY_BOUND "This key is already bound"
 
 typedef uint8 BlockType;

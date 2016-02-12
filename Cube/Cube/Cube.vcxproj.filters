@@ -27,6 +27,7 @@
     <ClCompile Include="world.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="bloodMoon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -58,9 +59,11 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
+    <ClInclude Include="bloodMoon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />
     <None Include="media\shaders\shader01.frag" />
+    <None Include="media\shaders\shader01.vert" />
   </ItemGroup>
 </Project>

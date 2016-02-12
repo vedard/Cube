@@ -17,6 +17,7 @@
 #include "animal.h"
 #include "vector3.h"
 #include "gun.h"
+#include "bloodMoon.h"
 #include "sound.h"
 #include "networkManager.h"
 #include "playerActor.h"
@@ -67,7 +68,6 @@ private:
 	void ManageMenuEnterKeyPress();
 	void DrawMenuSettingSelected(bool isFloat);
 	void DrawMenuControlSelected();
-	void SetLightSource(float gametime);
 
 	void CloseGame();	void SetDayOrNight(float gametime);
 private:
@@ -84,6 +84,8 @@ private:
 	GLfloat m_nightFogColors[4] = { 0.1f, 0.1f, 0.14f, 1 };
 	GLfloat m_dayFogColors[4] = { 0.74f, 0.76f, 0.73f, 1 };
 
+	int m_activeMonsters;
+	int m_activeAnimals;
 
 	bool m_keyboard[sf::Keyboard::KeyCount]; //tableau de toutes les touches du clavier
 	bool m_mouseButton[sf::Mouse::ButtonCount]; //tableau de toutes les touches du clavier
@@ -137,6 +139,8 @@ private:
 	float m_blueFog;
 	float m_fogDensity;
 	float m_fogStart;
+
+	int m_missingTime;
 
 	bool m_isMenuOpen;
 	Menu* m_menu;
