@@ -70,6 +70,7 @@ private:
 	void DrawMenuSettingSelected(bool isFloat);
 	void DrawMenuControlSelected();
 	void SetLightSource(float gametime);
+	void DrawScope();
 
 	void CloseGame();
 	void SetDayOrNight(float gametime);
@@ -94,6 +95,7 @@ private:
 	Texture m_textureFont;
 	Texture m_effectHurt;
 	Texture m_hitMarker;
+	Texture m_textureScope;
 
 	int m_fastInventoryKeySelected;
 	
