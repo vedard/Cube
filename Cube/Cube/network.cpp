@@ -7,6 +7,7 @@ Network::Network()
 	m_isServer = Parametre::GetInstance().m_isServer;
 	m_lstClient = vector<Client>();
 
+	m_EnetPeerServer = NULL;
 	m_ENetAddress.host = ENET_HOST_ANY;
 	m_ENetAddress.port = 1234;
 
@@ -31,7 +32,7 @@ Network::~Network()
 
 bool Network::Fetch()
 {
-	if (enet_host_service(m_ENetHost, &m_ENetEvent, 0))
+	if (enet_host_service(m_ENetHost, &m_ENetEvent, 0) > 0)
 	{
 		switch (m_ENetEvent.type)
 		{
@@ -68,19 +69,16 @@ void Network::Disconnect()
 		return;
 	
 	enet_peer_disconnect(m_EnetPeerServer, 0);
-
-
 }
 
 bool Network::Send(string data)
 {
-
-	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, ENET_PACKET_FLAG_RELIABLE);
+	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, 0);
 
 	// Broadcast a tous les client si on est un serveur
 	// Send au serveur si on est un client
 	if (m_isServer)
-		enet_host_broadcast(m_ENetHost, 0, packet);
+		enet_host_broadcast(m_ENetHost, 1, packet);
 	else if(m_EnetPeerServer)
 		enet_peer_send(m_EnetPeerServer, 0, packet);
 
@@ -89,23 +87,53 @@ bool Network::Send(string data)
 	return false;
 }
 
+vector<Client> Network::GetClient()
+{
+	return m_lstClient;
+}
+
 void Network::OnConnect()
 {
 	std::cout << "Connected event happens" << std::endl;
-	m_lstClient.push_back(Client(m_ENetEvent.peer, "test"));
 }
 
 void Network::OnDisconnect()
 {
 	std::cout << "Disconnected event happens" << std::endl;
 
-	if(!m_isServer)
-		m_lstClient.clear();
+	// Force to recreate the list
+	m_lstClient.clear();
 }
 
 void Network::OnPacketReceive()
 {
-	std::cout << "Packet Received: "<< m_ENetEvent.packet->data << std::endl;
+	//std::cout << "Packet Received: "<< m_ENetEvent.packet->data << std::endl;
+
+	Client tmpClient;
+
+	try
+	{
+		tmpClient.FromString(std::stringstream((char *)m_ENetEvent.packet->data));
+	}
+	catch (const std::exception ex)
+	{
+		std::cout << ex.what() << std::endl;
+		return;
+	}
+
+	// Update le client dans la liste
+	bool isFound = false;
+	for (auto&& c : m_lstClient)
+		if (c.name == tmpClient.name)
+		{
+			c = tmpClient;
+			isFound = true;
+		}
+	
+	// S'il n'est pas deja dans la liste on l'ajoute
+	if (!isFound)
+		m_lstClient.push_back(tmpClient);
+
 	enet_packet_destroy(m_ENetEvent.packet);
 }
 

@@ -3,6 +3,7 @@
 
 #include <enet/enet.h>
 #include <vector>
+#include <sstream>
 #include "vector3.h"
 #include "networkevent.h"
 #include "parametre.h"
@@ -12,11 +13,23 @@ using std::string;
 
 struct Client
 {
-	Vector3<float> pos;
+	float x, y, z, h, v;
 	string name;
-	ENetPeer * peer;
 
-	Client(ENetPeer * a_peer, string a_name) : peer(a_peer), name(a_name) {}
+	string ToString()
+	{
+		return	name + " "
+			+ std::to_string(x) + " "
+			+ std::to_string(y) + " "
+			+ std::to_string(z) + " "
+			+ std::to_string(h) + " "
+			+ std::to_string(v) + " ";
+	
+	}
+	void FromString(std::stringstream data)
+	{
+		data >> name >> x >> y >> z >> h >> v;
+	}
 };
 
 class Network : public NetworkEvent
@@ -29,13 +42,14 @@ public:
 	void Connect(const char * ip, uint16 port);
 	void Disconnect();
 	bool Send(string data);
+	vector<Client> GetClient();
 
 private:
 
 	// Network parameter
 	bool m_isServer;
 
-	// List of connected client
+	// List of client connected to the server
 	vector<Client> m_lstClient;
 
 	//ENet

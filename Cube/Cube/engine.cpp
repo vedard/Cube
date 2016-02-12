@@ -216,7 +216,7 @@ void Engine::LoadResource()
 	//Entity
 
 	// -- Player
-	m_world.GetPlayer()->SetName("Vincent Suce");
+	m_world.GetPlayer()->SetName(Parametre::GetInstance().m_PlayerName);
 }
 
 void Engine::UnloadResource()
@@ -272,10 +272,29 @@ void Engine::UpdateEnvironement(float gameTime)
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
 	m_network.Fetch();
+	SyncWithServer();
+
+}
+
+void Engine::SyncWithServer()
+{
 	if (Parametre::GetInstance().m_isServer)
 	{
-		if ((int)(gameTime * 100) % 100 == 0)
-			m_network.Send("Hi !!!");
+		for (auto c : m_network.GetClient())
+		{
+			m_network.Send(c.ToString());
+		}
+	}
+	else
+	{
+		Client c;
+		c.name = m_world.GetPlayer()->GetName();
+		c.x = m_world.GetPlayer()->GetPosition().x;
+		c.y = m_world.GetPlayer()->GetPosition().y;
+		c.z = m_world.GetPlayer()->GetPosition().z;
+		c.h = m_world.GetPlayer()->GetHorizontalRotation();
+		c.v = m_world.GetPlayer()->GetVerticalRotation();
+		m_network.Send(c.ToString());
 	}
 }
 
@@ -309,15 +328,9 @@ void Engine::DrawEnvironement(float gameTime) {
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underwater"), m_world.GetPlayer()->Underwater());
 	glUniform1f(glGetUniformLocation(m_shader01.m_program, "underlava"), m_world.GetPlayer()->UnderLava());
 
-
-
-
-
 	//Ciel
 	if (m_world.GetPlayer()->GetPosition().y > 64)
 		DrawSky(gameTime);
-
-
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
@@ -350,6 +363,11 @@ void Engine::DrawEnvironement(float gameTime) {
 	for (int i = 0; i < MAX_COW; i++)
 		m_world.GetAnimal()[i].Draw(m_modelCow);
 
+	// Draw other player on network
+	for (auto c : m_network.GetClient())
+	{
+		m_modelCow.Render(c.x, c.y, c.z, c.h, c.v, 1, 1, 1);
+	}
 
 	Shader::Disable();
 	glDisable(GL_LIGHTING);
@@ -547,11 +565,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[sf::Keyboard::F6])
 		{
 			m_network.Connect("localhost", 1234);
-		}
-		//f7 -> send packet
-		else if (m_keyboard[sf::Keyboard::F7])
-		{
-			m_network.Send("Poke");
 		}
 
 		//f10 -> toggle fulscreen mode

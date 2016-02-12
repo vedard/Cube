@@ -49,6 +49,7 @@ public:
 
 private:
 	void UpdateEnvironement(float gameTime);
+	void SyncWithServer();
 	void RenderFastInventory() const;
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);

@@ -62,6 +62,7 @@ void Parametre::Save()
 	myfile << "btnwireframe " << m_wireframe << "\n";
 	myfile << "musicvolume " << m_musicvolume << "\n";
 	myfile << "soundvolume " << m_soundvolume << "\n";
+	myfile << "playername " << m_PlayerName << "\n";
 
 	myfile.close();
 	Load();
@@ -103,6 +104,7 @@ void Parametre::SaveDefault()
 	myfile << "btnwireframe 24 \n";
 	myfile << "musicvolume 10 \n";
 	myfile << "soundvolume 12 \n";
+	myfile << "playername Player1 \n";
 
 
 	myfile.close();
@@ -160,6 +162,7 @@ void Parametre::Load()
 		setting.Get(27, 0) = "server";
 		setting.Get(28, 0) = "musicvolume";
 		setting.Get(29, 0) = "soundvolume";
+		setting.Get(30, 0) = "playername";
 
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
@@ -181,7 +184,7 @@ void Parametre::Load()
 			if (index != -1)
 				ss >> setting.Get(setting.GetIndex(temp), 1);
 		}
-		if (cpt <= 29)
+		if (cpt <= 30)
 		{
 			cout << "File incomplete, recreating";
 			SaveDefault();
@@ -258,5 +261,7 @@ void Parametre::Load()
 			m_musicvolume = (sf::Keyboard::Key)atoi(setting.Get(27, 1).c_str());
 		if (setting.Get(29, 1) != "null")
 			m_soundvolume = (sf::Keyboard::Key)atoi(setting.Get(28, 1).c_str());
+		if (setting.Get(30, 1) != "null")
+			m_PlayerName = setting.Get(30, 1);
 	}
 }
