@@ -155,6 +155,8 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
 		Sound::AddSound(Sound::HITMARK, WEAPONS_PATH "hitmarker.wav");
 		Sound::AddSound(Sound::AWP_FIRE, WEAPONS_PATH "awp.wav");
+		Sound::AddSound(Sound::HARP, EFFECT_PATH "harp.wav");
+
 
 		for (int i = 0; i < 9; i++)
 		{

@@ -71,6 +71,7 @@ typedef long long int64;
 #define HURT_PATH	"../Cube/media/audio/hurt/"
 #define DEATH_PATH  "../Cube/media/audio/death/"
 #define LEAVE_PATH	"../Cube/media/audio/leave/"
+#define EFFECT_PATH	"../Cube/media/audio/effect/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
