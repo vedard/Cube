@@ -158,7 +158,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::AWP_FIRE, WEAPONS_PATH "awp.wav");
 		Sound::AddSound(Sound::HARP, EFFECT_PATH "harp.wav");
 		Sound::AddSound(Sound::SPLASH, EFFECT_PATH "splash.wav");
-
+		Sound::AddSound(Sound::SHOTGUN_FIRE, WEAPONS_PATH "shotgun.wav");
 
 
 		for (int i = 0; i < 9; i++)
@@ -192,8 +192,11 @@ void Engine::LoadResource()
 			m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+			//m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "Shotgun.obj", TEXTURE_PATH "Shotgun.png", Sound::MP5K_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitRessource(MODEL_PATH "Shotgun.obj", TEXTURE_PATH "Shotgun.png", Sound::SHOTGUN_FIRE);
+
 
 		//Gun
 
@@ -208,6 +211,11 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 60, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 100, 0.5);
+
+
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
+
 
 	// -- Player
 	m_world.GetPlayer()->SetName(Parametre::GetInstance().m_PlayerName);
@@ -233,7 +241,7 @@ void Engine::UpdateEnvironement(float gameTime)
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].DisableAiming();
 
 	//Update les balles
-	for (int k = 0; k < 4; k++)
+	for (int k = 0; k < GUN_NUMBER; k++)
 	{
 		m_world.GetPlayer()->GetGuns()[k].Update();
 		for (int i = 0; i < MAX_BULLET; i++)
@@ -704,9 +712,15 @@ void Engine::KeyPressEvent(unsigned char key)
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		//3 ->  W_SUBMACHINE_GUN
+		//if (m_keyboard[m_settings.m_inventory3])
+		//{
+		//	m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+		//	Sound::Play(Sound::GUN_DRAW);
+		//}
+		//shotgun sur 2 pour le moment
 		if (m_keyboard[m_settings.m_inventory3])
 		{
-			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+			m_world.GetPlayer()->SetWeapon(W_SHOTGUN);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		else if (m_keyboard[m_settings.m_inventory4])
@@ -2431,16 +2445,16 @@ void Engine::DrawScope()
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0, 0);
-	glVertex2i(-10, 2);
+	glVertex2i(-13, 0);
 
 	glTexCoord2f(1, 0);
-	glVertex2i(Width() - 10, 2);
+	glVertex2i(Width(),0);
 
 	glTexCoord2f(1, 1);
-	glVertex2i(Width() - 10, Height() + 2);
+	glVertex2i(Width(), Height() + 2);
 
 	glTexCoord2f(0, 1);
-	glVertex2i(-10, Height() + 2);
+	glVertex2i(-13, Height() + 2);
 
 
 	glEnd();

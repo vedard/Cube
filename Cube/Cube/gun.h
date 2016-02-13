@@ -22,6 +22,7 @@ public:
 	const bool isAiming();
 	Bullet* GetBullets();
 	const bool GetIsAuto() const;
+	void InitAdvancedParameters(int precision, int precisionAim, int NumberofBullets,float distanceModif);
 
 
 private:
@@ -34,6 +35,10 @@ private:
 	float m_damage;
 	float m_recoilByBullet;
 	float m_aimingHeight;
+	float m_distanceModif;
+	int m_precision;
+	int m_precisionAim;
+	int m_numberofBullets;
 
 	//Timer
 	sf::Clock m_timerCooldown;

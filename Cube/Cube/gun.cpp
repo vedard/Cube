@@ -1,7 +1,7 @@
 #include "gun.h"
 
 
-Gun::Gun()
+Gun::Gun() : m_distanceModif(1), m_precision(100), m_precisionAim(40), m_numberofBullets(1)
 {
 	m_bullets = new Bullet[MAX_BULLET];
 	bool m_isAutomatic = false;
@@ -64,10 +64,13 @@ bool Gun::Shoot(float x, float y, float z, float rotX, float rotY)
 		for (int i = 0; i < MAX_BULLET; i++)
 			if (!m_bullets[i].GetIsActive())
 			{
-				if(m_isAiming)
-					m_bullets[i].Init(x, y, z, rotY + ((rand() % 40) - 20) * 20 / 400, rotX + ((rand() % 40) - 20) * 20 / 400, m_damage);
-				else
-					m_bullets[i].Init(x, y, z, rotY + ((rand() % 100) - 50) * 20 / 400, rotX + ((rand() % 100) - 50) * 20 / 400, m_damage);
+				for (int j = 0; j < m_numberofBullets && j + i < MAX_BULLET; j++)
+				{
+					if (m_isAiming)
+						m_bullets[i + j].Init(x, y, z, rotY + ((rand() % m_precisionAim) - (m_precisionAim / 2)) * 20 / 400, rotX + ((rand() % m_precisionAim) - (m_precisionAim / 2)) * 20 / 400, m_damage, m_distanceModif);
+					else
+						m_bullets[i + j].Init(x, y, z, rotY + ((rand() % m_precision) - (m_precision / 2)) * 20 / 400, rotX + ((rand() % m_precision) - (m_precision / 2)) * 20 / 400, m_damage, m_distanceModif);
+				}
 				m_recoilTotal += m_recoilByBullet;
 				Sound::Play(m_sound);
 				return true;
@@ -103,3 +106,13 @@ const bool Gun::GetIsAuto() const
 	return m_isAutomatic;
 
 }
+
+void Gun::InitAdvancedParameters(int precision, int precisionAim, int NumberofBullets, float distanceModif)
+{
+	m_distanceModif = distanceModif;
+	m_precision = precision;
+	m_precisionAim = precisionAim;
+	m_numberofBullets = NumberofBullets;
+}
+
+
