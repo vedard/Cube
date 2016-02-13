@@ -105,6 +105,7 @@ void Engine::LoadResource()
 		LoadTexture(m_hitMarker, EFFECTS_PATH "HitMarker.png");
 		LoadTexture(m_textureSky, TEXTURE_PATH "sky.jpg");
 		LoadTexture(m_textureFont, TEXTURE_PATH "font.png");
+		LoadTexture(m_textureScope, EFFECTS_PATH "SniperZoom.png");
 
 		//Load texture dans l'atlas
 		AddTextureToAtlas(BTYPE_GRASS, "Grass", TEXTURE_PATH "block_grass.bmp", 1);
@@ -183,24 +184,28 @@ void Engine::LoadResource()
 			}
 		}
 
-		//Model 3d
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
-		//m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+			//Model 3d
+			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+			m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+			m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
+			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+			m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
+
+		//Gun
+
+
 	}
 
 	m_world.LoadMap("map.sav", m_bInfo);
 	m_world.SetUpdateDistance(m_settings.m_renderdistance);
 	m_world.InitChunks(WORLD_SIZE / 2, WORLD_SIZE / 2);
 
-	//Gun
-	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 50, 300, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 20, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 120, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 60, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
 
 	// -- Player
 	m_world.GetPlayer()->SetName(Parametre::GetInstance().m_PlayerName);
@@ -220,13 +225,13 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 	// Update Guns
-	if (m_mouseButton[4])
+	if (m_mouseButton[4])		
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
 	else
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].DisableAiming();
 
 	//Update les balles
-	for (int k = 0; k < 3; k++)
+	for (int k = 0; k < 4; k++)
 	{
 		m_world.GetPlayer()->GetGuns()[k].Update();
 		for (int i = 0; i < MAX_BULLET; i++)
@@ -374,7 +379,9 @@ void Engine::DrawEnvironement(float gameTime) {
 
 
 	//Draw guns
-	if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
+	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
+		DrawScope();
+	else if (m_world.GetPlayer()->GetWeapon() != W_BLOCK)
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].Draw(
 			m_world.GetPlayer()->GetPosition().x,
 			m_world.GetPlayer()->GetPosition().y + m_world.GetPlayer()->GetDimension().y - shake - ((m_world.GetPlayer()->GetIsSneaked()) ? 0.2 : 0),
@@ -418,11 +425,14 @@ void Engine::DrawEnvironement(float gameTime) {
 	DrawHud();
 	if (m_world.GetPlayer()->isHurt > 0)
 		DrawHurtEffect();
+
+
 	if (m_world.GetPlayer()->hasHit > 0)
 		DrawHitMarker();
 	if (m_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
+		DrawScope();
 	// Draw le menu
 	if (m_isMenuOpen)
 	{
@@ -623,42 +633,6 @@ void Engine::KeyPressEvent(unsigned char key)
 		m_fastInventoryKeySelected = m_fastInventoryKeySelected != key ? key : -1;
 	}
 
-	// Si le menu est ouvert, gérer les keypress d'une certaine façon...
-	if (m_isMenuOpen)
-	{
-		// Fermer menu
-		if (m_keyboard[m_settings.m_menu])
-		{
-			if (m_isMenuOpen)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-		}
-		else if (m_keyboard[sf::Keyboard::Return])
-		{
-			ManageMenuEnterKeyPress();
-		}
-		else if (m_keyboard[sf::Keyboard::BackSpace])
-		{
-			if (m_menu->m_currentMenu == SM_PRINCIPAL)
-			{
-				m_isMenuOpen = false;
-				m_menu = new Menu(SM_PRINCIPAL);
-				HideCursor();
-			}
-			else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_CONTROLS)
-				m_menu = new Menu(SM_PRINCIPAL);
-			else
-				m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
-		else
-		{
-			m_menu->OnKeyDown(key); // Laisser la classe menu gérer ses keyPress
-		}
-	}
-
 	//Si linventaire est ouvert
 	if (m_isInventoryOpen)
 	{
@@ -724,7 +698,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		if (m_keyboard[m_settings.m_inventory2])
 		{
-			m_world.GetPlayer()->SetWeapon(W_PISTOL);
+			m_world.GetPlayer()->SetWeapon(W_SNIPER);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		//3 ->  W_SUBMACHINE_GUN
@@ -1040,6 +1014,8 @@ void Engine::DrawHud() const
 	// Affichage du crosshair
 	if (!m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawCross(m_settings.m_crossred, m_settings.m_crossgreen, m_settings.m_crossblue);
+
+
 
 	if (m_world.GetPlayer()->GetWeapon() == W_BLOCK && m_settings.m_inventaire_creatif)
 	{
@@ -2416,6 +2392,52 @@ void Engine::DrawHitMarker() const
 
 	glTexCoord2f(0, 1);
 	glVertex2i(-30, 30);
+
+
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glEnable(GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_BLEND);
+	glPopMatrix();
+}
+
+void Engine::DrawScope()
+{
+	glDisable(GL_LIGHTING);
+
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	//glClearColor(0.0, 0.0, 0.0, 0.0);
+
+
+	m_textureScope.Bind();
+	//static const int crossSize = 800;
+	glLoadIdentity();
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(0, 0);
+	glVertex2i(-10, 2);
+
+	glTexCoord2f(1, 0);
+	glVertex2i(Width() - 10, 2);
+
+	glTexCoord2f(1, 1);
+	glVertex2i(Width() - 10, Height() + 2);
+
+	glTexCoord2f(0, 1);
+	glVertex2i(-10, Height() + 2);
 
 
 	glEnd();
