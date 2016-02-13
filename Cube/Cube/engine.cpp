@@ -157,6 +157,8 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::HITMARK, WEAPONS_PATH "hitmarker.wav");
 		Sound::AddSound(Sound::AWP_FIRE, WEAPONS_PATH "awp.wav");
 		Sound::AddSound(Sound::HARP, EFFECT_PATH "harp.wav");
+		Sound::AddSound(Sound::SPLASH, EFFECT_PATH "splash.wav");
+
 
 
 		for (int i = 0; i < 9; i++)
@@ -2353,6 +2355,7 @@ void Engine::CloseGame()
 {
 	m_world.m_threadcontinue = false;
 	int sound = Sound::LEAVE1 + rand() % 5;
+	m_music.setVolume(0);
 	Sound::PlayAndWait(sound);
 	Stop();
 }

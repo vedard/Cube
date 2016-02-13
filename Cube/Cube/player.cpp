@@ -80,6 +80,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		}
 		if (m_footUnderwater)
 		{
+			if (!m_footWasUnderwater && m_wasInAir)
+			{
+				Sound::Play(Sound::SPLASH);
+				m_footWasUnderwater = true;
+			}
 			m_vitesse.x *= 0.6f;
 			m_vitesse.z *= 0.6f;
 		}
@@ -141,6 +146,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		m_pos.x += deplacementVector.x * m_vitesse.x;
 		m_pos.z += deplacementVector.z * m_vitesse.z;
 		m_isInAir = true;
+		m_wasInAir = true;
 	}
 
 	else
@@ -168,7 +174,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			if (m_vitesse.y > 0)
 			{
 				m_isInAir = false;
-
+				m_wasInAir = false;
+				if (m_vitesse.y > 0.02f)
+				{
+					m_wasInAir = true;
+				}
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
 				{
@@ -223,10 +233,13 @@ void Player::CheckUnderwater(World &world)
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
 
-	if (bt1 > 15 && bt1 < 21)
+	if (bt1 > 15 && bt1 < 21) {
 		m_footUnderwater = true;
-	else
+	}
+	else {
 		m_footUnderwater = false;
+		m_footWasUnderwater = false;
+	}
 }
 
 void Player::CheckUnderLava(World &world)
@@ -368,6 +381,7 @@ void Player::Jump()
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
+		m_wasInAir = true;
 	}
 	else if (m_footUnderwater && !m_headUnderwater && m_kneeUnderwater)
 		m_vitesse.y = -0.002f;

@@ -55,6 +55,7 @@ private:
 	void CheckBlockUnder(World &world);
 	void ResetDeath();
 private:
+	bool m_wasInAir; // S'il etait dans les airs.
 	bool m_godMode;
 	time_t m_TickBegin;     //timer de tick
 	time_t m_TickEnd;     //timer de tick
@@ -65,6 +66,7 @@ private:
 	bool m_headUnderwater;  // Si le joueur est sous l'eau
 	bool m_headWasUnderwater; // Si le joueur vient de sortir de l'eau.
 	bool m_footUnderwater;  // Si le joueur est sous l'eau
+	bool m_footWasUnderwater; // si le joueur vient de sortir de l'eau
 	bool m_headUnderLava; // Si le joueur est sous la lave
 	bool m_kneeUnderwater;  // Si le joueur est sous l'eau
 	bool m_kneeUnderLava;  // Si le joueur est sous la lave
