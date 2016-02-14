@@ -32,7 +32,7 @@ public:
 
 	Animal* GetCow() const;
 	Animal* GetBear() const;
-	Monster* GetMonster() const;
+	Monster* GetCreeper() const;
 	Player* GetPlayer() const;
 
 	void InitMap(int seed = 0);

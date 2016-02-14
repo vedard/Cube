@@ -1,6 +1,6 @@
 #include "creeper.h"
 
-Creeper::Creeper() :Monster(M_Creeper)
+Creeper::Creeper() :Monster(M_CREEPER)
 {
 	m_health = 130;
 }

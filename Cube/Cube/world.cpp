@@ -17,7 +17,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 	m_cow = new Cow[MAX_COW];
 	m_bear = new Bear[MAX_BEAR];
 
-	m_monster = new Creeper[MAX_MONSTER];
+	m_monster = new Creeper[MAX_CREEPER];
 	m_player = new Player;
 
 	
@@ -61,7 +61,7 @@ World::~World()
 
 Animal* World::GetCow() const { return m_cow; }
 Animal* World::GetBear() const { return m_bear; }
-Monster* World::GetMonster() const { return m_monster; }
+Monster* World::GetCreeper() const { return m_monster; }
 Player* World::GetPlayer() const { return m_player; }
 
 void World::InitMap(int seed)
@@ -86,7 +86,7 @@ void World::InitMap(int seed)
 		std::cout << "Flat map created" << std::endl << std::endl;
 
 	//  -- Monster
-	for (int i = 0; i < MAX_MONSTER; i++)
+	for (int i = 0; i < MAX_CREEPER; i++)
 	{
 		m_monster[i].SetName("Monster " + std::to_string(i + 1));
 		m_monster[i].SetTarget((Character*)&m_player);
@@ -652,7 +652,7 @@ void World::SpawnBears()
 
 void World::SpawnMonsters()
 {
-	for (int i = 0; i < MAX_MONSTER; i++)
+	for (int i = 0; i < MAX_CREEPER; i++)
 		if (!m_monster[i].GetisAlive())
 		{
 			m_monster[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));

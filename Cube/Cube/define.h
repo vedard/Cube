@@ -56,7 +56,7 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_MONSTER 5
+#define MAX_CREEPER 5
 #define MAX_COW 10
 #define MAX_BEAR 10
 #define PI 3.14159265358f
@@ -198,7 +198,7 @@ enum MENU_CONTROLS {
 };
 
 enum MONSTER_TYPE {
-	M_Creeper
+	M_CREEPER
 };
 
 #endif // DEFINE_H__
