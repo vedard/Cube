@@ -13,7 +13,7 @@ public:
 	Bullet();
 	~Bullet();
 
-	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage);
+	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage, float distanceModif);
 
 	void Update();
 	bool CheckCollision(Character &character);
@@ -39,6 +39,7 @@ private:
 
 	float m_damage;
 	float m_distance;
+	float m_distanceModif;
 };
 
 #endif //BULLET_H__

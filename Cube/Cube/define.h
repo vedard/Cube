@@ -71,6 +71,7 @@ typedef long long int64;
 #define HURT_PATH	"../Cube/media/audio/hurt/"
 #define DEATH_PATH  "../Cube/media/audio/death/"
 #define LEAVE_PATH	"../Cube/media/audio/leave/"
+#define EFFECT_PATH	"../Cube/media/audio/effect/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
@@ -79,7 +80,7 @@ typedef long long int64;
 #define INVULNERABILITY_PLAYER_TIME .300f
 #define HURT_TIME 20
 #define DAY_LENGTH 100
-#define GUN_NUMBER 4
+#define GUN_NUMBER 5
 
 #define INVENTORY_SIZE 15		//Must be larger than FAST_INVENTORY_SIZE
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
@@ -136,7 +137,8 @@ enum WEAPONS {
 	W_PISTOL,
 	W_SUBMACHINE_GUN,
 	W_ASSAULT_RIFLE,
-	W_SNIPER
+	W_SNIPER,
+	W_SHOTGUN
 };
 
 // Pour savoir sur quel menu nous nous situons
