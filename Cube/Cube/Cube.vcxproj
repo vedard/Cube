@@ -118,6 +118,7 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="sprinter.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="sprinter.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="textureatlas.h" />
     <ClInclude Include="tool.h" />

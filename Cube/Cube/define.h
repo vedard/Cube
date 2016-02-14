@@ -198,7 +198,8 @@ enum MENU_CONTROLS {
 };
 
 enum MONSTER_TYPE {
-	M_CREEPER
+	M_CREEPER,
+	M_SPRINTER
 };
 
 #endif // DEFINE_H__

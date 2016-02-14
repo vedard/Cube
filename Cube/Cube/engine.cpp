@@ -701,12 +701,11 @@ void Engine::KeyPressEvent(unsigned char key)
 		{ //LSHIFT -> RUN
 			m_world.GetPlayer()->SetRunning(true);
 		}
-
-		if (m_keyboard[m_settings.m_inventory1])
+		else if (m_keyboard[m_settings.m_inventory1])
 		{ //1 -> W_BLOCK
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
 		}
-		if (m_keyboard[m_settings.m_inventory2])
+		else if (m_keyboard[m_settings.m_inventory2])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SNIPER);
 			Sound::Play(Sound::GUN_DRAW);
@@ -718,7 +717,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		//	Sound::Play(Sound::GUN_DRAW);
 		//}
 		//shotgun sur 2 pour le moment
-		if (m_keyboard[m_settings.m_inventory3])
+		else if (m_keyboard[m_settings.m_inventory3])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SHOTGUN);
 			Sound::Play(Sound::GUN_DRAW);
