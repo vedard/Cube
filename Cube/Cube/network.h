@@ -1,8 +1,7 @@
 #ifndef NETWORK_H__
 #define NETWORK_H__
 
-#include "external/enet/include/enet/enet.h"
-#include "external/enet/include/enet/win32.h"
+#include <enet/enet.h>
 #include <vector>
 #include <sstream>
 #include "vector3.h"
