@@ -10,5 +10,5 @@ public:
 
 private:
 };
-#endif SPRINTER_H__
+#endif //SPRINTER_H__
 

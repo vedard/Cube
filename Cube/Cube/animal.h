@@ -11,9 +11,10 @@ public:
 	Animal(ANIMAL_TYPE typ);
 	~Animal();
 	
-	void Move(World &world);
+    void Move(World &world);
 	void Draw(Model3d &model) const;
-	void GetDamage(float damage);
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce) override;
+	virtual void SetTarget(Character* target);
 	ANIMAL_TYPE GetType();
 
 	 
