@@ -26,8 +26,9 @@ struct Client
 			+ std::to_string(v) + " ";
 	
 	}
-	void FromString(std::stringstream data)
+	void FromString(const std::string& str)
 	{
+std::istringstream data(str);
 		data >> name >> x >> y >> z >> h >> v;
 	}
 };
