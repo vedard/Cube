@@ -4,6 +4,7 @@
 #include "define.h"
 #include "vector3.h"
 #include "world.h"
+#include "sound.h"
 
 class Character
 {
@@ -19,7 +20,7 @@ public:
 	void Draw() const;
 	bool Attack(Character * character, float damage);
 	bool Attack(Character * character);
-	virtual bool GetDamage(float damage, bool ignoreArmor, bool godMode);
+	virtual bool GetDamage(float damage, bool ignoreArmor, bool godMode , Sound::ListeSons son = Sound::ListeSons::HURT, bool playonce = false);
 	void Jump();
 
 	//Set

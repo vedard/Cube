@@ -8,16 +8,17 @@
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="gun.cpp" />
+    <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
-    <ClCompile Include="networkManager.cpp" />
+    <ClCompile Include="network.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="playerActor.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -25,8 +26,11 @@
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
     <ClCompile Include="world.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="inventory.cpp" />
+    <ClCompile Include="creeper.cpp" />
+    <ClCompile Include="bear.cpp" />
+    <ClCompile Include="cow.cpp" />
+    <ClCompile Include="music.cpp" />
+    <ClCompile Include="sprinter.cpp" />
     <ClCompile Include="bloodMoon.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -44,13 +48,13 @@
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="networkevent.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
-    <ClInclude Include="networkManager.h" />
     <ClInclude Include="openglcontext.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="playerActor.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="sound.h" />
@@ -59,8 +63,11 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
-    <ClInclude Include="bloodMoon.h" />
-  </ItemGroup>
+    <ClInclude Include="bloodMoon.h" />    <ClInclude Include="creeper.h" />
+    <ClInclude Include="bear.h" />
+    <ClInclude Include="cow.h" />
+    <ClInclude Include="music.h" />
+    <ClInclude Include="sprinter.h" />  </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />
     <None Include="media\shaders\shader01.frag" />

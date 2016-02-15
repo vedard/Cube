@@ -14,7 +14,9 @@ m_footUnderwater(false),
 m_headUnderwater(false),
 m_HeadShake(0),
 isHurt(0),
-InvulnerabilityTimer(0)
+InvulnerabilityTimer(0),
+m_inventory(new Inventory()),
+hasHit(0)
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -25,7 +27,7 @@ InvulnerabilityTimer(0)
 	m_isAlive = false;
 	m_godMode = false;
 	
-	Guns = new Gun[3];	
+	Guns = new Gun[GUN_NUMBER];	
 }
 
 Player::~Player()
@@ -78,6 +80,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		}
 		if (m_footUnderwater)
 		{
+			if (!m_footWasUnderwater && m_wasInAir)
+			{
+				Sound::Play(Sound::SPLASH);
+				m_footWasUnderwater = true;
+			}
 			m_vitesse.x *= 0.6f;
 			m_vitesse.z *= 0.6f;
 		}
@@ -139,6 +146,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		m_pos.x += deplacementVector.x * m_vitesse.x;
 		m_pos.z += deplacementVector.z * m_vitesse.z;
 		m_isInAir = true;
+		m_wasInAir = true;
 	}
 
 	else
@@ -166,7 +174,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			if (m_vitesse.y > 0)
 			{
 				m_isInAir = false;
-
+				m_wasInAir = false;
+				if (m_vitesse.y > 0.02f)
+				{
+					m_wasInAir = true;
+				}
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f)
 				{
@@ -197,6 +209,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_vitesse.y = 0.08f;
 	//si le player est en dessous de la lave
 	CheckUnderLava(world);
+	CheckBlockUnder(world);
 
 	if (m_footUnderLava)
 		if (m_vitesse.y > 0.08f)
@@ -206,7 +219,6 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 void Player::CheckUnderwater(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);
-
 	if (bt1 > 15 && bt1 < 21)
 		m_headUnderwater = true;
 	else
@@ -221,10 +233,13 @@ void Player::CheckUnderwater(World &world)
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
 
-	if (bt1 > 15 && bt1 < 21)
+	if (bt1 > 15 && bt1 < 21) {
 		m_footUnderwater = true;
-	else
+	}
+	else {
 		m_footUnderwater = false;
+		m_footWasUnderwater = false;
+	}
 }
 
 void Player::CheckUnderLava(World &world)
@@ -244,11 +259,15 @@ void Player::CheckUnderLava(World &world)
 		m_kneeUnderLava = false;
 
 	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 2.5, m_pos.z);
-
 	if (bt1 > 20 && bt1 < 26)
 		m_footUnderLava = true;
 	else
 		m_footUnderLava = false;
+}
+
+void Player::CheckBlockUnder(World & world)
+{
+	m_blockUnder = world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z);
 }
 
 void Player::ResetDeath()
@@ -346,9 +365,13 @@ void Player::SetBlock(int direction)
 		m_block = 1;
 }
 
+void Player::SetBlockDirect(BlockType blockType) {
+	m_block = blockType;
+}
+
 void Player::SetWeapon(int mode)
 {
-	if (mode >= 0 && mode <= 3)
+	if (mode >= 0 && mode <= GUN_NUMBER)
 		m_weapon = mode;
 }
 
@@ -358,6 +381,7 @@ void Player::Jump()
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
+		m_wasInAir = true;
 	}
 	else if (m_footUnderwater && !m_headUnderwater && m_kneeUnderwater)
 		m_vitesse.y = -0.002f;
@@ -378,38 +402,41 @@ bool Player::Shoot(World &world)
 		return false;
 }
 
-bool Player::Underwater() const { return m_headUnderwater; }
+bool Player::Underwater() const {return m_headUnderwater;}
 bool Player::footUnderwater() const { return m_footUnderwater; }
+BlockType Player::blockUnderPlayer() const
+{
+	return m_blockUnder;
+}
 bool Player::UnderLava() const { return m_headUnderLava; }
 void Player::Tick()
 {
 	if (isHurt > 0)
 		isHurt--;
 
-
+	if (hasHit > 0)
+		hasHit--;
 	if (InvulnerabilityTimer > 0)
 		InvulnerabilityTimer -= TICK_DELAY;
 
 	if (m_footUnderLava)
 	{
+		GetDamage(8, true, m_godMode);
 		if (!GetDamage(8, true, m_godMode))
 		{
 			ResetDeath();
 		}
-		//isHurt = 20;
 	}
 	if (m_headUnderwater)
 	{
 		m_BreathCount++;
 		if (m_BreathCount > 75)
 		{
-			Sound::PlayOnce(Sound::DROWNING);
 			m_headWasUnderwater = true;
-			if (GetDamage(3, true, m_godMode))
+			if (!GetDamage(3, true, m_godMode, Sound::DROWNING, true))
 			{
 				ResetDeath();
 			}
-			//isHurt = 20;
 		}
 	}
 	else
@@ -424,7 +451,7 @@ void Player::Tick()
 	}
 }
 
-	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode)
+	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 	{
 		bool b = true;
 		if (InvulnerabilityTimer <= 0)
@@ -435,6 +462,15 @@ void Player::Tick()
 				b = Character::GetDamage(damage, ignoreArmor, godMode);
 				if (!godMode)
 				{
+					if (playonce)
+					{
+						Sound::PlayOnce(son);
+					}
+					else
+					{
+						Sound::Play(son);
+
+					}
 					isHurt = HURT_TIME;
 					InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
 				}
@@ -449,3 +485,12 @@ void Player::Tick()
 		return b;
 	}
 
+	bool Player::GetIsSneaked()
+	{
+		return m_sneaked;
+	}
+
+Inventory* Player::GetInventory()
+{
+	return m_inventory.get();
+}

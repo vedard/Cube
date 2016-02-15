@@ -1,6 +1,6 @@
 #include "monster.h"
 
-Monster::Monster() : Character()
+Monster::Monster(MONSTER_TYPE typ) : Character()
 {
 
 	m_dimension = Vector3<float>(0.9f, 2.6f, 0.9f);
@@ -11,6 +11,7 @@ Monster::Monster() : Character()
 	m_Armor = 1.1f;
 	m_target = NULL;
 	m_isAlive = false;
+	type = typ;
 }
 
 Monster::~Monster()
@@ -153,4 +154,9 @@ void Monster::GetDamage(float damage)
 	m_ClockAnimationDmg.restart();
 
 	Character::GetDamage(damage,false,false);
+}
+
+MONSTER_TYPE Monster::GetType()
+{
+	return type;
 }

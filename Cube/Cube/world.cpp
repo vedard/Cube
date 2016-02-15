@@ -2,6 +2,9 @@
 #include "animal.h"
 #include "monster.h"
 #include "player.h"
+#include "cow.h"
+#include "bear.h"
+#include "creeper.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
@@ -11,8 +14,10 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 	//	m_threadChunks[i] = std::thread(&World::RunWater, this, i * 20);
 
 	// Initialise les monstres et animaux.
-	m_animal = new Animal[MAX_COW];
-	m_monster = new Monster[MAX_MONSTER];
+	m_cow = new Cow[MAX_COW];
+	m_bear = new Bear[MAX_BEAR];
+
+	m_monster = new Creeper[MAX_CREEPER];
 	m_player = new Player;
 	m_bloodMoon = new BloodMoon;
 	
@@ -54,8 +59,9 @@ World::~World()
 	m_threadcontinue = false;
 }
 
-Animal* World::GetAnimal() const { return m_animal; }
-Monster* World::GetMonster() const { return m_monster; }
+Animal* World::GetCow() const { return m_cow; }
+Animal* World::GetBear() const { return m_bear; }
+Monster* World::GetCreeper() const { return m_monster; }
 Player* World::GetPlayer() const { return m_player; }
 
 BloodMoon* World::GetBloodMoonInstance() { return m_bloodMoon; }
@@ -84,7 +90,7 @@ void World::InitMap(int seed)
 		std::cout << "Flat map created" << std::endl << std::endl;
 
 	//  -- Monster
-	for (int i = 0; i < MAX_MONSTER; i++)
+	for (int i = 0; i < MAX_CREEPER; i++)
 	{
 		m_monster[i].SetName("Monster " + std::to_string(i + 1));
 		m_monster[i].SetTarget((Character*)&m_player);
@@ -92,7 +98,7 @@ void World::InitMap(int seed)
 
 	//  -- Cow
 	for (int i = 0; i < MAX_COW; i++)
-		m_animal[i].SetName("Cow " + std::to_string(i + 1));
+		m_cow[i].SetName("Cow " + std::to_string(i + 1));
 
 
 }
@@ -629,19 +635,29 @@ void World::SetUpdateDistance(int updateDist)
 		UpdateDistance = updateDist;
 }
 
-void World::SpawnAnimals()
+void World::SpawnCows()
 {
 	for (int i = 0; i < MAX_COW; i++)
-		if (!m_animal[i].GetisAlive())
+		if (!m_cow[i].GetisAlive())
 		{
-			m_animal[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			m_cow[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			break;
+		}
+}
+
+void World::SpawnBears()
+{
+	for (int i = 0; i < MAX_BEAR; i++)
+		if (!m_bear[i].GetisAlive())
+		{
+			m_bear[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
 			break;
 		}
 }
 
 void World::SpawnMonsters()
 {
-	for (int i = 0; i < MAX_MONSTER; i++)
+	for (int i = 0; i < MAX_CREEPER; i++)
 		if (!m_monster[i].GetisAlive())
 		{
 			m_monster[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));

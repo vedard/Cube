@@ -52,16 +52,21 @@ typedef long long int64;
 #define CHUNK_SIZE_X 16
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
-#define WORLD_SIZE 70
+#define WORLD_SIZE 45
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
+#define INVENTORY_SIZE 6
+#define MAX_CREEPER 5
+#define MAX_BULLET 500
+#define MAX_COW 10
 #define MAX_MONSTER 10
-#define MAX_COW 100
+#define MAX_BEAR 10
 #define BLOODMOON_PROBABILITY 100
 #define BLOODMOON_DURATION 2500
 #define PI 3.14159265358f
-#define MAX_BULLET 120
+#define INVULNERABILITY_PLAYER_TIME 1
+
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"
@@ -72,24 +77,31 @@ typedef long long int64;
 #define HURT_PATH	"../Cube/media/audio/hurt/"
 #define DEATH_PATH  "../Cube/media/audio/death/"
 #define LEAVE_PATH	"../Cube/media/audio/leave/"
+#define EFFECT_PATH	"../Cube/media/audio/effect/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
 #define TICK_DELAY .100f
 
-#define INVULNERABILITY_PLAYER_TIME .250f
-#define HURT_TIME 20
 
-#define INVENTORY_SIZE 15			//Must be larger than FAST_INVENTORY_SIZE
+#define HURT_TIME 20
+#define GUN_NUMBER 5
+
+
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
-#define IS_INVENTORY_CREATIVE true	//If the inventory is in creative mode(infinite everything)
+
+#define IS_INVENTORY_CREATIVE false	//If the inventory is in creative mode(infinite everything)
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
 #define THIRD_FAST_INVENTORY_KEY 	sf::Keyboard::C
 #define OPEN_CLOSE_INVENTORY_KEY	sf::Keyboard::I
+#define INVENTORY_MOVE_ITEM_KEY		sf::Keyboard::B
+#define INVENTORY_DELETE_ITEM_KEY	sf::Keyboard::E
 
 #define MIN_WIDTH 800  // Valeurs subjectives pour ne pas pouvoir mettre le jeu trop petit dans le menu et ne plus pouvoir rien faire
 #define MIN_HEIGHT 600
+#define MAX_VOLUME 100 // Valeurs du sf::Sound
+#define MIN_VOLUME 0
 
 #define KEY_BINDED_SUCCESSFULLY "The key was bound successfully"
 #define KEY_ALREADY_BOUND "This key is already bound"
@@ -130,7 +142,9 @@ enum WEAPONS {
 	W_BLOCK,
 	W_PISTOL,
 	W_SUBMACHINE_GUN,
-	W_ASSAULT_RIFLE
+	W_ASSAULT_RIFLE,
+	W_SNIPER,
+	W_SHOTGUN
 };
 
 // Pour savoir sur quel menu nous nous situons
@@ -156,10 +170,17 @@ enum MENU_SETTINGS {
 	MS_ANTI_ALIASING,
 	MS_VSYNC,
 	MS_RENDER_DISTANCE,
+	MS_SOUND_VOLUME,
+	MS_MUSIC_VOLUME,
 	MS_CROSSCOLOR_R,
 	MS_CROSSCOLOR_G,
 	MS_CROSSCOLOR_B,
 	MS_MOUSE_SENSITIVITY
+};
+enum ANIMAL_TYPE
+{
+	A_BEAR,
+	A_COW
 };
 
 enum MENU_CONTROLS {
@@ -180,6 +201,11 @@ enum MENU_CONTROLS {
 	MC_INVENTORY,
 	MC_SPAWNMONSTER,
 	MC_WIREFRAME
+};
+
+enum MONSTER_TYPE {
+	M_CREEPER,
+	M_SPRINTER
 };
 
 #endif // DEFINE_H__

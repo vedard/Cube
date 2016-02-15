@@ -19,8 +19,11 @@
 #include "gun.h"
 #include "bloodMoon.h"
 #include "sound.h"
-#include "networkManager.h"
-#include "playerActor.h"
+#include "parametre.h"
+#include "menu.h"
+#include "network.h"
+
+
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -28,6 +31,7 @@
 #include <thread>
 #include "parametre.h"
 #include "menu.h"
+#include "music.h"
 
 
 class Engine : public OpenglContext
@@ -49,35 +53,36 @@ public:
 
 private:
 	void UpdateEnvironement(float gameTime);
+	void SyncWithServer();
 	void RenderFastInventory() const;
 	bool LoadTexture(Texture& texture, const std::string& filename, bool stopOnError = true);
 	void DrawEnvironement(float gameTime);
 	void DrawHud() const;
 	void DrawHurtEffect() const;
-	void DrawSunMoon(float gametime) const;
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
-	void DrawMenuPrincipal() const;
+	void DrawMenuPrincipal() const;;
+	void DrawHitMarker() const;
 	void DrawMenuSettings() const;
 	void DrawMenuControls() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
+	void ManageAllMenuKeys(unsigned char key);
 	void ManageMenuEnterKeyPress();
 	void DrawMenuSettingSelected(bool isFloat);
 	void DrawMenuControlSelected();
+	void DrawScope();
 
-	void CloseGame();	void SetDayOrNight(float gametime);
+	void CloseGame();
+	void SetDayOrNight(float gametime);
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
-	bool m_firstMusic = true;
 	int m_cptTick = 0;
-	int m_musiclist [6] = {};
 	float m_LastTickTimeWater;
-	PlayerActor m_playerActor;
 
 	GLfloat m_nightLightAmb[4] = { 5.f, 4.f, 3.f, 7.f };
 	GLfloat m_dayLightAmb[4] = { 5.f, 5.f, 5.f, 7.f };
@@ -94,12 +99,12 @@ private:
 	Texture m_textureSky;
 	Texture m_textureFont;
 	Texture m_effectHurt;
-	Texture m_sun;
+	Texture m_hitMarker;
+	Texture m_textureScope;
 
 	int m_fastInventoryKeySelected;
 	
 	Shader m_shader01;
-	Shader m_shader02;
 	World m_world;
 
 	//Indexe de la texutre dans l'atlas
@@ -114,20 +119,21 @@ private:
 	int m_fps;
 	int m_chunkToUpdate;
 	bool displayInfo;
+	Music& m_music = Music::GetInstance();
 
-	sf::Music m_music;
+
 
 	//Model
 	Model3d m_modelCow;
-	Model3d m_modelRaptor;
+	Model3d m_modelCreeper;
+	Model3d m_modelBear;
+
+	Network m_network;
 
 	//Gun 
 	Gun * playerGun;
 
-	//NetworkManager
-	NetworkManager m_Netctl;
 	// Parametres
-
 	Parametre& m_settings = Parametre::GetInstance();
 
 	// Valeurs pour le jour et la nuit
@@ -144,6 +150,8 @@ private:
 
 	bool m_isMenuOpen;
 	Menu* m_menu;
+
+	bool m_isInventoryOpen;
 };
 
 #endif // ENGINE_H__

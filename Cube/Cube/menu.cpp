@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "sound.h"
 
 Menu::Menu(SOUS_MENU currentMenu) : m_currentMenu(currentMenu)
 {
@@ -7,7 +8,7 @@ Menu::Menu(SOUS_MENU currentMenu) : m_currentMenu(currentMenu)
 	if (m_currentMenu == SM_PRINCIPAL)
 		m_menuItemsAmount = 2; // Starts at 0
 	else if (m_currentMenu == SM_SETTINGS)
-		m_menuItemsAmount = 9;
+		m_menuItemsAmount = 11;
 	else if (m_currentMenu == SM_CONTROLS)
 		m_menuItemsAmount = 16;
 
@@ -125,13 +126,15 @@ void Menu::OnKeyDown(unsigned char key)
 	{
 		if (m_keyboard[sf::Keyboard::Up])
 		{
+			Sound::Play(Sound::HARP);
 			m_currentMenuItem--;
-
+			
 			if (m_currentMenuItem <= -1)
 				m_currentMenuItem = m_menuItemsAmount;
 		}
 		else if (m_keyboard[sf::Keyboard::Left])
 		{
+			Sound::Play(Sound::HARP);
 			if (m_currentMenu == SM_SETTINGS)
 			{
 				m_currentMenuItem -= ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
@@ -154,6 +157,7 @@ void Menu::OnKeyDown(unsigned char key)
 		}
 		else if (m_keyboard[sf::Keyboard::Right])
 		{
+			Sound::Play(Sound::HARP);
 			if (m_currentMenu == SM_SETTINGS)
 			{
 				m_currentMenuItem += ((m_menuItemsAmount + 1) / 2); // +1 parce que ça commence à zéro
@@ -176,6 +180,7 @@ void Menu::OnKeyDown(unsigned char key)
 		}
 		else if (m_keyboard[sf::Keyboard::Down])
 		{
+			Sound::Play(Sound::HARP);
 			m_currentMenuItem++;
 
 			if (m_currentMenuItem > m_menuItemsAmount)

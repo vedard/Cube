@@ -14,9 +14,13 @@
 #include "simplexnoise.h"
 
 
+
 class Player;
 class Animal;
 class Monster;
+class Bear;
+class Cow;
+class Creeper;
 
 class World
 {
@@ -27,8 +31,9 @@ public:
 	BlockType BlockAt(float x, float y, float z);
 	Chunk* ChunkAt(float x, float z);
 
-	Animal* GetAnimal() const;
-	Monster* GetMonster() const;
+	Animal* GetCow() const;
+	Animal* GetBear() const;
+	Monster* GetCreeper() const;
 	Player* GetPlayer() const;
 
 	BloodMoon* GetBloodMoonInstance();
@@ -43,7 +48,8 @@ public:
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
 	void SpawnMonsters();
-	void SpawnAnimals();
+	void SpawnCows();
+	void SpawnBears();
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);
 	void RemoveLava(Vector3<float> vf);
@@ -66,8 +72,9 @@ private:
 	Array2d<Chunk> m_chunks;
 
 	Player* m_player;
-	Monster* m_monster;
-	Animal* m_animal;
+	Creeper* m_monster;
+	Cow* m_cow;
+	Bear* m_bear;
 
 
 	int UpdateDistance;

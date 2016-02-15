@@ -27,6 +27,13 @@ public:
 	sf::Keyboard::Key m_spawnmonster = sf::Keyboard::M; // Faire spawner les monstres
 	sf::Keyboard::Key m_wireframe = sf::Keyboard::Y; // Activer le mode wireframe
 	sf::Keyboard::Key m_info = sf::Keyboard::F3; // montrer les fps etc...
+	// l'inventaire
+	sf::Keyboard::Key m_inventaire_rapide1 = sf::Keyboard::Z;
+	sf::Keyboard::Key m_inventaire_rapide2 = sf::Keyboard::X;
+	sf::Keyboard::Key m_inventaire_rapide3 = sf::Keyboard::C;
+	sf::Keyboard::Key m_inventaire_bouger_element = sf::Keyboard::B;
+	sf::Keyboard::Key m_inventaire_enlever_element = sf::Keyboard::E;
+	bool m_inventaire_creatif = true;
 
 	// Display
 	bool m_isfullscreen = false;
@@ -36,9 +43,10 @@ public:
 	int m_antialiasing = 0;
 	bool m_vsync = false;
 	int m_renderdistance = 6;
+	
+	std::string m_PlayerName = "Player1";
 
 	//Crosshair
-
 	float m_crossred = 0.0f;
 	float m_crossgreen = 0.9f;
 	float m_crossblue = 0.0f;

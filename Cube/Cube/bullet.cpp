@@ -62,8 +62,8 @@ bool Bullet::CheckCollision(Character &character)
 				&& z < character.GetPosition().z + character.GetDimension().z / 2)
 			{
 
-				//f(x) = -1 * 1.02 ^ (x + 10) + 50
-				character.GetDamage((float)(-1 * pow(1.04, m_distance + 10) + m_damage),false,false);
+				//f(x) = -1 * 1.10 ^ (x + 10) + 50
+				character.GetDamage((float)(-1 * pow(1.06, (m_distance * m_distanceModif) + 10) + m_damage),false,false);
 				m_isActive = false;
 				return true;
 			}
@@ -158,7 +158,7 @@ void Bullet::Draw() const
 
 	}
 }
-void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage)
+void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage, float distanceModif)
 {
 	m_damage = damage;
 	m_pos = Vector3<float>(x, y, z);
@@ -175,6 +175,7 @@ void Bullet::Init(float x, float y, float z, float rotationVertical, float rotat
 	m_VerticalRot = rotationVertical;
 	m_distance = 0;
 	m_isActive = true;
+	m_distanceModif = distanceModif;
 }
 
 const Vector3<float>& Bullet::GetPosition() const
