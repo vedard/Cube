@@ -15,17 +15,15 @@ void main()
     	texel.rgb *= light.rgb * 0.9;
 		texel.a *= light.a * 0.9;
 	}
-	else if(underwater)
+	else if (underwater)
 	{
-
-    		texel.rgb *= light.rgb * 0.9;
+    	texel.rgb *= light.rgb * 0.9;
 		texel.a *= light.a * 0.9;
 		texel.r -= 0.20;
 		texel.g -= 0.20;
 		texel.b -= 0.05;
 	}
-	else if(underlava)
-	{
+	else if(underlava)	{
 		texel.rgb *= light.rgb * 0.9;
 		texel.a *= light.a * 0.7;
 		texel.r -= 0.1;

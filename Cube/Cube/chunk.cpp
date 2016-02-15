@@ -238,7 +238,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + h, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * .50f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + h, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .50f, type);
 	}
-	//Derirere
+	//Derirere a
 	if (CheckFace(type, Blockpos - m_position, Vector3<float>(0, 0, 1)))
 	{
 		float light = CheckLightning(Blockpos - m_position, Vector3<float>(0, 0, 1));
@@ -668,7 +668,6 @@ void Chunk::WaterTick(int bloc)
 				try
 				{
 					BlockType bt = GetBlock(x, y, z);
-
 
 					if ((bt == BTYPE_WATER || bt == BTYPE_FWATER) && bloc == 0)
 					{
