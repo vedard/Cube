@@ -192,10 +192,11 @@ void Engine::LoadResource()
 			m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-			//m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "Shotgun.obj", TEXTURE_PATH "Shotgun.png", Sound::MP5K_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+
 			m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
 			m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitRessource(MODEL_PATH "Shotgun.obj", TEXTURE_PATH "Shotgun.png", Sound::SHOTGUN_FIRE);
+
 
 
 		//Gun
@@ -215,6 +216,8 @@ void Engine::LoadResource()
 
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 1.f);
+
 
 
 	// -- Player
