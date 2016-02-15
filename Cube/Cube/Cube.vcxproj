@@ -98,6 +98,7 @@
     <ClCompile Include="blockinfo.cpp" />
     <ClCompile Include="bloodMoon.cpp" />
     <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="Chicken.cpp" />
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="cow.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="blockinfo.h" />
     <ClInclude Include="bloodMoon.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="Chicken.h" />
     <ClInclude Include="chunk.h" />
     <ClInclude Include="chunkmesh.h" />
     <ClInclude Include="cow.h" />

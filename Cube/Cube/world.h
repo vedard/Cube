@@ -21,6 +21,7 @@ class Monster;
 class Bear;
 class Cow;
 class Creeper;
+class Chicken;
 
 class World
 {
@@ -50,6 +51,7 @@ public:
 	void SpawnMonsters();
 	void SpawnCows();
 	void SpawnBears();
+	void SpawnChickens();
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);
 	void RemoveLava(Vector3<float> vf);
@@ -75,7 +77,7 @@ private:
 	Creeper* m_monster;
 	Cow* m_cow;
 	Bear* m_bear;
-
+	Chicken* m_chicken;
 
 	int UpdateDistance;
 	int	m_seed;

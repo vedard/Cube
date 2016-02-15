@@ -127,6 +127,7 @@ private:
 	Model3d m_modelCow;
 	Model3d m_modelCreeper;
 	Model3d m_modelBear;
+	Model3d m_modelChicken;
 
 	Network m_network;
 

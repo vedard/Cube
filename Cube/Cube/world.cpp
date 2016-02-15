@@ -5,6 +5,7 @@
 #include "cow.h"
 #include "bear.h"
 #include "creeper.h"
+#include "Chicken.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
@@ -16,6 +17,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 	// Initialise les monstres et animaux.
 	m_cow = new Cow[MAX_COW];
 	m_bear = new Bear[MAX_BEAR];
+	m_chicken = new Chicken[MAX_CHICKEN];
 
 	m_monster = new Creeper[MAX_CREEPER];
 	m_player = new Player;
@@ -63,6 +65,8 @@ Animal* World::GetCow() const { return m_cow; }
 Animal* World::GetBear() const { return m_bear; }
 Monster* World::GetCreeper() const { return m_monster; }
 Player* World::GetPlayer() const { return m_player; }
+Chicken* World::GetChicken() const { return m_chicken; }
+
 
 BloodMoon* World::GetBloodMoonInstance() { return m_bloodMoon; }
 
@@ -654,6 +658,17 @@ void World::SpawnBears()
 			break;
 		}
 }
+
+void World::SpawnChickens()
+{
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		if (!m_chicken[i].GetisAlive())
+		{
+			m_chicken[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			break;
+		}
+}
+
 
 void World::SpawnMonsters()
 {
