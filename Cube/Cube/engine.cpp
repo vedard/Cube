@@ -253,9 +253,9 @@ void Engine::UpdateEnvironement(float gameTime)
 			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
-			for (int j = 0; j < MAX_MONSTER; j++)
+			for (int j = 0; j < MAX_CREEPER; j++)
 			{
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetMonster()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCreeper()[j]))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
@@ -283,8 +283,8 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 	//Update les monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Move(m_world);
+	for (int i = 0; i < MAX_CREEPER; i++)
+		m_world.GetCreeper()[i].Move(m_world);
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
@@ -386,8 +386,8 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBear()[i].Draw(m_modelBear);
 
 	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Draw(m_modelCreeper, false);
+	for (int i = 0; i < MAX_CREEPER; i++)
+		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
 
 
 
@@ -406,8 +406,8 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
 	//Draw Monstres
-	for (int i = 0; i < MAX_MONSTER; i++)
-		m_world.GetMonster()[i].Draw(m_modelCreeper, false);
+	for (int i = 0; i < MAX_CREEPER; i++)
+		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
 
 	for (int i = 0; i < MAX_COW; i++)
 		m_world.GetCow()[i].Draw(m_modelCow);
@@ -704,12 +704,11 @@ void Engine::KeyPressEvent(unsigned char key)
 		{ //LSHIFT -> RUN
 			m_world.GetPlayer()->SetRunning(true);
 		}
-
-		if (m_keyboard[m_settings.m_inventory1])
+		else if (m_keyboard[m_settings.m_inventory1])
 		{ //1 -> W_BLOCK
 			m_world.GetPlayer()->SetWeapon(W_BLOCK);
 		}
-		if (m_keyboard[m_settings.m_inventory2])
+		else if (m_keyboard[m_settings.m_inventory2])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SNIPER);
 			Sound::Play(Sound::GUN_DRAW);
@@ -721,7 +720,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		//	Sound::Play(Sound::GUN_DRAW);
 		//}
 		//shotgun sur 2 pour le moment
-		if (m_keyboard[m_settings.m_inventory3])
+		else if (m_keyboard[m_settings.m_inventory3])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SHOTGUN);
 			Sound::Play(Sound::GUN_DRAW);
@@ -733,9 +732,9 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{ //M -> spawn monster
-			for (int i = 0; i < MAX_MONSTER; i++) {
-				if (!m_world.GetMonster()[i].GetisAlive()) {
-					m_world.GetMonster()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
+			for (int i = 0; i < MAX_CREEPER; i++) {
+				if (!m_world.GetCreeper()[i].GetisAlive()) {
+					m_world.GetCreeper()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
 			}

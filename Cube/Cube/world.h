@@ -32,7 +32,7 @@ public:
 
 	Animal* GetCow() const;
 	Animal* GetBear() const;
-	Monster* GetMonster() const;
+	Monster* GetCreeper() const;
 	Player* GetPlayer() const;
 
 	void InitMap(int seed = 0);
@@ -64,7 +64,7 @@ private:
 	Array2d<Chunk> m_chunks;
 
 	Player* m_player;
-	Monster* m_monster;
+	Creeper* m_monster;
 	Cow* m_cow;
 	Bear* m_bear;
 

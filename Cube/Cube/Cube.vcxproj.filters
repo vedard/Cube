@@ -30,6 +30,7 @@
     <ClCompile Include="bear.cpp" />
     <ClCompile Include="cow.cpp" />
     <ClCompile Include="music.cpp" />
+    <ClCompile Include="sprinter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -65,6 +66,7 @@
     <ClInclude Include="bear.h" />
     <ClInclude Include="cow.h" />
     <ClInclude Include="music.h" />
+    <ClInclude Include="sprinter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

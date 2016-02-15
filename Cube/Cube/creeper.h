@@ -6,7 +6,10 @@ class Creeper : public Monster
 public:
 	Creeper();
 	~Creeper();
+	//std::vector<Vector3<int>> Explosion();
+
 private:
+	//int explosionRadius = 6;
 };
 #endif // !
 
