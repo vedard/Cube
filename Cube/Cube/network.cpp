@@ -1,4 +1,5 @@
 #include "network.h"
+#include <string.h>
 
 Network::Network()
 {
@@ -112,7 +113,7 @@ void Network::OnPacketReceive()
 
 	try
 	{
-		tmpClient.FromString(std::stringstream((char *)m_ENetEvent.packet->data));
+		tmpClient.FromString((char *)m_ENetEvent.packet->data);
 	}
 	catch (const std::exception ex)
 	{
