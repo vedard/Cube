@@ -55,6 +55,12 @@ void Bear::Move(World &world)
 							Jump();
 						}
 					}
+					chillCount++;
+					if (chillCount > 800)
+					{
+						isHurt = false;
+						chillCount = false;
+					}
 				}
 
 			}
@@ -89,7 +95,7 @@ void Bear::Move(World &world)
 
 bool Bear::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 {
-
+	chillCount = 0;
 	isHurt = true;
 	return Animal::GetDamage(damage,ignoreArmor,godMode,son,playonce);
 }

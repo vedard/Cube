@@ -514,13 +514,13 @@ void Engine::SetDayOrNight(float gametime)
 	fogcolor[3] = 1;
 
 	// Le fog
-	/*glEnable(GL_FOG);
+	glEnable(GL_FOG);
 	GLint fogmode = GL_EXP2;
 	glFogi(GL_FOG_MODE, fogmode);
 	glFogfv(GL_FOG_COLOR, fogcolor);
 	glFogf(GL_FOG_DENSITY, m_fogDensity);
 	glFogf(GL_FOG_START, m_fogStart);
-	glFogf(GL_FOG_END, 24.f);*/
+	glFogf(GL_FOG_END, 24.f);
 
 	// La lumiere
 	if (!m_world.GetBloodMoonInstance()->GetStartedState())
