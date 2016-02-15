@@ -1,7 +1,8 @@
 #ifndef NETWORK_H__
 #define NETWORK_H__
 
-#include <enet/enet.h>
+#include "external/enet/include/enet/enet.h"
+#include "external/enet/include/enet/win32.h"
 #include <vector>
 #include <string.h>
 #include <sstream>
@@ -27,8 +28,9 @@ struct Client
 			+ std::to_string(v) + " ";
 	
 	}
-	void FromString(std::istringstream data)
+	void FromString(const std::string& str)
 	{
+		std::istringstream data(str);
 		data >> name >> x >> y >> z >> h >> v;
 	}
 };

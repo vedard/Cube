@@ -8,7 +8,7 @@ Engine::Engine() :
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
 	m_network(),
-	m_fastInventoryKeySelected(0),
+	m_fastInventoryKeySelected(-1),
 	m_missingTime(0),
 	m_isInventoryOpen(false)
 {
@@ -204,7 +204,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 60, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
-	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 100, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 800, 100, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 1.f);
@@ -241,16 +241,16 @@ void Engine::UpdateEnvironement(float gameTime)
 			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
-			for (int j = 0; j < m_activeMonsters + 5; j++)
+			for (int j = 0; j < MAX_CREEPER + 5; j++)
 			{
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCreeper()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
-			for (int j = 0; j < m_activeAnimals + 5; j++)
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]))
+			for (int j = 0; j < MAX_COW + 5; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
@@ -258,10 +258,11 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 			for (int j = 0; j < MAX_BEAR; j++)
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetBear(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
@@ -271,17 +272,17 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Move(m_world);
+		m_world.GetCreeper(i)->Move(m_world);
 
 	//Update les Cow
 	for (int i = 0; i < m_activeAnimals; i++)
 	{
 
-		m_world.GetCow()[i].Move(m_world);
+		m_world.GetCow(i)->Move(m_world);
 	}
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear()[i].Move(m_world);
+		m_world.GetBear(i)->Move(m_world);
 
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
@@ -370,13 +371,15 @@ void Engine::DrawEnvironement(float gameTime) {
 		glDisable(GL_LIGHT0);
 
 	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetCow()[i].Draw(m_modelCow);
+	{
+		m_world.GetCow(i)->Draw(m_modelCow);
+	}
 	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear()[i].Draw(m_modelBear);
+		m_world.GetBear(i)->Draw(m_modelBear);
 
 	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
+		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 
 
@@ -394,12 +397,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetCow()[i].Draw(m_modelCow);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
@@ -457,6 +454,7 @@ void Engine::DrawEnvironement(float gameTime) {
 void Engine::SetDayOrNight(float gametime)
 {
 	float time = sin((gametime) / DAY_TIME);
+	std::cout << gametime << std::endl;
 	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
 		if (time < -0.97) {
 			m_world.GetBloodMoonInstance()->Start();
@@ -570,10 +568,6 @@ void Engine::Render(float elapsedTime)
 
 	if ((int)(gameTime * 100) % 100 == 0) {
 		m_world.SpawnMonsters();
-		if (m_activeMonsters >= MAX_MONSTER)
-			m_activeMonsters = MAX_MONSTER;
-		else
-			m_activeMonsters++;
 	}
 
 	//On met a jour le fps
@@ -710,6 +704,33 @@ void Engine::KeyPressEvent(unsigned char key)
 			ShowCursor();
 			m_menu = new Menu(SM_PRINCIPAL);
 		}
+		else if (m_keyboard[sf::Keyboard::H])
+		{
+			for (int i = 1; i < MAX_CREEPER; i++)
+			{
+				Creeper* currentCreeper = m_world.GetCreeper(i);
+				if (currentCreeper->GetisAlive())
+				{
+					std::vector<Vector3<int>> blocsDestroyed = currentCreeper->Explosion();
+					Vector3<int> chunkPos((int)currentCreeper->GetPosition().x / CHUNK_SIZE_X, 0, (int)currentCreeper->GetPosition().z / CHUNK_SIZE_Z);
+					for (size_t i = 0; i < blocsDestroyed.size(); i++)
+					{
+						int x = blocsDestroyed[i].x - (chunkPos.x * CHUNK_SIZE_X);
+						int y = blocsDestroyed[i].y - (chunkPos.y * CHUNK_SIZE_Y);
+						int z = blocsDestroyed[i].z - (chunkPos.z * CHUNK_SIZE_Z);
+						if (x < CHUNK_SIZE_X && x >= 0 &&
+							y < CHUNK_SIZE_Y && y >= 0 &&
+							z < CHUNK_SIZE_Z && z >= 0)
+							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(x, y, z);
+						else
+						{
+							chunkPos = Vector3<int>(blocsDestroyed[i].x / CHUNK_SIZE_X, 0, blocsDestroyed[i].z / CHUNK_SIZE_Z);
+							i--;
+						}
+					}
+				}
+			}
+		}
 
 		//f6 -> connect
 		else if (m_keyboard[sf::Keyboard::F6])
@@ -766,12 +787,10 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{ //M -> spawn monster
 			for (int i = 0; i < MAX_CREEPER; i++) {
-				if (!m_world.GetCreeper()[i].GetisAlive()) {
-					m_world.GetCreeper()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
-					if (m_activeMonsters >= MAX_MONSTER)
-						m_activeMonsters = MAX_MONSTER;
-					else
-						m_activeMonsters++;
+				if (!m_world.GetCreeper(i)->GetisAlive()) {
+					m_world.GetCreeper(i)->Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
+					
+					
 					break;
 				}
 			}
