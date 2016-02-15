@@ -1743,7 +1743,7 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 			m_menu = new Menu(SM_SETTINGS);
-		else if (m_menu->m_currentMenu == MP_CONTROLS)
+		else if ((int)m_menu->m_currentMenu == (int)MP_CONTROLS)
 			m_menu = new Menu(SM_CONTROLS);
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
@@ -1823,6 +1823,7 @@ void Engine::ManageMenuEnterKeyPress()
 			{
 				m_settings.m_renderdistance = m_menu->m_settingNewValue;
 				m_settings.Save();
+
 
 				m_world.SetUpdateDistance(m_settings.m_renderdistance);
 
