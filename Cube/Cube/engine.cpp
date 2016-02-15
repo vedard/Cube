@@ -457,7 +457,6 @@ void Engine::DrawEnvironement(float gameTime) {
 void Engine::SetDayOrNight(float gametime)
 {
 	float time = sin((gametime) / DAY_TIME);
-	std::cout << gametime << std::endl;
 	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
 		if (time < -0.97) {
 			m_world.GetBloodMoonInstance()->Start();
