@@ -31,9 +31,9 @@ public:
 	BlockType BlockAt(float x, float y, float z);
 	Chunk* ChunkAt(float x, float z);
 
-	Animal* GetCow() const;
-	Animal* GetBear() const;
-	Monster* GetCreeper() const;
+	Cow* GetCow(int pos) const;
+	Bear* GetBear(int pos) const;
+	Creeper* GetCreeper(int pos) const;
 	Player* GetPlayer() const;
 
 	BloodMoon* GetBloodMoonInstance();
@@ -72,7 +72,7 @@ private:
 	Array2d<Chunk> m_chunks;
 
 	Player* m_player;
-	Creeper* m_monster;
+	Creeper* m_creeper;
 	Cow* m_cow;
 	Bear* m_bear;
 
