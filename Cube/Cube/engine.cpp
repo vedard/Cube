@@ -704,6 +704,33 @@ void Engine::KeyPressEvent(unsigned char key)
 			ShowCursor();
 			m_menu = new Menu(SM_PRINCIPAL);
 		}
+		else if (m_keyboard[sf::Keyboard::H])
+		{
+			for (int i = 1; i < MAX_CREEPER; i++)
+			{
+				Creeper* currentCreeper = m_world.GetCreeper(i);
+				if (currentCreeper->GetisAlive())
+				{
+					std::vector<Vector3<int>> blocsDestroyed = currentCreeper->Explosion();
+					Vector3<int> chunkPos((int)currentCreeper->GetPosition().x / CHUNK_SIZE_X, 0, (int)currentCreeper->GetPosition().z / CHUNK_SIZE_Z);
+					for (size_t i = 0; i < blocsDestroyed.size(); i++)
+					{
+						int x = blocsDestroyed[i].x - (chunkPos.x * CHUNK_SIZE_X);
+						int y = blocsDestroyed[i].y - (chunkPos.y * CHUNK_SIZE_Y);
+						int z = blocsDestroyed[i].z - (chunkPos.z * CHUNK_SIZE_Z);
+						if (x < CHUNK_SIZE_X && x >= 0 &&
+							y < CHUNK_SIZE_Y && y >= 0 &&
+							z < CHUNK_SIZE_Z && z >= 0)
+							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(x, y, z);
+						else
+						{
+							chunkPos = Vector3<int>(blocsDestroyed[i].x / CHUNK_SIZE_X, 0, blocsDestroyed[i].z / CHUNK_SIZE_Z);
+							i--;
+						}
+					}
+				}
+			}
+		}
 
 		//f6 -> connect
 		else if (m_keyboard[sf::Keyboard::F6])
