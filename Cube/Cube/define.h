@@ -56,7 +56,7 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define INVENTORY_SIZE 6
+#define INVENTORY_SIZE 15
 #define MAX_CREEPER 5
 #define MAX_BULLET 500
 #define MAX_COW 10
