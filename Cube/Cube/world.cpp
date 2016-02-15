@@ -19,7 +19,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 
 	m_creeper = new Creeper[MAX_CREEPER];
 	m_player = new Player;
-
+	m_bloodMoon = new BloodMoon;
 	
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -63,6 +63,10 @@ Cow* World::GetCow(int pos) const { return &m_cow[pos]; }
 Bear* World::GetBear(int pos) const { return &m_bear[pos]; }
 Creeper* World::GetCreeper(int pos) const { return &m_creeper[pos]; }
 Player* World::GetPlayer() const { return m_player; }
+
+BloodMoon* World::GetBloodMoonInstance() { return m_bloodMoon; }
+
+void World::SetBloodMoon(BloodMoon* bloodMoon) { m_bloodMoon = bloodMoon; }
 
 void World::InitMap(int seed)
 {
@@ -390,6 +394,7 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 
 	std::cout << filename << " Loaded" << std::endl << std::endl;
 }
+
 
 void World::SaveMap(std::string filename)
 {

@@ -9,6 +9,7 @@ Engine::Engine() :
 	displayInfo(false),
 	m_network(),
 	m_fastInventoryKeySelected(-1),
+	m_missingTime(0),
 	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
@@ -66,9 +67,6 @@ void Engine::Init()
 
 
 	glEnable(GL_CULL_FACE);
-
-
-
 
 	// La lumiere
 	GLfloat light0Amb[4] = { 5.f, 4.f, 3.f, 7.f };
@@ -186,22 +184,16 @@ void Engine::LoadResource()
 			}
 		}
 
-			//Model 3d
-			m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
-			m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
-			m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
-			m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
+		//Model 3d
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
+		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
+		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
 
-			m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
-			m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitRessource(MODEL_PATH "Shotgun.obj", TEXTURE_PATH "Shotgun.png", Sound::SHOTGUN_FIRE);
-
-
-
-		//Gun
-
-
+		m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitRessource(MODEL_PATH "AWP.obj", TEXTURE_PATH "awp.jpg", Sound::AWP_FIRE);
+		m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitRessource(MODEL_PATH "Shotgun.obj", TEXTURE_PATH "Shotgun.png", Sound::SHOTGUN_FIRE);
 	}
 
 	m_world.LoadMap("map.sav", m_bInfo);
@@ -214,15 +206,11 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 800, 100, 0.5);
 
-
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 1.f);
 
-
-
 	// -- Player
 	m_world.GetPlayer()->SetName(Parametre::GetInstance().m_PlayerName);
-
 }
 
 void Engine::UnloadResource()
@@ -238,7 +226,7 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 	// Update Guns
-	if (m_mouseButton[4])		
+	if (m_mouseButton[4])
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].EnableAiming();
 	else
 		m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].DisableAiming();
@@ -253,7 +241,7 @@ void Engine::UpdateEnvironement(float gameTime)
 			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
-			for (int j = 0; j < MAX_CREEPER; j++)
+			for (int j = 0; j < MAX_CREEPER + 5; j++)
 			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
@@ -261,7 +249,7 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
-			for (int j = 0; j < MAX_COW; j++)
+			for (int j = 0; j < MAX_COW + 5; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
@@ -282,16 +270,16 @@ void Engine::UpdateEnvironement(float gameTime)
 		}
 	}
 
-
 	//Update les monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
 		m_world.GetCreeper(i)->Move(m_world);
 
 	//Update les Cow
-	for (int i = 0; i < MAX_COW; i++)
+	for (int i = 0; i < m_activeAnimals; i++)
+	{
 
 		m_world.GetCow(i)->Move(m_world);
-
+	}
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR; i++)
 		m_world.GetBear(i)->Move(m_world);
@@ -368,18 +356,19 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	m_chunkToUpdate = m_world.ChunkNotUpdated(playerPos.x, playerPos.z);
 
-
-
-	/// Position des lumières autour pour éclairer le joueur et les monstres
-	// Position de la lumière 1
-	GLfloat light0Pos1[4] = {
-		m_world.GetPlayer()->GetPosition().x,
-		m_world.GetPlayer()->GetPosition().y + 25,
-		m_world.GetPlayer()->GetPosition().z - 50,
-		1.f };
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
-
+	// Position des lumières autour pour éclairer le joueur et les monstres
+	if (!m_world.GetBloodMoonInstance()->GetStartedState())
+	{
+		GLfloat light0Pos1[4] = {
+			m_world.GetPlayer()->GetPosition().x,
+			m_world.GetPlayer()->GetPosition().y + 25,
+			m_world.GetPlayer()->GetPosition().z - 50,
+			1.f };
+		glEnable(GL_LIGHT0);
+		glLightfv(GL_LIGHT0, GL_POSITION, light0Pos1);
+	}
+	else
+		glDisable(GL_LIGHT0);
 
 	for (int i = 0; i < MAX_COW; i++)
 	{
@@ -464,7 +453,21 @@ void Engine::DrawEnvironement(float gameTime) {
 
 void Engine::SetDayOrNight(float gametime)
 {
-	float time = sin(gametime / DAY_TIME);
+	float time = sin((gametime) / DAY_TIME);
+	std::cout << gametime << std::endl;
+	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
+		if (time < -0.97) {
+			m_world.GetBloodMoonInstance()->Start();
+			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
+			m_missingTime = 60;
+		}
+	}
+
+	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
+		m_world.GetBloodMoonInstance()->AddElapsedUnit();
+		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
+	}
+
 
 	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
 	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
@@ -482,6 +485,23 @@ void Engine::SetDayOrNight(float gametime)
 	// Controle le cycle de densite du fog
 	m_fogDensity = -0.031f * sin(time) + 0.052f;
 	m_fogStart = 1.68f * sin(time) + 16;
+
+
+	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
+		// Controle les cycles de couleurs de la lumière
+		m_redLight = 0.f;
+		m_greenLight = 0.f;
+		m_blueLight = 0.f;
+
+		// Controle les cycles de couleurs du fog
+		m_redFog = 0.25f;
+		m_greenFog = 0.075f;
+		m_blueFog = 0.075f;
+
+		// Controle le cycle de densite du fog
+		m_fogDensity = 0.08f;
+		m_fogStart = 15.f;
+	}
 
 	light0Amb[0] = m_redLight;
 	light0Amb[1] = m_greenLight;
@@ -503,11 +523,14 @@ void Engine::SetDayOrNight(float gametime)
 	glFogf(GL_FOG_END, 24.f);*/
 
 	// La lumiere
-	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	if (!m_world.GetBloodMoonInstance()->GetStartedState())
+	{
+		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	}
 }
 
 void Engine::Render(float elapsedTime)
@@ -520,8 +543,9 @@ void Engine::Render(float elapsedTime)
 		DrawEnvironement(gameTime);
 		return;
 	}
-
 	gameTime += elapsedTime;
+
+	m_world.GetBloodMoonInstance()->Activate();
 
 	//gestion des ticks
 	if (gameTime - m_LastTickTime >= TICK_DELAY)
@@ -537,9 +561,14 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnCows();
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnBears();
+	if (m_activeAnimals >= MAX_COW)
+		m_activeAnimals = MAX_COW;
+	else
+		m_activeAnimals++;
 
-	if ((int)(gameTime * 100) % 100 == 0)
+	if ((int)(gameTime * 100) % 100 == 0) {
 		m_world.SpawnMonsters();
+	}
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
@@ -615,7 +644,6 @@ void Engine::Render(float elapsedTime)
 		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
 			m_mouseButton[1] = false;
 
-
 		SetDayOrNight(gameTime);
 		UpdateEnvironement(gameTime);
 
@@ -624,6 +652,8 @@ void Engine::Render(float elapsedTime)
 		nextGameUpdate += 0.02f;
 		loops++;
 	}
+
+
 
 	if (!m_settings.m_isServer)
 	{
@@ -732,6 +762,8 @@ void Engine::KeyPressEvent(unsigned char key)
 			for (int i = 0; i < MAX_CREEPER; i++) {
 				if (!m_world.GetCreeper(i)->GetisAlive()) {
 					m_world.GetCreeper(i)->Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
+					
+					
 					break;
 				}
 			}
@@ -2324,46 +2356,6 @@ void Engine::DrawHurtEffect() const
 }
 
 
-void Engine::SetLightSource(float gametime)
-{
-	int daytime = (int)gametime % DAY_LENGTH;
-	float positionX;
-	float positionY;
-	if (daytime / (DAY_LENGTH / 4) == 0)
-	{
-		positionX = (DAY_LENGTH / 4) - daytime;
-		positionY = daytime;
-	}
-	else if (daytime / (DAY_LENGTH / 4) == 1)
-	{
-		positionX = (DAY_LENGTH / 4) - daytime;
-		positionX = (DAY_LENGTH / 4) - positionX;
-	}
-	else if (daytime / (DAY_LENGTH / 4) == 2)
-	{
-		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
-		positionY = daytime - (DAY_LENGTH / 2);
-	}
-	else
-	{
-		positionX = (DAY_LENGTH / 4) - daytime - (DAY_LENGTH / 2);
-		positionX = (DAY_LENGTH / 4) - positionX;
-	}
-
-	GLfloat light0Pos[4] = { m_world.GetPlayer()->GetPosition().x + positionX ,  m_world.GetPlayer()->GetPosition().y + positionY, 0.0f, 0.0f };
-	GLfloat light0Amb[4] = { 2.f, 2.f, 2.f, 1.0f };
-	GLfloat light0Diff[4] = { 5.0f, 5.0f, 5.0f, 1.0f };
-	GLfloat light0Spec[4] = { 1.2f, 1.2f, 1.2f, 1.0f };
-
-
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
-
-}
-
 void Engine::CloseGame()
 {
 	m_world.m_threadcontinue = false;
@@ -2447,7 +2439,7 @@ void Engine::DrawScope()
 	glVertex2i(-13, 0);
 
 	glTexCoord2f(1, 0);
-	glVertex2i(Width(),0);
+	glVertex2i(Width(), 0);
 
 	glTexCoord2f(1, 1);
 	glVertex2i(Width(), Height() + 2);

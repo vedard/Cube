@@ -5,6 +5,7 @@
 #include "chunk.h"
 #include "tool.h"
 #include "shader.h"
+#include "bloodMoon.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -35,6 +36,9 @@ public:
 	Creeper* GetCreeper(int pos) const;
 	Player* GetPlayer() const;
 
+	BloodMoon* GetBloodMoonInstance();
+	void SetBloodMoon(BloodMoon* bloodMoon);
+
 	void InitMap(int seed = 0);
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
@@ -49,6 +53,7 @@ public:
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);
 	void RemoveLava(Vector3<float> vf);
+	
  
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
@@ -60,6 +65,9 @@ public:
 	BlockInfo* m_bInfo;
 private:
 	bool m_started;
+
+	BloodMoon* m_bloodMoon;
+
 
 	Array2d<Chunk> m_chunks;
 

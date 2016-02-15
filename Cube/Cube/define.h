@@ -56,11 +56,15 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define MAX_CREEPER 10
+#define MAX_CREEPER 5
+#define MAX_BULLET 500
 #define MAX_COW 10
 #define MAX_BEAR 100
+#define BLOODMOON_PROBABILITY 100
+#define BLOODMOON_DURATION 2500
 #define PI 3.14159265358f
-#define MAX_BULLET 500
+#define INVULNERABILITY_PLAYER_TIME 1
+
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"
@@ -77,13 +81,13 @@ typedef long long int64;
 #define MODEL_PATH	"../Cube/media/model/"
 #define TICK_DELAY .100f
 
-#define INVULNERABILITY_PLAYER_TIME .300f
+
 #define HURT_TIME 20
-#define DAY_LENGTH 100
 #define GUN_NUMBER 5
 
-#define INVENTORY_SIZE 15		//Must be larger than FAST_INVENTORY_SIZE
+
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
+#define INVENTORY_SIZE 15
 #define IS_INVENTORY_CREATIVE false	//If the inventory is in creative mode(infinite everything)
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
@@ -97,8 +101,9 @@ typedef long long int64;
 #define MAX_VOLUME 100 // Valeurs du sf::Sound
 #define MIN_VOLUME 0
 
-#define KEY_BINDED_SUCCESSFULLY "The key was binded successfully"
+
 #define KEY_ALREADY_BOUND "This key is already bound"
+#define KEY_BINDED_SUCCESSFULLY "Key was binded succesfully"
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 

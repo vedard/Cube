@@ -89,7 +89,7 @@ void Animal::Draw(Model3d &model) const
 		else
 			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		if (false)
+		if (true)
 		{
 			glPushMatrix();
 
@@ -126,13 +126,12 @@ void Animal::Draw(Model3d &model) const
 	}
 }
 
-void Animal::GetDamage(float damage)
+bool Animal::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 {
-	m_ClockAnimationDmg.restart();
 	Jump();
 	if (rand() % 100 > 66)
 		Sound::Play(Sound::FLESH_IMPACT);
-	Character::GetDamage(damage,false,false);
+	return Character::GetDamage(damage, ignoreArmor, godMode, son, playonce);
 }
 
 ANIMAL_TYPE Animal::GetType()

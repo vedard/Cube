@@ -12,7 +12,7 @@ public:
 	Bear();
 	~Bear();
 	void Move(World &world) override;
-	void GetDamage(float damage) override;
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)override;
 	void SetTarget(Character* target) override;
 	private:
 		bool isHurt;

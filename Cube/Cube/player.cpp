@@ -175,7 +175,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			{
 				m_isInAir = false;
 				m_wasInAir = false;
-				if (m_vitesse.y > 0.02f)
+				if (m_vitesse.y > 0.02f && !m_footUnderwater)
 				{
 					m_wasInAir = true;
 				}

@@ -7,6 +7,7 @@ Bear::Bear() :Animal(A_BEAR)
 	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
 	m_Name = "BigBadBear aka BBB";
 	isHurt = false;
+	chillCount = 0;
 };
 Bear::~Bear()
 {
@@ -86,11 +87,11 @@ void Bear::Move(World &world)
 	}
 }
 
-void Bear::GetDamage(float dmg)
+bool Bear::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 {
 
 	isHurt = true;
-	Animal::GetDamage(dmg);
+	return Animal::GetDamage(damage,ignoreArmor,godMode,son,playonce);
 }
 
 void Bear::SetTarget(Character* target)
