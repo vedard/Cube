@@ -212,7 +212,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 60, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
-	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 100, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 800, 100, 0.5);
 
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
@@ -255,14 +255,14 @@ void Engine::UpdateEnvironement(float gameTime)
 			//Check si y a collision
 			for (int j = 0; j < MAX_CREEPER; j++)
 			{
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCreeper()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
 			for (int j = 0; j < MAX_COW; j++)
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
@@ -270,10 +270,11 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 			for (int j = 0; j < MAX_BEAR; j++)
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetBear(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
@@ -284,16 +285,16 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Move(m_world);
+		m_world.GetCreeper(i)->Move(m_world);
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
 
-		m_world.GetCow()[i].Move(m_world);
+		m_world.GetCow(i)->Move(m_world);
 
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear()[i].Move(m_world);
+		m_world.GetBear(i)->Move(m_world);
 
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
@@ -381,13 +382,15 @@ void Engine::DrawEnvironement(float gameTime) {
 
 
 	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetCow()[i].Draw(m_modelCow);
+	{
+		m_world.GetCow(i)->Draw(m_modelCow);
+	}
 	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear()[i].Draw(m_modelBear);
+		m_world.GetBear(i)->Draw(m_modelBear);
 
 	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
+		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 
 
@@ -405,12 +408,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetCow()[i].Draw(m_modelCow);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
@@ -497,13 +494,13 @@ void Engine::SetDayOrNight(float gametime)
 	fogcolor[3] = 1;
 
 	// Le fog
-	glEnable(GL_FOG);
+	/*glEnable(GL_FOG);
 	GLint fogmode = GL_EXP2;
 	glFogi(GL_FOG_MODE, fogmode);
 	glFogfv(GL_FOG_COLOR, fogcolor);
 	glFogf(GL_FOG_DENSITY, m_fogDensity);
 	glFogf(GL_FOG_START, m_fogStart);
-	glFogf(GL_FOG_END, 24.f);
+	glFogf(GL_FOG_END, 24.f);*/
 
 	// La lumiere
 	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
@@ -733,8 +730,8 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{ //M -> spawn monster
 			for (int i = 0; i < MAX_CREEPER; i++) {
-				if (!m_world.GetCreeper()[i].GetisAlive()) {
-					m_world.GetCreeper()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
+				if (!m_world.GetCreeper(i)->GetisAlive()) {
+					m_world.GetCreeper(i)->Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
 			}

@@ -139,3 +139,8 @@ ANIMAL_TYPE Animal::GetType()
 {
 	return type;
 }
+
+void Animal::SetTarget(Character* target)
+{
+	std::cout << "penis" << std::endl;
+}
