@@ -7,6 +7,10 @@ public:
 	Creeper();
 	~Creeper();
 	std::vector<Vector3<int>> Explosion();
+	void SetExplosionRadius(int radius);
+	bool Attack(Character * character) override;
+	void Move(World &world) override;
+
 
 private:
 	int explosionRadius = 6;

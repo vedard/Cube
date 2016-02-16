@@ -191,6 +191,7 @@ void Engine::LoadResource()
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
+		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.png");
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
@@ -252,6 +253,15 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
+			for (int j = 0; j < MAX_CREEPER; j++)
+			{
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetSprinter(j)))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+			}
+
 			for (int j = 0; j < MAX_COW; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
 				{
@@ -282,9 +292,13 @@ void Engine::UpdateEnvironement(float gameTime)
 		}
 	}
 
-	//Update les monstres
+	//Update les Creepers
 	for (int i = 0; i < MAX_CREEPER; i++)
 		m_world.GetCreeper(i)->Move(m_world);
+
+	//Update les Sprinters
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		m_world.GetSprinter(i)->Move(m_world);
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
@@ -393,9 +407,12 @@ void Engine::DrawEnvironement(float gameTime) {
 	for (int i = 0; i < MAX_BEAR; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
 
-	//Draw Monstres
+	//Draw Creepers
 	for (int i = 0; i < MAX_CREEPER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
+
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
 
 
 
@@ -585,17 +602,17 @@ void Engine::Render(float elapsedTime)
 		m_world.GetPlayer()->Tick();
 	}
 
-	//Spawn des monstre aleatoirement
-	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 100 == 0)
+	if ((int)(gameTime * 100) % 100 == 0) {
+		m_world.SpawnCreepers();
+		m_world.SpawnSprinters();
 		m_world.SpawnCows();
-	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnBears();
-	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnChickens();
-
-	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnMonsters();
+		m_world.SpawnBears();
+	}
+	if (m_activeAnimals >= MAX_COW)
+		m_activeAnimals = MAX_COW;
+	else
+		m_activeAnimals++;
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
