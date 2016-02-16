@@ -35,6 +35,7 @@ void Character::Spawn(World &world, int x, int z)
 	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
 	m_pos.z = (float)z;
+	m_world = &world;
 
 	while (!CheckCollision(world))
 	{
