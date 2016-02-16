@@ -102,6 +102,7 @@
     <ClCompile Include="chunkmesh.cpp" />
     <ClCompile Include="cow.cpp" />
     <ClCompile Include="creeper.cpp" />
+    <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="gun.cpp" />
     <ClCompile Include="inventory.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="cow.h" />
     <ClInclude Include="creeper.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="Dragon.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
     <ClInclude Include="gun.h" />

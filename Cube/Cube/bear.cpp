@@ -3,7 +3,8 @@
 
 Bear::Bear() :Animal(A_BEAR)
 {
-	m_health = 200;
+	m_health = 300;
+	m_Armor = 5;
 	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
 	m_Name = "BigBadBear aka BBB";
 	isHurt = false;
@@ -19,8 +20,8 @@ void Bear::Move(World &world)
 	{
 		if (isHurt)
 		{
-			m_vitesse.x = 0.05f;
-			m_vitesse.z = 0.05f;
+			m_vitesse.x = 0.11f;
+			m_vitesse.z = 0.11f;
 
 			//Si la cible est valide
 			if (m_target)
@@ -56,7 +57,7 @@ void Bear::Move(World &world)
 						}
 					}
 					chillCount++;
-					if (chillCount > 800)
+					if (chillCount > 1000)
 					{
 						isHurt = false;
 						chillCount = false;

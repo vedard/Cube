@@ -5,6 +5,7 @@
 #include "cow.h"
 #include "bear.h"
 #include "creeper.h"
+#include "Dragon.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
@@ -20,6 +21,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 	m_creeper = new Creeper[MAX_CREEPER];
 	m_player = new Player;
 	m_bloodMoon = new BloodMoon;
+	m_dragon = new Dragon[MAX_DRAGON];
 	
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -61,6 +63,7 @@ World::~World()
 
 Cow* World::GetCow(int pos) const { return &m_cow[pos]; }
 Bear* World::GetBear(int pos) const { return &m_bear[pos]; }
+Dragon* World::GetDragon(int pos) const { return &m_dragon[pos]; }
 Creeper* World::GetCreeper(int pos) const { return &m_creeper[pos]; }
 Player* World::GetPlayer() const { return m_player; }
 
@@ -661,6 +664,17 @@ void World::SpawnBears()
 		{
 			m_bear[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
 			m_bear[i].SetTarget(m_player);
+			break;
+		}
+}
+
+void World::SpawnDragons()
+{
+	for (int i = 0; i < MAX_DRAGON; i++)
+		if (!m_dragon[i].GetisAlive())
+		{
+			m_dragon[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
+			m_dragon[i].SetTarget(m_player);
 			break;
 		}
 }
