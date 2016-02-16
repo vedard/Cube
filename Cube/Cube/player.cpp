@@ -96,7 +96,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		}
 		if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 28) // Si c'est un trampoline en dessous
 		{
-			m_vitesse.y *= -1.001f;
+			m_vitesse.y *= -1.01f;
+			if (m_vitesse.y <= -0.60f)
+			{
+				m_vitesse.y = -0.60f;
+			}
 			falldamage = false;
 		}
 	}
@@ -193,8 +197,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 				}
 			}
 
-			//annule
 			m_pos.y += m_vitesse.y;
+			//annule
 			if (falldamage)
 			{
 				m_vitesse.y = 0;
@@ -209,6 +213,10 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		else if (falldamage)
 		{
 			m_vitesse.y += 0.013f;
+			if (m_vitesse.y >= 0.6f)
+			{
+				m_vitesse.y = 0.6f;
+			}
 		}
 	}
 
