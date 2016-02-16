@@ -160,3 +160,9 @@ MONSTER_TYPE Monster::GetType()
 {
 	return type;
 }
+
+bool Monster::Attack(Character * character)
+{
+	return Character::Attack(character);
+}
+
