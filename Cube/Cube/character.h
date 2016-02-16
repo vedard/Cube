@@ -61,9 +61,11 @@ protected:
 	//État
 	bool m_isInAir;
 	bool m_isAlive;
+	bool m_isDying;
 
 	//Timer
 	sf::Clock m_cooldownAttackTimer;
+	sf::Clock m_deathTick;
 
 
 

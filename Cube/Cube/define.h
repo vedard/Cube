@@ -105,6 +105,8 @@ typedef long long int64;
 #define KEY_ALREADY_BOUND "This key is already bound"
 #define KEY_BINDED_SUCCESSFULLY "Key was binded succesfully"
 
+#define IS_DYING_LENGTH 3
+
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
 	BTYPE_AIR, 
