@@ -82,7 +82,7 @@ private:
 	void DrawScope();
 
 	void CloseGame();
-	void SetDayOrNight(float gametime);
+	void DayAndNightCycle(float gametime);
 private:
 	bool m_wireframe;
 	float m_LastTickTime;

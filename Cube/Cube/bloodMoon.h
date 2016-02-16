@@ -19,13 +19,13 @@ public:
 	bool GetStartedState() const;
 	float GetDuration() const;
 
-	bool m_isSurvivePlayed;
-	bool m_isHorrorPlayed;
+	float monsterMultiplier;
 
 private:
+	void Reset();
+
 	bool m_isActive;
 	bool m_isStarted;
-
 	float m_duration;
 	float m_currTime;
 };

@@ -57,11 +57,12 @@ typedef long long int64;
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
 #define INVENTORY_SIZE 15
-#define MAX_CREEPER 5
+#define MAX_CREEPER 20
 #define MAX_BULLET 500
-#define MAX_COW 10
-#define MAX_BEAR 10
+#define MAX_COW 15
+#define MAX_BEAR 20
 #define MAX_CHICKEN 50
+#define MONSTER_MULTIPLIER 5
 #define BLOODMOON_PROBABILITY 2 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
 #define BLOODMOON_DURATION 2500 // Doit toujours rester 2500
 #define PI 3.14159265358f

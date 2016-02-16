@@ -16,10 +16,10 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 
 	// Initialise les monstres et animaux.
 	m_cow = new Cow[MAX_COW];
-	m_bear = new Bear[MAX_BEAR];
+	m_bear = new Bear[MAX_BEAR * MONSTER_MULTIPLIER];
 	m_chicken = new Chicken[MAX_CHICKEN];
 
-	m_creeper = new Creeper[MAX_CREEPER];
+	m_creeper = new Creeper[MAX_CREEPER * MONSTER_MULTIPLIER];
 	m_player = new Player;
 	m_bloodMoon = new BloodMoon;
 	
@@ -658,9 +658,9 @@ void World::SpawnCows()
 		}
 }
 
-void World::SpawnBears()
+void World::SpawnBears(int MaxBears)
 {
-	for (int i = 0; i < MAX_BEAR; i++)
+	for (int i = 0; i < MaxBears; i++)
 		if (!m_bear[i].GetisAlive())
 		{
 			m_bear[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
@@ -680,9 +680,9 @@ void World::SpawnChickens()
 }
 
 
-void World::SpawnMonsters()
+void World::SpawnMonsters(int maxMonsters)
 {
-	for (int i = 0; i < MAX_CREEPER; i++)
+	for (int i = 0; i < maxMonsters; i++)
 		if (!m_creeper[i].GetisAlive())
 		{
 			m_creeper[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));

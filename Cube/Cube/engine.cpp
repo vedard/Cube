@@ -243,7 +243,7 @@ void Engine::UpdateEnvironement(float gameTime)
 			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
-			for (int j = 0; j < MAX_CREEPER; j++)
+			for (int j = 0; j < MAX_CREEPER * MONSTER_MULTIPLIER; j++)
 			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
@@ -259,7 +259,7 @@ void Engine::UpdateEnvironement(float gameTime)
 				}
 
 
-			for (int j = 0; j < MAX_BEAR; j++)
+			for (int j = 0; j < MAX_BEAR * MONSTER_MULTIPLIER; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetBear(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
@@ -282,20 +282,18 @@ void Engine::UpdateEnvironement(float gameTime)
 	}
 
 	//Update les monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
+	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Move(m_world);
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
-
 		m_world.GetCow(i)->Move(m_world);
 
 	for (int i = 0; i < MAX_CHICKEN; i++)
-
 		m_world.GetChicken(i)->Move(m_world);
 
 	//Update les Bear
-	for (int i = 0; i < MAX_BEAR; i++)
+	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Move(m_world);
 
 
@@ -348,18 +346,10 @@ void Engine::DrawEnvironement(float gameTime) {
 	else if (m_world.GetBloodMoonInstance()->GetDuration() <= 53 && m_world.GetBloodMoonInstance()->GetStartedState())
 	{
 		Sound::PlayOnce(Sound::SURVIVE);
-
 		m_wireframe = false;
 		DrawSurviveScreen();
-		if (!m_world.GetBloodMoonInstance()->m_isSurvivePlayed)
-		{
-			Sound::PlayOnce(Sound::SURVIVE);
-			//Sound::Play(Sound::SURVIVE);
-			m_world.GetBloodMoonInstance()->m_isSurvivePlayed = true;
-		}
 		return;
 	}
-
 
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	glColor3f(1.f, 1.f, 1.f);
@@ -404,11 +394,11 @@ void Engine::DrawEnvironement(float gameTime) {
 	{
 		m_world.GetCow(i)->Draw(m_modelCow);
 	}
-	for (int i = 0; i < MAX_BEAR; i++)
+	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
 
 	//Draw Monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
+	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 
@@ -431,13 +421,13 @@ void Engine::DrawEnvironement(float gameTime) {
 	{
 		m_world.GetCow(i)->Draw(m_modelCow);
 	}
-	for (int i = 0; i < MAX_BEAR; i++)
+	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Draw(m_modelChicken);
 
 	//Draw Monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
+	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
@@ -493,7 +483,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	}
 }
 
-void Engine::SetDayOrNight(float gametime)
+void Engine::DayAndNightCycle(float gametime)
 {
 	float time = sin(((gametime) - m_missingTime) / DAY_TIME);
 
@@ -614,16 +604,14 @@ void Engine::Render(float elapsedTime)
 	}
 
 	//Spawn des monstre aleatoirement
-	//Spawn des monstre aleatoirement
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnCows();
 	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnBears();
+		m_world.SpawnBears(MAX_BEAR * m_world.GetBloodMoonInstance()->monsterMultiplier);
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnChickens();
-
 	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnMonsters();
+		m_world.SpawnMonsters(MAX_CREEPER * m_world.GetBloodMoonInstance()->monsterMultiplier);
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
@@ -699,7 +687,7 @@ void Engine::Render(float elapsedTime)
 		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
 			m_mouseButton[1] = false;
 
-		SetDayOrNight(gameTime);
+		DayAndNightCycle(gameTime);
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -814,7 +802,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{ //M -> spawn monster
-			for (int i = 0; i < MAX_CREEPER; i++) {
+			for (int i = 0; i < MAX_CREEPER * m_world.GetBloodMoonInstance()->monsterMultiplier; i++) {
 				if (!m_world.GetCreeper(i)->GetisAlive()) {
 					m_world.GetCreeper(i)->Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;

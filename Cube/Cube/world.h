@@ -49,9 +49,9 @@ public:
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
-	void SpawnMonsters();
+	void SpawnMonsters(int maxMonsters);
 	void SpawnCows();
-	void SpawnBears();
+	void SpawnBears(int maxBears);
 	void SpawnChickens();
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);
