@@ -243,7 +243,7 @@ void Engine::UpdateEnvironement(float gameTime)
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
 			Parametre& m_settings = Parametre::GetInstance();
 
-			//Check si y a collision
+			//Check si y a collisionkdhfkjdshfkj
 			for (int j = 0; j < MAX_CREEPER; j++)
 			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
