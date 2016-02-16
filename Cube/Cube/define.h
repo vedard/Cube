@@ -62,6 +62,7 @@ typedef long long int64;
 #define MAX_COW 10
 #define MAX_BEAR 10
 #define MAX_CHICKEN 10
+#define MAX_DRAGON 5
 #define BLOODMOON_PROBABILITY 100
 #define BLOODMOON_DURATION 2500
 #define PI 3.14159265358f
@@ -183,7 +184,8 @@ enum ANIMAL_TYPE
 {
 	A_BEAR,
 	A_COW,
-	A_CHICKEN
+	A_CHICKEN,
+	A_DRAGON
 };
 
 enum MENU_CONTROLS {

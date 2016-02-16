@@ -189,6 +189,7 @@ void Engine::LoadResource()
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
+		m_modelDragon.LoadOBJ(MODEL_PATH "dragon.obj", TEXTURE_PATH "dragonfire.png");
 		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.png");
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
@@ -204,8 +205,8 @@ void Engine::LoadResource()
 
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 20, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 60, 0.4);
-	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 150, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 100, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
@@ -276,6 +277,13 @@ void Engine::UpdateEnvironement(float gameTime)
 					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
+			for (int j = 0; j < MAX_DRAGON; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetDragon(j)))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+
 			for (int j = 0; j < MAX_CHICKEN; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetChicken(j)))
 				{
@@ -300,29 +308,34 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
+	{
 
 		m_world.GetCow(i)->Move(m_world);
+	}
 
-	for (int i = 0; i < MAX_CHICKEN; i++)
+		for (int i = 0; i < MAX_CHICKEN; i++)
+			m_world.GetChicken(i)->Move(m_world);
 
-		m_world.GetChicken(i)->Move(m_world);
+		//Update les Bears
+		for (int i = 0; i < MAX_BEAR; i++)
+			m_world.GetBear(i)->Move(m_world);
 
-	//Update les Bear
-	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear(i)->Move(m_world);
+		//Update les Dragons
+		for (int i = 0; i < MAX_DRAGON; i++)
+			m_world.GetDragon(i)->Move(m_world);
 
+		//m_world.InitChunks(playerPos.x, playerPos.z);
+		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+		t.detach();
 
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
+		//Update les chunk autour du joueur si il sont dirty
+		m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+		m_network.Fetch();
+		SyncWithServer();
 
-	m_network.Fetch();
-	SyncWithServer();
+	}
 
-}
 
 void Engine::SyncWithServer()
 {
@@ -398,12 +411,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	else
 		glDisable(GL_LIGHT0);
 
-	for (int i = 0; i < MAX_COW; i++)
-	{
-		m_world.GetCow(i)->Draw(m_modelCow);
-	}
-	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear(i)->Draw(m_modelBear);
+	
 
 	//Draw Creepers
 	for (int i = 0; i < MAX_CREEPER; i++)
@@ -411,7 +419,6 @@ void Engine::DrawEnvironement(float gameTime) {
 
 	for (int i = 0; i < MAX_SPRINTER; i++)
 		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
-
 
 
 	//Draw guns
@@ -436,6 +443,8 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Draw(m_modelChicken);
+	for (int i = 0; i < MAX_DRAGON; i++)
+		m_world.GetDragon(i)->Draw(m_modelDragon);
 
 	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
@@ -496,84 +505,83 @@ void Engine::DrawEnvironement(float gameTime) {
 
 void Engine::SetDayOrNight(float gametime)
 {
-	float time = sin((gametime) / DAY_TIME);
-	//std::cout << gametime << std::endl;
-	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
-		if (time < -0.97) {
-			m_world.GetBloodMoonInstance()->Start();
-			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
-			m_missingTime = 60;
-		}
-	}
+	//float time = sin((gametime) / DAY_TIME);
+	//if (m_world.GetBloodMoonInstance()->GetActiveState()) {
+	//	if (time < -0.97) {
+	//		m_world.GetBloodMoonInstance()->Start();
+	//		m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
+	//		m_missingTime = 60;
+	//	}
+	//}
 
-	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
-		m_world.GetBloodMoonInstance()->AddElapsedUnit();
-		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
-	}
-
-
-	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
-	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
-
-	// Controle les cycles de couleurs de la lumière
-	m_redLight = 5.f;
-	m_greenLight = 0.48f * sin(time) + 4.5f;
-	m_blueLight = 0.95f * sin(time) + 3.8;
-
-	// Controle les cycles de couleurs du fog
-	m_redFog = 0.5f * sin(time) + 0.45f;
-	m_greenFog = 0.5f * sin(time) + 0.45f;
-	m_blueFog = 0.5f * sin(time) + 0.48f;
-
-	// Controle le cycle de densite du fog
-	m_fogDensity = -0.031f * sin(time) + 0.052f;
-	m_fogStart = 1.68f * sin(time) + 16;
+	//if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
+	//	m_world.GetBloodMoonInstance()->AddElapsedUnit();
+	//	m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
+	//}
 
 
-	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
-		// Controle les cycles de couleurs de la lumière
-		m_redLight = 0.f;
-		m_greenLight = 0.f;
-		m_blueLight = 0.f;
+	//GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+	//GLfloat fogcolor[4] = { 0, 0, 0, 0 };
 
-		// Controle les cycles de couleurs du fog
-		m_redFog = 0.25f;
-		m_greenFog = 0.075f;
-		m_blueFog = 0.075f;
+	//// Controle les cycles de couleurs de la lumière
+	//m_redLight = 5.f;
+	//m_greenLight = 0.48f * sin(time) + 4.5f;
+	//m_blueLight = 0.95f * sin(time) + 3.8;
 
-		// Controle le cycle de densite du fog
-		m_fogDensity = 0.08f;
-		m_fogStart = 15.f;
-	}
+	//// Controle les cycles de couleurs du fog
+	//m_redFog = 0.5f * sin(time) + 0.45f;
+	//m_greenFog = 0.5f * sin(time) + 0.45f;
+	//m_blueFog = 0.5f * sin(time) + 0.48f;
 
-	light0Amb[0] = m_redLight;
-	light0Amb[1] = m_greenLight;
-	light0Amb[2] = m_blueLight;
-	light0Amb[3] = 7.f;
+	//// Controle le cycle de densite du fog
+	//m_fogDensity = -0.031f * sin(time) + 0.052f;
+	//m_fogStart = 1.68f * sin(time) + 16;
 
-	fogcolor[0] = m_redFog;
-	fogcolor[1] = m_greenFog;
-	fogcolor[2] = m_blueFog;
-	fogcolor[3] = 1;
 
-	// Le fog
-	glEnable(GL_FOG);
-	GLint fogmode = GL_EXP2;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, m_fogDensity);
-	glFogf(GL_FOG_START, m_fogStart);
-	glFogf(GL_FOG_END, 24.f);
+	//if (m_world.GetBloodMoonInstance()->GetStartedState()) {
+	//	// Controle les cycles de couleurs de la lumière
+	//	m_redLight = 0.f;
+	//	m_greenLight = 0.f;
+	//	m_blueLight = 0.f;
 
-	// La lumiere
-	if (!m_world.GetBloodMoonInstance()->GetStartedState())
-	{
-		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	}
+	//	// Controle les cycles de couleurs du fog
+	//	m_redFog = 0.25f;
+	//	m_greenFog = 0.075f;
+	//	m_blueFog = 0.075f;
+
+	//	// Controle le cycle de densite du fog
+	//	m_fogDensity = 0.08f;
+	//	m_fogStart = 15.f;
+	//}
+
+	//light0Amb[0] = m_redLight;
+	//light0Amb[1] = m_greenLight;
+	//light0Amb[2] = m_blueLight;
+	//light0Amb[3] = 7.f;
+
+	//fogcolor[0] = m_redFog;
+	//fogcolor[1] = m_greenFog;
+	//fogcolor[2] = m_blueFog;
+	//fogcolor[3] = 1;
+
+	//// Le fog
+	//glEnable(GL_FOG);
+	//GLint fogmode = GL_EXP2;
+	//glFogi(GL_FOG_MODE, fogmode);
+	//glFogfv(GL_FOG_COLOR, fogcolor);
+	//glFogf(GL_FOG_DENSITY, m_fogDensity);
+	//glFogf(GL_FOG_START, m_fogStart);
+	//glFogf(GL_FOG_END, 24.f);
+
+	//// La lumiere
+	//if (!m_world.GetBloodMoonInstance()->GetStartedState())
+	//{
+	//	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+	//	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+	//	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+	//	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+	//	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	//}
 }
 
 void Engine::Render(float elapsedTime)
@@ -605,11 +613,10 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnCows();
 		m_world.SpawnChickens();
 		m_world.SpawnBears();
-	}
-	if (m_activeAnimals >= MAX_COW)
-		m_activeAnimals = MAX_COW;
-	else
-		m_activeAnimals++;
+	if ((int)(gameTime * 100) % 100 == 0)
+		m_world.SpawnDragons();
+	if ((int)(gameTime * 100) % 100 == 0)
+		m_world.SpawnChickens();
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
