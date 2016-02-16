@@ -1,5 +1,7 @@
 #include "openglcontext.h"
 #include "define.h"
+#include <chrono>
+#include <thread>
 
 OpenglContext::OpenglContext() : m_maxFps(999999), m_fullscreen(false), m_title(""), m_lastFrameTime(0)
 {
@@ -25,7 +27,7 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 		{
 			clock.restart();
 			Render(m_lastFrameTime);
-			Sleep(20);
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 			m_lastFrameTime = clock.getElapsedTime().asSeconds();
 		}
 	}

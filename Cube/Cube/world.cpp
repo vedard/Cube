@@ -5,7 +5,7 @@
 #include "cow.h"
 #include "bear.h"
 #include "creeper.h"
-#include "Chicken.h"
+#include "chicken.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
