@@ -60,11 +60,9 @@ void Character::Move(World &world)
 	//Si collision
 	if (CheckCollision(world))
 	{
-
 		//Si on a touche le sol 
 		if (m_vitesse.y > 0)
 			m_isInAir = false;
-
 		//annule
 		m_pos.y += m_vitesse.y;
 		m_vitesse.y = 0;

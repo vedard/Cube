@@ -5,18 +5,18 @@
 
 
 Player::Player() :
-Character(),
-m_noClip(false),
-m_sneaked(false),
-m_running(false),
-m_block(BTYPE_GRASS),
-m_footUnderwater(false),
-m_headUnderwater(false),
-m_HeadShake(0),
-isHurt(0),
-InvulnerabilityTimer(0),
-m_inventory(new Inventory()),
-hasHit(0)
+	Character(),
+	m_noClip(false),
+	m_sneaked(false),
+	m_running(false),
+	m_block(BTYPE_GRASS),
+	m_footUnderwater(false),
+	m_headUnderwater(false),
+	m_HeadShake(0),
+	isHurt(0),
+	InvulnerabilityTimer(0),
+	m_inventory(new Inventory()),
+	hasHit(0)
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -26,8 +26,8 @@ hasHit(0)
 	m_weapon = W_BLOCK;
 	m_isAlive = false;
 	m_godMode = false;
-	
-	Guns = new Gun[GUN_NUMBER];	
+
+	Guns = new Gun[GUN_NUMBER];
 }
 
 Player::~Player()
@@ -50,6 +50,7 @@ void Player::TurnTopBottom(float value)
 
 void Player::Move(bool front, bool back, bool left, bool right, World &world)
 {
+	bool falldamage = true;
 	//Orientation du player en rad
 	float orientationPlayer = m_HorizontalRot * PI / 180;
 	//Multiplicateur de vitesse
@@ -93,6 +94,11 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 			m_vitesse.x *= 0.4f;
 			m_vitesse.z *= 0.4f;
 		}
+		if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 28) // Si c'est un trampoline en dessous
+		{
+			m_vitesse.y *= -1.001f;
+			falldamage = false;
+		}
 	}
 
 	//Deplacement Avant/Arriere
@@ -116,9 +122,9 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 		else
 			deplacementVector -= directionVector;
 	}
-	if (right) 
+	if (right)
 		deplacementVector += rightVector;
-	if(left)
+	if (left)
 		deplacementVector -= rightVector;
 	//Si on bouge pas -> vitesse = 0
 	if (!left && !right && !front && !back)
@@ -180,25 +186,30 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 					m_wasInAir = true;
 				}
 				//Degat de chute 
-				if (m_vitesse.y > 0.40f)
+				if (m_vitesse.y > 0.40f && falldamage)
 				{
 					GetDamage(exp(m_vitesse.y * 6), false, m_godMode);
 					//isHurt = 20;
 				}
 			}
-			
+
 			//annule
 			m_pos.y += m_vitesse.y;
-			m_vitesse.y = 0;
+			if (falldamage)
+			{
+				m_vitesse.y = 0;
+			}
 		}
 
 		//Acceleration
 		if (m_footUnderwater)
 			m_vitesse.y += 0.002f;
-		else if(m_footUnderLava)
+		else if (m_footUnderLava)
 			m_vitesse.y += 0.001f;
-		else
+		else if (falldamage)
+		{
 			m_vitesse.y += 0.013f;
+		}
 	}
 
 	//Si le player est dans l'eau
@@ -224,7 +235,7 @@ void Player::CheckUnderwater(World &world)
 	else
 		m_headUnderwater = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5, m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 1.5, m_pos.z);
 
 	if (bt1 > 15 && bt1 < 21)
 		m_kneeUnderwater = true;
@@ -251,10 +262,10 @@ void Player::CheckUnderLava(World &world)
 	else
 		m_headUnderLava = false;
 
-	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y/1.5 , m_pos.z);
+	bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y / 1.5, m_pos.z);
 
 	if (bt1 > 20 && bt1 < 26)
-		m_kneeUnderLava = true; 
+		m_kneeUnderLava = true;
 	else
 		m_kneeUnderLava = false;
 
@@ -377,7 +388,7 @@ void Player::SetWeapon(int mode)
 
 void Player::Jump()
 {
-	if (!m_isInAir && !m_kneeUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20) && !m_kneeUnderLava)
+	if (!m_isInAir && !m_kneeUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y, 0, 0.20) && !m_kneeUnderLava)
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
@@ -395,14 +406,14 @@ void Player::Jump()
 
 bool Player::Shoot(World &world)
 {
-	Guns[GetWeapon() - 1].Shoot(GetPosition().x,GetPosition().y + world.GetPlayer()->GetDimension().y, GetPosition().z, GetHorizontalRotation(), GetVerticalRotation());
+	Guns[GetWeapon() - 1].Shoot(GetPosition().x, GetPosition().y + world.GetPlayer()->GetDimension().y, GetPosition().z, GetHorizontalRotation(), GetVerticalRotation());
 	if (Guns[GetWeapon() - 1].GetIsAuto())
 		return true;
 	else
 		return false;
 }
 
-bool Player::Underwater() const {return m_headUnderwater;}
+bool Player::Underwater() const { return m_headUnderwater; }
 bool Player::footUnderwater() const { return m_footUnderwater; }
 BlockType Player::blockUnderPlayer() const
 {
@@ -451,44 +462,44 @@ void Player::Tick()
 	}
 }
 
-	bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+{
+	bool b = true;
+	if (InvulnerabilityTimer <= 0)
 	{
-		bool b = true;
-		if (InvulnerabilityTimer <= 0)
+		b = Character::GetisAlive();
+		if (b)
 		{
-			b = Character::GetisAlive();
-			if (b)
+			b = Character::GetDamage(damage, ignoreArmor, godMode);
+			if (!godMode)
 			{
-				b = Character::GetDamage(damage, ignoreArmor, godMode);
-				if (!godMode)
+				if (playonce)
 				{
-					if (playonce)
-					{
-						Sound::PlayOnce(son);
-					}
-					else
-					{
-						Sound::Play(son);
+					Sound::PlayOnce(son);
+				}
+				else
+				{
+					Sound::Play(son);
 
-					}
-					isHurt = HURT_TIME;
-					InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
 				}
-				if (!b)
-				{
-					Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
-				}
+				isHurt = HURT_TIME;
+				InvulnerabilityTimer = INVULNERABILITY_PLAYER_TIME;
 			}
-			
+			if (!b)
+			{
+				Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
+			}
 		}
-		
-		return b;
+
 	}
 
-	bool Player::GetIsSneaked()
-	{
-		return m_sneaked;
-	}
+	return b;
+}
+
+bool Player::GetIsSneaked()
+{
+	return m_sneaked;
+}
 
 Inventory* Player::GetInventory()
 {

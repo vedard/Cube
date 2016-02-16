@@ -135,6 +135,8 @@ void Engine::LoadResource()
 		AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
 		AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 		AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
+		AddTextureToAtlas(BTYPE_TRAMPOLINE, "Grass", TEXTURE_PATH "block_trampoline.bmp", 1);
+
 
 		if (!m_textureAtlas.Generate(64, false))
 		{
@@ -457,7 +459,7 @@ void Engine::DrawEnvironement(float gameTime) {
 void Engine::SetDayOrNight(float gametime)
 {
 	float time = sin((gametime) / DAY_TIME);
-	std::cout << gametime << std::endl;
+	//std::cout << gametime << std::endl;
 	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
 		if (time < -0.97) {
 			m_world.GetBloodMoonInstance()->Start();
@@ -537,6 +539,7 @@ void Engine::SetDayOrNight(float gametime)
 }
 
 void Engine::Render(float elapsedTime)
+
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
