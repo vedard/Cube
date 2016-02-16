@@ -19,6 +19,7 @@ public:
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, World &world);
+	void DeathCheck();
 	void ApplyRotation() const;
 	float ApplyTranslation(); // return le shake
 	void ToggleNoClip();

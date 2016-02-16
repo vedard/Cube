@@ -21,6 +21,8 @@ class Monster;
 class Bear;
 class Cow;
 class Creeper;
+class Dragon;
+class Sprinter;
 class Chicken;
 
 class World
@@ -35,6 +37,8 @@ public:
 	Cow* GetCow(int pos) const;
 	Bear* GetBear(int pos) const;
 	Creeper* GetCreeper(int pos) const;
+	Dragon* GetDragon(int pos) const;
+	Sprinter* GetSprinter(int pos) const;
 	Chicken* GetChicken(int pos) const;
 	Player* GetPlayer() const;
 
@@ -49,8 +53,10 @@ public:
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
-	void SpawnMonsters();
+	void SpawnCreepers();
+	void SpawnSprinters();
 	void SpawnCows();
+	void SpawnDragons();
 	void SpawnBears();
 	void SpawnChickens();
 	void RunWater();
@@ -76,8 +82,10 @@ private:
 
 	Player* m_player;
 	Creeper* m_creeper;
+	Sprinter* m_sprinter;
 	Cow* m_cow;
 	Bear* m_bear;
+	Dragon* m_dragon;
 	Chicken* m_chicken;
 
 	int UpdateDistance;
