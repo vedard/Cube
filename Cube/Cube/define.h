@@ -56,12 +56,12 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 28
-#define INVENTORY_SIZE 15
-#define MAX_CREEPER 5
+#define MAX_CREEPER 2
+#define MAX_SPRINTER 10
 #define MAX_BULLET 500
 #define MAX_COW 10
 #define MAX_BEAR 10
-#define MAX_CHICKEN 50
+#define MAX_CHICKEN 10
 #define MAX_DRAGON 5
 #define BLOODMOON_PROBABILITY 100
 #define BLOODMOON_DURATION 2500
@@ -86,6 +86,7 @@ typedef long long int64;
 
 
 #define HURT_TIME 20
+#define IS_DYING_LENGTH 3
 #define GUN_NUMBER 5
 
 
@@ -107,8 +108,6 @@ typedef long long int64;
 
 #define KEY_ALREADY_BOUND "This key is already bound"
 #define KEY_BINDED_SUCCESSFULLY "Key was binded succesfully"
-
-#define IS_DYING_LENGTH 3
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 

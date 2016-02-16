@@ -5,7 +5,8 @@
 #include "cow.h"
 #include "bear.h"
 #include "creeper.h"
-#include "Dragon.h"
+#include "dragon.h"
+#include "sprinter.h"
 #include "chicken.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
@@ -21,6 +22,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 	m_chicken = new Chicken[MAX_CHICKEN];
 
 	m_creeper = new Creeper[MAX_CREEPER];
+	m_sprinter = new Sprinter[MAX_SPRINTER];
 	m_player = new Player;
 	m_bloodMoon = new BloodMoon;
 	m_dragon = new Dragon[MAX_DRAGON];
@@ -67,6 +69,7 @@ Cow* World::GetCow(int pos) const { return &m_cow[pos]; }
 Bear* World::GetBear(int pos) const { return &m_bear[pos]; }
 Dragon* World::GetDragon(int pos) const { return &m_dragon[pos]; }
 Creeper* World::GetCreeper(int pos) const { return &m_creeper[pos]; }
+Sprinter* World::GetSprinter(int pos) const { return &m_sprinter[pos]; }
 Player* World::GetPlayer() const { return m_player; }
 Chicken* World::GetChicken(int pos) const { return &m_chicken[pos]; }
 
@@ -96,11 +99,18 @@ void World::InitMap(int seed)
 	else
 		std::cout << "Flat map created" << std::endl << std::endl;
 
-	//  -- Monster
+	//  -- Creeper
 	for (int i = 0; i < MAX_CREEPER; i++)
 	{
 		m_creeper[i].SetName("Creeper " + std::to_string(i + 1));
 		m_creeper[i].SetTarget((Character*)&m_player);
+	}
+
+	//  -- Sprinter
+	for (int i = 0; i < MAX_SPRINTER; i++)
+	{
+		m_sprinter[i].SetName("Sprinter " + std::to_string(i + 1));
+		m_sprinter[i].SetTarget((Character*)&m_player);
 	}
 
 	//  -- Cow
@@ -694,13 +704,24 @@ void World::SpawnChickens()
 }
 
 
-void World::SpawnMonsters()
+void World::SpawnCreepers()
 {
 	for (int i = 0; i < MAX_CREEPER; i++)
 		if (!m_creeper[i].GetisAlive())
 		{
 			m_creeper[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
 			m_creeper[i].SetTarget(m_player);
+			break;
+		}
+}
+
+void World::SpawnSprinters()
+{
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		if (!m_sprinter[i].GetisAlive())
+		{
+			m_sprinter[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
+			m_sprinter[i].SetTarget(m_player);
 			break;
 		}
 }

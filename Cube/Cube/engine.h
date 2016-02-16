@@ -20,6 +20,7 @@
 #include "chicken.h"
 #include "creeper.h"
 #include "dragon.h"
+#include "sprinter.h"
 #include "vector3.h"
 #include "gun.h"
 #include "bloodMoon.h"
@@ -132,6 +133,7 @@ private:
 	Model3d m_modelCow;
 	Model3d m_modelCreeper;
 	Model3d m_modelBear;
+	Model3d m_modelSprinter;
 	Model3d m_modelChicken;
 	Model3d m_modelDragon;
 
