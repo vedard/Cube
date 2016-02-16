@@ -126,16 +126,20 @@ void Animal::Draw(Model3d &model) const
 	}
 }
 
-void Animal::GetDamage(float damage)
+bool Animal::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 {
-	m_ClockAnimationDmg.restart();
 	Jump();
 	if (rand() % 100 > 66)
 		Sound::Play(Sound::FLESH_IMPACT);
-	Character::GetDamage(damage,false,false);
+	return Character::GetDamage(damage, ignoreArmor, godMode, son, playonce);
 }
 
 ANIMAL_TYPE Animal::GetType()
 {
 	return type;
+}
+
+void Animal::SetTarget(Character* target)
+{
+	std::cout << "penis" << std::endl;
 }

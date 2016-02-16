@@ -14,7 +14,7 @@ public:
 
 	//Action
 	void Spawn(World &world, int x, int z);
-	void Move(World &world);
+	virtual void Move(World &world);
 	bool CheckCollision(World &world) const;
 	bool CheckCollision(Character & character) const;
 	void Draw() const;
@@ -53,6 +53,7 @@ protected:
 	//Stat
 	std::string m_Name;
 	float m_health;
+	float m_maxHealth;
 	int m_AttackRange;
 	float m_AttackSpeed;
 	float m_Armor;

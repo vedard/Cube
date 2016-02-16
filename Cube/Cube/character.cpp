@@ -12,15 +12,13 @@ Character::Character() :
 	m_Armor(1),
 	m_cooldownAttackTimer(),
 	m_AttackDamage(30.0f),
-	m_isAlive(true)
+	m_isAlive(true),
+	m_maxHealth(100)
 {
 
 	m_Name = "Character ";
 	for (int i = 0; i < 5; i++)
 		m_Name += std::to_string(std::rand() % 10);
-	m_health = 100;
-
-
 }
 
 Character::~Character()
@@ -30,6 +28,7 @@ Character::~Character()
 void Character::Spawn(World &world, int x, int z)
 {
 	m_isAlive = true;
+	m_health = m_maxHealth;
 	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
 	m_pos.z = (float)z;
@@ -49,7 +48,7 @@ void Character::Spawn(World &world, int x, int z)
 
 	m_pos.y++;
 
-	std::cout << m_Name << " spawned." << std::endl;
+//	std::cout << m_Name << " spawned." << std::endl;
 }
 
 void Character::Move(World &world)
