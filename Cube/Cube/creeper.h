@@ -6,10 +6,13 @@ class Creeper : public Monster
 public:
 	Creeper();
 	~Creeper();
-	//std::vector<Vector3<int>> Explosion();
+	std::vector<Vector3<int>> Explosion();
+	bool Attack(Character * character) override;
+	void Move(World &world) override;
+
 
 private:
-	//int explosionRadius = 6;
+	int explosionRadius = 6;
 };
 #endif // !
 

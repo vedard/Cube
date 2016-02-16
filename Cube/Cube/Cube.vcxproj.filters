@@ -33,6 +33,7 @@
     <ClCompile Include="sprinter.cpp" />
     <ClCompile Include="bloodMoon.cpp" />
     <ClCompile Include="Dragon.cpp" />
+    <ClCompile Include="Chicken.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -71,6 +72,9 @@
     <ClInclude Include="music.h" />
     <ClInclude Include="sprinter.h" />
     <ClInclude Include="Dragon.h" />
+  </ItemGroup>
+    <ClInclude Include="sprinter.h" />
+    <ClInclude Include="Chicken.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

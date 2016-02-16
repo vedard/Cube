@@ -16,13 +16,16 @@ public:
 	void SetTarget( Character* target);
 	void GetDamage(float damage);
 	MONSTER_TYPE GetType();
+	virtual bool Attack(Character * character) override;
 
 
 
 private:
-	Character* m_target;
 	sf::Clock m_ClockAnimationDmg;
 	MONSTER_TYPE type;
+
+protected:
+	Character* m_target;
 };
 #endif // !MONSTER_H__
 

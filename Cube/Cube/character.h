@@ -19,9 +19,10 @@ public:
 	bool CheckCollision(Character & character) const;
 	void Draw() const;
 	bool Attack(Character * character, float damage);
-	bool Attack(Character * character);
+	virtual bool Attack(Character * character);
 	virtual bool GetDamage(float damage, bool ignoreArmor, bool godMode , Sound::ListeSons son = Sound::ListeSons::HURT, bool playonce = false);
 	void Jump();
+	void DeathCheck();
 
 	//Set
 	void SetName(std::string name);
@@ -53,6 +54,7 @@ protected:
 	//Stat
 	std::string m_Name;
 	float m_health;
+	float m_maxHealth;
 	int m_AttackRange;
 	float m_AttackSpeed;
 	float m_Armor;
@@ -61,9 +63,11 @@ protected:
 	//État
 	bool m_isInAir;
 	bool m_isAlive;
+	bool m_isDying;
 
 	//Timer
 	sf::Clock m_cooldownAttackTimer;
+	sf::Clock m_deathTick;
 
 
 
