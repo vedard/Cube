@@ -272,6 +272,7 @@ void Engine::UpdateEnvironement(float gameTime)
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
+					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
@@ -479,7 +480,7 @@ void Engine::DrawEnvironement(float gameTime) {
 void Engine::SetDayOrNight(float gametime)
 {
 	float time = sin((gametime) / DAY_TIME);
-	std::cout << gametime << std::endl;
+	//std::cout << gametime << std::endl;
 	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
 		if (time < -0.97) {
 			m_world.GetBloodMoonInstance()->Start();

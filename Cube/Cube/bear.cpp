@@ -3,7 +3,7 @@
 
 Bear::Bear() :Animal(A_BEAR)
 {
-	m_health = 200;
+	m_maxHealth = 200;
 	m_dimension = Vector3<float>(2.5f, 3.f, 5.f);
 	m_Name = "BigBadBear aka BBB";
 	isHurt = false;
