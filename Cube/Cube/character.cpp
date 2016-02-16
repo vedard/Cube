@@ -236,9 +236,10 @@ void Character::Jump()
 	DeathCheck();
 }
 
+///
 void Character::DeathCheck()
 {
-	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000)
+	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000 && m_isAlive)
 	{
 		m_isAlive = false;
 		std::cout << m_Name << " died." << std::endl;
