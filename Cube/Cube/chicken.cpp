@@ -1,6 +1,6 @@
 #include "Chicken.h"
 
-Chicken::Chicken() :Animal(A_CHICKEN)
+Chicken::Chicken() :Animal(A_CHICKEN), isHurt(false)
 {
 	m_maxHealth = 250;
 	m_dimension = Vector3<float>(0.8f, 1.1f, 1.f);

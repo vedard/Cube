@@ -214,6 +214,8 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 	if (m_footUnderLava)
 		if (m_vitesse.y > 0.08f)
 			m_vitesse.y = 0.08f;
+
+	DeathCheck();
 }
 
 void Player::CheckUnderwater(World &world)

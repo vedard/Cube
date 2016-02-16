@@ -20,7 +20,7 @@ Monster::~Monster()
 
 void Monster::Move(World &world)
 {
-	if (m_isAlive)
+	if (m_isAlive && !m_isDying)
 	{
 		m_vitesse.x = 0.05f;
 		m_vitesse.z = 0.05f;
@@ -61,29 +61,9 @@ void Monster::Move(World &world)
 			}
 
 		}
-
-		//Chute
-		m_pos.y -= m_vitesse.y;
-
-		//Si collision
-		if (CheckCollision(world))
-		{
-
-			//Si on a touche le sol 
-			if (m_vitesse.y > 0)
-				m_isInAir = false;
-
-			//annule
-			m_pos.y += m_vitesse.y;
-			m_vitesse.y = 0;
-		}
-		else
-			m_isInAir = true;
-
-		//Acceleration
-		m_vitesse.y += 0.013f;
-
 	}
+
+	Character::Move(world);
 }
 
 void Monster::Draw(Model3d &model, bool debugRange) const
@@ -160,3 +140,9 @@ MONSTER_TYPE Monster::GetType()
 {
 	return type;
 }
+
+bool Monster::Attack(Character * character)
+{
+	return Character::Attack(character);
+}
+
