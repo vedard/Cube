@@ -613,101 +613,101 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnCows();
 		m_world.SpawnChickens();
 		m_world.SpawnBears();
-	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnDragons();
-	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnChickens();
+	}
+		
 
-	//On met a jour le fps
-	if ((int)(gameTime * 100) % 10 == 0)
-		m_fps = (int)round(1.f / elapsedTime);
+		//On met a jour le fps
+		if ((int)(gameTime * 100) % 10 == 0)
+			m_fps = (int)round(1.f / elapsedTime);
 
-	int loops = 0;
+		int loops = 0;
 
-	//Lock les mouvements a 50 fps
-	while (gameTime > nextGameUpdate && loops < 10)
-	{
-		//Gestion des Ticks
-
-		//Footstep
-		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
-		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
+		//Lock les mouvements a 50 fps
+		while (gameTime > nextGameUpdate && loops < 10)
 		{
-			if (m_world.GetPlayer()->footUnderwater())
+			//Gestion des Ticks
+
+			//Footstep
+			static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
+			if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 			{
-				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
-			}
-			else
-			{
-				switch (m_world.GetPlayer()->blockUnderPlayer())
+				if (m_world.GetPlayer()->footUnderwater())
 				{
-				case 1: // GRASS
-					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-					break;
-				case 3: // STONE
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 5: // WOOD PLANK
-					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-					break;
-				case 7: // DIRT
-					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-					break;
-				case 8: // IRON
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 9: // COAL
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 10: // DIAMOND
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 11: // GOLD
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 12: // REDSTONE
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 13: // LAPIS
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 14: // WOOD
-					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-					break;
-				case 15: // LEAVE
-					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-					break;
-				case 26: // SAND
-					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
-					break;
-				default:
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
+					Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 				}
+				else
+				{
+					switch (m_world.GetPlayer()->blockUnderPlayer())
+					{
+					case 1: // GRASS
+						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+						break;
+					case 3: // STONE
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 5: // WOOD PLANK
+						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+						break;
+					case 7: // DIRT
+						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+						break;
+					case 8: // IRON
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 9: // COAL
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 10: // DIAMOND
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 11: // GOLD
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 12: // REDSTONE
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 13: // LAPIS
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 14: // WOOD
+						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+						break;
+					case 15: // LEAVE
+						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+						break;
+					case 26: // SAND
+						Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+						break;
+					default:
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					}
+				}
+				lastpos = m_world.GetPlayer()->GetPosition();
 			}
-			lastpos = m_world.GetPlayer()->GetPosition();
+
+
+			if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
+				m_mouseButton[1] = false;
+
+			SetDayOrNight(gameTime);
+			UpdateEnvironement(gameTime);
+
+			//Time control
+			//1 / 0.02 = 50 fps
+			nextGameUpdate += 0.02f;
+			loops++;
 		}
 
 
-		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
-			m_mouseButton[1] = false;
 
-		SetDayOrNight(gameTime);
-		UpdateEnvironement(gameTime);
-
-		//Time control
-		//1 / 0.02 = 50 fps
-		nextGameUpdate += 0.02f;
-		loops++;
-	}
-
-
-
-	if (!m_settings.m_isServer)
-	{
-		GetBlocAtCursor();
-		DrawEnvironement(gameTime);
-	}
+		if (!m_settings.m_isServer)
+		{
+			GetBlocAtCursor();
+			DrawEnvironement(gameTime);
+		}
+	
 }
 
 void Engine::KeyPressEvent(unsigned char key)
