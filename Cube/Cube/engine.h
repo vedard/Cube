@@ -17,7 +17,7 @@
 #include "animal.h"
 #include "bear.h"
 #include "cow.h"
-#include "Chicken.h"
+#include "chicken.h"
 #include "creeper.h"
 #include "vector3.h"
 #include "gun.h"
