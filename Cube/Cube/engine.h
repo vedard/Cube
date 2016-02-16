@@ -62,6 +62,7 @@ private:
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
+	void DrawSurviveScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
@@ -121,8 +122,6 @@ private:
 	bool displayInfo;
 	Music& m_music = Music::GetInstance();
 
-
-
 	//Model
 	Model3d m_modelCow;
 	Model3d m_modelCreeper;
@@ -145,7 +144,6 @@ private:
 	float m_blueFog;
 	float m_fogDensity;
 	float m_fogStart;
-
 	int m_missingTime;
 
 	bool m_isMenuOpen;

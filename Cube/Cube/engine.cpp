@@ -145,6 +145,7 @@ void Engine::LoadResource()
 		std::cout << " Loading audio ..." << std::endl;
 		Sound::AddSound(Sound::M9_FIRE, WEAPONS_PATH "glock18-1.wav");
 		Sound::AddSound(Sound::MP5K_FIRE, WEAPONS_PATH "mp7-1.wav");
+		Sound::AddSound(Sound::SURVIVE, EFFECT_PATH "survive.wav");
 		Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
 		Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
 		Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
@@ -329,6 +330,18 @@ void Engine::DrawEnvironement(float gameTime) {
 		return;
 	}
 
+	else if (m_world.GetBloodMoonInstance()->GetDuration() <= 53 && m_world.GetBloodMoonInstance()->GetStartedState())
+	{
+		m_wireframe = false;
+		DrawSurviveScreen();
+		if (!m_world.GetBloodMoonInstance()->m_isSurvivePlayed)
+		{
+			Sound::Play(Sound::SURVIVE);
+			m_world.GetBloodMoonInstance()->m_isSurvivePlayed = true;
+		}
+		return;
+	}
+
 
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	glColor3f(1.f, 1.f, 1.f);
@@ -456,21 +469,20 @@ void Engine::DrawEnvironement(float gameTime) {
 
 void Engine::SetDayOrNight(float gametime)
 {
-	float time = sin((gametime) / DAY_TIME);
+	float time = sin(((gametime) - m_missingTime) / DAY_TIME);
+
 	std::cout << gametime << std::endl;
+
 	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
 		if (time < -0.97) {
 			m_world.GetBloodMoonInstance()->Start();
 			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
-			m_missingTime = 60;
 		}
 	}
 
 	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
 		m_world.GetBloodMoonInstance()->AddElapsedUnit();
-		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
 	}
-
 
 	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
 	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
@@ -489,34 +501,45 @@ void Engine::SetDayOrNight(float gametime)
 	m_fogDensity = -0.031f * sin(time) + 0.052f;
 	m_fogStart = 1.68f * sin(time) + 16;
 
+	// Controle de tout ce qui se passe de visuel pendant 
+	// la blood moon selon le temps entre 0 et 2500
+	if (m_world.GetBloodMoonInstance()->GetStartedState()) 
+	{
+		// Éteint la lumière
+		if (m_world.GetBloodMoonInstance()->GetDuration() >= 50 && m_world.GetBloodMoonInstance()->GetDuration() <= 100)
+		{
+			m_redFog = 0.21 * sin(0.03f * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
+			m_greenFog = 0.037 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
+			m_blueFog = 0.008 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.06746;
+		}
 
-	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
-		// Controle les cycles de couleurs de la lumière
-		m_redLight = 0.f;
-		m_greenLight = 0.f;
-		m_blueLight = 0.f;
+		// Éteint
+		else if (m_world.GetBloodMoonInstance()->GetDuration() >= 100)
+		{
+			// Controle les cycles de couleurs de la lumière
+			m_redLight = 0.f;
+			m_greenLight = 0.f;
+			m_blueLight = 0.f;
 
-		// Controle les cycles de couleurs du fog
-		m_redFog = 0.25f;
-		m_greenFog = 0.075f;
-		m_blueFog = 0.075f;
+			// Controle les cycles de couleurs du fog
+			m_redFog = 0.25f;
+			m_greenFog = 0.075f;
+			m_blueFog = 0.075f;
+		}
 
 		// Controle le cycle de densite du fog
 		m_fogDensity = 0.08f;
 		m_fogStart = 15.f;
+
+		if (m_world.GetBloodMoonInstance()->GetDuration() > 2400)
+			m_missingTime += 50;
 	}
 
-	light0Amb[0] = m_redLight;
-	light0Amb[1] = m_greenLight;
-	light0Amb[2] = m_blueLight;
-	light0Amb[3] = 7.f;
-
+	// Le Fog
 	fogcolor[0] = m_redFog;
 	fogcolor[1] = m_greenFog;
 	fogcolor[2] = m_blueFog;
 	fogcolor[3] = 1;
-
-	// Le fog
 	glEnable(GL_FOG);
 	GLint fogmode = GL_EXP2;
 	glFogi(GL_FOG_MODE, fogmode);
@@ -524,6 +547,11 @@ void Engine::SetDayOrNight(float gametime)
 	glFogf(GL_FOG_DENSITY, m_fogDensity);
 	glFogf(GL_FOG_START, m_fogStart);
 	glFogf(GL_FOG_END, 24.f);
+
+	light0Amb[0] = m_redLight;
+	light0Amb[1] = m_greenLight;
+	light0Amb[2] = m_blueLight;
+	light0Amb[3] = 0.f;
 
 	// La lumiere
 	if (!m_world.GetBloodMoonInstance()->GetStartedState())
@@ -1120,7 +1148,6 @@ void Engine::DrawHud() const
 
 void Engine::DrawDeathScreen() const
 {
-
 	glEnable(GL_TEXTURE_2D);
 
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -1158,6 +1185,42 @@ void Engine::DrawDeathScreen() const
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
+}
+
+void Engine::DrawSurviveScreen() const
+{
+	glEnable(GL_TEXTURE_2D);
+
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_BLEND);
+
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Bind de la texture pour le font
+	m_textureFont.Bind();
+
+	//Text
+	std::ostringstream ss;
+	ss << "Survive";
+	PrintText(Width() / 2 - (ss.str().length() * 48) / 2, Height() / 2, 64, ss.str());
+
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 }
 
 void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const
