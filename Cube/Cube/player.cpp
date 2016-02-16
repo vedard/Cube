@@ -224,7 +224,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 void Player::DeathCheck()
 {
-	if (m_isDying)
+	if (m_isDying && m_isAlive)
 	{
 		m_isAlive = false;
 		std::cout << m_Name << " died." << std::endl;
