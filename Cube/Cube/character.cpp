@@ -30,6 +30,7 @@ Character::~Character()
 void Character::Spawn(World &world, int x, int z)
 {
 	m_isAlive = true;
+	m_isDying = false;
 	m_health = m_maxHealth;
 	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
@@ -75,6 +76,8 @@ void Character::Move(World &world)
 
 	//Acceleration
 	m_vitesse.y += 0.013f;
+
+	DeathCheck();
 }
 
 bool Character::CheckCollision(World &world) const
@@ -211,8 +214,11 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::L
 
 		if (m_health <= 0)
 		{
-			m_isAlive = false;
-			std::cout << m_Name << " died." << std::endl;
+			m_deathTick.restart();
+			m_isDying = true;
+			std::cout << m_Name << " is dying." << std::endl;
+			//m_isAlive = false;
+			//std::cout << m_Name << " died." << std::endl;
 		}
 	}
 	return m_isAlive;
@@ -224,6 +230,15 @@ void Character::Jump()
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
+	}
+}
+
+void Character::DeathCheck()
+{
+	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000)
+	{
+		m_isAlive = false;
+		std::cout << m_Name << " died." << std::endl;
 	}
 }
 
