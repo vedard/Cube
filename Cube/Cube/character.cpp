@@ -77,11 +77,7 @@ void Character::Move(World &world)
 	//Acceleration
 	m_vitesse.y += 0.013f;
 
-	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000)
-	{
-		m_isAlive = false;
-		std::cout << m_Name << " died." << std::endl;
-	}
+	DeathCheck();
 }
 
 bool Character::CheckCollision(World &world) const
@@ -234,6 +230,15 @@ void Character::Jump()
 	{
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
+	}
+}
+
+void Character::DeathCheck()
+{
+	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000)
+	{
+		m_isAlive = false;
+		std::cout << m_Name << " died." << std::endl;
 	}
 }
 

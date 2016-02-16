@@ -22,6 +22,7 @@ public:
 	bool Attack(Character * character);
 	virtual bool GetDamage(float damage, bool ignoreArmor, bool godMode , Sound::ListeSons son = Sound::ListeSons::HURT, bool playonce = false);
 	void Jump();
+	void DeathCheck();
 
 	//Set
 	void SetName(std::string name);
