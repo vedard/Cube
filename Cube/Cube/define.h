@@ -60,8 +60,8 @@ typedef long long int64;
 #define MAX_CREEPER 5
 #define MAX_BULLET 500
 #define MAX_COW 10
-#define MAX_MONSTER 10
 #define MAX_BEAR 10
+#define MAX_CHICKEN 50
 #define BLOODMOON_PROBABILITY 100
 #define BLOODMOON_DURATION 2500
 #define PI 3.14159265358f
@@ -89,7 +89,7 @@ typedef long long int64;
 
 
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
-
+#define INVENTORY_SIZE 15
 #define IS_INVENTORY_CREATIVE false	//If the inventory is in creative mode(infinite everything)
 #define FIRST_FAST_INVENTORY_KEY 	sf::Keyboard::Z
 #define SECOND_FAST_INVENTORY_KEY 	sf::Keyboard::X
@@ -103,8 +103,11 @@ typedef long long int64;
 #define MAX_VOLUME 100 // Valeurs du sf::Sound
 #define MIN_VOLUME 0
 
-#define KEY_BINDED_SUCCESSFULLY "The key was bound successfully"
+
 #define KEY_ALREADY_BOUND "This key is already bound"
+#define KEY_BINDED_SUCCESSFULLY "Key was binded succesfully"
+
+#define IS_DYING_LENGTH 3
 
 typedef uint8 BlockType;
 enum BLOCK_TYPE { 
@@ -181,7 +184,8 @@ enum MENU_SETTINGS {
 enum ANIMAL_TYPE
 {
 	A_BEAR,
-	A_COW
+	A_COW,
+	A_CHICKEN
 };
 
 enum MENU_CONTROLS {

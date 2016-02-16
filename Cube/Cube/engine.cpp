@@ -187,7 +187,8 @@ void Engine::LoadResource()
 		}
 
 		//Model 3d
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
+		m_modelChicken.LoadOBJ(MODEL_PATH "Chicken.obj", TEXTURE_PATH "Chicken.png");
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
@@ -243,16 +244,16 @@ void Engine::UpdateEnvironement(float gameTime)
 			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
-			for (int j = 0; j < m_activeMonsters + 5; j++)
+			for (int j = 0; j < MAX_CREEPER; j++)
 			{
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCreeper()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
-			for (int j = 0; j < m_activeAnimals + 5; j++)
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetCow()[j]))
+			for (int j = 0; j < MAX_COW; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
@@ -260,10 +261,20 @@ void Engine::UpdateEnvironement(float gameTime)
 
 
 			for (int j = 0; j < MAX_BEAR; j++)
-				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world.GetBear()[j]))
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetBear(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
+				}
+
+			for (int j = 0; j < MAX_CHICKEN; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetChicken(j)))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
+					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
@@ -273,17 +284,21 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Move(m_world);
+		m_world.GetCreeper(i)->Move(m_world);
 
 	//Update les Cow
-	for (int i = 0; i < m_activeAnimals; i++)
-	{
+	for (int i = 0; i < MAX_COW; i++)
 
-		m_world.GetCow()[i].Move(m_world);
-	}
+		m_world.GetCow(i)->Move(m_world);
+
+	for (int i = 0; i < MAX_CHICKEN; i++)
+
+		m_world.GetChicken(i)->Move(m_world);
+
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear()[i].Move(m_world);
+		m_world.GetBear(i)->Move(m_world);
+
 
 	//m_world.InitChunks(playerPos.x, playerPos.z);
 	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
@@ -372,13 +387,15 @@ void Engine::DrawEnvironement(float gameTime) {
 		glDisable(GL_LIGHT0);
 
 	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetCow()[i].Draw(m_modelCow);
+	{
+		m_world.GetCow(i)->Draw(m_modelCow);
+	}
 	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear()[i].Draw(m_modelBear);
+		m_world.GetBear(i)->Draw(m_modelBear);
 
 	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
+		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 
 
@@ -396,12 +413,18 @@ void Engine::DrawEnvironement(float gameTime) {
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
 
+	for (int i = 0; i < MAX_COW; i++)
+	{
+		m_world.GetCow(i)->Draw(m_modelCow);
+	}
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear(i)->Draw(m_modelBear);
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		m_world.GetChicken(i)->Draw(m_modelChicken);
+
 	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper()[i].Draw(m_modelCreeper, false);
-
-	for (int i = 0; i < MAX_COW; i++)
-		m_world.GetCow()[i].Draw(m_modelCow);
+		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
@@ -563,22 +586,16 @@ void Engine::Render(float elapsedTime)
 	}
 
 	//Spawn des monstre aleatoirement
+	//Spawn des monstre aleatoirement
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnCows();
 	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnBears();
-	if (m_activeAnimals >= MAX_COW)
-		m_activeAnimals = MAX_COW;
-	else
-		m_activeAnimals++;
+	if ((int)(gameTime * 100) % 100 == 0)
+		m_world.SpawnChickens();
 
-	if ((int)(gameTime * 100) % 100 == 0) {
+	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnMonsters();
-		if (m_activeMonsters >= MAX_MONSTER)
-			m_activeMonsters = MAX_MONSTER;
-		else
-			m_activeMonsters++;
-	}
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
@@ -770,12 +787,8 @@ void Engine::KeyPressEvent(unsigned char key)
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{ //M -> spawn monster
 			for (int i = 0; i < MAX_CREEPER; i++) {
-				if (!m_world.GetCreeper()[i].GetisAlive()) {
-					m_world.GetCreeper()[i].Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
-					if (m_activeMonsters >= MAX_MONSTER)
-						m_activeMonsters = MAX_MONSTER;
-					else
-						m_activeMonsters++;
+				if (!m_world.GetCreeper(i)->GetisAlive()) {
+					m_world.GetCreeper(i)->Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
 				}
 			}
@@ -1728,7 +1741,7 @@ void Engine::ManageMenuEnterKeyPress()
 		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 			m_menu = new Menu(SM_SETTINGS);
-		else if (m_menu->m_currentMenu == MP_CONTROLS)
+		else if ((int)m_menu->m_currentMenu == (int)MP_CONTROLS)
 			m_menu = new Menu(SM_CONTROLS);
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
@@ -1808,6 +1821,7 @@ void Engine::ManageMenuEnterKeyPress()
 			{
 				m_settings.m_renderdistance = m_menu->m_settingNewValue;
 				m_settings.Save();
+
 
 				m_world.SetUpdateDistance(m_settings.m_renderdistance);
 

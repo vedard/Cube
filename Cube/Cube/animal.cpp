@@ -22,7 +22,7 @@ Animal::~Animal()
 
 void Animal::Move(World &world)
 {
-	if (m_isAlive)
+	if (m_isAlive && !m_isDying)
 	{
 		m_vitesse.x = 0.05f;
 		m_vitesse.z = 0.05f;
@@ -54,30 +54,9 @@ void Animal::Move(World &world)
 			m_ClockTarget.restart();
 		}
 
-
-
-		//Chute
-		m_pos.y -= m_vitesse.y;
-
-		//Si collision
-		if (CheckCollision(world))
-		{
-
-			//Si on a touche le sol 
-			if (m_vitesse.y > 0)
-				m_isInAir = false;
-
-			//annule
-			m_pos.y += m_vitesse.y;
-			m_vitesse.y = 0;
-		}
-		else
-			m_isInAir = true;
-
-		//Acceleration
-		m_vitesse.y += 0.013f;
-
 	}
+
+	Character::Move(world);
 }
 
 void Animal::Draw(Model3d &model) const
@@ -89,7 +68,7 @@ void Animal::Draw(Model3d &model) const
 		else
 			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		if (false)
+		if (true)
 		{
 			glPushMatrix();
 
@@ -126,16 +105,20 @@ void Animal::Draw(Model3d &model) const
 	}
 }
 
-void Animal::GetDamage(float damage)
+bool Animal::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
 {
-	m_ClockAnimationDmg.restart();
 	Jump();
 	if (rand() % 100 > 66)
 		Sound::Play(Sound::FLESH_IMPACT);
-	Character::GetDamage(damage,false,false);
+	return Character::GetDamage(damage, ignoreArmor, godMode, son, playonce);
 }
 
 ANIMAL_TYPE Animal::GetType()
 {
 	return type;
+}
+
+void Animal::SetTarget(Character* target)
+{
+	std::cout << "penis" << std::endl;
 }

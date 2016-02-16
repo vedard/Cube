@@ -22,7 +22,6 @@ void BloodMoon::AddElapsedUnit()
 
 bool BloodMoon::GetCompletionState()
 {
-	//std::cout << m_currTime << std::endl;
 	if (m_currTime >= m_duration) {
 		m_isActive = false;
 		m_isStarted = false;
