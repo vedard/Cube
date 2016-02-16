@@ -7,6 +7,7 @@ public:
 	Creeper();
 	~Creeper();
 	std::vector<Vector3<int>> Explosion();
+	void SetExplosionRadius(int radius);
 
 private:
 	int explosionRadius = 6;

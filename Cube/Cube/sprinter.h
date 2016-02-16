@@ -6,7 +6,7 @@ class Sprinter : public Monster
 public:
 	Sprinter();
 	~Sprinter();
-	void Move(World &world);
+	//void Move(World &world);
 
 private:
 };

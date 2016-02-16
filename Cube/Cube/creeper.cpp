@@ -33,3 +33,9 @@ std::vector<Vector3<int>> Creeper::Explosion()
 
 	return blocsDestroyed;
 }
+
+void Creeper::SetExplosionRadius(int radius)
+{
+	if (radius > 0)
+		explosionRadius = radius;
+}
