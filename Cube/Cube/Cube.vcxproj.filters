@@ -32,6 +32,7 @@
     <ClCompile Include="music.cpp" />
     <ClCompile Include="sprinter.cpp" />
     <ClCompile Include="bloodMoon.cpp" />
+    <ClCompile Include="Chicken.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -63,11 +64,14 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
-    <ClInclude Include="bloodMoon.h" />    <ClInclude Include="creeper.h" />
+    <ClInclude Include="bloodMoon.h" />
+    <ClInclude Include="creeper.h" />
     <ClInclude Include="bear.h" />
     <ClInclude Include="cow.h" />
     <ClInclude Include="music.h" />
-    <ClInclude Include="sprinter.h" />  </ItemGroup>
+    <ClInclude Include="sprinter.h" />
+    <ClInclude Include="Chicken.h" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />
     <None Include="media\shaders\shader01.frag" />

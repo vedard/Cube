@@ -12,7 +12,7 @@ Network::Network()
 	m_ENetAddress.host = ENET_HOST_ANY;
 	m_ENetAddress.port = 1234;
 
-	if(m_isServer)
+	if (m_isServer)
 		m_ENetHost = enet_host_create(&m_ENetAddress, 32, 2, 0, 0);
 	else
 		m_ENetHost = enet_host_create(NULL, 1, 2, 0, 0);
@@ -33,7 +33,7 @@ Network::~Network()
 
 bool Network::Fetch()
 {
-	if (enet_host_service(m_ENetHost, &m_ENetEvent, 0) > 0)
+	while (enet_host_service(m_ENetHost, &m_ENetEvent, 0) > 0)
 	{
 		switch (m_ENetEvent.type)
 		{
@@ -68,22 +68,22 @@ void Network::Disconnect()
 {
 	if (m_isServer || m_EnetPeerServer == NULL)
 		return;
-	
+
 	enet_peer_disconnect(m_EnetPeerServer, 0);
 }
 
 bool Network::Send(string data)
 {
-	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, 0);
+	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, ENET_PACKET_FLAG_UNSEQUENCED);
 
 	// Broadcast a tous les client si on est un serveur
 	// Send au serveur si on est un client
 	if (m_isServer)
-		enet_host_broadcast(m_ENetHost, 1, packet);
-	else if(m_EnetPeerServer)
+		enet_host_broadcast(m_ENetHost, 0, packet);
+	else if (m_EnetPeerServer)
 		enet_peer_send(m_EnetPeerServer, 0, packet);
 
-	enet_host_flush(m_ENetHost);
+	//enet_host_flush(m_ENetHost);
 
 	return false;
 }
@@ -129,7 +129,7 @@ void Network::OnPacketReceive()
 			c = tmpClient;
 			isFound = true;
 		}
-	
+
 	// S'il n'est pas deja dans la liste on l'ajoute
 	if (!isFound)
 		m_lstClient.push_back(tmpClient);

@@ -12,7 +12,8 @@ Character::Character() :
 	m_Armor(1),
 	m_cooldownAttackTimer(),
 	m_AttackDamage(30.0f),
-	m_isAlive(true)
+	m_isAlive(true),
+	m_maxHealth(100)
 {
 
 	m_Name = "Character ";
@@ -30,7 +31,7 @@ void Character::Spawn(World &world, int x, int z)
 {
 	m_isAlive = true;
 	m_isDying = false;
-	m_health = 100;
+	m_health = m_maxHealth;
 	m_pos.x = (float)x;
 	m_pos.y = CHUNK_SIZE_Y;
 	m_pos.z = (float)z;

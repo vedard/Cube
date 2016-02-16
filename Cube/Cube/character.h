@@ -53,6 +53,7 @@ protected:
 	//Stat
 	std::string m_Name;
 	float m_health;
+	float m_maxHealth;
 	int m_AttackRange;
 	float m_AttackSpeed;
 	float m_Armor;
