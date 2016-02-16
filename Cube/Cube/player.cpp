@@ -50,172 +50,185 @@ void Player::TurnTopBottom(float value)
 
 void Player::Move(bool front, bool back, bool left, bool right, World &world)
 {
-	//Orientation du player en rad
-	float orientationPlayer = m_HorizontalRot * PI / 180;
-	//Multiplicateur de vitesse
-	m_vitesse.x = 0.1f;
-	m_vitesse.z = 0.1f;
-
-	//Change la vittesse selon l'etat du player
-
-	if (m_noClip)
+	if (!m_isDying)
 	{
-		m_vitesse.x = 1.2f;
-		m_vitesse.z = 1.2f;
-		m_vitesse.y = 1.2f;
-	}
-	else
-	{
-		if (m_sneaked)
-		{
-			m_vitesse.x *= 0.7f;
-			m_vitesse.z *= 0.7f;
 
-		}
-		else if (m_running)
-		{
-			m_vitesse.x *= 1.4f;
-			m_vitesse.z *= 1.4f;
+		//Orientation du player en rad
+		float orientationPlayer = m_HorizontalRot * PI / 180;
+		//Multiplicateur de vitesse
+		m_vitesse.x = 0.1f;
+		m_vitesse.z = 0.1f;
 
-		}
-		if (m_footUnderwater)
+		//Change la vittesse selon l'etat du player
+
+		if (m_noClip)
 		{
-			if (!m_footWasUnderwater && m_wasInAir)
+			m_vitesse.x = 1.2f;
+			m_vitesse.z = 1.2f;
+			m_vitesse.y = 1.2f;
+		}
+		else
+		{
+			if (m_sneaked)
 			{
-				Sound::Play(Sound::SPLASH);
-				m_footWasUnderwater = true;
+				m_vitesse.x *= 0.7f;
+				m_vitesse.z *= 0.7f;
+
 			}
-			m_vitesse.x *= 0.6f;
-			m_vitesse.z *= 0.6f;
+			else if (m_running)
+			{
+				m_vitesse.x *= 1.4f;
+				m_vitesse.z *= 1.4f;
+
+			}
+			if (m_footUnderwater)
+			{
+				if (!m_footWasUnderwater && m_wasInAir)
+				{
+					Sound::Play(Sound::SPLASH);
+					m_footWasUnderwater = true;
+				}
+				m_vitesse.x *= 0.6f;
+				m_vitesse.z *= 0.6f;
+			}
+			if (m_footUnderLava)
+			{
+				m_vitesse.x *= 0.4f;
+				m_vitesse.z *= 0.4f;
+			}
 		}
+
+		//Deplacement Avant/Arriere
+		Vector3<float> directionVector(cosf(PI / 2.f * 3.f + orientationPlayer), 0.f, sinf(PI / 2.f * 3.f + orientationPlayer));
+		Vector3<float> directionVectorNoClip(cosf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_VerticalRot * PI / 180)), sinf(-m_VerticalRot * PI / 180), sinf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_VerticalRot * PI / 180)));
+		//Deplacement Gauche/Droite
+		Vector3<float> rightVector = directionVector.Cross(Vector3<float>(0, 1, 0));
+		//Deplacement Total
+		Vector3<float> deplacementVector(0, 0, 0);
+
+		//Selon les touches appuie on modifie le vecteur de deplacement
+		if (front) {
+			if (m_noClip)
+				deplacementVector += directionVectorNoClip;
+			else
+				deplacementVector += directionVector;
+		}
+		else if (back) {
+			if (m_noClip)
+				deplacementVector -= directionVectorNoClip;
+			else
+				deplacementVector -= directionVector;
+		}
+		if (right)
+			deplacementVector += rightVector;
+		if (left)
+			deplacementVector -= rightVector;
+		//Si on bouge pas -> vitesse = 0
+		if (!left && !right && !front && !back)
+		{
+			m_vitesse.x = 0;
+			m_vitesse.z = 0;
+
+
+			//m_HeadShake -= 0.01;
+			//if (m_HeadShake <= 0)
+			m_HeadShake = 0;
+		}
+		else if (!m_isInAir)
+			m_HeadShake += 2.2f * m_vitesse.x;
+
+
+		//Normalize les vecteur
+		deplacementVector.Normalize();
+
+
+		//Si no clip (pas de collision)
+		if (m_noClip)
+		{
+			m_pos.y += deplacementVector.y * m_vitesse.y;
+			m_pos.x += deplacementVector.x * m_vitesse.x;
+			m_pos.z += deplacementVector.z * m_vitesse.z;
+			m_isInAir = true;
+			m_wasInAir = true;
+		}
+
+		else
+		{
+			//Deplacement en X
+			m_pos.x += deplacementVector.x * m_vitesse.x;
+			//Si collision, on annule
+			if (CheckCollision(world))
+				m_pos.x -= deplacementVector.x * m_vitesse.x;
+
+			//Deplacement en Z
+			m_pos.z += deplacementVector.z * m_vitesse.z;
+			//Si collision, on annule
+			if (CheckCollision(world))
+				m_pos.z -= deplacementVector.z * m_vitesse.z;
+
+
+			//Deplacement en Y (Gravité)
+			m_pos.y -= m_vitesse.y;
+
+			//Si collision
+			if (CheckCollision(world))
+			{
+				//Si on a touche le sol 
+				if (m_vitesse.y > 0)
+				{
+					m_isInAir = false;
+					m_wasInAir = false;
+					if (m_vitesse.y > 0.02f && !m_footUnderwater)
+					{
+						m_wasInAir = true;
+					}
+					//Degat de chute 
+					if (m_vitesse.y > 0.40f)
+					{
+						GetDamage(exp(m_vitesse.y * 6), false, m_godMode);
+						//isHurt = 20;
+					}
+				}
+
+				//annule
+				m_pos.y += m_vitesse.y;
+				m_vitesse.y = 0;
+			}
+
+			//Acceleration
+			if (m_footUnderwater)
+				m_vitesse.y += 0.002f;
+			else if (m_footUnderLava)
+				m_vitesse.y += 0.001f;
+			else
+				m_vitesse.y += 0.013f;
+		}
+
+		//Si le player est dans l'eau
+		CheckUnderwater(world);
+
+		if (m_footUnderwater)
+			if (m_vitesse.y > 0.08f)
+				m_vitesse.y = 0.08f;
+		//si le player est en dessous de la lave
+		CheckUnderLava(world);
+		CheckBlockUnder(world);
+
 		if (m_footUnderLava)
-		{
-			m_vitesse.x *= 0.4f;
-			m_vitesse.z *= 0.4f;
-		}
+			if (m_vitesse.y > 0.08f)
+				m_vitesse.y = 0.08f;
 	}
-
-	//Deplacement Avant/Arriere
-	Vector3<float> directionVector(cosf(PI / 2.f * 3.f + orientationPlayer), 0.f, sinf(PI / 2.f * 3.f + orientationPlayer));
-	Vector3<float> directionVectorNoClip(cosf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_VerticalRot * PI / 180)), sinf(-m_VerticalRot * PI / 180), sinf(PI / 2 * 3 + orientationPlayer) * (cosf(-m_VerticalRot * PI / 180)));
-	//Deplacement Gauche/Droite
-	Vector3<float> rightVector = directionVector.Cross(Vector3<float>(0, 1, 0));
-	//Deplacement Total
-	Vector3<float> deplacementVector(0, 0, 0);
-
-	//Selon les touches appuie on modifie le vecteur de deplacement
-	if (front) {
-		if (m_noClip)
-			deplacementVector += directionVectorNoClip;
-		else
-			deplacementVector += directionVector;
-	}
-	else if (back) {
-		if (m_noClip)
-			deplacementVector -= directionVectorNoClip;
-		else
-			deplacementVector -= directionVector;
-	}
-	if (right) 
-		deplacementVector += rightVector;
-	if(left)
-		deplacementVector -= rightVector;
-	//Si on bouge pas -> vitesse = 0
-	if (!left && !right && !front && !back)
-	{
-		m_vitesse.x = 0;
-		m_vitesse.z = 0;
-
-
-		//m_HeadShake -= 0.01;
-		//if (m_HeadShake <= 0)
-		m_HeadShake = 0;
-	}
-	else if (!m_isInAir)
-		m_HeadShake += 2.2f * m_vitesse.x;
-
-
-	//Normalize les vecteur
-	deplacementVector.Normalize();
-
-
-	//Si no clip (pas de collision)
-	if (m_noClip)
-	{
-		m_pos.y += deplacementVector.y * m_vitesse.y;
-		m_pos.x += deplacementVector.x * m_vitesse.x;
-		m_pos.z += deplacementVector.z * m_vitesse.z;
-		m_isInAir = true;
-		m_wasInAir = true;
-	}
-
-	else
-	{
-		//Deplacement en X
-		m_pos.x += deplacementVector.x * m_vitesse.x;
-		//Si collision, on annule
-		if (CheckCollision(world))
-			m_pos.x -= deplacementVector.x * m_vitesse.x;
-
-		//Deplacement en Z
-		m_pos.z += deplacementVector.z * m_vitesse.z;
-		//Si collision, on annule
-		if (CheckCollision(world))
-			m_pos.z -= deplacementVector.z * m_vitesse.z;
-
-
-		//Deplacement en Y (Gravité)
-		m_pos.y -= m_vitesse.y;
-
-		//Si collision
-		if (CheckCollision(world))
-		{
-			//Si on a touche le sol 
-			if (m_vitesse.y > 0)
-			{
-				m_isInAir = false;
-				m_wasInAir = false;
-				if (m_vitesse.y > 0.02f && !m_footUnderwater)
-				{
-					m_wasInAir = true;
-				}
-				//Degat de chute 
-				if (m_vitesse.y > 0.40f)
-				{
-					GetDamage(exp(m_vitesse.y * 6), false, m_godMode);
-					//isHurt = 20;
-				}
-			}
-			
-			//annule
-			m_pos.y += m_vitesse.y;
-			m_vitesse.y = 0;
-		}
-
-		//Acceleration
-		if (m_footUnderwater)
-			m_vitesse.y += 0.002f;
-		else if(m_footUnderLava)
-			m_vitesse.y += 0.001f;
-		else
-			m_vitesse.y += 0.013f;
-	}
-
-	//Si le player est dans l'eau
-	CheckUnderwater(world);
-
-	if (m_footUnderwater)
-		if (m_vitesse.y > 0.08f)
-			m_vitesse.y = 0.08f;
-	//si le player est en dessous de la lave
-	CheckUnderLava(world);
-	CheckBlockUnder(world);
-
-	if (m_footUnderLava)
-		if (m_vitesse.y > 0.08f)
-			m_vitesse.y = 0.08f;
 
 	DeathCheck();
+}
+
+void Player::DeathCheck()
+{
+	if (m_isDying)
+	{
+		m_isAlive = false;
+		std::cout << m_Name << " died." << std::endl;
+	}
 }
 
 void Player::CheckUnderwater(World &world)
