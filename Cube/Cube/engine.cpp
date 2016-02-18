@@ -158,6 +158,8 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::HARP, EFFECT_PATH "harp.wav");
 		Sound::AddSound(Sound::SPLASH, EFFECT_PATH "splash.wav");
 		Sound::AddSound(Sound::SHOTGUN_FIRE, WEAPONS_PATH "shotgun.wav");
+		Sound::AddSound(Sound::BLOODMOON_THEME, EFFECT_PATH "bloodmoon_theme.wav");
+
 
 
 		for (int i = 0; i < 9; i++)
@@ -190,6 +192,8 @@ void Engine::LoadResource()
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
+		m_modelDragon.LoadOBJ(MODEL_PATH "dragon.obj", TEXTURE_PATH "dragonfire.png");
+		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.jpg");
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
@@ -204,8 +208,8 @@ void Engine::LoadResource()
 
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 20, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
-	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 60, 0.4);
-	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 150, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 100, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
@@ -251,6 +255,15 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
+			for (int j = 0; j < MAX_SPRINTER; j++)
+			{
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetSprinter(j)))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+			}
+
 			for (int j = 0; j < MAX_COW; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
 				{
@@ -267,6 +280,13 @@ void Engine::UpdateEnvironement(float gameTime)
 					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
+			for (int j = 0; j < MAX_DRAGON; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetDragon(j)))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+				}
+
 			for (int j = 0; j < MAX_CHICKEN; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetChicken(j)))
 				{
@@ -281,33 +301,46 @@ void Engine::UpdateEnvironement(float gameTime)
 		}
 	}
 
-	//Update les monstres
+	//Update les Creepers
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Move(m_world);
 
+	//Update les Sprinters
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		m_world.GetSprinter(i)->Move(m_world);
+
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
+	{
+
 		m_world.GetCow(i)->Move(m_world);
+	}
 
-	for (int i = 0; i < MAX_CHICKEN; i++)
-		m_world.GetChicken(i)->Move(m_world);
+		for (int i = 0; i < MAX_CHICKEN; i++)
+			m_world.GetChicken(i)->Move(m_world);
+		//Update les Bears
+		for (int i = 0; i < MAX_BEAR; i++)
+			m_world.GetBear(i)->Move(m_world);
 
+		//Update les Dragons
+		for (int i = 0; i < MAX_DRAGON; i++)
+			m_world.GetDragon(i)->Move(m_world);
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Move(m_world);
 
+		//m_world.InitChunks(playerPos.x, playerPos.z);
+		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+		t.detach();
 
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
+		//Update les chunk autour du joueur si il sont dirty
+		m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	//Update les chunk autour du joueur si il sont dirty
-	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+		m_network.Fetch();
+		SyncWithServer();
 
-	m_network.Fetch();
-	SyncWithServer();
+	}
 
-}
 
 void Engine::SyncWithServer()
 {
@@ -347,6 +380,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	{
 		Sound::PlayOnce(Sound::SURVIVE);
 		m_wireframe = false;
+		m_music.setVolume(0);
 		DrawSurviveScreen();
 		return;
 	}
@@ -396,11 +430,14 @@ void Engine::DrawEnvironement(float gameTime) {
 	}
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
+	
 
-	//Draw Monstres
+	//Draw Creepers
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
 
 
 	//Draw guns
@@ -425,6 +462,8 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Draw(m_modelChicken);
+	for (int i = 0; i < MAX_DRAGON; i++)
+		m_world.GetDragon(i)->Draw(m_modelDragon);
 
 	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
@@ -487,6 +526,7 @@ void Engine::DayAndNightCycle(float gametime)
 {
 	float time = sin(((gametime) - m_missingTime) / DAY_TIME);
 
+	// Decide si la prochaine nuit est une bloodmoon
 	if (time > 0.99)
 		if (rand() % BLOODMOON_PROBABILITY == 0)
 			m_world.GetBloodMoonInstance()->Activate();
@@ -523,6 +563,10 @@ void Engine::DayAndNightCycle(float gametime)
 	// la blood moon selon le temps entre 0 et 2500
 	if (m_world.GetBloodMoonInstance()->GetStartedState()) 
 	{
+		if (m_world.GetBloodMoonInstance()->GetDuration() == 55)
+		{
+			Sound::PlayOnce(Sound::BLOODMOON_THEME);
+		}
 		// Éteint la lumière
 		if (m_world.GetBloodMoonInstance()->GetDuration() >= 50 && m_world.GetBloodMoonInstance()->GetDuration() <= 100)
 		{
@@ -549,8 +593,10 @@ void Engine::DayAndNightCycle(float gametime)
 		m_fogDensity = 0.08f;
 		m_fogStart = 15.f;
 
-		if (m_world.GetBloodMoonInstance()->GetDuration() > 2400)
+		if (m_world.GetBloodMoonInstance()->GetDuration() >= 2500) {
 			m_missingTime += 50;
+			m_music.setVolume(m_settings.m_musicvolume);
+		}
 	}
 
 	// Le Fog
@@ -597,112 +643,107 @@ void Engine::Render(float elapsedTime)
 	//gestion des ticks
 	if (gameTime - m_LastTickTime >= TICK_DELAY)
 	{
-		if (!m_settings.m_isServer)
+		if (!m_settings.m_isServer && !m_world.GetBloodMoonInstance()->GetStartedState())
 			m_music.PlayNext();
 		m_LastTickTime = gameTime;
 		m_world.GetPlayer()->Tick();
 	}
 
-	//Spawn des monstre aleatoirement
-	if ((int)(gameTime * 100) % 100 == 0)
+	if ((int)(gameTime * 100) % 100 == 0) {
+		m_world.SpawnCreepers(MAX_CREEPER * m_world.GetBloodMoonInstance()->monsterMultiplier);
+		m_world.SpawnSprinters();
 		m_world.SpawnCows();
-	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnBears(MAX_BEAR * m_world.GetBloodMoonInstance()->monsterMultiplier);
-	if ((int)(gameTime * 100) % 100 == 0)
 		m_world.SpawnChickens();
-	if ((int)(gameTime * 100) % 100 == 0)
-		m_world.SpawnMonsters(MAX_CREEPER * m_world.GetBloodMoonInstance()->monsterMultiplier);
+		m_world.SpawnBears(MAX_BEAR * m_world.GetBloodMoonInstance()->monsterMultiplier);
+		m_world.SpawnDragons();
+	}
 
-	//On met a jour le fps
-	if ((int)(gameTime * 100) % 10 == 0)
-		m_fps = (int)round(1.f / elapsedTime);
-
-	int loops = 0;
-
-	//Lock les mouvements a 50 fps
-	while (gameTime > nextGameUpdate && loops < 10)
-	{
-		//Gestion des Ticks
-
-		//Footstep
-		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
-		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
+		//Lock les mouvements a 50 fps
+		int loops = 0;
+		while (gameTime > nextGameUpdate && loops < 10)
 		{
-			if (m_world.GetPlayer()->footUnderwater())
+			//Gestion des Ticks
+
+			//Footstep
+			static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
+			if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 			{
-				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
-			}
-			else
-			{
-				switch (m_world.GetPlayer()->blockUnderPlayer())
+				if (m_world.GetPlayer()->footUnderwater())
 				{
-				case 1: // GRASS
-					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-					break;
-				case 3: // STONE
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 5: // WOOD PLANK
-					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-					break;
-				case 7: // DIRT
-					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-					break;
-				case 8: // IRON
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 9: // COAL
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 10: // DIAMOND
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 11: // GOLD
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 12: // REDSTONE
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 13: // LAPIS
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
-				case 14: // WOOD
-					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-					break;
-				case 15: // LEAVE
-					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-					break;
-				case 26: // SAND
-					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
-					break;
-				default:
-					Sound::Play(Sound::STONESTEP1 + rand() % 4);
-					break;
+					Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 				}
+				else
+				{
+					switch (m_world.GetPlayer()->blockUnderPlayer())
+					{
+					case 1: // GRASS
+						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+						break;
+					case 3: // STONE
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 5: // WOOD PLANK
+						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+						break;
+					case 7: // DIRT
+						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+						break;
+					case 8: // IRON
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 9: // COAL
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 10: // DIAMOND
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 11: // GOLD
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 12: // REDSTONE
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 13: // LAPIS
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					case 14: // WOOD
+						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+						break;
+					case 15: // LEAVE
+						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+						break;
+					case 26: // SAND
+						Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+						break;
+					default:
+						Sound::Play(Sound::STONESTEP1 + rand() % 4);
+						break;
+					}
+				}
+				lastpos = m_world.GetPlayer()->GetPosition();
 			}
-			lastpos = m_world.GetPlayer()->GetPosition();
-		}
 
 
-		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
-			m_mouseButton[1] = false;
+			if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
+				m_mouseButton[1] = false;
 
 		DayAndNightCycle(gameTime);
 		UpdateEnvironement(gameTime);
 
-		//Time control
-		//1 / 0.02 = 50 fps
-		nextGameUpdate += 0.02f;
-		loops++;
-	}
+			//Time control
+			//1 / 0.02 = 50 fps
+			nextGameUpdate += 0.02f;
+			loops++;
+		}
 
 
 
-	if (!m_settings.m_isServer)
-	{
-		GetBlocAtCursor();
-		DrawEnvironement(gameTime);
-	}
+		if (!m_settings.m_isServer)
+		{
+			GetBlocAtCursor();
+			DrawEnvironement(gameTime);
+		}
+	
 }
 
 void Engine::KeyPressEvent(unsigned char key)

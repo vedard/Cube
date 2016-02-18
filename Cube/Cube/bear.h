@@ -5,6 +5,7 @@
 #include "model3d.h"
 #include "sound.h"
 #include "animal.h"
+#include "world.h"
 
 class Bear : public Animal
 {

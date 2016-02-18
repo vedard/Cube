@@ -208,16 +208,19 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::L
 		}
 		m_health -= damage;
 
-		std::cout << m_Name << " received " << damage << " damage." << std::endl;
+		if (!m_isDying)
+			std::cout << m_Name << " received " << damage << " damage." << std::endl;
 
 		if (m_health <= 0)
 		{
+			if (m_isDying == false && m_isAlive)
+				std::cout << m_Name << " is dying." << std::endl;
 			m_deathTick.restart();
 			m_isDying = true;
-			std::cout << m_Name << " is dying." << std::endl;
 			//m_isAlive = false;
 			//std::cout << m_Name << " died." << std::endl;
 		}
+		DeathCheck();
 	}
 	return m_isAlive;
 }
@@ -229,11 +232,13 @@ void Character::Jump()
 		m_vitesse.y = -0.20f;
 		m_isInAir = true;
 	}
+	DeathCheck();
 }
 
+///
 void Character::DeathCheck()
 {
-	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000)
+	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000 && m_isAlive)
 	{
 		m_isAlive = false;
 		std::cout << m_Name << " died." << std::endl;
