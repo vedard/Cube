@@ -5,7 +5,7 @@ Bear::Bear() :Animal(A_BEAR)
 {
 	m_maxHealth = 300;
 	m_Armor = 2;
-	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
+	m_dimension = Vector3<float>(2.5f, 3.f, 5.f);
 	m_Name = "BigBadBear aka BBB";
 	isHurt = false;
 	chillCount = 0;

@@ -193,7 +193,7 @@ void Engine::LoadResource()
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 		m_modelDragon.LoadOBJ(MODEL_PATH "dragon.obj", TEXTURE_PATH "dragonfire.png");
-		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.png");
+		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.jpg");
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
@@ -246,7 +246,7 @@ void Engine::UpdateEnvironement(float gameTime)
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].Update();
 			Parametre& m_settings = Parametre::GetInstance();
 
-			//Check si y a collisionkdhfkjdshfkj
+			//Check si y a collision
 			for (int j = 0; j < MAX_CREEPER; j++)
 			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
@@ -277,7 +277,6 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
-					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			for (int j = 0; j < MAX_DRAGON; j++)
@@ -292,7 +291,6 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
-					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
@@ -447,7 +445,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
+	//Draw animals
 	for (int i = 0; i < MAX_COW; i++)
 	{
 		m_world.GetCow(i)->Draw(m_modelCow);
@@ -461,9 +459,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
@@ -801,24 +796,29 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[m_settings.m_inventory2])
 		{
-			m_world.GetPlayer()->SetWeapon(W_SNIPER);
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		//3 ->  W_SUBMACHINE_GUN
-		//if (m_keyboard[m_settings.m_inventory3])
-		//{
-		//	m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
-		//	Sound::Play(Sound::GUN_DRAW);
-		//}
+		if (m_keyboard[m_settings.m_inventory3])
+		{
+			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+			Sound::Play(Sound::GUN_DRAW);
+		}
 		//shotgun sur 2 pour le moment
-		else if (m_keyboard[m_settings.m_inventory3])
+		else if (m_keyboard[m_settings.m_inventory4])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SHOTGUN);
 			Sound::Play(Sound::GUN_DRAW);
 		}
-		else if (m_keyboard[m_settings.m_inventory4])
-		{ //4 ->  W_ASSAULT_RIFLE
+		else if (m_keyboard[m_settings.m_inventory5])
+		{ //5 ->  W_ASSAULT_RIFLE
 			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		else if (m_keyboard[m_settings.m_inventory6])
+		{ //6 ->  W_SNIPER
+			m_world.GetPlayer()->SetWeapon(W_SNIPER);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		else if (m_keyboard[m_settings.m_spawnmonster])
