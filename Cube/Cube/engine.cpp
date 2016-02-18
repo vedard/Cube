@@ -274,7 +274,6 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
-					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			for (int j = 0; j < MAX_DRAGON; j++)
@@ -289,7 +288,6 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
-					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
@@ -434,7 +432,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
+	//Draw animals
 	for (int i = 0; i < MAX_COW; i++)
 	{
 		m_world.GetCow(i)->Draw(m_modelCow);
@@ -446,9 +444,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
 
-	//Draw Monstres
-	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
@@ -785,24 +780,29 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[m_settings.m_inventory2])
 		{
-			m_world.GetPlayer()->SetWeapon(W_SNIPER);
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		//3 ->  W_SUBMACHINE_GUN
-		//if (m_keyboard[m_settings.m_inventory3])
-		//{
-		//	m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
-		//	Sound::Play(Sound::GUN_DRAW);
-		//}
+		if (m_keyboard[m_settings.m_inventory3])
+		{
+			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+			Sound::Play(Sound::GUN_DRAW);
+		}
 		//shotgun sur 2 pour le moment
-		else if (m_keyboard[m_settings.m_inventory3])
+		else if (m_keyboard[m_settings.m_inventory4])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SHOTGUN);
 			Sound::Play(Sound::GUN_DRAW);
 		}
-		else if (m_keyboard[m_settings.m_inventory4])
-		{ //4 ->  W_ASSAULT_RIFLE
+		else if (m_keyboard[m_settings.m_inventory5])
+		{ //5 ->  W_ASSAULT_RIFLE
 			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		else if (m_keyboard[m_settings.m_inventory6])
+		{ //6 ->  W_SNIPER
+			m_world.GetPlayer()->SetWeapon(W_SNIPER);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		else if (m_keyboard[m_settings.m_spawnmonster])
