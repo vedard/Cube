@@ -252,7 +252,7 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 			}
-			for (int j = 0; j < MAX_CREEPER; j++)
+			for (int j = 0; j < MAX_SPRINTER; j++)
 			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetSprinter(j)))
 				{
