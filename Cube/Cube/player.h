@@ -75,7 +75,8 @@ private:
 	BlockType m_blockUnder; // Bloc en dessous du joueur
 	Gun * Guns;
 	float InvulnerabilityTimer;
-	
+	int m_nbsauttrampoline = 0;
+	float multiplicateur = 1.01f;
 	int m_weapon;			// current weapon
 
 	float m_HeadShake;		// Shake la camera a chaque pas

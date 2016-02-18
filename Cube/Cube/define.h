@@ -56,16 +56,17 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 29
-#define MAX_CREEPER 2
-#define MAX_SPRINTER 10
+#define MAX_CREEPER 0
+#define MAX_SPRINTER 0
 #define MAX_BULLET 500
-#define MAX_COW 10
-#define MAX_BEAR 10
-#define MAX_CHICKEN 10
+#define MAX_COW 0
+#define MAX_BEAR 0
+#define MAX_CHICKEN 0
 #define BLOODMOON_PROBABILITY 100
 #define BLOODMOON_DURATION 2500
 #define PI 3.14159265358f
 #define INVULNERABILITY_PLAYER_TIME 1
+#define MAX_TRAMPOLINE_JUMP 10
 
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
