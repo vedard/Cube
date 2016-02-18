@@ -22,9 +22,6 @@ void Monster::Move(World &world)
 {
 	if (m_isAlive && !m_isDying)
 	{
-		m_vitesse.x = 0.05f;
-		m_vitesse.z = 0.05f;
-
 		//Si la cible est valide
 		if (m_target)
 		{

@@ -7,7 +7,7 @@ Character::Character() :
 	m_AttackRange(2),
 	m_HorizontalRot(0.f),
 	m_VerticalRot(45.f),
-	m_vitesse(0, 0, 0),
+	m_vitesse(0.05f, 0, 0.05f),
 	m_AttackSpeed(0),
 	m_Armor(1),
 	m_cooldownAttackTimer(),

@@ -9,6 +9,7 @@ public:
 	void Move(World &world);
 
 private:
+	int m_mouvementCooldown;
 };
 #endif //SPRINTER_H__
 
