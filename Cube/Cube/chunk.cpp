@@ -74,7 +74,7 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type, char direction)
 		m_negativeX->m_isDirty = true;
 
 	}
-	else if (x >= CHUNK_SIZE_X && m_positiveX)
+	else if (x == CHUNK_SIZE_X && m_positiveX)
 	{
 		int distance = x - CHUNK_SIZE_X;
 		m_positiveX->m_blocks.Set(distance, y, z, type);
@@ -90,7 +90,7 @@ void Chunk::SetBlock(int x, int y, int z, BlockType type, char direction)
 		m_negativeZ->m_isDirty = true;
 
 	}
-	else if (z >= CHUNK_SIZE_Z && m_positiveZ)
+	else if (z == CHUNK_SIZE_Z && m_positiveZ)
 	{
 		int distance = z - CHUNK_SIZE_Z;
 		m_positiveZ->m_blocks.Set(x, y, distance, type);

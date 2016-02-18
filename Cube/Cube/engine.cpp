@@ -159,6 +159,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::SPLASH, EFFECT_PATH "splash.wav");
 		Sound::AddSound(Sound::SHOTGUN_FIRE, WEAPONS_PATH "shotgun.wav");
 		Sound::AddSound(Sound::BLOODMOON_THEME, EFFECT_PATH "bloodmoon_theme.wav");
+		Sound::AddSound(Sound::SPRINTER, SPRINTER_PATH "SprinterScream.wav");
 
 
 
@@ -189,6 +190,7 @@ void Engine::LoadResource()
 
 		//Model 3d
 		m_modelChicken.LoadOBJ(MODEL_PATH "Chicken.obj", TEXTURE_PATH "Chicken.png");
+		m_modelBird.LoadOBJ(MODEL_PATH "Bird.obj", TEXTURE_PATH "Bird.png");
 		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
@@ -209,11 +211,11 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 20, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
-	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 150, 0.5);
-	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 100, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 150, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
-	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 1.f);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 0.01f);
 
 	// -- Player
 	m_world.GetPlayer()->SetName(Parametre::GetInstance().m_PlayerName);
@@ -277,7 +279,6 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
-					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			for (int j = 0; j < MAX_DRAGON; j++)
@@ -292,8 +293,14 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
-					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
+				}
+
+			for (int j = 0; j < MAX_BIRD; j++)
+				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetBird(j)))
+				{
+					m_world.GetPlayer()->hasHit = 5;
+					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 
 			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
@@ -316,30 +323,33 @@ void Engine::UpdateEnvironement(float gameTime)
 		m_world.GetCow(i)->Move(m_world);
 	}
 
-		for (int i = 0; i < MAX_CHICKEN; i++)
-			m_world.GetChicken(i)->Move(m_world);
-		//Update les Bears
-		for (int i = 0; i < MAX_BEAR; i++)
-			m_world.GetBear(i)->Move(m_world);
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		m_world.GetChicken(i)->Move(m_world);
+	for (int i = 0; i < MAX_BIRD; i++)
+		m_world.GetBird(i)->Move(m_world);
 
-		//Update les Dragons
-		for (int i = 0; i < MAX_DRAGON; i++)
-			m_world.GetDragon(i)->Move(m_world);
+	//Update les Bears
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear(i)->Move(m_world);
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Move(m_world);
 
-		//m_world.InitChunks(playerPos.x, playerPos.z);
-		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-		t.detach();
+	//Update les Dragons
+	for (int i = 0; i < MAX_DRAGON; i++)
+		m_world.GetDragon(i)->Move(m_world);
 
-		//Update les chunk autour du joueur si il sont dirty
-		m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+	//m_world.InitChunks(playerPos.x, playerPos.z);
+	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+	t.detach();
 
-		m_network.Fetch();
-		SyncWithServer();
+	//Update les chunk autour du joueur si il sont dirty
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-	}
+	m_network.Fetch();
+	SyncWithServer();
+
+}
 
 
 void Engine::SyncWithServer()
@@ -432,6 +442,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBear(i)->Draw(m_modelBear);
 	
 
+
 	//Draw Creepers
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
@@ -453,7 +464,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
-
+	//Draw animals
 	for (int i = 0; i < MAX_COW; i++)
 	{
 		m_world.GetCow(i)->Draw(m_modelCow);
@@ -462,6 +473,8 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Draw(m_modelChicken);
+	for (int i = 0; i < MAX_BIRD; i++)
+		m_world.GetBird(i)->Draw(m_modelBird);
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
 
@@ -655,95 +668,103 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnCows();
 		m_world.SpawnChickens();
 		m_world.SpawnBears(MAX_BEAR * m_world.GetBloodMoonInstance()->monsterMultiplier);
+		m_world.SpawnBird();
 		m_world.SpawnDragons();
 	}
 
+
 		//Lock les mouvements a 50 fps
-		int loops = 0;
-		while (gameTime > nextGameUpdate && loops < 10)
+	//On met a jour le fps
+	if ((int)(gameTime * 100) % 10 == 0)
+		m_fps = (int)round(1.f / elapsedTime);
+
+	int loops = 0;
+
+	//Lock les mouvements a 50 fps
+	while (gameTime > nextGameUpdate && loops < 10)
+	{
+		//Gestion des Ticks
+
+		//Footstep
+		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
+		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 		{
-			//Gestion des Ticks
-
-			//Footstep
-			static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
-			if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
+			if (m_world.GetPlayer()->footUnderwater())
 			{
-				if (m_world.GetPlayer()->footUnderwater())
-				{
-					Sound::Play(Sound::WATERSTEP1 + rand() % 4);
-				}
-				else
-				{
-					switch (m_world.GetPlayer()->blockUnderPlayer())
-					{
-					case 1: // GRASS
-						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-						break;
-					case 3: // STONE
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 5: // WOOD PLANK
-						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-						break;
-					case 7: // DIRT
-						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-						break;
-					case 8: // IRON
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 9: // COAL
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 10: // DIAMOND
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 11: // GOLD
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 12: // REDSTONE
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 13: // LAPIS
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 14: // WOOD
-						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-						break;
-					case 15: // LEAVE
-						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-						break;
-					case 26: // SAND
-						Sound::Play(Sound::SANDSTEP1 + rand() % 4);
-						break;
-					default:
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					}
-				}
-				lastpos = m_world.GetPlayer()->GetPosition();
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 			}
+			else
+			{
+				switch (m_world.GetPlayer()->blockUnderPlayer())
+				{
+				case 1: // GRASS
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 3: // STONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 5: // WOOD PLANK
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 7: // DIRT
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 8: // IRON
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 9: // COAL
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 10: // DIAMOND
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 11: // GOLD
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 12: // REDSTONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 13: // LAPIS
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 14: // WOOD
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 15: // LEAVE
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 26: // SAND
+					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+					break;
+				default:
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				}
+			}
+			lastpos = m_world.GetPlayer()->GetPosition();
+		}
 
 
-			if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
-				m_mouseButton[1] = false;
+		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
+			m_mouseButton[1] = false;
 
 		DayAndNightCycle(gameTime);
 		UpdateEnvironement(gameTime);
 
-			//Time control
-			//1 / 0.02 = 50 fps
-			nextGameUpdate += 0.02f;
-			loops++;
-		}
+		//Time control
+		//1 / 0.02 = 50 fps
+		nextGameUpdate += 0.02f;
+		loops++;
+	}
 
 
 
-		if (!m_settings.m_isServer)
-		{
-			GetBlocAtCursor();
-			DrawEnvironement(gameTime);
-		}
-	
+	if (!m_settings.m_isServer)
+	{
+		GetBlocAtCursor();
+		DrawEnvironement(gameTime);
+	}
+
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -821,24 +842,29 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[m_settings.m_inventory2])
 		{
-			m_world.GetPlayer()->SetWeapon(W_SNIPER);
+			m_world.GetPlayer()->SetWeapon(W_PISTOL);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		//3 ->  W_SUBMACHINE_GUN
-		//if (m_keyboard[m_settings.m_inventory3])
-		//{
-		//	m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
-		//	Sound::Play(Sound::GUN_DRAW);
-		//}
+		if (m_keyboard[m_settings.m_inventory3])
+		{
+			m_world.GetPlayer()->SetWeapon(W_SUBMACHINE_GUN);
+			Sound::Play(Sound::GUN_DRAW);
+		}
 		//shotgun sur 2 pour le moment
-		else if (m_keyboard[m_settings.m_inventory3])
+		else if (m_keyboard[m_settings.m_inventory4])
 		{
 			m_world.GetPlayer()->SetWeapon(W_SHOTGUN);
 			Sound::Play(Sound::GUN_DRAW);
 		}
-		else if (m_keyboard[m_settings.m_inventory4])
-		{ //4 ->  W_ASSAULT_RIFLE
+		else if (m_keyboard[m_settings.m_inventory5])
+		{ //5 ->  W_ASSAULT_RIFLE
 			m_world.GetPlayer()->SetWeapon(W_ASSAULT_RIFLE);
+			Sound::Play(Sound::GUN_DRAW);
+		}
+		else if (m_keyboard[m_settings.m_inventory6])
+		{ //6 ->  W_SNIPER
+			m_world.GetPlayer()->SetWeapon(W_SNIPER);
 			Sound::Play(Sound::GUN_DRAW);
 		}
 		else if (m_keyboard[m_settings.m_spawnmonster])

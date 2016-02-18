@@ -24,6 +24,7 @@ class Creeper;
 class Dragon;
 class Sprinter;
 class Chicken;
+class Bird;
 
 class World
 {
@@ -40,6 +41,7 @@ public:
 	Dragon* GetDragon(int pos) const;
 	Sprinter* GetSprinter(int pos) const;
 	Chicken* GetChicken(int pos) const;
+	Bird* GetBird(int pos) const;
 	Player* GetPlayer() const;
 
 	BloodMoon* GetBloodMoonInstance();
@@ -57,6 +59,7 @@ public:
 	void SpawnDragons();
 	void SpawnCows();
 	void SpawnSprinters();	void SpawnBears(int maxBears);	void SpawnChickens();
+	void SpawnBird();
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);
 	void RemoveLava(Vector3<float> vf);
@@ -85,6 +88,7 @@ private:
 	Bear* m_bear;
 	Dragon* m_dragon;
 	Chicken* m_chicken;
+	Bird* m_bird;
 
 	int UpdateDistance;
 	int	m_seed;
