@@ -210,11 +210,12 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::L
 		}
 		m_health -= damage;
 
-		std::cout << m_Name << " received " << damage << " damage." << std::endl;
+		if (!m_isDying)
+			std::cout << m_Name << " received " << damage << " damage." << std::endl;
 
 		if (m_health <= 0)
 		{
-			if (m_isDying == false)
+			if (m_isDying == false && m_isAlive)
 				std::cout << m_Name << " is dying." << std::endl;
 			m_deathTick.restart();
 			m_isDying = true;
