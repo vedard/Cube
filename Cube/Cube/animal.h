@@ -18,7 +18,7 @@ public:
 	ANIMAL_TYPE GetType();
 
 	 
-private:
+protected:
 	sf::Clock m_ClockTarget;
 	int m_timeNextTarget;
 	ANIMAL_TYPE type;
