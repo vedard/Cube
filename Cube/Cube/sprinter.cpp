@@ -64,4 +64,6 @@ void Sprinter::Move(World &world)
 
 	if (m_mouvementCooldown <= 0)
 		Character::Move(world);
+
+	DeathCheck();
 }
