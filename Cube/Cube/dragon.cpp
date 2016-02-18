@@ -3,14 +3,14 @@
 
 Dragon::Dragon() :Animal(A_DRAGON)
 {
-	m_health = 1000;
+	m_maxHealth = 1000;
 	m_dimension = Vector3<float>(3.0f, 4.6f, 4.8f);
 	m_Name = "I AM FIRE, I AM DEATH!";
 	isHurt = false;
 	chillCount = 0;
 	m_Armor = 10;
-	m_AttackDamage = 50;
-	m_AttackRange = 10;
+	m_AttackDamage = 25;
+	m_AttackRange = 5;
 };
 Dragon::~Dragon()
 {
