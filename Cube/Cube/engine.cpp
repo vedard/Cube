@@ -157,6 +157,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::HARP, EFFECT_PATH "harp.wav");
 		Sound::AddSound(Sound::SPLASH, EFFECT_PATH "splash.wav");
 		Sound::AddSound(Sound::SHOTGUN_FIRE, WEAPONS_PATH "shotgun.wav");
+		Sound::AddSound(Sound::SPRINTER, SPRINTER_PATH "SprinterScream.wav");
 
 
 		for (int i = 0; i < 9; i++)

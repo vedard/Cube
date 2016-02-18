@@ -7,6 +7,7 @@ Sprinter::Sprinter() :Monster(M_SPRINTER)
 	m_dimension = Vector3<float>(3.f, 4.1f, 1.f);
 	m_mouvementCooldown = 400;
 	m_vitesse = Vector3<float>(0.9f, 0, 0.9f);
+	m_soundPlayed = false;
 }
 Sprinter::~Sprinter()
 {
@@ -26,6 +27,12 @@ void Sprinter::Move(World &world)
 				m_mouvementCooldown--;
 				if (m_mouvementCooldown <= 0)
 				{
+					if (!m_soundPlayed)
+					{
+						Sound::Play(Sound::SPRINTER);
+						m_soundPlayed = true;
+					}
+
 					//Distance entre le monstre et sa cible
 					Vector3<float> DeltaTarget(m_target->GetPosition().x - m_pos.x, (m_target->GetPosition().y + m_target->GetDimension().y / 2) - (m_pos.y + m_dimension.y / 2), m_target->GetPosition().z - m_pos.z);
 
@@ -58,6 +65,7 @@ void Sprinter::Move(World &world)
 			else
 			{
 				m_mouvementCooldown = 400;
+				m_soundPlayed = false;
 			}
 		}
 	}

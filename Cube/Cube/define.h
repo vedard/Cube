@@ -80,6 +80,7 @@ typedef long long int64;
 #define DEATH_PATH  "../Cube/media/audio/death/"
 #define LEAVE_PATH	"../Cube/media/audio/leave/"
 #define EFFECT_PATH	"../Cube/media/audio/effect/"
+#define SPRINTER_PATH	"../Cube/media/audio/sprinter/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
