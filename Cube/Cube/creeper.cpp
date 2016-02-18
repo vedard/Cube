@@ -2,7 +2,7 @@
 
 Creeper::Creeper() :Monster(M_CREEPER)
 {
-	m_health = 130;
+	m_maxHealth = 130;
 }
 Creeper::~Creeper()
 {
