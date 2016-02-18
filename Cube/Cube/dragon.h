@@ -1,25 +1,25 @@
-#ifndef BEAR_H__
-#define BEAR_H__
+#ifndef DRAGON_H__
+#define DRAGON_H__
 
 #include "character.h"
 #include "model3d.h"
 #include "sound.h"
 #include "animal.h"
-#include "world.h"
 
-class Bear : public Animal
+class Dragon : public Animal
 {
 public:
-	Bear();
-	~Bear();
+	Dragon();
+	~Dragon();
 	void Move(World &world) override;
 	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)override;
 	void SetTarget(Character* target) override;
-	private:
-		bool isHurt;
-		int chillCount;
-		Character* m_target;
+private:
+	bool isHurt;
+	int chillCount;
+	Character* m_target;
 
 };
 
-#endif
+
+#endif // !DRAGON_H__

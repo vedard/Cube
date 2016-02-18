@@ -75,7 +75,7 @@ void Monster::Draw(Model3d &model, bool debugRange) const
 		else
 			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		if (true)
+		if (debugRange)
 		{
 			glPushMatrix();
 
