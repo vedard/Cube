@@ -97,7 +97,7 @@ void Animal::Draw(Model3d &model) const
 		else
 			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		if (false)
+		if (true)
 		{
 			glPushMatrix();
 

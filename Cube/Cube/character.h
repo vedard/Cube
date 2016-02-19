@@ -50,6 +50,7 @@ protected:
 	Vector3<float> m_vitesse;
 	float m_HorizontalRot;
 	float m_VerticalRot;
+	World* m_world;
 
 	//Stat
 	std::string m_Name;
