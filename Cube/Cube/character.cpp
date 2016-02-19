@@ -280,3 +280,40 @@ const std::string& Character::GetName() const { return m_Name; }
 bool Character::GetisAlive() const { return m_isAlive; }
 
 bool Character::GetisInAir() const { return m_isInAir; }
+
+void Character::CheckBlock(World & world)
+{
+	if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 28) // Si c'est un trampoline en dessous
+	{
+		if (m_vitesse.y > 0.10f)
+		{
+			if (m_nbsauttrampoline == 0)
+			{
+				multiplicateur = -1.01f;
+			}
+			m_nbsauttrampoline++;
+			if (m_nbsauttrampoline >= MAX_TRAMPOLINE_JUMP)
+			{
+				multiplicateur += 0.025f;
+			}
+			m_vitesse.y *= multiplicateur;
+			if (m_vitesse.y <= -0.60f)
+			{
+				m_vitesse.y = -0.60f;
+			}
+			if (m_vitesse.y >= 0)
+			{
+				m_vitesse.y = 0;
+			}
+		}
+	}
+	if (!m_isInAir && m_vitesse.y >= 0.0f)
+	{
+		m_nbsauttrampoline = 0;
+	}
+	if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 29) // Si c'est un tapis roulant
+	{
+		m_vitesse.x *= 2;
+		m_vitesse.z *= 2;
+	}
+}

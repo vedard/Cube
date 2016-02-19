@@ -136,6 +136,7 @@ void Engine::LoadResource()
 		AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 		AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
 		AddTextureToAtlas(BTYPE_TRAMPOLINE, "Grass", TEXTURE_PATH "block_trampoline.bmp", 1);
+		AddTextureToAtlas(BTYPE_TAPIS, "Grass", TEXTURE_PATH "block_tapis.bmp", 1);
 
 
 		if (!m_textureAtlas.Generate(64, false))

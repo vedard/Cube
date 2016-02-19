@@ -55,7 +55,7 @@ typedef long long int64;
 #define WORLD_SIZE 45
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
-#define NUMBER_OF_BLOCK 29
+#define NUMBER_OF_BLOCK 30
 #define MAX_CREEPER 1
 #define MAX_SPRINTER 0
 #define MAX_BULLET 500
@@ -65,7 +65,7 @@ typedef long long int64;
 #define MAX_DRAGON 0
 #define MAX_BIRD 50
 #define MONSTER_MULTIPLIER 5
-#define BLOODMOON_PROBABILITY 122 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
+#define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
 #define BLOODMOON_DURATION 2500 // Doit toujours rester 2500#define PI 3.14159265358f
 #define INVULNERABILITY_PLAYER_TIME 1
 #define MAX_TRAMPOLINE_JUMP 10
@@ -143,7 +143,8 @@ enum BLOCK_TYPE {
 	BTYPE_LAVA,
 	BTYPE_SAND,
 	BTYPE_NETHEREACK,
-	BTYPE_TRAMPOLINE
+	BTYPE_TRAMPOLINE,
+	BTYPE_TAPIS
 };
 
 enum WEAPONS {

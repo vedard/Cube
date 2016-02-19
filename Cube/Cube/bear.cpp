@@ -30,34 +30,7 @@ void Bear::Move(World &world)
 				//Si la cible est valide
 				if (m_target)
 				{
-					if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 28) // Si c'est un trampoline en dessous
-					{
-						if (m_vitesse.y > 0.10f)
-						{
-							if (m_nbsauttrampoline == 0)
-							{
-								multiplicateur = -1.01f;
-							}
-							m_nbsauttrampoline++;
-							if (m_nbsauttrampoline >= MAX_TRAMPOLINE_JUMP)
-							{
-								multiplicateur += 0.025f;
-							}
-							m_vitesse.y *= multiplicateur;
-							if (m_vitesse.y <= -0.60f)
-							{
-								m_vitesse.y = -0.60f;
-							}
-							if (m_vitesse.y >= 0)
-							{
-								m_vitesse.y = 0;
-							}
-						}
-					}
-					if (!m_isInAir && m_vitesse.y >= 0.0f)
-					{
-						m_nbsauttrampoline = 0;
-					}
+					Character::CheckBlock(world);
 					//On attaque, si c'est pas possible on avance
 					if (!Attack(m_target))
 					{

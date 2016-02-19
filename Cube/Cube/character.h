@@ -40,7 +40,7 @@ public:
 	const std::string& GetName() const;
 	bool GetisAlive() const;
 	bool GetisInAir() const;
-	
+	void CheckBlock(World &world);
 
 protected:
 
