@@ -3,8 +3,9 @@
 
 Bear::Bear() :Animal(A_BEAR)
 {
-	m_maxHealth = 200;
-	m_dimension = Vector3<float>(2.5f, 3.f, 5.f);
+	m_health = 300;
+	m_Armor = 5;
+	m_dimension = Vector3<float>(1.5f, 2.3f, 2.4f);
 	m_Name = "BigBadBear aka BBB";
 	isHurt = false;
 	chillCount = 0;
@@ -19,6 +20,8 @@ void Bear::Move(World &world)
 	{
 		if (isHurt)
 		{
+			m_vitesse.x = 0.11f;
+			m_vitesse.z = 0.11f;
 			if (!m_isDying)
 			{
 				m_vitesse.x = 0.05f;
@@ -27,6 +30,34 @@ void Bear::Move(World &world)
 				//Si la cible est valide
 				if (m_target)
 				{
+					if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 28) // Si c'est un trampoline en dessous
+					{
+						if (m_vitesse.y > 0.10f)
+						{
+							if (m_nbsauttrampoline == 0)
+							{
+								multiplicateur = -1.01f;
+							}
+							m_nbsauttrampoline++;
+							if (m_nbsauttrampoline >= MAX_TRAMPOLINE_JUMP)
+							{
+								multiplicateur += 0.025f;
+							}
+							m_vitesse.y *= multiplicateur;
+							if (m_vitesse.y <= -0.60f)
+							{
+								m_vitesse.y = -0.60f;
+							}
+							if (m_vitesse.y >= 0)
+							{
+								m_vitesse.y = 0;
+							}
+						}
+					}
+					if (!m_isInAir && m_vitesse.y >= 0.0f)
+					{
+						m_nbsauttrampoline = 0;
+					}
 					//On attaque, si c'est pas possible on avance
 					if (!Attack(m_target))
 					{
@@ -60,11 +91,12 @@ void Bear::Move(World &world)
 						chillCount++;
 						if (chillCount > 800)
 						{
+							chillCount = 0;
 							isHurt = false;
 							chillCount = false;
 						}
 					}
-
+					
 				}
 			}
 

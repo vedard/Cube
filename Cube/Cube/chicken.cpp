@@ -1,4 +1,4 @@
-#include "Chicken.h"
+#include "chicken.h"
 
 Chicken::Chicken() :Animal(A_CHICKEN), isHurt(false)
 {

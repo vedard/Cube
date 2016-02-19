@@ -58,6 +58,7 @@ void Character::Move(World &world)
 {
 	//Chute
 	m_pos.y -= m_vitesse.y;
+	Vector3<float> deplacementVector = Vector3<float>(sin(m_HorizontalRot / 180 * PI), 0.f, cos(m_HorizontalRot / 180 * PI));
 
 	//Si collision
 	if (CheckCollision(world))
@@ -67,14 +68,17 @@ void Character::Move(World &world)
 			m_isInAir = false;
 		//annule
 		m_pos.y += m_vitesse.y;
-		m_vitesse.y = 0;
 	}
 	else
 		m_isInAir = true;
 
 	//Acceleration
 	m_vitesse.y += 0.013f;
-
+	if (m_vitesse.y >= 0.6f)
+	{
+		m_vitesse.y = 0.6f;
+	}
+	m_pos.y += deplacementVector.y * m_vitesse.y;
 	DeathCheck();
 }
 
@@ -208,11 +212,12 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::L
 		}
 		m_health -= damage;
 
-		std::cout << m_Name << " received " << damage << " damage." << std::endl;
+		if (!m_isDying)
+			std::cout << m_Name << " received " << damage << " damage." << std::endl;
 
 		if (m_health <= 0)
 		{
-			if (m_isDying == false)
+			if (m_isDying == false && m_isAlive)
 				std::cout << m_Name << " is dying." << std::endl;
 			m_deathTick.restart();
 			m_isDying = true;
@@ -234,9 +239,10 @@ void Character::Jump()
 	DeathCheck();
 }
 
+///
 void Character::DeathCheck()
 {
-	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000)
+	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000 && m_isAlive)
 	{
 		m_isAlive = false;
 		std::cout << m_Name << " died." << std::endl;

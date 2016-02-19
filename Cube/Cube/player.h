@@ -19,6 +19,7 @@ public:
 	void TurnLeftRight(float value);
 	void TurnTopBottom(float value);
 	void Move(bool front, bool back, bool left, bool right, World &world);
+	void DeathCheck();
 	void ApplyRotation() const;
 	float ApplyTranslation(); // return le shake
 	void ToggleNoClip();
@@ -75,8 +76,6 @@ private:
 	BlockType m_blockUnder; // Bloc en dessous du joueur
 	Gun * Guns;
 	float InvulnerabilityTimer;
-	int m_nbsauttrampoline = 0;
-	float multiplicateur = 1.01f;
 	int m_weapon;			// current weapon
 
 	float m_HeadShake;		// Shake la camera a chaque pas

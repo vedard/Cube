@@ -256,7 +256,14 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 
 	DeathCheck();
 }
-
+void Player::DeathCheck()
+{
+	if (m_isDying)
+	{
+		m_isAlive = false;
+		std::cout << m_Name << " died." << std::endl;
+	}
+}
 void Player::CheckUnderwater(World &world)
 {
 	BlockType bt1 = world.BlockAt(m_pos.x, m_pos.y + m_dimension.y, m_pos.z);

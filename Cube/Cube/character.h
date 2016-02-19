@@ -64,11 +64,14 @@ protected:
 	bool m_isInAir;
 	bool m_isAlive;
 	bool m_isDying;
-
+	//Trampoline
+	int m_nbsauttrampoline = 0;
+	float multiplicateur = 1.01f;
 	//Timer
 	sf::Clock m_cooldownAttackTimer;
 	sf::Clock m_deathTick;
-
+private:
+	
 
 
 
