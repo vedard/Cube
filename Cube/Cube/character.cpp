@@ -94,16 +94,30 @@ bool Character::CheckCollision(World &world) const
 		et on vérifie si il n'y pas de block
 		solide qui y touche
 		*/
+	float posx = 0.0f;
+	float posy = 0.0f;
+	float posz = 0.0f;
 	for (int y = 0; y <= h; y++)
 		for (int x = 0; x <= w; x++)
-			for (int z = 0; z <= d; z++)
-			{
+			for (int z = 0; z <= d; z++){
+				posx = (m_dimension.x / w * x) + m_dimension.x / 2;
+				posy = (m_dimension.y / h * y);
+				posz = (m_dimension.z / d * z) + m_dimension.z / 2;
+
+				posx = m_pos.x - posx;
+				posy = m_pos.y + posy;
+				posz = m_pos.z - posz;
 				BlockType bt1 = world.BlockAt(
 					m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
 					m_pos.y + (m_dimension.y / h * y),
 					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 
 				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
+				if (bt1 == BTYPE_TRAP)
+				{
+					Vector3<int> chunkPos(posx / CHUNK_SIZE_X, 0, posz / CHUNK_SIZE_Z);
+					world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(posx - (chunkPos.x * CHUNK_SIZE_X), posy, posz - (chunkPos.z * CHUNK_SIZE_X));
+				}
 				if (bt1 != BTYPE_AIR && (bt1 < 16 || bt1>25) && bt1 != BTYPE_TRAP)
 					return true;
 			}
