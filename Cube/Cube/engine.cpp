@@ -1939,7 +1939,7 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			m_settings.m_vsync = !m_settings.m_vsync;
 			m_settings.Save();
-			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+			SetVSync(m_settings.m_vsync);
 		}
 		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
 		{
