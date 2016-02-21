@@ -20,6 +20,7 @@
 #include "chicken.h"
 #include "creeper.h"
 #include "dragon.h"
+#include "bird.h"
 #include "sprinter.h"
 #include "vector3.h"
 #include "gun.h"
@@ -68,6 +69,7 @@ private:
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
+	void DrawSurviveScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
@@ -83,7 +85,7 @@ private:
 	void DrawScope();
 
 	void CloseGame();
-	void SetDayOrNight(float gametime);
+	void DayAndNightCycle(float gametime);
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
@@ -126,8 +128,6 @@ private:
 	int m_chunkToUpdate;
 	bool displayInfo;
 
-
-
 	//Model
 	Model3d m_modelCow;
 	Model3d m_modelCreeper;
@@ -135,6 +135,7 @@ private:
 	Model3d m_modelSprinter;
 	Model3d m_modelChicken;
 	Model3d m_modelDragon;
+	Model3d m_modelBird;
 
 	Network m_network;
 	Parametre& m_settings = Parametre::GetInstance();
@@ -154,7 +155,6 @@ private:
 	float m_blueFog;
 	float m_fogDensity;
 	float m_fogStart;
-
 	int m_missingTime;
 
 	bool m_isMenuOpen;

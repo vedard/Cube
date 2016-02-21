@@ -2,10 +2,16 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="animal.cpp" />
+    <ClCompile Include="bear.cpp" />
     <ClCompile Include="blockinfo.cpp" />
+    <ClCompile Include="bloodMoon.cpp" />
     <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="Chicken.cpp" />
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="chunkmesh.cpp" />
+    <ClCompile Include="cow.cpp" />
+    <ClCompile Include="creeper.cpp" />
+    <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="gun.cpp" />
     <ClCompile Include="inventory.cpp" />
@@ -15,6 +21,7 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="model3d.cpp" />
+    <ClCompile Include="music.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
@@ -22,34 +29,35 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simplexnoise.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="sprinter.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="textureatlas.cpp" />
     <ClCompile Include="tool.cpp" />
     <ClCompile Include="world.cpp" />
-    <ClCompile Include="creeper.cpp" />
-    <ClCompile Include="bear.cpp" />
-    <ClCompile Include="cow.cpp" />
-    <ClCompile Include="music.cpp" />
-    <ClCompile Include="sprinter.cpp" />
-    <ClCompile Include="bloodMoon.cpp" />
-    <ClCompile Include="Dragon.cpp" />
-    <ClCompile Include="Chicken.cpp" />
+    <ClCompile Include="bird.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
     <ClInclude Include="array2d.h" />
     <ClInclude Include="array3d.h" />
+    <ClInclude Include="bear.h" />
     <ClInclude Include="blockinfo.h" />
+    <ClInclude Include="bloodMoon.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="Chicken.h" />
     <ClInclude Include="chunk.h" />
     <ClInclude Include="chunkmesh.h" />
+    <ClInclude Include="cow.h" />
+    <ClInclude Include="creeper.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="Dragon.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
     <ClInclude Include="gun.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="music.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="networkevent.h" />
     <ClInclude Include="parametre.h" />
@@ -60,21 +68,13 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="simplexnoise.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="sprinter.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="textureatlas.h" />
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
-    <ClInclude Include="bloodMoon.h" />
-    <ClInclude Include="creeper.h" />
-    <ClInclude Include="bear.h" />
-    <ClInclude Include="cow.h" />
-    <ClInclude Include="music.h" />
-    <ClInclude Include="sprinter.h" />
-    <ClInclude Include="Dragon.h" />
-  </ItemGroup>
-    <ClInclude Include="sprinter.h" />
-    <ClInclude Include="Chicken.h" />
+    <ClInclude Include="bird.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

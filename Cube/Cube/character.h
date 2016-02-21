@@ -40,7 +40,7 @@ public:
 	const std::string& GetName() const;
 	bool GetisAlive() const;
 	bool GetisInAir() const;
-	
+	void CheckBlock(World &world);
 
 protected:
 
@@ -50,6 +50,7 @@ protected:
 	Vector3<float> m_vitesse;
 	float m_HorizontalRot;
 	float m_VerticalRot;
+	World* m_world;
 
 	//Stat
 	std::string m_Name;
@@ -64,11 +65,14 @@ protected:
 	bool m_isInAir;
 	bool m_isAlive;
 	bool m_isDying;
-
+	//Trampoline
+	int m_nbsauttrampoline = 0;
+	float multiplicateur = 1.01f;
 	//Timer
 	sf::Clock m_cooldownAttackTimer;
 	sf::Clock m_deathTick;
-
+private:
+	
 
 
 

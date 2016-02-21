@@ -23,6 +23,8 @@ public:
 	sf::Keyboard::Key m_inventory2 = sf::Keyboard::Num2; //Prendre l'item dans le slot 2
 	sf::Keyboard::Key m_inventory3 = sf::Keyboard::Num3; //Prendre l'item dans le slot 3
 	sf::Keyboard::Key m_inventory4 = sf::Keyboard::Num4; //Prendre l'item dans le slot 4
+	sf::Keyboard::Key m_inventory5 = sf::Keyboard::Num5; //Prendre l'item dans le slot 3
+	sf::Keyboard::Key m_inventory6 = sf::Keyboard::Num6; //Prendre l'item dans le slot 4
 	sf::Keyboard::Key m_openinventory = sf::Keyboard::I; // Ouvrir l'inventaire
 	sf::Keyboard::Key m_spawnmonster = sf::Keyboard::M; // Faire spawner les monstres
 	sf::Keyboard::Key m_wireframe = sf::Keyboard::Y; // Activer le mode wireframe

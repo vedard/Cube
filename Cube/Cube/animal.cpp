@@ -26,11 +26,11 @@ void Animal::Move(World &world)
 	{
 		m_vitesse.x = 0.05f;
 		m_vitesse.z = 0.05f;
-
+		Vector3<float> deplacementVector = Vector3<float>(sin(m_HorizontalRot / 180 * PI), 0.f, cos(m_HorizontalRot / 180 * PI));
+		deplacementVector.Normalize();
 		if (m_ClockTarget.getElapsedTime().asSeconds() < m_timeNextTarget)
 		{
-			Vector3<float> deplacementVector = Vector3<float>(sin(m_HorizontalRot / 180 * PI), 0.f, cos(m_HorizontalRot / 180 * PI));
-			deplacementVector.Normalize();
+			Character::CheckBlock(world);
 
 			//Avance en x
 			m_pos.x += deplacementVector.x * m_vitesse.x;
@@ -42,19 +42,21 @@ void Animal::Move(World &world)
 			//En z
 			m_pos.z += deplacementVector.z * m_vitesse.z;
 			if (CheckCollision(world))
-			{
-				m_pos.z -= deplacementVector.z * m_vitesse.z;
-				Jump();
-			}
-		}
-		else
-		{
-			m_HorizontalRot += rand() % 200 - 100;
-			m_timeNextTarget = rand() % 10;
-			m_ClockTarget.restart();
-		}
 
+				m_pos.z -= deplacementVector.z * m_vitesse.z;
+			Jump();
+		}
+		
+		m_pos.y += deplacementVector.y * m_vitesse.y;
 	}
+	else
+	{
+		m_HorizontalRot += rand() % 200 - 100;
+		m_timeNextTarget = rand() % 10;
+		m_ClockTarget.restart();
+	}
+
+
 
 	Character::Move(world);
 }
@@ -120,5 +122,4 @@ ANIMAL_TYPE Animal::GetType()
 
 void Animal::SetTarget(Character* target)
 {
-	std::cout << "penis" << std::endl;
 }
