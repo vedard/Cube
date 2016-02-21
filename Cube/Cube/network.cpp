@@ -1,7 +1,9 @@
 #include "network.h"
 #include <string.h>
 
-Network::Network()
+
+
+Network::Network(World * world)
 {
 	enet_initialize();
 
@@ -23,6 +25,8 @@ Network::Network()
 		exit(EXIT_FAILURE);
 	}
 
+	m_world = world;
+
 }
 
 Network::~Network()
@@ -30,6 +34,7 @@ Network::~Network()
 	enet_host_destroy(m_ENetHost);
 	enet_deinitialize();
 }
+
 
 bool Network::Fetch()
 {
@@ -41,7 +46,8 @@ bool Network::Fetch()
 			OnConnect();
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
-			OnPacketReceive();
+			OnPacketReceive((char *)m_ENetEvent.packet->data);
+			enet_packet_destroy(m_ENetEvent.packet);
 			break;
 		case ENET_EVENT_TYPE_DISCONNECT:
 			OnDisconnect();
@@ -72,18 +78,16 @@ void Network::Disconnect()
 	enet_peer_disconnect(m_EnetPeerServer, 0);
 }
 
-bool Network::Send(string data)
+bool Network::Send(string data, bool reliable)
 {
-	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, ENET_PACKET_FLAG_UNSEQUENCED);
+	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, (reliable) ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
 
 	// Broadcast a tous les client si on est un serveur
 	// Send au serveur si on est un client
 	if (m_isServer)
-		enet_host_broadcast(m_ENetHost, 0, packet);
+		enet_host_broadcast(m_ENetHost, (reliable) ? 1 : 0, packet);
 	else if (m_EnetPeerServer)
-		enet_peer_send(m_EnetPeerServer, 0, packet);
-
-	//enet_host_flush(m_ENetHost);
+		enet_peer_send(m_EnetPeerServer, (reliable) ? 1 : 0, packet);
 
 	return false;
 }
@@ -105,36 +109,47 @@ void Network::OnDisconnect()
 	// Force to recreate the list
 	m_lstClient.clear();
 }
-
-void Network::OnPacketReceive()
+void Network::OnPacketReceive(string packet)
 {
-	//std::cout << "Packet Received: "<< m_ENetEvent.packet->data << std::endl;
-	Client tmpClient;
+	if (packet[0] != 'p')
+		std::cout << packet << std::endl;
 
-	try
+	if (packet.find("map") == 0)
 	{
-		tmpClient.FromString((char *)m_ENetEvent.packet->data);
+		std::istringstream stream(packet);
+		
+		string null;
+		float x, y, z;
+		int b;
+
+		stream >> null >> x >> y >> z >> b;
+
+		Vector3<float> chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
+		Chunk * chunk = m_world->ChunkAt(chunkPos.x, chunkPos.z);
+
+		if (chunk)
+			chunk->SetBlock(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X), b, ')');
+
+		// le serveur broadcast le changement a tous les clients
+		if (m_isServer)
+			Send(packet, true);
 	}
-	catch (const std::exception ex)
+	else if (packet.find("player") == 0)
 	{
-		std::cout << ex.what() << std::endl;
-		return;
+		Client tmpClient;
+		tmpClient.FromString(packet);
+
+		// Update le client dans la liste
+		bool isFound = false;
+		for (auto&& c : m_lstClient)
+			if (c.name == tmpClient.name)
+			{
+				c = tmpClient;
+				isFound = true;
+			}
+
+		// S'il n'est pas deja dans la liste on l'ajoute
+		if (!isFound)
+			m_lstClient.push_back(tmpClient);
 	}
-
-	// Update le client dans la liste
-	bool isFound = false;
-	for (auto&& c : m_lstClient)
-		if (c.name == tmpClient.name)
-		{
-			c = tmpClient;
-			isFound = true;
-		}
-
-	// S'il n'est pas deja dans la liste on l'ajoute
-	if (!isFound)
-		m_lstClient.push_back(tmpClient);
-
-	enet_packet_destroy(m_ENetEvent.packet);
 }
-
-

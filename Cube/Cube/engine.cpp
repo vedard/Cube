@@ -7,9 +7,9 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_network(),
 	m_fastInventoryKeySelected(0),
 	m_missingTime(0),
+	m_network(&m_world),
 	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
@@ -293,7 +293,7 @@ void Engine::UpdateEnvironement(float gameTime)
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
-			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world, m_network);
 
 		}
 	}
@@ -313,37 +313,44 @@ void Engine::UpdateEnvironement(float gameTime)
 		m_world.GetCow(i)->Move(m_world);
 	}
 
-		for (int i = 0; i < MAX_CHICKEN; i++)
-			m_world.GetChicken(i)->Move(m_world);
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		m_world.GetChicken(i)->Move(m_world);
 
-		//Update les Bears
-		for (int i = 0; i < MAX_BEAR; i++)
-			m_world.GetBear(i)->Move(m_world);
+	//Update les Bears
+	for (int i = 0; i < MAX_BEAR; i++)
+		m_world.GetBear(i)->Move(m_world);
 
-		//Update les Dragons
-		for (int i = 0; i < MAX_DRAGON; i++)
-			m_world.GetDragon(i)->Move(m_world);
+	//Update les Dragons
+	for (int i = 0; i < MAX_DRAGON; i++)
+		m_world.GetDragon(i)->Move(m_world);
 
-		//m_world.InitChunks(playerPos.x, playerPos.z);
-		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-		t.detach();
+	//m_world.InitChunks(playerPos.x, playerPos.z);
+	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+	t.detach();
 
-		//Update les chunk autour du joueur si il sont dirty
-		m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+	//Update les chunk autour du joueur si il sont dirty
+	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
-		m_network.Fetch();
+
+	m_network.Fetch();
+
+	// pour eviter de surcharge le reseau on envoie 3 fois moins de packets
+	// que l'on en fetch
+	static int updateCount = 0;
+	if (updateCount++ % 3 == 0)
 		SyncWithServer();
 
-	}
+}
 
 
 void Engine::SyncWithServer()
 {
 	if (Parametre::GetInstance().m_isServer)
 	{
+		//std::cout << m_fps << std::endl;
 		for (auto c : m_network.GetClient())
 		{
-			m_network.Send(c.ToString());
+			m_network.Send("player " + c.ToString(), false);
 		}
 	}
 	else
@@ -353,9 +360,9 @@ void Engine::SyncWithServer()
 		c.x = m_world.GetPlayer()->GetPosition().x;
 		c.y = m_world.GetPlayer()->GetPosition().y;
 		c.z = m_world.GetPlayer()->GetPosition().z;
-		c.h = m_world.GetPlayer()->GetHorizontalRotation();
+		c.h = -m_world.GetPlayer()->GetHorizontalRotation();
 		c.v = m_world.GetPlayer()->GetVerticalRotation();
-		m_network.Send(c.ToString());
+		m_network.Send("player " + c.ToString(), false);
 	}
 }
 
@@ -411,7 +418,7 @@ void Engine::DrawEnvironement(float gameTime) {
 	else
 		glDisable(GL_LIGHT0);
 
-	
+
 
 	//Draw Creepers
 	for (int i = 0; i < MAX_CREEPER; i++)
@@ -453,7 +460,10 @@ void Engine::DrawEnvironement(float gameTime) {
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
 	{
-		m_modelCow.Render(c.x, c.y, c.z, c.h, c.v, 1, 1, 1);
+		//if (c.name == m_world.GetPlayer()->GetName())
+		//	continue;
+
+		m_modelCreeper.Render(c.x, c.y, c.z, c.h, 0, 1, 1, 1);
 	}
 
 	Shader::Disable();
@@ -505,83 +515,83 @@ void Engine::DrawEnvironement(float gameTime) {
 
 void Engine::SetDayOrNight(float gametime)
 {
-	//float time = sin((gametime) / DAY_TIME);
-	//if (m_world.GetBloodMoonInstance()->GetActiveState()) {
-	//	if (time < -0.97) {
-	//		m_world.GetBloodMoonInstance()->Start();
-	//		m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
-	//		m_missingTime = 60;
-	//	}
-	//}
+	float time = sin((gametime) / DAY_TIME);
+	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
+		if (time < -0.97) {
+			m_world.GetBloodMoonInstance()->Start();
+			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
+			m_missingTime = 60;
+		}
+	}
 
-	//if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
-	//	m_world.GetBloodMoonInstance()->AddElapsedUnit();
-	//	m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
-	//}
-
-
-	//GLfloat light0Amb[4] = { 0, 0, 0, 0 };
-	//GLfloat fogcolor[4] = { 0, 0, 0, 0 };
-
-	//// Controle les cycles de couleurs de la lumière
-	//m_redLight = 5.f;
-	//m_greenLight = 0.48f * sin(time) + 4.5f;
-	//m_blueLight = 0.95f * sin(time) + 3.8;
-
-	//// Controle les cycles de couleurs du fog
-	//m_redFog = 0.5f * sin(time) + 0.45f;
-	//m_greenFog = 0.5f * sin(time) + 0.45f;
-	//m_blueFog = 0.5f * sin(time) + 0.48f;
-
-	//// Controle le cycle de densite du fog
-	//m_fogDensity = -0.031f * sin(time) + 0.052f;
-	//m_fogStart = 1.68f * sin(time) + 16;
+	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
+		m_world.GetBloodMoonInstance()->AddElapsedUnit();
+		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
+	}
 
 
-	//if (m_world.GetBloodMoonInstance()->GetStartedState()) {
-	//	// Controle les cycles de couleurs de la lumière
-	//	m_redLight = 0.f;
-	//	m_greenLight = 0.f;
-	//	m_blueLight = 0.f;
+	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
 
-	//	// Controle les cycles de couleurs du fog
-	//	m_redFog = 0.25f;
-	//	m_greenFog = 0.075f;
-	//	m_blueFog = 0.075f;
+	// Controle les cycles de couleurs de la lumière
+	m_redLight = 5.f;
+	m_greenLight = 0.48f * sin(time) + 4.5f;
+	m_blueLight = 0.95f * sin(time) + 3.8;
 
-	//	// Controle le cycle de densite du fog
-	//	m_fogDensity = 0.08f;
-	//	m_fogStart = 15.f;
-	//}
+	// Controle les cycles de couleurs du fog
+	m_redFog = 0.5f * sin(time) + 0.45f;
+	m_greenFog = 0.5f * sin(time) + 0.45f;
+	m_blueFog = 0.5f * sin(time) + 0.48f;
 
-	//light0Amb[0] = m_redLight;
-	//light0Amb[1] = m_greenLight;
-	//light0Amb[2] = m_blueLight;
-	//light0Amb[3] = 7.f;
+	// Controle le cycle de densite du fog
+	m_fogDensity = -0.031f * sin(time) + 0.052f;
+	m_fogStart = 1.68f * sin(time) + 16;
 
-	//fogcolor[0] = m_redFog;
-	//fogcolor[1] = m_greenFog;
-	//fogcolor[2] = m_blueFog;
-	//fogcolor[3] = 1;
 
-	//// Le fog
-	//glEnable(GL_FOG);
-	//GLint fogmode = GL_EXP2;
-	//glFogi(GL_FOG_MODE, fogmode);
-	//glFogfv(GL_FOG_COLOR, fogcolor);
-	//glFogf(GL_FOG_DENSITY, m_fogDensity);
-	//glFogf(GL_FOG_START, m_fogStart);
-	//glFogf(GL_FOG_END, 24.f);
+	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
+		// Controle les cycles de couleurs de la lumière
+		m_redLight = 0.f;
+		m_greenLight = 0.f;
+		m_blueLight = 0.f;
 
-	//// La lumiere
-	//if (!m_world.GetBloodMoonInstance()->GetStartedState())
-	//{
-	//	GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-	//	GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-	//	glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-	//	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-	//	glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	//}
+		// Controle les cycles de couleurs du fog
+		m_redFog = 0.25f;
+		m_greenFog = 0.075f;
+		m_blueFog = 0.075f;
+
+		// Controle le cycle de densite du fog
+		m_fogDensity = 0.08f;
+		m_fogStart = 15.f;
+	}
+
+	light0Amb[0] = m_redLight;
+	light0Amb[1] = m_greenLight;
+	light0Amb[2] = m_blueLight;
+	light0Amb[3] = 7.f;
+
+	fogcolor[0] = m_redFog;
+	fogcolor[1] = m_greenFog;
+	fogcolor[2] = m_blueFog;
+	fogcolor[3] = 1;
+
+	// Le fog
+	glEnable(GL_FOG);
+	GLint fogmode = GL_EXP2;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, m_fogDensity);
+	glFogf(GL_FOG_START, m_fogStart);
+	glFogf(GL_FOG_END, 24.f);
+
+	// La lumiere
+	if (!m_world.GetBloodMoonInstance()->GetStartedState())
+	{
+		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	}
 }
 
 void Engine::Render(float elapsedTime)
@@ -615,99 +625,98 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnBears();
 		m_world.SpawnDragons();
 	}
-		
 
-		//On met a jour le fps
-		if ((int)(gameTime * 100) % 10 == 0)
-			m_fps = (int)round(1.f / elapsedTime);
 
-		int loops = 0;
+	//On met a jour le fps
+	if ((int)(gameTime * 100) % 10 == 0)
+		m_fps = (int)round(1.f / elapsedTime);
 
-		//Lock les mouvements a 50 fps
-		while (gameTime > nextGameUpdate && loops < 10)
+	int loops = 0;
+
+	//Lock les mouvements a 50 fps
+	while (gameTime > nextGameUpdate && loops < 10)
+	{
+		//Gestion des Ticks
+
+		//Footstep
+		static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
+		if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
 		{
-			//Gestion des Ticks
-
-			//Footstep
-			static Vector3<float> lastpos = m_world.GetPlayer()->GetPosition();
-			if (sqrtf(pow(lastpos.x - m_world.GetPlayer()->GetPosition().x, 2) + pow(lastpos.z - m_world.GetPlayer()->GetPosition().z, 2)) > 1.8f && !m_world.GetPlayer()->GetisInAir())
+			if (m_world.GetPlayer()->footUnderwater())
 			{
-				if (m_world.GetPlayer()->footUnderwater())
-				{
-					Sound::Play(Sound::WATERSTEP1 + rand() % 4);
-				}
-				else
-				{
-					switch (m_world.GetPlayer()->blockUnderPlayer())
-					{
-					case 1: // GRASS
-						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-						break;
-					case 3: // STONE
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 5: // WOOD PLANK
-						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-						break;
-					case 7: // DIRT
-						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-						break;
-					case 8: // IRON
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 9: // COAL
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 10: // DIAMOND
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 11: // GOLD
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 12: // REDSTONE
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 13: // LAPIS
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					case 14: // WOOD
-						Sound::Play(Sound::WOODSTEP1 + rand() % 4);
-						break;
-					case 15: // LEAVE
-						Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
-						break;
-					case 26: // SAND
-						Sound::Play(Sound::SANDSTEP1 + rand() % 4);
-						break;
-					default:
-						Sound::Play(Sound::STONESTEP1 + rand() % 4);
-						break;
-					}
-				}
-				lastpos = m_world.GetPlayer()->GetPosition();
+				Sound::Play(Sound::WATERSTEP1 + rand() % 4);
 			}
-
-
-			if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
-				m_mouseButton[1] = false;
-
-			SetDayOrNight(gameTime);
-			UpdateEnvironement(gameTime);
-
-			//Time control
-			//1 / 0.02 = 50 fps
-			nextGameUpdate += 0.02f;
-			loops++;
+			else
+			{
+				switch (m_world.GetPlayer()->blockUnderPlayer())
+				{
+				case 1: // GRASS
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 3: // STONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 5: // WOOD PLANK
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 7: // DIRT
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 8: // IRON
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 9: // COAL
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 10: // DIAMOND
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 11: // GOLD
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 12: // REDSTONE
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 13: // LAPIS
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				case 14: // WOOD
+					Sound::Play(Sound::WOODSTEP1 + rand() % 4);
+					break;
+				case 15: // LEAVE
+					Sound::Play(Sound::GRASSSTEP1 + rand() % 4);
+					break;
+				case 26: // SAND
+					Sound::Play(Sound::SANDSTEP1 + rand() % 4);
+					break;
+				default:
+					Sound::Play(Sound::STONESTEP1 + rand() % 4);
+					break;
+				}
+			}
+			lastpos = m_world.GetPlayer()->GetPosition();
 		}
 
 
+		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
+			m_mouseButton[1] = false;
 
-		if (!m_settings.m_isServer)
-		{
-			GetBlocAtCursor();
-			DrawEnvironement(gameTime);
-		}
-	
+		SetDayOrNight(gameTime);
+		UpdateEnvironement(gameTime);
+
+		//Time control
+		//1 / 0.02 = 50 fps
+		nextGameUpdate += 0.02f;
+		loops++;
+	}
+
+
+
+	if (!m_settings.m_isServer)
+	{
+		GetBlocAtCursor();
+		DrawEnvironement(gameTime);
+	}
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -756,6 +765,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		//f6 -> connect
 		else if (m_keyboard[sf::Keyboard::F6])
 		{
+			//m_network.Connect("45.55.42.126", 1234);
 			m_network.Connect("localhost", 1234);
 		}
 
@@ -904,7 +914,6 @@ void Engine::MouseMoveEvent(int x, int y)
 			m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
 		}
 	}
-
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -932,6 +941,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_network.Send("map " 
+						+ std::to_string(m_currentBlock.x) + " " 
+						+ std::to_string(m_currentBlock.y) + " " 
+						+ std::to_string(m_currentBlock.z) + " " 
+						+ std::to_string(BTYPE_AIR),
+						true);
 			}
 
 			//Right Click
@@ -956,10 +971,17 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 						//Si ya collision on efface le block
 						if (m_world.GetPlayer()->CheckCollision(m_world))
 							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
+						else
+						{
+							m_network.Send("map " 
+									+ std::to_string(m_currentBlock.x) + " " 
+									+ std::to_string(m_currentBlock.y) + " " 
+									+ std::to_string(m_currentBlock.z) + " " 
+									+ std::to_string(m_world.GetPlayer()->GetBlock()),
+									true);
+						}
 					}
 				}
-
-
 			}
 
 			if (m_settings.m_inventaire_creatif)
