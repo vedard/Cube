@@ -208,7 +208,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
-	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 150, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 1200, 150, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 0.01f);
@@ -513,83 +513,83 @@ void Engine::DrawEnvironement(float gameTime) {
 
 void Engine::SetDayOrNight(float gametime)
 {
-	float time = sin((gametime) / DAY_TIME);
-	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
-		if (time < -0.97) {
-			m_world.GetBloodMoonInstance()->Start();
-			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
-			m_missingTime = 60;
-		}
-	}
-
-	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
-		m_world.GetBloodMoonInstance()->AddElapsedUnit();
-		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
-	}
-
-
-	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
-	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
-
-	// Controle les cycles de couleurs de la lumière
-	m_redLight = 5.f;
-	m_greenLight = 0.48f * sin(time) + 4.5f;
-	m_blueLight = 0.95f * sin(time) + 3.8;
-
-	// Controle les cycles de couleurs du fog
-	m_redFog = 0.5f * sin(time) + 0.45f;
-	m_greenFog = 0.5f * sin(time) + 0.45f;
-	m_blueFog = 0.5f * sin(time) + 0.48f;
-
-	// Controle le cycle de densite du fog
-	m_fogDensity = -0.031f * sin(time) + 0.052f;
-	m_fogStart = 1.68f * sin(time) + 16;
-
-
-	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
-		// Controle les cycles de couleurs de la lumière
-		m_redLight = 0.f;
-		m_greenLight = 0.f;
-		m_blueLight = 0.f;
-
-		// Controle les cycles de couleurs du fog
-		m_redFog = 0.25f;
-		m_greenFog = 0.075f;
-		m_blueFog = 0.075f;
-
-		// Controle le cycle de densite du fog
-		m_fogDensity = 0.08f;
-		m_fogStart = 15.f;
-	}
-
-	light0Amb[0] = m_redLight;
-	light0Amb[1] = m_greenLight;
-	light0Amb[2] = m_blueLight;
-	light0Amb[3] = 7.f;
-
-	fogcolor[0] = m_redFog;
-	fogcolor[1] = m_greenFog;
-	fogcolor[2] = m_blueFog;
-	fogcolor[3] = 1;
-
-	// Le fog
-	glEnable(GL_FOG);
-	GLint fogmode = GL_EXP2;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, m_fogDensity);
-	glFogf(GL_FOG_START, m_fogStart);
-	glFogf(GL_FOG_END, 24.f);
-
-	// La lumiere
-	if (!m_world.GetBloodMoonInstance()->GetStartedState())
-	{
-		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	}
+//	float time = sin((gametime) / DAY_TIME);
+//	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
+//		if (time < -0.97) {
+//			m_world.GetBloodMoonInstance()->Start();
+//			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
+//			m_missingTime = 60;
+//		}
+//	}
+//
+//	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
+//		m_world.GetBloodMoonInstance()->AddElapsedUnit();
+//		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
+//	}
+//
+//
+//	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+//	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
+//
+//	// Controle les cycles de couleurs de la lumière
+//	m_redLight = 5.f;
+//	m_greenLight = 0.48f * sin(time) + 4.5f;
+//	m_blueLight = 0.95f * sin(time) + 3.8;
+//
+//	// Controle les cycles de couleurs du fog
+//	m_redFog = 0.5f * sin(time) + 0.45f;
+//	m_greenFog = 0.5f * sin(time) + 0.45f;
+//	m_blueFog = 0.5f * sin(time) + 0.48f;
+//
+//	// Controle le cycle de densite du fog
+//	m_fogDensity = -0.031f * sin(time) + 0.052f;
+//	m_fogStart = 1.68f * sin(time) + 16;
+//
+//
+//	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
+//		// Controle les cycles de couleurs de la lumière
+//		m_redLight = 0.f;
+//		m_greenLight = 0.f;
+//		m_blueLight = 0.f;
+//
+//		// Controle les cycles de couleurs du fog
+//		m_redFog = 0.25f;
+//		m_greenFog = 0.075f;
+//		m_blueFog = 0.075f;
+//
+//		// Controle le cycle de densite du fog
+//		m_fogDensity = 0.08f;
+//		m_fogStart = 15.f;
+//	}
+//
+//	light0Amb[0] = m_redLight;
+//	light0Amb[1] = m_greenLight;
+//	light0Amb[2] = m_blueLight;
+//	light0Amb[3] = 7.f;
+//
+//	fogcolor[0] = m_redFog;
+//	fogcolor[1] = m_greenFog;
+//	fogcolor[2] = m_blueFog;
+//	fogcolor[3] = 1;
+//
+//	// Le fog
+//	glEnable(GL_FOG);
+//	GLint fogmode = GL_EXP2;
+//	glFogi(GL_FOG_MODE, fogmode);
+//	glFogfv(GL_FOG_COLOR, fogcolor);
+//	glFogf(GL_FOG_DENSITY, m_fogDensity);
+//	glFogf(GL_FOG_START, m_fogStart);
+//	glFogf(GL_FOG_END, 24.f);
+//
+//	// La lumiere
+//	if (!m_world.GetBloodMoonInstance()->GetStartedState())
+//	{
+//		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+//		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+//		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+//		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+//		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+//	}
 }
 
 void Engine::Render(float elapsedTime)
