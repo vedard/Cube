@@ -35,6 +35,7 @@
     <ClCompile Include="tool.cpp" />
     <ClCompile Include="world.cpp" />
     <ClCompile Include="bird.cpp" />
+    <ClCompile Include="experience.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animal.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="vector3.h" />
     <ClInclude Include="world.h" />
     <ClInclude Include="bird.h" />
+    <ClInclude Include="experience.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cube.conf" />

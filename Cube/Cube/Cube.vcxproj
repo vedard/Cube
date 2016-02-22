@@ -106,6 +106,7 @@
     <ClCompile Include="creeper.cpp" />
     <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="engine.cpp" />
+    <ClCompile Include="experience.cpp" />
     <ClCompile Include="gun.cpp" />
     <ClCompile Include="inventory.cpp" />
     <ClCompile Include="item.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Dragon.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
+    <ClInclude Include="experience.h" />
     <ClInclude Include="gun.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
