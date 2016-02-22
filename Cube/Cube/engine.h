@@ -77,6 +77,7 @@ private:
 	void DrawHitMarker() const;
 	void DrawMenuSettings() const;
 	void DrawMenuControls() const;
+	void DrawMenuMultiplayer() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
 	void ManageAllMenuKeys(unsigned char key);
 	void ManageMenuEnterKeyPress();

@@ -516,6 +516,7 @@ void Engine::DrawEnvironement(float gameTime)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawScope();
+
 	// Draw le menu
 	if (m_isMenuOpen)
 	{
@@ -532,6 +533,8 @@ void Engine::DrawEnvironement(float gameTime)
 				DrawMenuSettingSelected(false);
 		else if (m_menu->m_currentMenu == SM_CONTROL_SELECTED)
 			DrawMenuControlSelected();
+		else if (m_menu->m_currentMenu == SM_MULTIPLAYER)
+			DrawMenuMultiplayer();
 	}
 }
 
@@ -811,8 +814,17 @@ void Engine::KeyPressEvent(unsigned char key)
 		//f6 -> connect
 		else if (m_keyboard[sf::Keyboard::F6])
 		{
-			//m_network.Connect("45.55.42.126", 1234);
-			m_network.Connect("localhost", 1234);
+			if (m_settings.m_isConnected)
+			{
+				m_network.Disconnect();
+				m_settings.m_isConnected = false;
+			}
+			else
+			{
+				//m_network.Connect("45.55.42.126", 1234);
+				m_network.Connect("localhost", 1234);
+				m_settings.m_isConnected = true;
+			}
 		}
 
 		//f10 -> toggle fulscreen mode
@@ -1561,6 +1573,13 @@ void Engine::DrawMenuPrincipal() const
 	int menuPositionX = Width() / 2;
 	int menuPositionY = Height() / 2;
 
+	std::string connection;
+
+	if (m_settings.m_isConnected == true)
+		connection = "Connected";
+	else
+		connection = "Multiplayer";
+
 	glEnable(GL_TEXTURE_2D);
 	// Setter le blend function , tout ce qui sera noir sera transparent
 	glDisable(GL_LIGHTING);
@@ -1598,7 +1617,8 @@ void Engine::DrawMenuPrincipal() const
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2));
+	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2) + 25);
+	DrawMenuButton(MP_MULTIPLAYER, connection, Width() / 2 - (connection.length() * 4 + 2), (Height() / 2) - 25);
 	DrawMenuButton(MP_EXIT_GAME, "Exit Game", Width() / 2 - 40, (Height() / 2) - (menuHeight / 2));
 
 
@@ -1807,6 +1827,59 @@ void Engine::DrawMenuControls() const
 	glPopMatrix();
 }
 
+void Engine::DrawMenuMultiplayer() const
+{
+	// Menu specs
+	int menuWidth = 100;
+	int menuHeight = 60;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
+	PrintText(Width() / 2 - 68, Height() / 2 + 5, 12.f, "Escape to cancel");
+	PrintText(Width() / 2 - 70, Height() / 2 - 20, 12.f, "Enter to confirm");
+	PrintText(Width() / 2 - (m_settings.m_lastServer.length() * 5), Height() / 2 - menuHeight + 8, 12.f, m_settings.m_lastServer);
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
 void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const
 {
 	if (m_menu->m_currentMenuItem == menuItem)
@@ -1867,9 +1940,21 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			CloseGame();
 		}
+		else if (m_menu->m_currentMenuItem == MP_MULTIPLAYER)
+		{
+			if (m_settings.m_isConnected == true)
+			{
+				m_network.Disconnect();
+				m_settings.m_isConnected = false;
+			}
+			else
+			{
+				m_menu = new Menu(SM_MULTIPLAYER);
+			}
+		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 			m_menu = new Menu(SM_SETTINGS);
-		else if ((int)m_menu->m_currentMenu == (int)MP_CONTROLS)
+		else if (m_menu->m_currentMenu == MP_CONTROLS)
 			m_menu = new Menu(SM_CONTROLS);
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
@@ -2150,6 +2235,15 @@ void Engine::ManageMenuEnterKeyPress()
 			m_menu->m_controlSelected = "Wireframe";
 			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
 		}
+	}
+	else if (m_menu->m_currentMenu == SM_MULTIPLAYER)
+	{
+		m_network.Connect(m_settings.m_lastServer.c_str(), 1234);
+		m_settings.m_isConnected = true;
+		m_settings.Save();
+
+		m_menu = new Menu(SM_PRINCIPAL);
+		m_menu->m_currentMenuItem = MP_MULTIPLAYER;
 	}
 }
 
