@@ -50,7 +50,7 @@ void Character::Spawn(World &world, int x, int z)
 
 	m_pos.y++;
 
-//	std::cout << m_Name << " spawned." << std::endl;
+	//	std::cout << m_Name << " spawned." << std::endl;
 }
 
 void Character::Move(World &world)
@@ -99,7 +99,7 @@ bool Character::CheckCollision(World &world) const
 	float posz = 0.0f;
 	for (int y = 0; y <= h; y++)
 		for (int x = 0; x <= w; x++)
-			for (int z = 0; z <= d; z++){
+			for (int z = 0; z <= d; z++) {
 				posx = (m_dimension.x / w * x) + m_dimension.x / 2;
 				posy = (m_dimension.y / h * y);
 				posz = (m_dimension.z / d * z) + m_dimension.z / 2;
@@ -107,10 +107,22 @@ bool Character::CheckCollision(World &world) const
 				posx = m_pos.x - posx;
 				posy = m_pos.y + posy;
 				posz = m_pos.z - posz;
-				BlockType bt1 = world.BlockAt(
-					m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
-					m_pos.y + (m_dimension.y / h * y),
-					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+
+				BlockType bt1;
+				if (!m_isDying)
+				{
+					bt1 = world.BlockAt(
+						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+						m_pos.y + (m_dimension.y / h * y),
+						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				}
+				else
+				{
+					bt1 = world.BlockAt(
+						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+						m_pos.y + (m_dimension.y / h * y) + 2,
+						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				}
 
 				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
 				if (bt1 == BTYPE_TRAP)
@@ -219,9 +231,9 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::L
 			if (m_Armor > 0)
 				damage = damage / m_Armor;
 
-				//Toujours un minimun de 1 damange
+			//Toujours un minimun de 1 damange
 
-				damage = (damage < 1) ? 1 : damage;
+			damage = (damage < 1) ? 1 : damage;
 		}
 		m_health -= damage;
 
