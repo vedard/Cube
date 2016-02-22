@@ -106,10 +106,22 @@ bool Character::CheckCollision(World &world) const
 				posx = m_pos.x - posx;
 				posy = m_pos.y + posy;
 				posz = m_pos.z - posz;
-				BlockType bt1 = world.BlockAt(
-					m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
-					m_pos.y + (m_dimension.y / h * y),
-					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				
+				BlockType bt1;
+				if (!m_isDying)
+				{
+					bt1 = world.BlockAt(
+						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+						m_pos.y + (m_dimension.y / h * y),
+						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				}
+				else
+				{
+					bt1 = world.BlockAt(
+						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+						m_pos.y + (m_dimension.y / h * y) + 2,
+						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				}
 
 				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
 				if (bt1 == BTYPE_TRAP)
