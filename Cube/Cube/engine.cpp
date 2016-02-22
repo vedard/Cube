@@ -216,7 +216,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
-	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 150, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 1200, 150, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 0.01f);
