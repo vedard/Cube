@@ -55,20 +55,22 @@ typedef long long int64;
 #define WORLD_SIZE 45
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
-#define NUMBER_OF_BLOCK 28
-#define MAX_SPRINTER 10
-#define MAX_CREEPER 10
-#define MAX_SPRINTER 1
+#define NUMBER_OF_BLOCK 31
+#define MAX_CREEPER 0
+#define NUMBER_OF_BLOCK 31
+#define MAX_SPRINTER 0
 #define MAX_BULLET 500
-#define MAX_COW 10
-#define MAX_BEAR 10
-#define MAX_CHICKEN 10
-#define MAX_DRAGON 5
+#define MAX_COW 0
+#define MAX_BEAR 0
+#define MAX_CHICKEN 0
+#define MAX_DRAGON 0
 #define MAX_BIRD 50
-#define BLOODMOON_PROBABILITY 10073584365876487
-#define BLOODMOON_DURATION 2500
-#define PI 3.14159265358f
+#define MONSTER_MULTIPLIER 5
+#define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
+#define BLOODMOON_DURATION 2500 // Doit toujours rester 2500#define PI 3.14159265358f
 #define INVULNERABILITY_PLAYER_TIME 1
+#define MAX_TRAMPOLINE_JUMP 10
+#define PI 3.14159265359
 
 #define TEXTURE_PATH	"../Cube/media/textures/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
@@ -81,6 +83,7 @@ typedef long long int64;
 #define DEATH_PATH  "../Cube/media/audio/death/"
 #define LEAVE_PATH	"../Cube/media/audio/leave/"
 #define EFFECT_PATH	"../Cube/media/audio/effect/"
+#define SPRINTER_PATH	"../Cube/media/audio/sprinter/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
@@ -140,7 +143,10 @@ enum BLOCK_TYPE {
 	BTYPE_FLAVA,
 	BTYPE_LAVA,
 	BTYPE_SAND,
-	BTYPE_NETHEREACK
+	BTYPE_NETHEREACK,
+	BTYPE_TRAMPOLINE,
+	BTYPE_TAPIS,
+	BTYPE_TRAP
 };
 
 enum WEAPONS {
@@ -158,13 +164,15 @@ enum SOUS_MENU {
 	SM_CONTROLS,
 	SM_SETTINGS,
 	SM_SETTING_SELECTED,
-	SM_CONTROL_SELECTED
+	SM_CONTROL_SELECTED,
+	SM_MULTIPLAYER
 };
 
 // Buttons/states du menu principal
 enum MENU_PRINCIPAL {
 	MP_CONTROLS,
 	MP_SETTINGS,
+	MP_MULTIPLAYER,
 	MP_EXIT_GAME
 };
 

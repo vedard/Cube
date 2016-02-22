@@ -63,7 +63,7 @@ bool Bullet::CheckCollision(Character &character)
 			{
 
 				//f(x) = -1 * 1.10 ^ (x + 10) + 50
-				character.GetDamage((float)(-1 * pow(1.06, (m_distance * m_distanceModif) + 10) + m_damage),false,false);
+    			character.GetDamage((float)(-1 * pow(1.06, (m_distance * m_distanceModif) + 10) + m_damage),false,false);
 				m_isActive = false;
 				return true;
 			}
@@ -73,7 +73,7 @@ bool Bullet::CheckCollision(Character &character)
 }
 
 
-bool Bullet::CheckCollision(World &world)
+bool Bullet::CheckCollision(World &world, Network &net)
 {
 	if (m_isActive)
 	{
@@ -96,7 +96,15 @@ bool Bullet::CheckCollision(World &world)
 				Chunk * chunk = world.ChunkAt(chunkPos.x, chunkPos.z);
 
 				if (chunk)
+				{
 					chunk->RemoveBloc(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
+					net.Send("map " 
+						+ std::to_string(x) + " " 
+						+ std::to_string(y) + " " 
+						+ std::to_string(z) + " " 
+						+ std::to_string(BTYPE_AIR),
+						true);
+				}
 				m_isActive = false;
 				return true;
 

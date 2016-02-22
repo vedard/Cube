@@ -7,7 +7,7 @@ Character::Character() :
 	m_AttackRange(2),
 	m_HorizontalRot(0.f),
 	m_VerticalRot(45.f),
-	m_vitesse(0, 0, 0),
+	m_vitesse(0.05f, 0, 0.05f),
 	m_AttackSpeed(0),
 	m_Armor(1),
 	m_cooldownAttackTimer(),
@@ -19,8 +19,6 @@ Character::Character() :
 	m_Name = "Character ";
 	for (int i = 0; i < 5; i++)
 		m_Name += std::to_string(std::rand() % 10);
-
-
 }
 
 Character::~Character()
@@ -59,25 +57,27 @@ void Character::Move(World &world)
 {
 	//Chute
 	m_pos.y -= m_vitesse.y;
+	Vector3<float> deplacementVector = Vector3<float>(sin(m_HorizontalRot / 180 * PI), 0.f, cos(m_HorizontalRot / 180 * PI));
 
 	//Si collision
 	if (CheckCollision(world))
 	{
-
 		//Si on a touche le sol 
 		if (m_vitesse.y > 0)
 			m_isInAir = false;
-
 		//annule
 		m_pos.y += m_vitesse.y;
-		m_vitesse.y = 0;
 	}
 	else
 		m_isInAir = true;
 
 	//Acceleration
 	m_vitesse.y += 0.013f;
-
+	if (m_vitesse.y >= 0.6f)
+	{
+		m_vitesse.y = 0.6f;
+	}
+	m_pos.y += deplacementVector.y * m_vitesse.y;
 	DeathCheck();
 }
 
@@ -94,17 +94,31 @@ bool Character::CheckCollision(World &world) const
 		et on vérifie si il n'y pas de block
 		solide qui y touche
 		*/
+	float posx = 0.0f;
+	float posy = 0.0f;
+	float posz = 0.0f;
 	for (int y = 0; y <= h; y++)
 		for (int x = 0; x <= w; x++)
-			for (int z = 0; z <= d; z++)
-			{
+			for (int z = 0; z <= d; z++){
+				posx = (m_dimension.x / w * x) + m_dimension.x / 2;
+				posy = (m_dimension.y / h * y);
+				posz = (m_dimension.z / d * z) + m_dimension.z / 2;
+
+				posx = m_pos.x - posx;
+				posy = m_pos.y + posy;
+				posz = m_pos.z - posz;
 				BlockType bt1 = world.BlockAt(
 					m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
 					m_pos.y + (m_dimension.y / h * y),
 					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 
 				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
-				if (bt1 != BTYPE_AIR && (bt1 < 16 || bt1>25))
+				if (bt1 == BTYPE_TRAP)
+				{
+					Vector3<int> chunkPos(posx / CHUNK_SIZE_X, 0, posz / CHUNK_SIZE_Z);
+					world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(posx - (chunkPos.x * CHUNK_SIZE_X), posy, posz - (chunkPos.z * CHUNK_SIZE_X));
+				}
+				if (bt1 != BTYPE_AIR && (bt1 < 16 || bt1>25) && bt1 != BTYPE_TRAP)
 					return true;
 			}
 
@@ -280,3 +294,40 @@ const std::string& Character::GetName() const { return m_Name; }
 bool Character::GetisAlive() const { return m_isAlive; }
 
 bool Character::GetisInAir() const { return m_isInAir; }
+
+void Character::CheckBlock(World & world)
+{
+	if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 28) // Si c'est un trampoline en dessous
+	{
+		if (m_vitesse.y > 0.10f)
+		{
+			if (m_nbsauttrampoline == 0)
+			{
+				multiplicateur = -1.01f;
+			}
+			m_nbsauttrampoline++;
+			if (m_nbsauttrampoline >= MAX_TRAMPOLINE_JUMP)
+			{
+				multiplicateur += 0.025f;
+			}
+			m_vitesse.y *= multiplicateur;
+			if (m_vitesse.y <= -0.60f)
+			{
+				m_vitesse.y = -0.60f;
+			}
+			if (m_vitesse.y >= 0)
+			{
+				m_vitesse.y = 0;
+			}
+		}
+	}
+	if (!m_isInAir && m_vitesse.y >= 0.0f)
+	{
+		m_nbsauttrampoline = 0;
+	}
+	if (world.BlockAt(m_pos.x, m_pos.y - 1, m_pos.z) == 29) // Si c'est un tapis roulant
+	{
+		m_vitesse.x *= 2;
+		m_vitesse.z *= 2;
+	}
+}

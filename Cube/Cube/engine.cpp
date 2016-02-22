@@ -7,9 +7,9 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_network(),
 	m_fastInventoryKeySelected(0),
 	m_missingTime(0),
+	m_network(&m_world),
 	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
@@ -135,6 +135,10 @@ void Engine::LoadResource()
 		AddTextureToAtlas(BTYPE_RLAVA2, "Grass", TEXTURE_PATH "block_rlava2.bmp", .5f);
 		AddTextureToAtlas(BTYPE_RLAVA3, "Grass", TEXTURE_PATH "block_rlava3.bmp", .25f);
 		AddTextureToAtlas(BTYPE_FLAVA, "Grass", TEXTURE_PATH "block_flava.bmp", 1);
+		AddTextureToAtlas(BTYPE_TRAMPOLINE, "Grass", TEXTURE_PATH "block_trampoline.bmp", 1);
+		AddTextureToAtlas(BTYPE_TAPIS, "Grass", TEXTURE_PATH "block_tapis.bmp", 1);
+		AddTextureToAtlas(BTYPE_TRAP, "Grass", TEXTURE_PATH "block_trap.bmp", 1);
+
 
 		if (!m_textureAtlas.Generate(64, false))
 		{
@@ -145,6 +149,7 @@ void Engine::LoadResource()
 		std::cout << " Loading audio ..." << std::endl;
 		Sound::AddSound(Sound::M9_FIRE, WEAPONS_PATH "glock18-1.wav");
 		Sound::AddSound(Sound::MP5K_FIRE, WEAPONS_PATH "mp7-1.wav");
+		Sound::AddSound(Sound::SURVIVE, EFFECT_PATH "survive.wav");
 		Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
 		Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
 		Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
@@ -157,6 +162,9 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::HARP, EFFECT_PATH "harp.wav");
 		Sound::AddSound(Sound::SPLASH, EFFECT_PATH "splash.wav");
 		Sound::AddSound(Sound::SHOTGUN_FIRE, WEAPONS_PATH "shotgun.wav");
+		Sound::AddSound(Sound::BLOODMOON_THEME, EFFECT_PATH "bloodmoon_theme.wav");
+		Sound::AddSound(Sound::SPRINTER, SPRINTER_PATH "SprinterScream.wav");
+
 
 
 		for (int i = 0; i < 9; i++)
@@ -245,22 +253,19 @@ void Engine::UpdateEnvironement(float gameTime)
 			Parametre& m_settings = Parametre::GetInstance();
 
 			//Check si y a collision
-			for (int j = 0; j < MAX_CREEPER; j++)
-			{
+			for (int j = 0; j < MAX_CREEPER * MONSTER_MULTIPLIER; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
+
 			for (int j = 0; j < MAX_SPRINTER; j++)
-			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetSprinter(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
 
 			for (int j = 0; j < MAX_COW; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
@@ -270,11 +275,12 @@ void Engine::UpdateEnvironement(float gameTime)
 				}
 
 
-			for (int j = 0; j < MAX_BEAR; j++)
+			for (int j = 0; j < MAX_BEAR * MONSTER_MULTIPLIER; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetBear(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			for (int j = 0; j < MAX_DRAGON; j++)
@@ -289,6 +295,8 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
+
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
@@ -299,13 +307,13 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 
-			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world, m_network);
 
 		}
 	}
 
 	//Update les Creepers
-	for (int i = 0; i < MAX_CREEPER; i++)
+	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Move(m_world);
 
 	//Update les Sprinters
@@ -328,6 +336,10 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les Bears
 	for (int i = 0; i < MAX_BEAR; i++)
 		m_world.GetBear(i)->Move(m_world);
+	//
+	//Update les Bear
+	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
+		m_world.GetBear(i)->Move(m_world);
 
 	//Update les Dragons
 	for (int i = 0; i < MAX_DRAGON; i++)
@@ -340,8 +352,14 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
+
 	m_network.Fetch();
-	SyncWithServer();
+
+	// pour eviter de surcharge le reseau on envoie 3 fois moins de packets
+	// que l'on en fetch
+	static int updateCount = 0;
+	if (updateCount++ % 3 == 0)
+		SyncWithServer();
 
 }
 
@@ -350,9 +368,10 @@ void Engine::SyncWithServer()
 {
 	if (Parametre::GetInstance().m_isServer)
 	{
+		//std::cout << m_fps << std::endl;
 		for (auto c : m_network.GetClient())
 		{
-			m_network.Send(c.ToString());
+			m_network.Send("player " + c.ToString(), false);
 		}
 	}
 	else
@@ -362,13 +381,14 @@ void Engine::SyncWithServer()
 		c.x = m_world.GetPlayer()->GetPosition().x;
 		c.y = m_world.GetPlayer()->GetPosition().y;
 		c.z = m_world.GetPlayer()->GetPosition().z;
-		c.h = m_world.GetPlayer()->GetHorizontalRotation();
+		c.h = -m_world.GetPlayer()->GetHorizontalRotation();
 		c.v = m_world.GetPlayer()->GetVerticalRotation();
-		m_network.Send(c.ToString());
+		m_network.Send("player " + c.ToString(), false);
 	}
 }
 
-void Engine::DrawEnvironement(float gameTime) {
+void Engine::DrawEnvironement(float gameTime) 
+{
 
 	//Clear 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -380,6 +400,14 @@ void Engine::DrawEnvironement(float gameTime) {
 		return;
 	}
 
+	else if (m_world.GetBloodMoonInstance()->GetDuration() <= 53 && m_world.GetBloodMoonInstance()->GetStartedState())
+	{
+		Sound::PlayOnce(Sound::SURVIVE);
+		m_wireframe = false;
+		m_music.setVolume(0);
+		DrawSurviveScreen();
+		return;
+	}
 
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
 	glColor3f(1.f, 1.f, 1.f);
@@ -421,15 +449,6 @@ void Engine::DrawEnvironement(float gameTime) {
 		glDisable(GL_LIGHT0);
 
 
-
-	//Draw Creepers
-	for (int i = 0; i < MAX_CREEPER; i++)
-		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
-
-	for (int i = 0; i < MAX_SPRINTER; i++)
-		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
-
-
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawScope();
@@ -443,12 +462,13 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+	
 	//Draw animals
 	for (int i = 0; i < MAX_COW; i++)
-	{
 		m_world.GetCow(i)->Draw(m_modelCow);
-	}
-	for (int i = 0; i < MAX_BEAR; i++)
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		m_world.GetChicken(i)->Draw(m_modelChicken);
+	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Draw(m_modelChicken);
@@ -456,12 +476,16 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBird(i)->Draw(m_modelBird);
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
-
+	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
+		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
 	{
-		m_modelCow.Render(c.x, c.y, c.z, c.h, c.v, 1, 1, 1);
+		if (c.name == m_world.GetPlayer()->GetName())
+			continue;
+
+		m_modelCreeper.Render(c.x, c.y, c.z, c.h, 0, 1, 1, 1);
 	}
 
 	Shader::Disable();
@@ -492,6 +516,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawScope();
+
 	// Draw le menu
 	if (m_isMenuOpen)
 	{
@@ -508,89 +533,117 @@ void Engine::DrawEnvironement(float gameTime) {
 				DrawMenuSettingSelected(false);
 		else if (m_menu->m_currentMenu == SM_CONTROL_SELECTED)
 			DrawMenuControlSelected();
+		else if (m_menu->m_currentMenu == SM_MULTIPLAYER)
+			DrawMenuMultiplayer();
 	}
 }
 
-void Engine::SetDayOrNight(float gametime)
+void Engine::DayAndNightCycle(float gametime)
 {
-//	float time = sin((gametime) / DAY_TIME);
-//	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
-//		if (time < -0.97) {
-//			m_world.GetBloodMoonInstance()->Start();
-//			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
-//			m_missingTime = 60;
-//		}
-//	}
-//
-//	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
-//		m_world.GetBloodMoonInstance()->AddElapsedUnit();
-//		m_missingTime++; // Missing time se soustrait a time pour figer le temps lors d'une blood moon
-//	}
-//
-//
-//	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
-//	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
-//
-//	// Controle les cycles de couleurs de la lumière
-//	m_redLight = 5.f;
-//	m_greenLight = 0.48f * sin(time) + 4.5f;
-//	m_blueLight = 0.95f * sin(time) + 3.8;
-//
-//	// Controle les cycles de couleurs du fog
-//	m_redFog = 0.5f * sin(time) + 0.45f;
-//	m_greenFog = 0.5f * sin(time) + 0.45f;
-//	m_blueFog = 0.5f * sin(time) + 0.48f;
-//
-//	// Controle le cycle de densite du fog
-//	m_fogDensity = -0.031f * sin(time) + 0.052f;
-//	m_fogStart = 1.68f * sin(time) + 16;
-//
-//
-//	if (m_world.GetBloodMoonInstance()->GetStartedState()) {
-//		// Controle les cycles de couleurs de la lumière
-//		m_redLight = 0.f;
-//		m_greenLight = 0.f;
-//		m_blueLight = 0.f;
-//
-//		// Controle les cycles de couleurs du fog
-//		m_redFog = 0.25f;
-//		m_greenFog = 0.075f;
-//		m_blueFog = 0.075f;
-//
-//		// Controle le cycle de densite du fog
-//		m_fogDensity = 0.08f;
-//		m_fogStart = 15.f;
-//	}
-//
-//	light0Amb[0] = m_redLight;
-//	light0Amb[1] = m_greenLight;
-//	light0Amb[2] = m_blueLight;
-//	light0Amb[3] = 7.f;
-//
-//	fogcolor[0] = m_redFog;
-//	fogcolor[1] = m_greenFog;
-//	fogcolor[2] = m_blueFog;
-//	fogcolor[3] = 1;
-//
-//	// Le fog
-//	glEnable(GL_FOG);
-//	GLint fogmode = GL_EXP2;
-//	glFogi(GL_FOG_MODE, fogmode);
-//	glFogfv(GL_FOG_COLOR, fogcolor);
-//	glFogf(GL_FOG_DENSITY, m_fogDensity);
-//	glFogf(GL_FOG_START, m_fogStart);
-//	glFogf(GL_FOG_END, 24.f);
-//
-//	// La lumiere
-//	if (!m_world.GetBloodMoonInstance()->GetStartedState())
-//	{
-//		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-//		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-//		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-//		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-//		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-//	}
+	float time = sin(((gametime) - m_missingTime) / DAY_TIME);
+
+	// Decide si la prochaine nuit est une bloodmoon
+	if (time > 0.99)
+		if (rand() % BLOODMOON_PROBABILITY == 0)
+			m_world.GetBloodMoonInstance()->Activate();
+
+	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
+		if (time < -0.97) {
+			m_world.GetBloodMoonInstance()->Start();
+			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
+		}
+	}
+
+	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
+		m_world.GetBloodMoonInstance()->AddElapsedUnit();
+	}
+
+	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
+
+	// Controle les cycles de couleurs de la lumière
+	m_redLight = 5.f;
+	m_greenLight = 0.48f * sin(time) + 4.5f;
+	m_blueLight = 0.95f * sin(time) + 3.8;
+
+	// Controle les cycles de couleurs du fog
+	m_redFog = 0.5f * sin(time) + 0.45f;
+	m_greenFog = 0.5f * sin(time) + 0.45f;
+	m_blueFog = 0.5f * sin(time) + 0.48f;
+
+	// Controle le cycle de densite du fog
+	m_fogDensity = -0.031f * sin(time) + 0.052f;
+	m_fogStart = 1.68f * sin(time) + 16;
+
+	// Controle de tout ce qui se passe de visuel pendant 
+	// la blood moon selon le temps entre 0 et 2500
+	if (m_world.GetBloodMoonInstance()->GetStartedState()) 
+	{
+		if (m_world.GetBloodMoonInstance()->GetDuration() == 55)
+		{
+			Sound::PlayOnce(Sound::BLOODMOON_THEME);
+		}
+		// Éteint la lumière
+		if (m_world.GetBloodMoonInstance()->GetDuration() >= 50 && m_world.GetBloodMoonInstance()->GetDuration() <= 100)
+		{
+			m_redFog = 0.21 * sin(0.03f * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
+			m_greenFog = 0.037 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
+			m_blueFog = 0.008 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.06746;
+		}
+
+		// Éteint
+		else if (m_world.GetBloodMoonInstance()->GetDuration() >= 100)
+		{
+			// Controle les cycles de couleurs de la lumière
+			m_redLight = 0.f;
+			m_greenLight = 0.f;
+			m_blueLight = 0.f;
+
+			// Controle les cycles de couleurs du fog
+			m_redFog = 0.25f;
+			m_greenFog = 0.075f;
+			m_blueFog = 0.075f;
+		}
+
+		// Controle le cycle de densite du fog
+		m_fogDensity = 0.08f;
+		m_fogStart = 15.f;
+
+		if (m_world.GetBloodMoonInstance()->GetDuration() >= 2500) {
+			m_missingTime += 50;
+			m_music.setVolume(m_settings.m_musicvolume);
+		}
+	}
+
+	// Le Fog
+	fogcolor[0] = m_redFog;
+	fogcolor[1] = m_greenFog;
+	fogcolor[2] = m_blueFog;
+	fogcolor[3] = 1;
+	glEnable(GL_FOG);
+	GLint fogmode = GL_EXP2;
+	glFogi(GL_FOG_MODE, fogmode);
+	glFogfv(GL_FOG_COLOR, fogcolor);
+	glFogf(GL_FOG_DENSITY, m_fogDensity);
+	glFogf(GL_FOG_START, m_fogStart);
+	glFogf(GL_FOG_END, 24.f);
+
+	light0Amb[0] = m_redLight;
+	light0Amb[1] = m_greenLight;
+	light0Amb[2] = m_blueLight;
+	light0Amb[3] = 0.f;
+
+	// La lumiere
+	if (!m_world.GetBloodMoonInstance()->GetStartedState())
+	{
+		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+	}
 }
+
 
 void Engine::Render(float elapsedTime)
 {
@@ -604,27 +657,24 @@ void Engine::Render(float elapsedTime)
 	}
 	gameTime += elapsedTime;
 
-	m_world.GetBloodMoonInstance()->Activate();
-
 	//gestion des ticks
 	if (gameTime - m_LastTickTime >= TICK_DELAY)
 	{
-		if (!m_settings.m_isServer)
+		if (!m_settings.m_isServer && !m_world.GetBloodMoonInstance()->GetStartedState())
 			m_music.PlayNext();
 		m_LastTickTime = gameTime;
 		m_world.GetPlayer()->Tick();
 	}
 
 	if ((int)(gameTime * 100) % 100 == 0) {
-		m_world.SpawnCreepers();
+		m_world.SpawnCreepers(MAX_CREEPER * m_world.GetBloodMoonInstance()->monsterMultiplier);
 		m_world.SpawnSprinters();
 		m_world.SpawnCows();
 		m_world.SpawnChickens();
+		m_world.SpawnBears(MAX_BEAR * m_world.GetBloodMoonInstance()->monsterMultiplier);
 		m_world.SpawnBird();
-		m_world.SpawnBears();
 		m_world.SpawnDragons();
 	}
-
 
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
@@ -700,7 +750,7 @@ void Engine::Render(float elapsedTime)
 		if (m_mouseButton[1] && m_world.GetPlayer()->GetWeapon() != W_BLOCK && m_world.GetPlayer()->Shoot(m_world) == false)
 			m_mouseButton[1] = false;
 
-		SetDayOrNight(gameTime);
+		DayAndNightCycle(gameTime);
 		UpdateEnvironement(gameTime);
 
 		//Time control
@@ -716,7 +766,6 @@ void Engine::Render(float elapsedTime)
 		GetBlocAtCursor();
 		DrawEnvironement(gameTime);
 	}
-
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -765,7 +814,17 @@ void Engine::KeyPressEvent(unsigned char key)
 		//f6 -> connect
 		else if (m_keyboard[sf::Keyboard::F6])
 		{
-			m_network.Connect("localhost", 1234);
+			if (m_settings.m_isConnected)
+			{
+				m_network.Disconnect();
+				m_settings.m_isConnected = false;
+			}
+			else
+			{
+				//m_network.Connect("45.55.42.126", 1234);
+				m_network.Connect("localhost", 1234);
+				m_settings.m_isConnected = true;
+			}
 		}
 
 		//f10 -> toggle fulscreen mode
@@ -821,7 +880,7 @@ void Engine::KeyPressEvent(unsigned char key)
 		}
 		else if (m_keyboard[m_settings.m_spawnmonster])
 		{ //M -> spawn monster
-			for (int i = 0; i < MAX_CREEPER; i++) {
+			for (int i = 0; i < MAX_CREEPER * m_world.GetBloodMoonInstance()->monsterMultiplier; i++) {
 				if (!m_world.GetCreeper(i)->GetisAlive()) {
 					m_world.GetCreeper(i)->Spawn(m_world, (int)((m_world.GetPlayer()->GetPosition().x) - 50 + rand() % 100), (int)((m_world.GetPlayer()->GetPosition().z) - 50 + rand() % 100));
 					break;
@@ -918,7 +977,6 @@ void Engine::MouseMoveEvent(int x, int y)
 			m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
 		}
 	}
-
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -946,6 +1004,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_network.Send("map " 
+						+ std::to_string(m_currentBlock.x) + " " 
+						+ std::to_string(m_currentBlock.y) + " " 
+						+ std::to_string(m_currentBlock.z) + " " 
+						+ std::to_string(BTYPE_AIR),
+						true);
 			}
 
 			//Right Click
@@ -970,10 +1034,17 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 						//Si ya collision on efface le block
 						if (m_world.GetPlayer()->CheckCollision(m_world))
 							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
+						else
+						{
+							m_network.Send("map " 
+									+ std::to_string(m_currentBlock.x) + " " 
+									+ std::to_string(m_currentBlock.y) + " " 
+									+ std::to_string(m_currentBlock.z) + " " 
+									+ std::to_string(m_world.GetPlayer()->GetBlock()),
+									true);
+						}
 					}
 				}
-
-
 			}
 
 			if (m_settings.m_inventaire_creatif)
@@ -988,7 +1059,6 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			}
 		}
 	}
-
 }
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -1171,7 +1241,6 @@ void Engine::DrawHud() const
 
 void Engine::DrawDeathScreen() const
 {
-
 	glEnable(GL_TEXTURE_2D);
 
 	// Setter le blend function , tout ce qui sera noir sera transparent
@@ -1209,6 +1278,42 @@ void Engine::DrawDeathScreen() const
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 
+}
+
+void Engine::DrawSurviveScreen() const
+{
+	glEnable(GL_TEXTURE_2D);
+
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_BLEND);
+
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Bind de la texture pour le font
+	m_textureFont.Bind();
+
+	//Text
+	std::ostringstream ss;
+	ss << "Survive";
+	PrintText(Width() / 2 - (ss.str().length() * 48) / 2, Height() / 2, 64, ss.str());
+
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 }
 
 void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const
@@ -1468,6 +1573,13 @@ void Engine::DrawMenuPrincipal() const
 	int menuPositionX = Width() / 2;
 	int menuPositionY = Height() / 2;
 
+	std::string connection;
+
+	if (m_settings.m_isConnected == true)
+		connection = "Connected";
+	else
+		connection = "Multiplayer";
+
 	glEnable(GL_TEXTURE_2D);
 	// Setter le blend function , tout ce qui sera noir sera transparent
 	glDisable(GL_LIGHTING);
@@ -1505,7 +1617,8 @@ void Engine::DrawMenuPrincipal() const
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2));
+	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2) + 25);
+	DrawMenuButton(MP_MULTIPLAYER, connection, Width() / 2 - (connection.length() * 4 + 2), (Height() / 2) - 25);
 	DrawMenuButton(MP_EXIT_GAME, "Exit Game", Width() / 2 - 40, (Height() / 2) - (menuHeight / 2));
 
 
@@ -1714,6 +1827,59 @@ void Engine::DrawMenuControls() const
 	glPopMatrix();
 }
 
+void Engine::DrawMenuMultiplayer() const
+{
+	// Menu specs
+	int menuWidth = 100;
+	int menuHeight = 60;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
+	PrintText(Width() / 2 - 68, Height() / 2 + 5, 12.f, "Escape to cancel");
+	PrintText(Width() / 2 - 70, Height() / 2 - 20, 12.f, "Enter to confirm");
+	PrintText(Width() / 2 - (m_settings.m_lastServer.length() * 5), Height() / 2 - menuHeight + 8, 12.f, m_settings.m_lastServer);
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
 void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const
 {
 	if (m_menu->m_currentMenuItem == menuItem)
@@ -1774,9 +1940,21 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			CloseGame();
 		}
+		else if (m_menu->m_currentMenuItem == MP_MULTIPLAYER)
+		{
+			if (m_settings.m_isConnected == true)
+			{
+				m_network.Disconnect();
+				m_settings.m_isConnected = false;
+			}
+			else
+			{
+				m_menu = new Menu(SM_MULTIPLAYER);
+			}
+		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 			m_menu = new Menu(SM_SETTINGS);
-		else if ((int)m_menu->m_currentMenu == (int)MP_CONTROLS)
+		else if (m_menu->m_currentMenu == MP_CONTROLS)
 			m_menu = new Menu(SM_CONTROLS);
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
@@ -1846,7 +2024,7 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			m_settings.m_vsync = !m_settings.m_vsync;
 			m_settings.Save();
-			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+			SetVSync(m_settings.m_vsync);
 		}
 		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
 		{
@@ -2057,6 +2235,15 @@ void Engine::ManageMenuEnterKeyPress()
 			m_menu->m_controlSelected = "Wireframe";
 			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
 		}
+	}
+	else if (m_menu->m_currentMenu == SM_MULTIPLAYER)
+	{
+		m_network.Connect(m_settings.m_lastServer.c_str(), 1234);
+		m_settings.m_isConnected = true;
+		m_settings.Save();
+
+		m_menu = new Menu(SM_PRINCIPAL);
+		m_menu->m_currentMenuItem = MP_MULTIPLAYER;
 	}
 }
 

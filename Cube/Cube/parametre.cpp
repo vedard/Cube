@@ -70,6 +70,7 @@ void Parametre::Save()
 	myfile << "inventaire_enlever_element " << m_inventaire_enlever_element << "\n";
 	myfile << "inventaire_creatif " << m_inventaire_creatif << "\n";
 	myfile << "playername " << m_PlayerName << "\n";
+	myfile << "last_server " << m_lastServer << "\n";
 
 	myfile.close();
 	Load();
@@ -119,6 +120,7 @@ void Parametre::SaveDefault()
 	myfile << "inventaire_enlever_element " << INVENTORY_DELETE_ITEM_KEY << "\n";
 	myfile << "inventaire_creatif " << IS_INVENTORY_CREATIVE << "\n";
 	myfile << "playername Player1 \n";
+	myfile << "last_server none \n";
 
 
 	myfile.close();
@@ -183,6 +185,7 @@ void Parametre::Load()
 		setting.Get(34, 0) = "inventaire_enlever_element";
 		setting.Get(35, 0) = "inventaire_creatif";
 		setting.Get(36, 0) = "playername";
+		setting.Get(37, 0) = "last_server";
 
 		file.open(filename);
 		std::cout << "Reading " << filename << "..." << std::endl;
@@ -294,5 +297,7 @@ void Parametre::Load()
 		m_inventaire_creatif = (setting.Get(35, 1) == "true" || setting.Get(35,1) == "1");
 		if (setting.Get(36, 1) != "null")
 			m_PlayerName = setting.Get(36, 1);
+		if (setting.Get(37, 1) != "null")
+			m_lastServer = setting.Get(37, 1);
 	}
 }

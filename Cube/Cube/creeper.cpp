@@ -60,6 +60,7 @@ void Creeper::Move(World &world)
 		//Si la cible est valide
 		if (m_target)
 		{
+			Character::CheckBlock(world);
 			//On attaque, si c'est pas possible on avance
 			if (!Attack(m_target))
 			{

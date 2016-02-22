@@ -264,7 +264,6 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + h, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * .75f, type);
 			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + h, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .00f, binfo.v + binfo.h * 1.0f, type);
 			vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + h, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
-
 		}
 	}
 	//Bas
@@ -276,9 +275,7 @@ void Chunk::AddBlockToMesh(ChunkMesh::VertexData * &vd, int& count, BlockInfo &b
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 0.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * .75f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 1.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * 1.0f, binfo.v + binfo.h * 1.0f, type);
 		vd[count++] = ChunkMesh::VertexData(Blockpos.x + 0.f, Blockpos.y + 0.f, Blockpos.z + 1.f, light, light, light, binfo.u + binfo.w * .50f, binfo.v + binfo.h * 1.0f, type);
-
 	}
-
 }
 
 void Chunk::RenderSolidBuffer(GLenum &m_program) const

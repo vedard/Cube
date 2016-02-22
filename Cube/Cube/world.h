@@ -55,12 +55,10 @@ public:
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
-	void SpawnCreepers();
-	void SpawnSprinters();
-	void SpawnCows();
+	void SpawnCreepers(int maxMonsters);
 	void SpawnDragons();
-	void SpawnBears();
-	void SpawnChickens();
+	void SpawnCows();
+	void SpawnSprinters();	void SpawnBears(int maxBears);	void SpawnChickens();
 	void SpawnBird();
 	void RunWater();
 	void RemoveWater(Vector3<float> vf);

@@ -6,7 +6,7 @@ Menu::Menu(SOUS_MENU currentMenu) : m_currentMenu(currentMenu)
 	m_currentMenuItem = 0;
 
 	if (m_currentMenu == SM_PRINCIPAL)
-		m_menuItemsAmount = 2; // Starts at 0
+		m_menuItemsAmount = 3; // Starts at 0
 	else if (m_currentMenu == SM_SETTINGS)
 		m_menuItemsAmount = 11;
 	else if (m_currentMenu == SM_CONTROLS)
@@ -121,6 +121,36 @@ void Menu::OnKeyDown(unsigned char key)
 			m_settings.Save();
 			m_controlSelected = KEY_BINDED_SUCCESSFULLY;
 		}
+	}
+	else if (m_currentMenu == SM_MULTIPLAYER)
+	{
+		if (m_keyboard[sf::Keyboard::BackSpace])
+		{
+			if (m_settings.m_lastServer.length() > 0)
+				m_settings.m_lastServer.erase(m_settings.m_lastServer.length() - 1);
+		}
+		else if (m_keyboard[sf::Keyboard::Num0])
+			m_settings.m_lastServer += '0';
+		else if (m_keyboard[sf::Keyboard::Num1])
+			m_settings.m_lastServer += '1';
+		else if (m_keyboard[sf::Keyboard::Num2])
+			m_settings.m_lastServer += '2';
+		else if (m_keyboard[sf::Keyboard::Num3])
+			m_settings.m_lastServer += '3';
+		else if (m_keyboard[sf::Keyboard::Num4])
+			m_settings.m_lastServer += '4';
+		else if (m_keyboard[sf::Keyboard::Num5])
+			m_settings.m_lastServer += '5';
+		else if (m_keyboard[sf::Keyboard::Num6])
+			m_settings.m_lastServer += '6';
+		else if (m_keyboard[sf::Keyboard::Num7])
+			m_settings.m_lastServer += '7';
+		else if (m_keyboard[sf::Keyboard::Num8])
+			m_settings.m_lastServer += '8';
+		else if (m_keyboard[sf::Keyboard::Num9])
+			m_settings.m_lastServer += '9';
+		else if (m_keyboard[sf::Keyboard::Period])
+			m_settings.m_lastServer += '.';
 	}
 	else // Quand on navigue dans les menus
 	{

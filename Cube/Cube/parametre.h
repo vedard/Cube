@@ -39,7 +39,6 @@ public:
 
 	// Display
 	bool m_isfullscreen = false;
-	bool m_isServer = false;
 	int m_width = 1360;
 	int m_height = 768;
 	int m_antialiasing = 0;
@@ -58,6 +57,11 @@ public:
 	//Sound
 	int m_musicvolume = 10;
 	int m_soundvolume = 12;
+
+	// Multiplayer
+	bool m_isServer = false;
+	std::string m_lastServer = "none";
+	bool m_isConnected = false;
 
 	void Save();
 
