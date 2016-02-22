@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 Engine::Engine() :
 	m_wireframe(false),
@@ -217,7 +217,6 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 1200, 150, 0.5);
-
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 0.01f);
 
@@ -1230,6 +1229,40 @@ void Engine::DrawHud() const
 	if (!m_settings.m_inventaire_creatif)
 		RenderFastInventory();
 
+	if(!false)
+	{
+		glPushMatrix(); 
+		{
+			float barHeight = (float)m_world.GetPlayer()->GetXp()->GetXp() / (float)m_world.GetPlayer()->GetXp()->GetMaxXp();
+			glLoadIdentity();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			glColor3f(XPBAR_COLOR_R / 255.f, XPBAR_COLOR_G / 255.f, XPBAR_COLOR_B / 255.f);
+			glBegin(GL_QUADS);
+			glVertex2i(XPBAR_PADDING_X, XPBAR_PADDING_Y);
+			glVertex2i(XPBAR_WIDTH + XPBAR_PADDING_X, XPBAR_PADDING_Y);
+			glVertex2i(XPBAR_WIDTH + XPBAR_PADDING_X, Height() * barHeight - XPBAR_PADDING_Y);
+			glVertex2i(XPBAR_PADDING_X, Height() * barHeight - XPBAR_PADDING_Y);
+			glEnd();
+
+			m_textureFont.Bind();
+			glEnable(GL_TEXTURE_2D);
+		
+			//Text
+			std::ostringstream ss;
+			ss << "Lvl: " << m_world.GetPlayer()->GetXp()->GetLevel();
+			PrintText(XPBAR_WIDTH + XPBAR_PADDING_X + 5, 0, 16, ss.str(), false);
+
+			ss.str("");
+			ss << "Xp: " << m_world.GetPlayer()->GetXp()->GetXp() << " / " << m_world.GetPlayer()->GetXp()->GetMaxXp();
+			PrintText(XPBAR_PADDING_X, 0, 16, ss.str(), false);
+		
+			glDisable(GL_BLEND);
+			glDisable(GL_TEXTURE_2D);
+		}
+		glPopMatrix();
+	} 
+
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
@@ -1316,9 +1349,11 @@ void Engine::DrawSurviveScreen() const
 	glPopMatrix();
 }
 
-void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const
+void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t, bool useIdentity) const
 {
-	glLoadIdentity();
+	if(useIdentity){
+		glLoadIdentity();
+	}
 	glTranslated(x, y, 0);
 	for (unsigned int i = 0; i < t.length(); ++i)
 	{

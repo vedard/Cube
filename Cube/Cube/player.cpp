@@ -2,21 +2,23 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include "experience.h"
 
 
 Player::Player() :
-	Character(),
-	m_noClip(false),
-	m_sneaked(false),
-	m_running(false),
-	m_block(BTYPE_GRASS),
-	m_footUnderwater(false),
-	m_headUnderwater(false),
-	m_HeadShake(0),
-	isHurt(0),
-	InvulnerabilityTimer(0),
-	m_inventory(new Inventory()),
-	hasHit(0)
+Character(),
+m_noClip(false),
+m_sneaked(false),
+m_running(false),
+m_block(BTYPE_GRASS),
+m_footUnderwater(false),
+m_headUnderwater(false),
+m_HeadShake(0),
+isHurt(0),
+InvulnerabilityTimer(0),
+m_inventory(new Inventory()),
+hasHit(0),
+m_xp()
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -32,6 +34,7 @@ Player::Player() :
 
 Player::~Player()
 {
+
 }
 
 void Player::TurnLeftRight(float value)

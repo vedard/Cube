@@ -65,6 +65,7 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 World::~World()
 {
 	m_threadcontinue = false;
+	delete m_player;
 }
 
 Cow* World::GetCow(int pos) const { return &m_cow[pos]; }
