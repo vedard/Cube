@@ -58,7 +58,7 @@ typedef long long int64;
 #define NUMBER_OF_BLOCK 31
 #define MAX_CREEPER 0
 #define NUMBER_OF_BLOCK 31
-#define MAX_SPRINTER 0
+#define MAX_SPRINTER 30
 #define MAX_BULLET 500
 #define MAX_COW 20
 #define MAX_BEAR 20
