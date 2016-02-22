@@ -195,7 +195,7 @@ void Engine::LoadResource()
 		//Model 3d
 		m_modelChicken.LoadOBJ(MODEL_PATH "Chicken.obj", TEXTURE_PATH "Chicken.png");
 		m_modelBird.LoadOBJ(MODEL_PATH "Bird.obj", TEXTURE_PATH "Bird.png");
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 		m_modelDragon.LoadOBJ(MODEL_PATH "dragon.obj", TEXTURE_PATH "dragonfire.png");
