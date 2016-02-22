@@ -148,7 +148,7 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::AK47_FIRE, WEAPONS_PATH "ak47-1.wav");
 		Sound::AddSound(Sound::GUN_DRAW, WEAPONS_PATH "glock_draw.wav");
 		Sound::AddSound(Sound::FLESH_IMPACT, HURT_PATH "cowhurt3.ogg");
-		Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
+		//Sound::AddSound(Sound::MUSIC1, MUSIC_PATH "music.wav");
 		Sound::AddSound(Sound::DROWNING, HURT_PATH "drowning.wav");
 		Sound::AddSound(Sound::GASPING, HURT_PATH "gasping.wav");
 		Sound::AddSound(Sound::HURT, HURT_PATH "hurt.wav");
@@ -186,11 +186,11 @@ void Engine::LoadResource()
 
 		//Model 3d
 		m_modelChicken.LoadOBJ(MODEL_PATH "Chicken.obj", TEXTURE_PATH "Chicken.png");
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 		m_modelDragon.LoadOBJ(MODEL_PATH "dragon.obj", TEXTURE_PATH "dragonfire.png");
-		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.png");
+		m_modelSprinter.LoadOBJ(MODEL_PATH "sprinter.obj", TEXTURE_PATH "sprinter.jpg");
 		m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitRessource(MODEL_PATH "m9.obj", TEXTURE_PATH "m9.jpg", Sound::M9_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitRessource(MODEL_PATH "mp5k.obj", TEXTURE_PATH "mp5k.png", Sound::MP5K_FIRE);
 		m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitRessource(MODEL_PATH "ak47.obj", TEXTURE_PATH "ak47.bmp", Sound::AK47_FIRE);
@@ -932,6 +932,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_world.GetPlayer()->GetXp()->GainXp(m_world.GetPlayer()->GetXp()->GetXpGain());			
 			}
 
 			//Right Click
@@ -1145,6 +1146,40 @@ void Engine::DrawHud() const
 	}
 	if (!m_settings.m_inventaire_creatif)
 		RenderFastInventory();
+	
+	if(!false)
+	{
+		glPushMatrix(); 
+		{
+			float barHeight = (float)m_world.GetPlayer()->GetXp()->GetXp() / (float)m_world.GetPlayer()->GetXp()->GetMaxXp();
+			glLoadIdentity();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			glColor3f(XPBAR_COLOR_R / 255.f, XPBAR_COLOR_G / 255.f, XPBAR_COLOR_B / 255.f);
+			glBegin(GL_QUADS);
+			glVertex2i(XPBAR_PADDING_X, XPBAR_PADDING_Y);
+			glVertex2i(XPBAR_WIDTH + XPBAR_PADDING_X, XPBAR_PADDING_Y);
+			glVertex2i(XPBAR_WIDTH + XPBAR_PADDING_X, Height() * barHeight - XPBAR_PADDING_Y);
+			glVertex2i(XPBAR_PADDING_X, Height() * barHeight - XPBAR_PADDING_Y);
+			glEnd();
+
+			m_textureFont.Bind();
+			glEnable(GL_TEXTURE_2D);
+		
+			//Text
+			std::ostringstream ss;
+			ss << "Lvl: " << m_world.GetPlayer()->GetXp()->GetLevel();
+			PrintText(XPBAR_WIDTH + XPBAR_PADDING_X + 5, 0, 16, ss.str(), false);
+
+			ss.str("");
+			ss << "Xp: " << m_world.GetPlayer()->GetXp()->GetXp() << " / " << m_world.GetPlayer()->GetXp()->GetMaxXp();
+			PrintText(XPBAR_PADDING_X, 0, 16, ss.str(), false);
+		
+			glDisable(GL_BLEND);
+			glDisable(GL_TEXTURE_2D);
+		}
+		glPopMatrix();
+	}
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
@@ -1197,9 +1232,11 @@ void Engine::DrawDeathScreen() const
 
 }
 
-void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const
+void Engine::PrintText(unsigned int x, unsigned int y, float size, const std::string & t, bool useIdentity) const
 {
-	glLoadIdentity();
+	if(useIdentity){
+		glLoadIdentity();
+	}
 	glTranslated(x, y, 0);
 	for (unsigned int i = 0; i < t.length(); ++i)
 	{
@@ -1772,6 +1809,8 @@ void Engine::ManageMenuEnterKeyPress()
 			m_settings.m_isfullscreen = !m_settings.m_isfullscreen;
 			m_settings.Save();
 			SetFullscreen(IsFullscreen());
+
+
 		}
 		else if (m_menu->m_currentMenuItem == MS_WIDTH)
 		{

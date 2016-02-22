@@ -89,6 +89,13 @@ typedef long long int64;
 #define IS_DYING_LENGTH 3
 #define GUN_NUMBER 5
 
+#define XPBAR_WIDTH 25
+#define XPBAR_PADDING_X 5
+#define XPBAR_COLOR_R 0.f
+#define XPBAR_COLOR_G 128.f
+#define XPBAR_COLOR_B 0.f
+#define XPBAR_PADDING_Y 0
+
 
 #define FAST_INVENTORY_SIZE 3		//If changed, modification must be made into the render and the keybinding to apply the changes
 #define INVENTORY_SIZE 15

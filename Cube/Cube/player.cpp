@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include "experience.h"
 
 
 Player::Player() :
@@ -16,7 +17,8 @@ m_HeadShake(0),
 isHurt(0),
 InvulnerabilityTimer(0),
 m_inventory(new Inventory()),
-hasHit(0)
+hasHit(0),
+m_xp()
 {
 	m_BreathCount = 0;
 	m_dimension = Vector3<float>(0.2f, 1.62f, 0.2f);
@@ -27,11 +29,12 @@ hasHit(0)
 	m_isAlive = false;
 	m_godMode = false;
 	
-	Guns = new Gun[GUN_NUMBER];	
+	Guns = new Gun[GUN_NUMBER];
 }
 
 Player::~Player()
 {
+
 }
 
 void Player::TurnLeftRight(float value)
@@ -392,6 +395,7 @@ void Player::SetWeapon(int mode)
 
 void Player::Jump()
 {
+
 	if (!m_isInAir && !m_kneeUnderwater && Tool::EqualWithEpsilon<float>(m_vitesse.y,0, 0.20) && !m_kneeUnderLava)
 	{
 		m_vitesse.y = -0.20f;

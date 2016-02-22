@@ -5,7 +5,9 @@
 #include "gun.h"
 #include "inventory.h"
 #include "define.h"
+#include "experience.h"
 #include <memory>
+#include <cmath>
 
 
 class Player : public Character
@@ -49,6 +51,8 @@ public:
 	void AddToInventory(BlockType type);
 	bool RemoveFromInventory(BlockType type);
 	Inventory* GetInventory();
+	
+	Experience* GetXp() { return &m_xp; }
 
 private:
 	void CheckUnderwater(World &world);
@@ -82,6 +86,8 @@ private:
 	float m_HeadShake;		// Shake la camera a chaque pas
 
 	std::unique_ptr<Inventory> m_inventory;	//Inventaire du joueur
+
+	Experience m_xp;
 
 public:
 	int isHurt;
