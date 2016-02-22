@@ -44,6 +44,8 @@ public:
 	int Width() const;
 	int Height() const;
 
+	void SetVSync(bool enable);
+
 	void SetMaxFps(int maxFps);
 	int GetMaxFps() const;
 
@@ -67,7 +69,10 @@ private:
 	Parametre& m_settings = Parametre::GetInstance();
 
 protected:
+#ifdef NODISPLAY
+#else
 	sf::Window	m_app;
+#endif
 	int			m_renderDistance;
 	float		m_cross_color_r, m_cross_color_g, m_cross_color_b;
 	float		m_mouse_sensibility;

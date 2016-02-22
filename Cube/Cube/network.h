@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sstream>
 #include "vector3.h"
+#include "world.h"
 #include "networkevent.h"
 #include "parametre.h"
 
@@ -30,22 +31,34 @@ struct Client
 	void FromString(const std::string& str)
 	{
 		std::istringstream data(str);
-		data >> name >> x >> y >> z >> h >> v;
+		string null;
+		data >> null >> name >> x >> y >> z >> h >> v;
 	}
 };
 
 class Network : public NetworkEvent
 {
 
+// Methodes
 public:
-	Network();
-	virtual ~Network();
+	Network(World * world);
+	~Network();
+
 	bool Fetch();
 	void Connect(const char * ip, uint16 port);
 	void Disconnect();
-	bool Send(string data);
+	bool Send(string data, bool reliable);
 	vector<Client> GetClient();
 
+private:
+	
+	// Hérité via NetworkEvent
+	virtual void OnConnect() override;
+	virtual void OnDisconnect() override;
+	virtual void OnPacketReceive(string packet) override;
+
+
+// Members
 private:
 
 	// Network parameter
@@ -53,6 +66,7 @@ private:
 
 	// List of client connected to the server
 	vector<Client> m_lstClient;
+	World * m_world;
 
 	//ENet
 	ENetHost *	m_ENetHost;
@@ -60,12 +74,5 @@ private:
 	ENetAddress	m_ENetAddress;
 	ENetPeer *	m_EnetPeerServer;
 
-	// Hérité via NetworkEvent
-	virtual void OnConnect() override;
-	virtual void OnDisconnect() override;
-	virtual void OnPacketReceive() override;
-
 };
-
-
 #endif

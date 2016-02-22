@@ -77,6 +77,7 @@ private:
 	void DrawHitMarker() const;
 	void DrawMenuSettings() const;
 	void DrawMenuControls() const;
+	void DrawMenuMultiplayer() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
 	void ManageAllMenuKeys(unsigned char key);
 	void ManageMenuEnterKeyPress();
@@ -127,7 +128,6 @@ private:
 	int m_fps;
 	int m_chunkToUpdate;
 	bool displayInfo;
-	Music& m_music = Music::GetInstance();
 
 	//Model
 	Model3d m_modelCow;
@@ -139,12 +139,13 @@ private:
 	Model3d m_modelBird;
 
 	Network m_network;
+	Parametre& m_settings = Parametre::GetInstance();
+	Music& m_music = Music::GetInstance();
 
 	//Gun 
 	Gun * playerGun;
 
 	// Parametres
-	Parametre& m_settings = Parametre::GetInstance();
 
 	// Valeurs pour le jour et la nuit
 	float m_redLight;

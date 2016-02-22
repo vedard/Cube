@@ -33,6 +33,8 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 	}
 	else
 	{
+#ifdef NODISPLAY
+#else
 		while (m_app.isOpen())
 		{
 			clock.restart();
@@ -80,6 +82,7 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 
 			m_lastFrameTime = clock.getElapsedTime().asSeconds();
 		}
+#endif
 	}
 
 	UnloadResource();
@@ -90,29 +93,46 @@ bool OpenglContext::Start(const std::string& title, int width, int height)
 
 bool OpenglContext::Stop()
 {
+#ifdef NODISPLAY
+#else
 	m_app.close();
+#endif
 	return true;
 }
 
 void OpenglContext::CenterMouse()
 {
+#ifdef NODISPLAY
+#else
 	sf::Mouse::setPosition(sf::Vector2i(Width() / 2, Height() / 2), m_app);
+#endif
 }
 
 int OpenglContext::Width() const
 {
+#ifdef NODISPLAY
+	return 0;
+#else
 	return m_app.getSize().x;
+#endif
 }
 
 int OpenglContext::Height() const
 {
+#ifdef NODISPLAY
+	return 0;
+#else
 	return m_app.getSize().y;
+#endif
 }
 
 void OpenglContext::SetMaxFps(int maxFps)
 {
 	m_maxFps = maxFps;
+#ifdef NODISPLAY
+#else
 	m_app.setFramerateLimit(maxFps);
+#endif
 }
 
 int OpenglContext::GetMaxFps() const
@@ -124,7 +144,10 @@ void OpenglContext::SetFullscreen(bool fullscreen)
 {
 	ShowCursor();
 	m_settings.m_isfullscreen = fullscreen;
+#ifdef NODISPLAY
+#else
 	m_app.setPosition(sf::Vector2i(0, 0));
+#endif
 	DeInit();
 	InitWindow();
 	Init();
@@ -150,12 +173,18 @@ void OpenglContext::MakeRelativeToCenter(int& x, int& y) const
 
 void OpenglContext::ShowCursor()
 {
+#ifdef NODISPLAY
+#else
 	m_app.setMouseCursorVisible(true);
+#endif
 }
 
 void OpenglContext::HideCursor()
 {
+#ifdef NODISPLAY
+#else
 	m_app.setMouseCursorVisible(false);
+#endif
 }
 
 void OpenglContext::ShowCrossCursor() const
@@ -168,6 +197,8 @@ void OpenglContext::InitWindow(int width, int height)
 	if (m_settings.m_isServer)
 		return;
 
+#ifdef NODISPLAY
+#else
 	std::cout << sf::VideoMode::getDesktopMode().width << std::endl;
 
 	if (m_settings.m_isfullscreen)
@@ -181,6 +212,16 @@ void OpenglContext::InitWindow(int width, int height)
 			sf::Style::Close,
 			sf::ContextSettings(32, 8, m_settings.m_antialiasing));
 	m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+#endif
+}
+
+void OpenglContext::SetVSync(bool enable)
+{
+#ifdef NODISPLAY
+#else
+	m_app.setVerticalSyncEnabled(enable);
+#endif
+
 }
 
 OpenglContext::MOUSE_BUTTON OpenglContext::ConvertMouseButton(sf::Mouse::Button button) const

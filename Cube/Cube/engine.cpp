@@ -7,9 +7,9 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_network(),
 	m_fastInventoryKeySelected(0),
 	m_missingTime(0),
+	m_network(&m_world),
 	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
@@ -254,21 +254,18 @@ void Engine::UpdateEnvironement(float gameTime)
 
 			//Check si y a collision
 			for (int j = 0; j < MAX_CREEPER * MONSTER_MULTIPLIER; j++)
-			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
+
 			for (int j = 0; j < MAX_SPRINTER; j++)
-			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetSprinter(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
 
 			for (int j = 0; j < MAX_COW; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
@@ -283,6 +280,7 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			for (int j = 0; j < MAX_DRAGON; j++)
@@ -297,6 +295,8 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
+
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
@@ -307,7 +307,7 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 
-			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world, m_network);
 
 		}
 	}
@@ -329,12 +329,14 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Move(m_world);
+
 	for (int i = 0; i < MAX_BIRD; i++)
 		m_world.GetBird(i)->Move(m_world);
 
 	//Update les Bears
 	for (int i = 0; i < MAX_BEAR; i++)
 		m_world.GetBear(i)->Move(m_world);
+	//
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Move(m_world);
@@ -350,8 +352,14 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
+
 	m_network.Fetch();
-	SyncWithServer();
+
+	// pour eviter de surcharge le reseau on envoie 3 fois moins de packets
+	// que l'on en fetch
+	static int updateCount = 0;
+	if (updateCount++ % 3 == 0)
+		SyncWithServer();
 
 }
 
@@ -360,9 +368,10 @@ void Engine::SyncWithServer()
 {
 	if (Parametre::GetInstance().m_isServer)
 	{
+		//std::cout << m_fps << std::endl;
 		for (auto c : m_network.GetClient())
 		{
-			m_network.Send(c.ToString());
+			m_network.Send("player " + c.ToString(), false);
 		}
 	}
 	else
@@ -372,13 +381,14 @@ void Engine::SyncWithServer()
 		c.x = m_world.GetPlayer()->GetPosition().x;
 		c.y = m_world.GetPlayer()->GetPosition().y;
 		c.z = m_world.GetPlayer()->GetPosition().z;
-		c.h = m_world.GetPlayer()->GetHorizontalRotation();
+		c.h = -m_world.GetPlayer()->GetHorizontalRotation();
 		c.v = m_world.GetPlayer()->GetVerticalRotation();
-		m_network.Send(c.ToString());
+		m_network.Send("player " + c.ToString(), false);
 	}
 }
 
-void Engine::DrawEnvironement(float gameTime) {
+void Engine::DrawEnvironement(float gameTime) 
+{
 
 	//Clear 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -438,22 +448,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	else
 		glDisable(GL_LIGHT0);
 
-	for (int i = 0; i < MAX_COW; i++)
-	{
-		m_world.GetCow(i)->Draw(m_modelCow);
-	}
-	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
-		m_world.GetBear(i)->Draw(m_modelBear);
-	
-
-
-	//Draw Creepers
-	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
-		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
-
-	for (int i = 0; i < MAX_SPRINTER; i++)
-		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
-
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
@@ -468,11 +462,12 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+	
 	//Draw animals
 	for (int i = 0; i < MAX_COW; i++)
-	{
 		m_world.GetCow(i)->Draw(m_modelCow);
-	}
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		m_world.GetChicken(i)->Draw(m_modelChicken);
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
@@ -481,15 +476,16 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBird(i)->Draw(m_modelBird);
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
-
-	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
 	{
-		m_modelCow.Render(c.x, c.y, c.z, c.h, c.v, 1, 1, 1);
+		if (c.name == m_world.GetPlayer()->GetName())
+			continue;
+
+		m_modelCreeper.Render(c.x, c.y, c.z, c.h, 0, 1, 1, 1);
 	}
 
 	Shader::Disable();
@@ -520,6 +516,7 @@ void Engine::DrawEnvironement(float gameTime) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
 		DrawScope();
+
 	// Draw le menu
 	if (m_isMenuOpen)
 	{
@@ -536,6 +533,8 @@ void Engine::DrawEnvironement(float gameTime) {
 				DrawMenuSettingSelected(false);
 		else if (m_menu->m_currentMenu == SM_CONTROL_SELECTED)
 			DrawMenuControlSelected();
+		else if (m_menu->m_currentMenu == SM_MULTIPLAYER)
+			DrawMenuMultiplayer();
 	}
 }
 
@@ -645,8 +644,8 @@ void Engine::DayAndNightCycle(float gametime)
 	}
 }
 
-void Engine::Render(float elapsedTime)
 
+void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
@@ -677,8 +676,6 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnDragons();
 	}
 
-
-		//Lock les mouvements a 50 fps
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
 		m_fps = (int)round(1.f / elapsedTime);
@@ -769,7 +766,6 @@ void Engine::Render(float elapsedTime)
 		GetBlocAtCursor();
 		DrawEnvironement(gameTime);
 	}
-
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -818,7 +814,17 @@ void Engine::KeyPressEvent(unsigned char key)
 		//f6 -> connect
 		else if (m_keyboard[sf::Keyboard::F6])
 		{
-			m_network.Connect("localhost", 1234);
+			if (m_settings.m_isConnected)
+			{
+				m_network.Disconnect();
+				m_settings.m_isConnected = false;
+			}
+			else
+			{
+				//m_network.Connect("45.55.42.126", 1234);
+				m_network.Connect("localhost", 1234);
+				m_settings.m_isConnected = true;
+			}
 		}
 
 		//f10 -> toggle fulscreen mode
@@ -971,7 +977,6 @@ void Engine::MouseMoveEvent(int x, int y)
 			m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
 		}
 	}
-
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -999,6 +1004,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_network.Send("map " 
+						+ std::to_string(m_currentBlock.x) + " " 
+						+ std::to_string(m_currentBlock.y) + " " 
+						+ std::to_string(m_currentBlock.z) + " " 
+						+ std::to_string(BTYPE_AIR),
+						true);
 			}
 
 			//Right Click
@@ -1023,10 +1034,17 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 						//Si ya collision on efface le block
 						if (m_world.GetPlayer()->CheckCollision(m_world))
 							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
+						else
+						{
+							m_network.Send("map " 
+									+ std::to_string(m_currentBlock.x) + " " 
+									+ std::to_string(m_currentBlock.y) + " " 
+									+ std::to_string(m_currentBlock.z) + " " 
+									+ std::to_string(m_world.GetPlayer()->GetBlock()),
+									true);
+						}
 					}
 				}
-
-
 			}
 
 			if (m_settings.m_inventaire_creatif)
@@ -1041,7 +1059,6 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			}
 		}
 	}
-
 }
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -1556,6 +1573,13 @@ void Engine::DrawMenuPrincipal() const
 	int menuPositionX = Width() / 2;
 	int menuPositionY = Height() / 2;
 
+	std::string connection;
+
+	if (m_settings.m_isConnected == true)
+		connection = "Connected";
+	else
+		connection = "Multiplayer";
+
 	glEnable(GL_TEXTURE_2D);
 	// Setter le blend function , tout ce qui sera noir sera transparent
 	glDisable(GL_LIGHTING);
@@ -1593,7 +1617,8 @@ void Engine::DrawMenuPrincipal() const
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	DrawMenuButton(MP_CONTROLS, "Controls", Width() / 2 - 35, (Height() / 2) + (menuHeight / 2));
-	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2));
+	DrawMenuButton(MP_SETTINGS, "Settings", Width() / 2 - 35, (Height() / 2) + 25);
+	DrawMenuButton(MP_MULTIPLAYER, connection, Width() / 2 - (connection.length() * 4 + 2), (Height() / 2) - 25);
 	DrawMenuButton(MP_EXIT_GAME, "Exit Game", Width() / 2 - 40, (Height() / 2) - (menuHeight / 2));
 
 
@@ -1802,6 +1827,59 @@ void Engine::DrawMenuControls() const
 	glPopMatrix();
 }
 
+void Engine::DrawMenuMultiplayer() const
+{
+	// Menu specs
+	int menuWidth = 100;
+	int menuHeight = 60;
+	int menuPositionX = Width() / 2;
+	int menuPositionY = Height() / 2;
+
+	glEnable(GL_TEXTURE_2D);
+	// Setter le blend function , tout ce qui sera noir sera transparent
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, Width(), 0, Height(), -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	// Translate au centre pour y dessiner le menu
+	glLoadIdentity();
+	glTranslated(menuPositionX, menuPositionY, 0);
+
+	// Zone menu
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	glBegin(GL_QUADS);
+	glVertex2i(-menuWidth, -menuHeight);
+	glVertex2i(menuWidth, -menuHeight);
+	glVertex2i(menuWidth, menuHeight);
+	glVertex2i(-menuWidth, menuHeight);
+	glEnd();
+
+	// Préparer le font pour écrire dans le menu
+	m_textureFont.Bind();
+	glColor3f(0.7f, 0.7f, 0.7f);
+
+	PrintText(Width() / 2 - 80, Height() / 2 + menuHeight - 30, 12.f, "Backspace to erase");
+	PrintText(Width() / 2 - 68, Height() / 2 + 5, 12.f, "Escape to cancel");
+	PrintText(Width() / 2 - 70, Height() / 2 - 20, 12.f, "Enter to confirm");
+	PrintText(Width() / 2 - (m_settings.m_lastServer.length() * 5), Height() / 2 - menuHeight + 8, 12.f, m_settings.m_lastServer);
+
+	glDisable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
 void Engine::DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const
 {
 	if (m_menu->m_currentMenuItem == menuItem)
@@ -1862,9 +1940,21 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			CloseGame();
 		}
+		else if (m_menu->m_currentMenuItem == MP_MULTIPLAYER)
+		{
+			if (m_settings.m_isConnected == true)
+			{
+				m_network.Disconnect();
+				m_settings.m_isConnected = false;
+			}
+			else
+			{
+				m_menu = new Menu(SM_MULTIPLAYER);
+			}
+		}
 		else if (m_menu->m_currentMenuItem == MP_SETTINGS)
 			m_menu = new Menu(SM_SETTINGS);
-		else if ((int)m_menu->m_currentMenu == (int)MP_CONTROLS)
+		else if (m_menu->m_currentMenu == MP_CONTROLS)
 			m_menu = new Menu(SM_CONTROLS);
 	}
 	else if (m_menu->m_currentMenu == SM_SETTINGS || m_menu->m_currentMenu == SM_SETTING_SELECTED)
@@ -1934,7 +2024,7 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			m_settings.m_vsync = !m_settings.m_vsync;
 			m_settings.Save();
-			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+			SetVSync(m_settings.m_vsync);
 		}
 		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
 		{
@@ -2145,6 +2235,15 @@ void Engine::ManageMenuEnterKeyPress()
 			m_menu->m_controlSelected = "Wireframe";
 			m_menu->m_currentMenu = SM_CONTROL_SELECTED;
 		}
+	}
+	else if (m_menu->m_currentMenu == SM_MULTIPLAYER)
+	{
+		m_network.Connect(m_settings.m_lastServer.c_str(), 1234);
+		m_settings.m_isConnected = true;
+		m_settings.Save();
+
+		m_menu = new Menu(SM_PRINCIPAL);
+		m_menu->m_currentMenuItem = MP_MULTIPLAYER;
 	}
 }
 
