@@ -69,4 +69,8 @@ void Bird::Move(World &world)
 		}
 
 	}
+	else
+	{
+		Character::Move(world);
+	}
 }
