@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="animal.cpp" />
     <ClCompile Include="bear.cpp" />
+    <ClCompile Include="bird.cpp" />
     <ClCompile Include="blockinfo.cpp" />
     <ClCompile Include="bloodMoon.cpp" />
     <ClCompile Include="bullet.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="array2d.h" />
     <ClInclude Include="array3d.h" />
     <ClInclude Include="bear.h" />
+    <ClInclude Include="bird.h" />
     <ClInclude Include="blockinfo.h" />
     <ClInclude Include="bloodMoon.h" />
     <ClInclude Include="bullet.h" />

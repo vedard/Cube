@@ -20,6 +20,7 @@
 #include "chicken.h"
 #include "creeper.h"
 #include "dragon.h"
+#include "bird.h"
 #include "sprinter.h"
 #include "vector3.h"
 #include "gun.h"
@@ -69,12 +70,14 @@ private:
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
 	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t, bool useIdentity = true) const;
+	void DrawSurviveScreen() const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;;
 	void DrawHitMarker() const;
 	void DrawMenuSettings() const;
 	void DrawMenuControls() const;
+	void DrawMenuMultiplayer() const;
 	void DrawMenuButton(int menuItem, std::string text, int xPos, int yPos) const;
 	void ManageAllMenuKeys(unsigned char key);
 	void ManageMenuEnterKeyPress();
@@ -83,7 +86,7 @@ private:
 	void DrawScope();
 
 	void CloseGame();
-	void SetDayOrNight(float gametime);
+	void DayAndNightCycle(float gametime);
 private:
 	bool m_wireframe;
 	float m_LastTickTime;
@@ -125,9 +128,6 @@ private:
 	int m_fps;
 	int m_chunkToUpdate;
 	bool displayInfo;
-	Music& m_music = Music::GetInstance();
-
-
 
 	//Model
 	Model3d m_modelCow;
@@ -136,14 +136,16 @@ private:
 	Model3d m_modelSprinter;
 	Model3d m_modelChicken;
 	Model3d m_modelDragon;
+	Model3d m_modelBird;
 
 	Network m_network;
+	Parametre& m_settings = Parametre::GetInstance();
+	Music& m_music = Music::GetInstance();
 
 	//Gun 
 	Gun * playerGun;
 
 	// Parametres
-	Parametre& m_settings = Parametre::GetInstance();
 
 	// Valeurs pour le jour et la nuit
 	float m_redLight;
@@ -154,7 +156,6 @@ private:
 	float m_blueFog;
 	float m_fogDensity;
 	float m_fogStart;
-
 	int m_missingTime;
 
 	bool m_isMenuOpen;

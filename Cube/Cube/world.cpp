@@ -8,6 +8,7 @@
 #include "dragon.h"
 #include "sprinter.h"
 #include "chicken.h"
+#include "bird.h"
 
 World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5), m_started(false)//, m_threadChunks(RunWater)
 {
@@ -18,14 +19,15 @@ World::World() : m_chunks(WORLD_SIZE, WORLD_SIZE), m_seed(6), UpdateDistance(5),
 
 	// Initialise les monstres et animaux.
 	m_cow = new Cow[MAX_COW];
-	m_bear = new Bear[MAX_BEAR];
+	m_bear = new Bear[MAX_BEAR * MONSTER_MULTIPLIER];
 	m_chicken = new Chicken[MAX_CHICKEN];
 
-	m_creeper = new Creeper[MAX_CREEPER];
+	m_creeper = new Creeper[MAX_CREEPER * MONSTER_MULTIPLIER];
 	m_sprinter = new Sprinter[MAX_SPRINTER];
 	m_player = new Player;
 	m_bloodMoon = new BloodMoon;
 	m_dragon = new Dragon[MAX_DRAGON];
+	m_bird = new Bird[MAX_BIRD];
 	
 	//Parcours les chunks et les positionne dans la map
 	for (int i = 0; i < WORLD_SIZE; i++)
@@ -73,6 +75,8 @@ Creeper* World::GetCreeper(int pos) const { return &m_creeper[pos]; }
 Sprinter* World::GetSprinter(int pos) const { return &m_sprinter[pos]; }
 Player* World::GetPlayer() const { return m_player; }
 Chicken* World::GetChicken(int pos) const { return &m_chicken[pos]; }
+Bird* World::GetBird(int pos) const { return &m_bird[pos]; }
+
 
 
 BloodMoon* World::GetBloodMoonInstance() { return m_bloodMoon; }
@@ -672,9 +676,9 @@ void World::SpawnCows()
 		}
 }
 
-void World::SpawnBears()
+void World::SpawnBears(int MaxBears)
 {
-	for (int i = 0; i < MAX_BEAR; i++)
+	for (int i = 0; i < MaxBears; i++)
 		if (!m_bear[i].GetisAlive())
 		{
 			m_bear[i].Spawn(*this, (int)(m_player[0].GetPosition().x - 100 + rand() % 200), (int)((m_player[0].GetPosition().z) - 100 + rand() % 200));
@@ -705,9 +709,9 @@ void World::SpawnChickens()
 }
 
 
-void World::SpawnCreepers()
+void World::SpawnCreepers(int maxMonsters)
 {
-	for (int i = 0; i < MAX_CREEPER; i++)
+	for (int i = 0; i < maxMonsters; i++)
 		if (!m_creeper[i].GetisAlive())
 		{
 			m_creeper[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
@@ -726,6 +730,18 @@ void World::SpawnSprinters()
 			break;
 		}
 }
+
+void World::SpawnBird()
+{
+	for (int i = 0; i < MAX_BIRD; i++)
+		if (!m_bird[i].GetisAlive())
+		{
+			m_bird[i].Spawn(*this, (int)((m_player[0].GetPosition().x) - 50 + rand() % 100), (int)((m_player[0].GetPosition().z) - 50 + rand() % 100));
+			m_bird[i].SetTarget(m_player);
+			break;
+		}
+}
+
 
 void World::RunWater()
 {

@@ -2,7 +2,7 @@
 
 Creeper::Creeper() :Monster(M_CREEPER)
 {
-	m_health = 130;
+	m_maxHealth = 130;
 }
 Creeper::~Creeper()
 {
@@ -22,6 +22,11 @@ std::vector<Vector3<int>> Creeper::Explosion()
 				if ((x + z) <= (explosionRadius - abs(y)))
 				{
 					// Pour les 4 quartiles
+					m_world->ChunkAt((int)GetPosition().x + x, (int)GetPosition().z + z)->SetBlock((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z, BTYPE_AIR, 'Q');
+					m_world->ChunkAt((int)GetPosition().x + x, (int)GetPosition().z - z)->SetBlock((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z, BTYPE_AIR, 'Q');
+					m_world->ChunkAt((int)GetPosition().x - x, (int)GetPosition().z - z)->SetBlock((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z, BTYPE_AIR, 'Q');
+					m_world->ChunkAt((int)GetPosition().x - x, (int)GetPosition().z + z)->SetBlock((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z + z, BTYPE_AIR, 'Q');
+
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z));
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z));
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z));
@@ -30,7 +35,6 @@ std::vector<Vector3<int>> Creeper::Explosion()
 			}
 		}
 	}
-
 	return blocsDestroyed;
 }
 
@@ -42,12 +46,8 @@ void Creeper::SetExplosionRadius(int radius)
 
 bool Creeper::Attack(Character * character)
 {
-	if (!Character::Attack(character));
-	{
-		Explosion();
-		return false;
-	}
-	return true;
+	return Character::Attack(character);
+	
 }
 
 void Creeper::Move(World &world)
@@ -60,6 +60,7 @@ void Creeper::Move(World &world)
 		//Si la cible est valide
 		if (m_target)
 		{
+			Character::CheckBlock(world);
 			//On attaque, si c'est pas possible on avance
 			if (!Attack(m_target))
 			{
@@ -90,6 +91,10 @@ void Creeper::Move(World &world)
 						Jump();
 					}
 				}
+			}
+			else
+			{
+				Explosion();
 			}
 
 		}
