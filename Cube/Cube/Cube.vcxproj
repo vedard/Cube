@@ -117,6 +117,7 @@
     <ClCompile Include="model3d.cpp" />
     <ClCompile Include="music.cpp" />
     <ClCompile Include="network.cpp" />
+    <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="music.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="networkevent.h" />
+    <ClInclude Include="networkManager.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
