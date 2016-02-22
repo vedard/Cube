@@ -63,7 +63,7 @@ typedef long long int64;
 #define MAX_COW 0
 #define MAX_BEAR 0
 #define MAX_CHICKEN 0
-#define MAX_DRAGON 0
+#define MAX_DRAGON 50
 #define MAX_BIRD 50
 #define MONSTER_MULTIPLIER 5
 #define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
