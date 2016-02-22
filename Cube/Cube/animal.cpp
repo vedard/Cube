@@ -30,7 +30,7 @@ void Animal::Move(World &world)
 		deplacementVector.Normalize();
 		if (m_ClockTarget.getElapsedTime().asSeconds() < m_timeNextTarget)
 		{
-			Character::CheckBlock(world);
+			//Character::CheckBlock(world);
 
 			//Avance en x
 			m_pos.x += deplacementVector.x * m_vitesse.x;
@@ -70,7 +70,7 @@ void Animal::Draw(Model3d &model) const
 		else
 			model.Render(m_pos.x, m_pos.y, m_pos.z, m_HorizontalRot, m_VerticalRot, 1.f, 1.f, 1.f);
 
-		if (true)
+		if (false)
 		{
 			glPushMatrix();
 

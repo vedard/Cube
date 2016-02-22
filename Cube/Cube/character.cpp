@@ -50,7 +50,6 @@ void Character::Spawn(World &world, int x, int z)
 
 	m_pos.y++;
 
-//	std::cout << m_Name << " spawned." << std::endl;
 }
 
 void Character::Move(World &world)
