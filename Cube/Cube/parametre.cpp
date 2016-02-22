@@ -71,7 +71,6 @@ void Parametre::Save()
 	myfile << "inventaire_creatif " << m_inventaire_creatif << "\n";
 	myfile << "playername " << m_PlayerName << "\n";
 	myfile << "last_server " << m_lastServer << "\n";
-	myfile << "isConnected " << m_isConnected << "\n";
 
 	myfile.close();
 	Load();

@@ -5,6 +5,7 @@
 #include "define.h"
 #include "character.h"
 #include "world.h"
+#include "network.h"
 
 
 class Bullet
@@ -17,7 +18,7 @@ public:
 
 	void Update();
 	bool CheckCollision(Character &character);
-	bool CheckCollision(World &world);
+	bool CheckCollision(World &world, Network &net);
 	void Draw() const;
 
 	const Vector3<float>& GetPosition() const;

@@ -7,9 +7,9 @@ Engine::Engine() :
 	m_world(),
 	m_currentBlock(-1, -1, -1),
 	displayInfo(false),
-	m_network(),
 	m_fastInventoryKeySelected(0),
 	m_missingTime(0),
+	m_network(&m_world),
 	m_isInventoryOpen(false)
 {
 	m_LastTickTime = 0.0f;
@@ -254,21 +254,18 @@ void Engine::UpdateEnvironement(float gameTime)
 
 			//Check si y a collision
 			for (int j = 0; j < MAX_CREEPER * MONSTER_MULTIPLIER; j++)
-			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCreeper(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
+
 			for (int j = 0; j < MAX_SPRINTER; j++)
-			{
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetSprinter(j)))
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
-			}
 
 			for (int j = 0; j < MAX_COW; j++)
 				if (m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(*m_world.GetCow(j)))
@@ -283,6 +280,7 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
 				}
 
 			for (int j = 0; j < MAX_DRAGON; j++)
@@ -297,6 +295,8 @@ void Engine::UpdateEnvironement(float gameTime)
 				{
 					m_world.GetPlayer()->hasHit = 5;
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
+					//m_world.GetBear()[i].SetTarget(m_world.GetPlayer());
+
 					m_world.GetChicken(j)->SetTarget(m_world.GetPlayer());
 				}
 
@@ -307,7 +307,7 @@ void Engine::UpdateEnvironement(float gameTime)
 					Sound::Play(Sound::HITMARK, m_settings.m_soundvolume * 5);
 				}
 
-			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world);
+			m_world.GetPlayer()->GetGuns()[k].GetBullets()[i].CheckCollision(m_world, m_network);
 
 		}
 	}
@@ -329,12 +329,14 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Move(m_world);
+
 	for (int i = 0; i < MAX_BIRD; i++)
 		m_world.GetBird(i)->Move(m_world);
 
 	//Update les Bears
 	for (int i = 0; i < MAX_BEAR; i++)
 		m_world.GetBear(i)->Move(m_world);
+	//
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Move(m_world);
@@ -350,8 +352,14 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
 
+
 	m_network.Fetch();
-	SyncWithServer();
+
+	// pour eviter de surcharge le reseau on envoie 3 fois moins de packets
+	// que l'on en fetch
+	static int updateCount = 0;
+	if (updateCount++ % 3 == 0)
+		SyncWithServer();
 
 }
 
@@ -360,9 +368,10 @@ void Engine::SyncWithServer()
 {
 	if (Parametre::GetInstance().m_isServer)
 	{
+		//std::cout << m_fps << std::endl;
 		for (auto c : m_network.GetClient())
 		{
-			m_network.Send(c.ToString());
+			m_network.Send("player " + c.ToString(), false);
 		}
 	}
 	else
@@ -372,13 +381,14 @@ void Engine::SyncWithServer()
 		c.x = m_world.GetPlayer()->GetPosition().x;
 		c.y = m_world.GetPlayer()->GetPosition().y;
 		c.z = m_world.GetPlayer()->GetPosition().z;
-		c.h = m_world.GetPlayer()->GetHorizontalRotation();
+		c.h = -m_world.GetPlayer()->GetHorizontalRotation();
 		c.v = m_world.GetPlayer()->GetVerticalRotation();
-		m_network.Send(c.ToString());
+		m_network.Send("player " + c.ToString(), false);
 	}
 }
 
-void Engine::DrawEnvironement(float gameTime) {
+void Engine::DrawEnvironement(float gameTime) 
+{
 
 	//Clear 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -438,22 +448,6 @@ void Engine::DrawEnvironement(float gameTime) {
 	else
 		glDisable(GL_LIGHT0);
 
-	for (int i = 0; i < MAX_COW; i++)
-	{
-		m_world.GetCow(i)->Draw(m_modelCow);
-	}
-	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
-		m_world.GetBear(i)->Draw(m_modelBear);
-	
-
-
-	//Draw Creepers
-	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
-		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
-
-	for (int i = 0; i < MAX_SPRINTER; i++)
-		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
-
 
 	//Draw guns
 	if (m_world.GetPlayer()->GetWeapon() == W_SNIPER && m_world.GetPlayer()->GetGuns()[m_world.GetPlayer()->GetWeapon() - 1].isAiming())
@@ -468,11 +462,12 @@ void Engine::DrawEnvironement(float gameTime) {
 	//Draw Chunks
 	m_textureAtlas.Bind();
 	m_world.Render(playerPos.x, playerPos.z, m_shader01.m_program);
+	
 	//Draw animals
 	for (int i = 0; i < MAX_COW; i++)
-	{
 		m_world.GetCow(i)->Draw(m_modelCow);
-	}
+	for (int i = 0; i < MAX_CHICKEN; i++)
+		m_world.GetChicken(i)->Draw(m_modelChicken);
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Draw(m_modelBear);
 	for (int i = 0; i < MAX_CHICKEN; i++)
@@ -481,15 +476,16 @@ void Engine::DrawEnvironement(float gameTime) {
 		m_world.GetBird(i)->Draw(m_modelBird);
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
-
-	//Draw Monstres
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
 	{
-		m_modelCow.Render(c.x, c.y, c.z, c.h, c.v, 1, 1, 1);
+		if (c.name == m_world.GetPlayer()->GetName())
+			continue;
+
+		m_modelCreeper.Render(c.x, c.y, c.z, c.h, 0, 1, 1, 1);
 	}
 
 	Shader::Disable();
@@ -648,8 +644,8 @@ void Engine::DayAndNightCycle(float gametime)
 	}
 }
 
-void Engine::Render(float elapsedTime)
 
+void Engine::Render(float elapsedTime)
 {
 	static float gameTime = elapsedTime;
 	static float nextGameUpdate = gameTime;
@@ -680,8 +676,6 @@ void Engine::Render(float elapsedTime)
 		m_world.SpawnDragons();
 	}
 
-
-		//Lock les mouvements a 50 fps
 	//On met a jour le fps
 	if ((int)(gameTime * 100) % 10 == 0)
 		m_fps = (int)round(1.f / elapsedTime);
@@ -772,7 +766,6 @@ void Engine::Render(float elapsedTime)
 		GetBlocAtCursor();
 		DrawEnvironement(gameTime);
 	}
-
 }
 
 void Engine::KeyPressEvent(unsigned char key)
@@ -828,6 +821,7 @@ void Engine::KeyPressEvent(unsigned char key)
 			}
 			else
 			{
+				//m_network.Connect("45.55.42.126", 1234);
 				m_network.Connect("localhost", 1234);
 				m_settings.m_isConnected = true;
 			}
@@ -983,7 +977,6 @@ void Engine::MouseMoveEvent(int x, int y)
 			m_world.GetPlayer()->TurnTopBottom(relativeY *m_settings.m_mousesensibility);
 		}
 	}
-
 }
 
 void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -1011,6 +1004,12 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_network.Send("map " 
+						+ std::to_string(m_currentBlock.x) + " " 
+						+ std::to_string(m_currentBlock.y) + " " 
+						+ std::to_string(m_currentBlock.z) + " " 
+						+ std::to_string(BTYPE_AIR),
+						true);
 			}
 
 			//Right Click
@@ -1035,10 +1034,17 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 						//Si ya collision on efface le block
 						if (m_world.GetPlayer()->CheckCollision(m_world))
 							m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->SetBlock(newBlocPos.x - (chunkPos.x * CHUNK_SIZE_X), newBlocPos.y, newBlocPos.z - (chunkPos.z * CHUNK_SIZE_X), BTYPE_AIR, 'Q');
+						else
+						{
+							m_network.Send("map " 
+									+ std::to_string(m_currentBlock.x) + " " 
+									+ std::to_string(m_currentBlock.y) + " " 
+									+ std::to_string(m_currentBlock.z) + " " 
+									+ std::to_string(m_world.GetPlayer()->GetBlock()),
+									true);
+						}
 					}
 				}
-
-
 			}
 
 			if (m_settings.m_inventaire_creatif)
@@ -1053,7 +1059,6 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 			}
 		}
 	}
-
 }
 
 void Engine::MouseReleaseEvent(const MOUSE_BUTTON &button, int x, int y)
@@ -2019,7 +2024,7 @@ void Engine::ManageMenuEnterKeyPress()
 		{
 			m_settings.m_vsync = !m_settings.m_vsync;
 			m_settings.Save();
-			m_app.setVerticalSyncEnabled(m_settings.m_vsync);
+			SetVSync(m_settings.m_vsync);
 		}
 		else if (m_menu->m_currentMenuItem == MS_RENDER_DISTANCE)
 		{

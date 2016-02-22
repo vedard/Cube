@@ -126,7 +126,8 @@ void Menu::OnKeyDown(unsigned char key)
 	{
 		if (m_keyboard[sf::Keyboard::BackSpace])
 		{
-			m_settings.m_lastServer.erase(m_settings.m_lastServer.length() - 1);
+			if (m_settings.m_lastServer.length() > 0)
+				m_settings.m_lastServer.erase(m_settings.m_lastServer.length() - 1);
 		}
 		else if (m_keyboard[sf::Keyboard::Num0])
 			m_settings.m_lastServer += '0';
