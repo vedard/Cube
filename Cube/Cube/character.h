@@ -60,6 +60,7 @@ protected:
 	float m_AttackSpeed;
 	float m_Armor;
 	float m_AttackDamage;
+	float m_deathSink;
 
 	//État
 	bool m_isInAir;

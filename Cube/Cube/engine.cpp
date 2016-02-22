@@ -477,6 +477,8 @@ void Engine::DrawEnvironement(float gameTime)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())

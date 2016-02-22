@@ -106,6 +106,7 @@
     <ClCompile Include="creeper.cpp" />
     <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="engine.cpp" />
+    <ClCompile Include="experience.cpp" />
     <ClCompile Include="gun.cpp" />
     <ClCompile Include="inventory.cpp" />
     <ClCompile Include="item.cpp" />
@@ -116,6 +117,7 @@
     <ClCompile Include="model3d.cpp" />
     <ClCompile Include="music.cpp" />
     <ClCompile Include="network.cpp" />
+    <ClCompile Include="networkManager.cpp" />
     <ClCompile Include="openglcontext.cpp" />
     <ClCompile Include="parametre.cpp" />
     <ClCompile Include="player.cpp" />
@@ -146,6 +148,7 @@
     <ClInclude Include="Dragon.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="character.h" />
+    <ClInclude Include="experience.h" />
     <ClInclude Include="gun.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="item.h" />
@@ -153,6 +156,7 @@
     <ClInclude Include="music.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="networkevent.h" />
+    <ClInclude Include="networkManager.h" />
     <ClInclude Include="parametre.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="model3d.h" />
