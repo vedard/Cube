@@ -13,7 +13,8 @@ Character::Character() :
 	m_cooldownAttackTimer(),
 	m_AttackDamage(30.0f),
 	m_isAlive(true),
-	m_maxHealth(100)
+	m_maxHealth(100),
+	m_deathSink(2)
 {
 
 	m_Name = "Character ";
@@ -119,7 +120,7 @@ bool Character::CheckCollision(World &world) const
 				{
 					bt1 = world.BlockAt(
 						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
-						m_pos.y + (m_dimension.y / h * y) + 2,
+						m_pos.y + (m_dimension.y / h * y) + m_deathSink,
 						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
 				}
 

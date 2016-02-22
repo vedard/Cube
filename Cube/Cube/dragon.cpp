@@ -11,6 +11,7 @@ Dragon::Dragon() :Animal(A_DRAGON), m_falling(true)
 	m_Armor = 10;
 	m_AttackDamage = 25;
 	m_AttackRange = 5;
+	m_deathSink = 4;
 };
 Dragon::~Dragon()
 {
