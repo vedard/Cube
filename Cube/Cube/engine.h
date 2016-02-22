@@ -69,8 +69,8 @@ private:
 	void DrawFocusedBlock() const;
 	void DrawSky(float gameTime) const;
 	void DrawDeathScreen() const;
+	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t, bool useIdentity = true) const;
 	void DrawSurviveScreen() const;
-	void PrintText(unsigned int x, unsigned int y, float size, const std::string & t) const;
 	void DrawCross(float r, float g, float b) const;
 	void AddTextureToAtlas(BlockType type, const std::string &name, const std::string &path, float hauteur);
 	void DrawMenuPrincipal() const;;
