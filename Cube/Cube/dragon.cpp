@@ -25,7 +25,8 @@ void Dragon::Move(World &world)
 		m_vitesse.z = 0.15f;
 		if (isHurt)
 		{
-
+			m_vitesse.x = 0.11f;
+			m_vitesse.z = 0.11f;
 			//Si la cible est valide
 			if (m_target)
 			{
@@ -63,8 +64,9 @@ void Dragon::Move(World &world)
 					if (chillCount > 1000)
 					{
 						isHurt = false;
-						chillCount = false;
+						chillCount = 0;
 						m_falling = true;
+						
 					}
 				}
 
@@ -113,12 +115,15 @@ void Dragon::Move(World &world)
 
 			if (m_falling)
 			{
+
 				m_pos.y -= m_vitesse.y;
+				
 
 				//Si collision
 				if (CheckCollision(world))
 				{
-
+					hauteury = m_pos.y;
+					m_up = true;
 					//Si on a touche le sol 
 					if (m_vitesse.y > 0)
 						m_isInAir = false;
@@ -127,10 +132,21 @@ void Dragon::Move(World &world)
 					m_pos.y += m_vitesse.y;
 					m_vitesse.y = 0;
 					m_falling = false;
-					m_pos.y += 20;
+					
+					
 				}
+				
 				//Acceleration
 				m_vitesse.y += 0.013f;
+			}
+			if (m_up)
+			{
+				m_pos.y += 0.25;
+				if (m_pos.y > hauteury + 30)
+				{
+					m_up = false;
+
+				}
 			}
 
 		}
