@@ -97,9 +97,15 @@ vector<Client> Network::GetClient()
 	return m_lstClient;
 }
 
+bool Network::IsConnected()
+{
+	return m_EnetPeerServer != NULL;
+}
+
 void Network::OnConnect()
 {
 	std::cout << "Connected event happens" << std::endl;
+	m_world->InitMap(0);
 }
 
 void Network::OnDisconnect()

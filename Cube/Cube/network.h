@@ -48,6 +48,7 @@ public:
 	void Connect(const char * ip, uint16 port);
 	void Disconnect();
 	bool Send(string data, bool reliable);
+	bool IsConnected();
 	vector<Client> GetClient();
 
 private:

@@ -345,12 +345,16 @@ void Engine::UpdateEnvironement(float gameTime)
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Move(m_world);
 
+	std::cout << m_network.IsConnected() << std::endl;
 	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
-
+	if (!m_network.IsConnected())
+	{
+		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+		t.detach();
+	}
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
+
 
 
 	m_network.Fetch();
@@ -368,7 +372,6 @@ void Engine::SyncWithServer()
 {
 	if (Parametre::GetInstance().m_isServer)
 	{
-		//std::cout << m_fps << std::endl;
 		for (auto c : m_network.GetClient())
 		{
 			m_network.Send("player " + c.ToString(), false);
@@ -381,7 +384,7 @@ void Engine::SyncWithServer()
 		c.x = m_world.GetPlayer()->GetPosition().x;
 		c.y = m_world.GetPlayer()->GetPosition().y;
 		c.z = m_world.GetPlayer()->GetPosition().z;
-		c.h = -m_world.GetPlayer()->GetHorizontalRotation();
+		c.h = -m_world.GetPlayer()->GetHorizontalRotation() - 180;
 		c.v = m_world.GetPlayer()->GetVerticalRotation();
 		m_network.Send("player " + c.ToString(), false);
 	}

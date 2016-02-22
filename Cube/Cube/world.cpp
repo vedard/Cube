@@ -92,10 +92,16 @@ void World::InitMap(int seed)
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 		{
+
 			Chunk * chunk = ChunkAt((float)i, (float)j);
 			chunk->GetSave() = false;
 			chunk->DeleteCache();
 			chunk->m_iscreated = false;
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+						if (chunk->GetBlock(x, y, z) != BTYPE_AIR)
+							chunk->SetBlock(x, y, z, BTYPE_AIR, ' ');
 		}
 
 	if (seed != 0)
@@ -127,10 +133,6 @@ void World::InitMap(int seed)
 		m_bear[i].SetName("Bear " + std::to_string(i + 1));
 		m_bear[i].SetTarget((Character*)&m_player);
 	}*/
-
-
-
-
 }
 
 void World::InitChunk(float i, float j)
