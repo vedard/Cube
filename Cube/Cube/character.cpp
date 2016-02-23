@@ -13,7 +13,8 @@ Character::Character() :
 	m_cooldownAttackTimer(),
 	m_AttackDamage(30.0f),
 	m_isAlive(true),
-	m_maxHealth(100)
+	m_maxHealth(100),
+	m_deathSink(5)
 {
 
 	m_Name = "Character ";
@@ -50,7 +51,6 @@ void Character::Spawn(World &world, int x, int z)
 
 	m_pos.y++;
 
-//	std::cout << m_Name << " spawned." << std::endl;
 }
 
 void Character::Move(World &world)
@@ -107,10 +107,22 @@ bool Character::CheckCollision(World &world) const
 				posx = m_pos.x - posx;
 				posy = m_pos.y + posy;
 				posz = m_pos.z - posz;
-				BlockType bt1 = world.BlockAt(
-					m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
-					m_pos.y + (m_dimension.y / h * y),
-					m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				
+				BlockType bt1;
+				if (!m_isDying)
+				{
+					bt1 = world.BlockAt(
+						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+						m_pos.y + (m_dimension.y / h * y),
+						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				}
+				else
+				{
+					bt1 = world.BlockAt(
+						m_pos.x - (m_dimension.x / w * x) + m_dimension.x / 2,
+						m_pos.y + (m_dimension.y / h * y) + m_deathSink,
+						m_pos.z - (m_dimension.z / d * z) + m_dimension.z / 2);
+				}
 
 				//Si un des block n'est pas BTYPE_AIR OU BTYPE_WATER ou BTYPE_LAVA -> il y a collision
 				if (bt1 == BTYPE_TRAP)
@@ -258,7 +270,6 @@ void Character::DeathCheck()
 	if (m_isDying && m_deathTick.getElapsedTime().asMilliseconds() >= IS_DYING_LENGTH * 1000 && m_isAlive)
 	{
 		m_isAlive = false;
-		std::cout << m_Name << " died." << std::endl;
 	}
 }
 

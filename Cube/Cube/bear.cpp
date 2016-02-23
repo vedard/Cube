@@ -9,6 +9,7 @@ Bear::Bear() :Animal(A_BEAR)
 	m_Name = "BigBadBear aka BBB";
 	isHurt = false;
 	chillCount = 0;
+	m_deathSink = 8;
 };
 Bear::~Bear()
 {

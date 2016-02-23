@@ -1,7 +1,7 @@
 #include "dragon.h"
 
 
-Dragon::Dragon() :Animal(A_DRAGON)
+Dragon::Dragon() :Animal(A_DRAGON), m_falling(true)
 {
 	m_maxHealth = 1000;
 	m_dimension = Vector3<float>(3.0f, 4.6f, 4.8f);
@@ -11,6 +11,7 @@ Dragon::Dragon() :Animal(A_DRAGON)
 	m_Armor = 10;
 	m_AttackDamage = 25;
 	m_AttackRange = 5;
+	m_deathSink = 8;
 };
 Dragon::~Dragon()
 {
@@ -18,13 +19,15 @@ Dragon::~Dragon()
 
 void Dragon::Move(World &world)
 {
-	if (m_isAlive)
+
+	if (m_isAlive && !m_isDying)
 	{
+		m_vitesse.x = 0.15f;
+		m_vitesse.z = 0.15f;
 		if (isHurt)
 		{
 			m_vitesse.x = 0.11f;
 			m_vitesse.z = 0.11f;
-
 			//Si la cible est valide
 			if (m_target)
 			{
@@ -59,10 +62,12 @@ void Dragon::Move(World &world)
 						}
 					}
 					chillCount++;
-					if (chillCount > 10000)
+					if (chillCount > 1000)
 					{
 						isHurt = false;
-						chillCount = false;
+						chillCount = 0;
+						m_falling = true;
+						
 					}
 				}
 
@@ -89,11 +94,74 @@ void Dragon::Move(World &world)
 			//Acceleration
 			m_vitesse.y += 0.013f;
 		}
+		if (m_ClockTarget.getElapsedTime().asSeconds() < m_timeNextTarget)
+		{
+			Vector3<float> deplacementVector = Vector3<float>(sin(m_HorizontalRot / 180 * PI), 0.f, cos(m_HorizontalRot / 180 * PI));
+			deplacementVector.Normalize();
+
+			//Avance en x
+			m_pos.x += deplacementVector.x * m_vitesse.x;
+			if (CheckCollision(world))
+			{
+				m_pos.x -= deplacementVector.x * m_vitesse.x;
+				m_pos.y++;
+			}
+			//En z
+			m_pos.z += deplacementVector.z * m_vitesse.z;
+			if (CheckCollision(world))
+			{
+				m_pos.z -= deplacementVector.z * m_vitesse.z;
+				m_pos.y++;
+			}
+
+			if (m_falling)
+			{
+
+				m_pos.y -= m_vitesse.y;
+				
+
+				//Si collision
+				if (CheckCollision(world))
+				{
+					hauteury = m_pos.y;
+					m_up = true;
+					//Si on a touche le sol 
+					if (m_vitesse.y > 0)
+						m_isInAir = false;
+
+					//annule
+					m_pos.y += m_vitesse.y;
+					m_vitesse.y = 0;
+					m_falling = false;
+					
+					
+				}
+				
+				//Acceleration
+				m_vitesse.y += 0.013f;
+			}
+			if (m_up)
+			{
+				m_pos.y += 0.25;
+				if (m_pos.y > hauteury + 30)
+				{
+					m_up = false;
+
+				}
+			}
+
+		}
 		else
 		{
-			Animal::Move(world);
+			m_HorizontalRot += rand() % 200 - 100;
+			m_timeNextTarget = rand() % 10;
+			m_ClockTarget.restart();
 		}
+
 	}
+	
+		
+		
 }
 
 bool Dragon::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
