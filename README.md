@@ -49,6 +49,7 @@ Compiler en mode release.
 		Supprimer le cache: Shift Droit + F5
 		Ouvrir le menu: Échap
 		Naviguer dans le menu: les flèches de directions
+		Valider une option du menu: Entrée
 		Inventaire de bloc: 1
 		Pistol: 2
 		Mp5: 3
@@ -61,7 +62,12 @@ Compiler en mode release.
 		Inventaire bloc 3: C
 		Choisir un bloc dans l'inventaire: B
 		Enlever un bloc de l'inventaire: E
-		
+##	Multijoueur
+	Pour faire fonctionner le mode multijoueur, il faut tout d'abord changer son nom dans le fichier de configuration.
+	Le fichier de configuration se situe à cette emplacement: \HellRain\Cube\Cube\Cube.conf
+	il faut changer la ligne où il est écris playername pour playername "TonNom".
+	Ensuite il faut ouvrir le jeu, ouvrir le menu, naviguer vers l'option Multiplayer, entrer l'ip du serveur où on veut se connecter, dans notre cas, 
+	l'ip est 45.55.42.126.
 #	Qu'est-ce qui serait a améliorer ?
 	-Changer le pathing des monstres. En ce moment, ils se promènent dans la direction du joueur et ils sautent si il y a collision.
 	-Faire que l'on puisse cliquer sur le menu pour selectionner les options.
