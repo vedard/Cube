@@ -93,10 +93,17 @@ void World::InitMap(int seed)
 	for (int i = 0; i < WORLD_SIZE; i++)
 		for (int j = 0; j < WORLD_SIZE; j++)
 		{
+
 			Chunk * chunk = ChunkAt((float)i, (float)j);
 			chunk->GetSave() = false;
 			chunk->DeleteCache();
 			chunk->m_iscreated = false;
+			chunk->m_isrequested = false;
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y < CHUNK_SIZE_Y; ++y)
+						if (chunk->GetBlock(x, y, z) != BTYPE_AIR)
+							chunk->SetBlock(x, y, z, BTYPE_AIR, ' ');
 		}
 
 	if (seed != 0)
@@ -128,13 +135,9 @@ void World::InitMap(int seed)
 		m_bear[i].SetName("Bear " + std::to_string(i + 1));
 		m_bear[i].SetTarget((Character*)&m_player);
 	}*/
-
-
-
-
 }
 
-void World::InitChunk(float i, float j)
+void World::InitChunk(int i, int j)
 {
 	Chunk* chunk = ChunkAt(i, j);
 	chunk->m_iscreated = true;
@@ -340,7 +343,7 @@ void World::InitChunk(float i, float j)
 	}
 }
 
-BlockType World::BlockAt(float x, float y, float z)
+BlockType World::BlockAt(int x, int y, int z)
 {
 	Vector3<float> chunkPos(floor(x / CHUNK_SIZE_X), 0, floor(z / CHUNK_SIZE_Z));
 	Chunk * chunk = ChunkAt(chunkPos.x, chunkPos.z);
@@ -352,7 +355,7 @@ BlockType World::BlockAt(float x, float y, float z)
 		return BTYPE_AIR;
 }
 
-Chunk* World::ChunkAt(float x, float z)
+Chunk* World::ChunkAt(int x, int z)
 {
 	if (x >= 0 && z >= 0 && x < WORLD_SIZE && z < WORLD_SIZE)
 		return &m_chunks.Get((int)x, (int)z);
@@ -409,7 +412,6 @@ void World::LoadMap(std::string filename, BlockInfo* &binfo)
 							chunk->m_bInfo = m_bInfo;
 							chunk->SetBlock(x, y, z, (b == 0) ? BTYPE_AIR : binfo[b].GetType(), ' ');
 						}
-
 					}
 		}
 	}
@@ -524,7 +526,6 @@ void World::AddTree(Chunk * &chunk, int x, int y, int z)
 
 void World::InitChunks(int CenterX, int CenterZ)
 {
-	//Init les blocks
 	for (int i = 0; i < UpdateDistance * 2; i++)
 		for (int j = 0; j < UpdateDistance * 2; j++)
 		{
@@ -533,6 +534,25 @@ void World::InitChunks(int CenterX, int CenterZ)
 			//Si n'est pas creer
 			if (chunk && !chunk->m_iscreated)
 				InitChunk((float)(CenterX + i - UpdateDistance), (float)(CenterZ + j - UpdateDistance));
+
+		}
+}
+
+void World::RequestChunks(int CenterX, int CenterZ, Network *net)
+{
+	for (int i = 0; i < UpdateDistance * 2; i++)
+		for (int j = 0; j < UpdateDistance * 2; j++)
+		{
+			Chunk * chunk = ChunkAt((float)(CenterX + i - UpdateDistance), (float)(CenterZ + j - UpdateDistance));
+
+			//Si n'est pas creer
+			if (chunk && !chunk->m_isrequested)
+			{
+				std::stringstream ss;
+				ss << "RequestChunk " << (float)(CenterX + i - UpdateDistance)  << " " << (float)(CenterZ + j - UpdateDistance);
+				net->Send(ss.str(), true);
+				chunk->m_isrequested = true;
+			}
 
 		}
 }
@@ -803,13 +823,3 @@ void World::RemoveLava(Vector3<float> vf)
 			chunk->RemoveLava(vf);
 		}
 }
-
-
-
-
-
-
-
-
-
-

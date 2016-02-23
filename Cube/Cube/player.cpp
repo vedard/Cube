@@ -243,7 +243,6 @@ void Player::DeathCheck()
 	if (m_isDying)
 	{
 		m_isAlive = false;
-		std::cout << m_Name << " died." << std::endl;
 	}
 }
 void Player::CheckUnderwater(World &world)
