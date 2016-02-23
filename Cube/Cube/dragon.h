@@ -18,6 +18,9 @@ private:
 	bool isHurt;
 	int chillCount;
 	Character* m_target;
+	bool m_falling;
+	bool m_up;
+	int hauteury;
 
 };
 
