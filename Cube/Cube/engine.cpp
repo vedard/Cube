@@ -165,8 +165,6 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::BLOODMOON_THEME, EFFECT_PATH "bloodmoon_theme.wav");
 		Sound::AddSound(Sound::SPRINTER, SPRINTER_PATH "SprinterScream.wav");
 
-
-
 		for (int i = 0; i < 9; i++)
 		{
 			if (i < 9)
@@ -323,7 +321,6 @@ void Engine::UpdateEnvironement(float gameTime)
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
 	{
-
 		m_world.GetCow(i)->Move(m_world);
 	}
 
@@ -345,12 +342,18 @@ void Engine::UpdateEnvironement(float gameTime)
 	for (int i = 0; i < MAX_DRAGON; i++)
 		m_world.GetDragon(i)->Move(m_world);
 
-	std::cout << m_network.IsConnected() << std::endl;
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	if (!m_network.IsConnected())
+	
+	// Init les chunk la map si on est en singleplayer
+	// sinon on fait un demande au serveur pour downloader les chunk
+	if (!m_network.IsConnected() || m_settings.m_isServer)
 	{
+		//m_world.InitChunks(playerPos.x, playerPos.z);
 		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
 		t.detach();
+	}
+	else
+	{
+		m_world.RequestChunks(playerPos.x, playerPos.z, &m_network);
 	}
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
@@ -543,108 +546,108 @@ void Engine::DrawEnvironement(float gameTime)
 
 void Engine::DayAndNightCycle(float gametime)
 {
-	float time = sin(((gametime) - m_missingTime) / DAY_TIME);
-
-	// Decide si la prochaine nuit est une bloodmoon
-	if (time > 0.99)
-		if (rand() % BLOODMOON_PROBABILITY == 0)
-			m_world.GetBloodMoonInstance()->Activate();
-
-	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
-		if (time < -0.97) {
-			m_world.GetBloodMoonInstance()->Start();
-			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
-		}
-	}
-
-	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
-		m_world.GetBloodMoonInstance()->AddElapsedUnit();
-	}
-
-	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
-	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
-
-	// Controle les cycles de couleurs de la lumière
-	m_redLight = 5.f;
-	m_greenLight = 0.48f * sin(time) + 4.5f;
-	m_blueLight = 0.95f * sin(time) + 3.8;
-
-	// Controle les cycles de couleurs du fog
-	m_redFog = 0.5f * sin(time) + 0.45f;
-	m_greenFog = 0.5f * sin(time) + 0.45f;
-	m_blueFog = 0.5f * sin(time) + 0.48f;
-
-	// Controle le cycle de densite du fog
-	m_fogDensity = -0.031f * sin(time) + 0.052f;
-	m_fogStart = 1.68f * sin(time) + 16;
-
-	// Controle de tout ce qui se passe de visuel pendant 
-	// la blood moon selon le temps entre 0 et 2500
-	if (m_world.GetBloodMoonInstance()->GetStartedState()) 
-	{
-		if (m_world.GetBloodMoonInstance()->GetDuration() == 55)
-		{
-			Sound::PlayOnce(Sound::BLOODMOON_THEME);
-		}
-		// Éteint la lumière
-		if (m_world.GetBloodMoonInstance()->GetDuration() >= 50 && m_world.GetBloodMoonInstance()->GetDuration() <= 100)
-		{
-			m_redFog = 0.21 * sin(0.03f * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
-			m_greenFog = 0.037 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
-			m_blueFog = 0.008 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.06746;
-		}
-
-		// Éteint
-		else if (m_world.GetBloodMoonInstance()->GetDuration() >= 100)
-		{
-			// Controle les cycles de couleurs de la lumière
-			m_redLight = 0.f;
-			m_greenLight = 0.f;
-			m_blueLight = 0.f;
-
-			// Controle les cycles de couleurs du fog
-			m_redFog = 0.25f;
-			m_greenFog = 0.075f;
-			m_blueFog = 0.075f;
-		}
-
-		// Controle le cycle de densite du fog
-		m_fogDensity = 0.08f;
-		m_fogStart = 15.f;
-
-		if (m_world.GetBloodMoonInstance()->GetDuration() >= 2500) {
-			m_missingTime += 50;
-			m_music.setVolume(m_settings.m_musicvolume);
-		}
-	}
-
-	// Le Fog
-	fogcolor[0] = m_redFog;
-	fogcolor[1] = m_greenFog;
-	fogcolor[2] = m_blueFog;
-	fogcolor[3] = 1;
-	glEnable(GL_FOG);
-	GLint fogmode = GL_EXP2;
-	glFogi(GL_FOG_MODE, fogmode);
-	glFogfv(GL_FOG_COLOR, fogcolor);
-	glFogf(GL_FOG_DENSITY, m_fogDensity);
-	glFogf(GL_FOG_START, m_fogStart);
-	glFogf(GL_FOG_END, 24.f);
-
-	light0Amb[0] = m_redLight;
-	light0Amb[1] = m_greenLight;
-	light0Amb[2] = m_blueLight;
-	light0Amb[3] = 0.f;
-
-	// La lumiere
-	if (!m_world.GetBloodMoonInstance()->GetStartedState())
-	{
-		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
-		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
-		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
-	}
+//	float time = sin(((gametime) - m_missingTime) / DAY_TIME);
+//
+//	// Decide si la prochaine nuit est une bloodmoon
+//	if (time > 0.99)
+//		if (rand() % BLOODMOON_PROBABILITY == 0)
+//			m_world.GetBloodMoonInstance()->Activate();
+//
+//	if (m_world.GetBloodMoonInstance()->GetActiveState()) {
+//		if (time < -0.97) {
+//			m_world.GetBloodMoonInstance()->Start();
+//			m_world.GetBloodMoonInstance()->Deactivate(); // Je le déactive pour qu'il ne repasse pas dans cette boucle.
+//		}
+//	}
+//
+//	if (m_world.GetBloodMoonInstance()->GetStartedState() && !m_world.GetBloodMoonInstance()->GetCompletionState()) {
+//		m_world.GetBloodMoonInstance()->AddElapsedUnit();
+//	}
+//
+//	GLfloat light0Amb[4] = { 0, 0, 0, 0 };
+//	GLfloat fogcolor[4] = { 0, 0, 0, 0 };
+//
+//	// Controle les cycles de couleurs de la lumière
+//	m_redLight = 5.f;
+//	m_greenLight = 0.48f * sin(time) + 4.5f;
+//	m_blueLight = 0.95f * sin(time) + 3.8;
+//
+//	// Controle les cycles de couleurs du fog
+//	m_redFog = 0.5f * sin(time) + 0.45f;
+//	m_greenFog = 0.5f * sin(time) + 0.45f;
+//	m_blueFog = 0.5f * sin(time) + 0.48f;
+//
+//	// Controle le cycle de densite du fog
+//	m_fogDensity = -0.031f * sin(time) + 0.052f;
+//	m_fogStart = 1.68f * sin(time) + 16;
+//
+//	// Controle de tout ce qui se passe de visuel pendant 
+//	// la blood moon selon le temps entre 0 et 2500
+//	if (m_world.GetBloodMoonInstance()->GetStartedState()) 
+//	{
+//		if (m_world.GetBloodMoonInstance()->GetDuration() == 55)
+//		{
+//			Sound::PlayOnce(Sound::BLOODMOON_THEME);
+//		}
+//		// Éteint la lumière
+//		if (m_world.GetBloodMoonInstance()->GetDuration() >= 50 && m_world.GetBloodMoonInstance()->GetDuration() <= 100)
+//		{
+//			m_redFog = 0.21 * sin(0.03f * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
+//			m_greenFog = 0.037 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.03746;
+//			m_blueFog = 0.008 * sin(0.03 * (m_world.GetBloodMoonInstance()->GetDuration() - 50)) + 0.06746;
+//		}
+//
+//		// Éteint
+//		else if (m_world.GetBloodMoonInstance()->GetDuration() >= 100)
+//		{
+//			// Controle les cycles de couleurs de la lumière
+//			m_redLight = 0.f;
+//			m_greenLight = 0.f;
+//			m_blueLight = 0.f;
+//
+//			// Controle les cycles de couleurs du fog
+//			m_redFog = 0.25f;
+//			m_greenFog = 0.075f;
+//			m_blueFog = 0.075f;
+//		}
+//
+//		// Controle le cycle de densite du fog
+//		m_fogDensity = 0.08f;
+//		m_fogStart = 15.f;
+//
+//		if (m_world.GetBloodMoonInstance()->GetDuration() >= 2500) {
+//			m_missingTime += 50;
+//			m_music.setVolume(m_settings.m_musicvolume);
+//		}
+//	}
+//
+//	// Le Fog
+//	fogcolor[0] = m_redFog;
+//	fogcolor[1] = m_greenFog;
+//	fogcolor[2] = m_blueFog;
+//	fogcolor[3] = 1;
+//	glEnable(GL_FOG);
+//	GLint fogmode = GL_EXP2;
+//	glFogi(GL_FOG_MODE, fogmode);
+//	glFogfv(GL_FOG_COLOR, fogcolor);
+//	glFogf(GL_FOG_DENSITY, m_fogDensity);
+//	glFogf(GL_FOG_START, m_fogStart);
+//	glFogf(GL_FOG_END, 24.f);
+//
+//	light0Amb[0] = m_redLight;
+//	light0Amb[1] = m_greenLight;
+//	light0Amb[2] = m_blueLight;
+//	light0Amb[3] = 0.f;
+//
+//	// La lumiere
+//	if (!m_world.GetBloodMoonInstance()->GetStartedState())
+//	{
+//		GLfloat light0Diff[4] = { 5.f, 4.f, 3.f, .7f };
+//		GLfloat light0Spec[4] = { 5.f, 4.f, 3.f, .7f };
+//		glLightfv(GL_LIGHT0, GL_AMBIENT, light0Amb);
+//		glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
+//		glLightfv(GL_LIGHT0, GL_SPECULAR, light0Spec);
+//	}
 }
 
 

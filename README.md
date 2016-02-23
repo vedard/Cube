@@ -1,43 +1,16 @@
-# Cube
-Minecraft Clone in c++
+#	Documentation développeur
+420-6GD-HY - Entretien de logiciels d’applications
 
-# Screenshot
-![Screenshot](http://i.imgur.com/fc7oHRX.png)	
+#	Description
 
-# Todo
-- Redo everything, code is a mess
+#	Collaborateur
 
-# Controls
+#	Les systèmes d'exploitation supportés/testés
 
-- Moving           
-	- w / a / s / d 
-- Delete block     	 
-	- Left Click    
-- Add block        
-	- Right Click   
-- Select a block   	
-	- Scroll wheel     
-- Sneaking         	 
-	- Ctrl          
-- Run              	 
-	- Shift         
-- Jump             	 
-	- space         
-- Fly / NoClip Mode	 
-	- v             
-- Wireframe Mode   	 
-	- y             
-- Display info     	 
-	- f3            
-- Fullscreen Mode  	 
-	- f10           
-- Open Map         	
-	- LShift-o      
-- Save             	
-	- LShift-w      
-- Create Random Map	 
-	- LShift-r      
-- Create Flat Map   	 
-	- LShift-f      
-- Delete Cache     	
-	- LShift-f5     
+#	Installation sur Linux
+
+#	Installation sur Windows
+
+#	Renseignement sur le fonctionement
+
+#	Qu'est-ce qui serait a ameliorer ?
