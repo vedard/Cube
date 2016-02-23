@@ -33,3 +33,14 @@ Compiler en mode release.
 	
 
 #	Qu'est-ce qui serait a ameliorer ?
+	-Changer le pathing des monstres. En ce moment, ils se promènent aléatoirement et ils sautent si il y a collision.
+	-Faire que l'on puisse clicker sur le menu pour selectionné les options.
+	-Faire que l'on puisse clicker sur l'inventaire pour bouger/placer/enlever les blocques.
+	-Faire qu'il y a plusieurs map et que l'on puisse choirsir laquel nous voulons.
+	-Faire que les clients download la map du serveur.
+	-Synchroniser les monstres entre le serveur et client.
+	-Faire que les blocs on une durabilité.
+	-Ajouter des armures.
+	-Optimisation de la sauvegarde de la map.
+	-Fall damage pour les monstres.
+	-Optimiser la façon que les monstres spawn.
