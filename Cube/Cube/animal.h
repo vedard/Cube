@@ -13,7 +13,7 @@ public:
 	
     void Move(World &world);
 	void Draw(Model3d &model) const;
-	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce) override;
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce) override;
 	virtual void SetTarget(Character* target);
 	ANIMAL_TYPE GetType();
 

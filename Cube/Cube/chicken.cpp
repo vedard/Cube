@@ -78,9 +78,9 @@ void Chicken::SetTarget(Character* target)
 	m_target = target;
 }
 
-bool Chicken::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Chicken::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	chillCount = 0;
 	isHurt = true;
-	return Animal::GetDamage(damage, ignoreArmor, godMode, son, playonce);
+	return Animal::GetDamage(damage, ignoreArmor, godMode, killer, son, playonce);
 }
