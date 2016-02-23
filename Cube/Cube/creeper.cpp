@@ -116,8 +116,6 @@ void Creeper::Move(World &world)
 				
 				m_deathTick.restart();
 				m_isDying = true;
-				//m_isAlive = false;
-				//std::cout << m_Name << " died." << std::endl;
 
 				DeathCheck();
 			}

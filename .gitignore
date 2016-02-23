@@ -221,3 +221,8 @@ pip-log.txt
 
 #Map save
 *.sav
+
+#Xp File
+*.xp
+/Cube/Cube/Cube.conf
+/Cube/Cube/Cube.conf

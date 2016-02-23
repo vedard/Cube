@@ -46,8 +46,7 @@ bool Network::Fetch()
 			OnConnect();
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
-			OnPacketReceive((char *)m_ENetEvent.packet->data);
-			enet_packet_destroy(m_ENetEvent.packet);
+			OnPacketReceive();
 			break;
 		case ENET_EVENT_TYPE_DISCONNECT:
 			OnDisconnect();
@@ -78,7 +77,7 @@ void Network::Disconnect()
 	enet_peer_disconnect(m_EnetPeerServer, 0);
 }
 
-bool Network::Send(string data, bool reliable)
+void Network::Send(string data, bool reliable)
 {
 	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, (reliable) ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
 
@@ -88,8 +87,13 @@ bool Network::Send(string data, bool reliable)
 		enet_host_broadcast(m_ENetHost, (reliable) ? 1 : 0, packet);
 	else if (m_EnetPeerServer)
 		enet_peer_send(m_EnetPeerServer, (reliable) ? 1 : 0, packet);
+}
 
-	return false;
+void Network::SendTo(string data, bool reliable, ENetPeer * peer)
+{
+	ENetPacket * packet = enet_packet_create(data.c_str(), strlen(data.c_str()) + 1, (reliable) ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
+
+	enet_peer_send(peer, (reliable) ? 1 : 0, packet);
 }
 
 vector<Client> Network::GetClient()
@@ -97,27 +101,41 @@ vector<Client> Network::GetClient()
 	return m_lstClient;
 }
 
+bool Network::IsConnected()
+{
+	return m_EnetPeerServer != NULL;
+}
+
 void Network::OnConnect()
 {
 	std::cout << "Connected event happens" << std::endl;
+
+	// les client efface leur map
+	if (!m_isServer)
+		m_world->InitMap(0);
 }
 
 void Network::OnDisconnect()
 {
 	std::cout << "Disconnected event happens" << std::endl;
 
+	m_EnetPeerServer = NULL;
+	if (!m_isServer)
+		m_world->InitMap(42);
+
 	// Force to recreate the list
 	m_lstClient.clear();
 }
-void Network::OnPacketReceive(string packet)
+void Network::OnPacketReceive()
 {
-	if (packet[0] != 'p')
-		std::cout << packet << std::endl;
+	string packet = (char *)m_ENetEvent.packet->data;
+	//if (packet[0] != 'p')
+	//	std::cout << packet << std::endl;
 
 	if (packet.find("map") == 0)
 	{
 		std::istringstream stream(packet);
-		
+
 		string null;
 		float x, y, z;
 		int b;
@@ -133,6 +151,59 @@ void Network::OnPacketReceive(string packet)
 		// le serveur broadcast le changement a tous les clients
 		if (m_isServer)
 			Send(packet, true);
+	}
+	else if (packet.find("RequestChunk") == 0)
+	{
+		if(!m_isServer)
+			return;
+
+		std::istringstream stream(packet);
+
+		string null;
+		int posX, posZ;
+		stream >> null >> posX >> posZ;
+
+		Chunk* chunk = m_world->ChunkAt(posX,posZ);
+
+		if (chunk != NULL)
+		{
+			if (chunk->m_iscreated == false)
+				m_world->InitChunk(posX,posZ);
+
+			std::stringstream toSendStream;
+
+			toSendStream << "ThisIsChunk " << posX << " " << posZ << " ";
+
+			for (int x = 0; x < CHUNK_SIZE_X; ++x)
+				for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+					for (int y = 0; y <= CHUNK_SIZE_Y; y++)
+					{
+						toSendStream << (int)chunk->GetBlock(x, y, z) << " ";
+					}
+			SendTo(toSendStream.str(), 1, m_ENetEvent.peer);
+		}
+	}
+	else if (packet.find("ThisIsChunk") == 0)
+	{
+		std::istringstream stream(packet);
+
+		string null;
+		int posX, posZ, block;
+		stream >> null >> posX >> posZ;
+
+		Chunk* chunk = m_world->ChunkAt((float)posX, (float)posZ);
+		chunk->m_iscreated = true;
+
+		for (int x = 0; x < CHUNK_SIZE_X; ++x)
+			for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+				for (int y = 0; y <= CHUNK_SIZE_Y; y++)
+				{
+					stream >> block;
+					if (block >= 0 && block < NUMBER_OF_BLOCK)
+					{
+						chunk->SetBlock(x, y, z, block, ' ');
+					}
+				}
 	}
 	else if (packet.find("player") == 0)
 	{

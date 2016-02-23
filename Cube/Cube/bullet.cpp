@@ -1,5 +1,5 @@
 #include "bullet.h"
-
+#include "player.h"
 
 Bullet::Bullet() : m_LastPos(0, 0, 0)
 {
@@ -98,6 +98,7 @@ bool Bullet::CheckCollision(World &world, Network &net)
 				if (chunk)
 				{
 					chunk->RemoveBloc(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
+					world.GetPlayer()->GetXp()->GainXp(world.GetPlayer()->GetXp()->GetXpGain());
 					net.Send("map " 
 						+ std::to_string(x) + " " 
 						+ std::to_string(y) + " " 

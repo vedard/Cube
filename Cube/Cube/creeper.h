@@ -13,7 +13,7 @@ public:
 
 
 private:
-	int explosionRadius = 6;
+	int explosionRadius = 4;
 };
 #endif // !
 

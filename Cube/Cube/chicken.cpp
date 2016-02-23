@@ -5,6 +5,7 @@ Chicken::Chicken() :Animal(A_CHICKEN), isHurt(false)
 	m_maxHealth = 250;
 	m_dimension = Vector3<float>(0.8f, 1.1f, 1.f);
 	m_Name = "Chicken";
+	m_deathSink = 1;
 }
 
 Chicken::~Chicken()

@@ -64,6 +64,7 @@ private:
 	//Todo - rendre private
 public:
 	bool m_iscreated;               //Si le chunk a été init selon le seed de la map
+	bool m_isrequested;             //si on a fait la demande au serveur pour avoir le chunk
 	Vector3<float> m_position;
 	BlockInfo* m_bInfo;
 	bool DeleteWater;
