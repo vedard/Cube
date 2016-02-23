@@ -56,7 +56,7 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 31
-#define MAX_CREEPER 0
+#define MAX_CREEPER 5
 #define NUMBER_OF_BLOCK 31
 #define MAX_SPRINTER 0
 #define MAX_BULLET 500

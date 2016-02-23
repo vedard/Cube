@@ -9,7 +9,7 @@ Creeper::~Creeper()
 
 }
 
-std::vector<Vector3<int>> Creeper::Explosion()
+void Creeper::Explosion(World &world)
 {
 	std::vector<Vector3<int>> blocsDestroyed;
 
@@ -22,20 +22,57 @@ std::vector<Vector3<int>> Creeper::Explosion()
 				if ((x + z) <= (explosionRadius - abs(y)))
 				{
 					// Pour les 4 quartiles
-					m_world->ChunkAt((int)GetPosition().x + x, (int)GetPosition().z + z)->SetBlock((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z, BTYPE_AIR, 'Q');
-					m_world->ChunkAt((int)GetPosition().x + x, (int)GetPosition().z - z)->SetBlock((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z, BTYPE_AIR, 'Q');
-					m_world->ChunkAt((int)GetPosition().x - x, (int)GetPosition().z - z)->SetBlock((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z, BTYPE_AIR, 'Q');
-					m_world->ChunkAt((int)GetPosition().x - x, (int)GetPosition().z + z)->SetBlock((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z + z, BTYPE_AIR, 'Q');
-
+					//m_world->ChunkAt((int)GetPosition().x  + x, (int)GetPosition().z + z)->SetBlock((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z, BTYPE_AIR, 'Q');
+					//m_world->ChunkAt((int)GetPosition().x + x, (int)GetPosition().z - z)->SetBlock((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z, BTYPE_AIR, 'Q');
+					//m_world->ChunkAt((int)GetPosition().x - x, (int)GetPosition().z - z)->SetBlock((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z, BTYPE_AIR, 'Q');
+					//m_world->ChunkAt((int)GetPosition().x - x, (int)GetPosition().z + z)->SetBlock((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z + z, BTYPE_AIR, 'Q');
+					
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z));
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z));
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z));
 					blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z + z));
+
+					/*for (int i = 0; i < blocsDestroyed.size(); i++)
+					{
+						blocsDestroyed.clear();
+
+						blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z));
+						blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z));
+						blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z));
+						blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z + z));
+
+						if (blocsDestroyed[i].x < CHUNK_SIZE_X && x >= 0 &&
+							blocsDestroyed[i].y < CHUNK_SIZE_Y && y >= 0 &&
+							blocsDestroyed[i].z < CHUNK_SIZE_Z && z >= 0)
+							world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(blocsDestroyed[i].x, blocsDestroyed[i].y, blocsDestroyed[i].z);
+						else
+						{
+							chunkPos = Vector3<int>(currentBloc.x / CHUNK_SIZE_X, 0, currentBloc.z / CHUNK_SIZE_Z);
+							i--;
+						}
+					}*/
 				}
 			}
 		}
 	}
-	return blocsDestroyed;
+
+	Vector3<int> chunkPos(m_pos.x / CHUNK_SIZE_X, 0, m_pos.z / CHUNK_SIZE_Z);
+	for (int i = 0; i < blocsDestroyed.size(); i++)
+	{
+		int x = blocsDestroyed[i].x - (chunkPos.x * CHUNK_SIZE_X);
+		int y = blocsDestroyed[i].y - (chunkPos.y * CHUNK_SIZE_Y);
+		int z = blocsDestroyed[i].z - (chunkPos.z * CHUNK_SIZE_Z);
+
+		if (x < CHUNK_SIZE_X && x >= 0 &&
+			y < CHUNK_SIZE_Y && y >= 0 &&
+			z < CHUNK_SIZE_Z && z >= 0)
+			world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(x, y, z);
+		else
+		{
+			chunkPos = Vector3<int>(blocsDestroyed[i].x / CHUNK_SIZE_X, 0, blocsDestroyed[i].z / CHUNK_SIZE_Z);
+			i--;
+		}
+	}
 }
 
 void Creeper::SetExplosionRadius(int radius)
@@ -94,7 +131,43 @@ void Creeper::Move(World &world)
 			}
 			else
 			{
-				Explosion();
+				Explosion(world);
+				/*std::vector<Vector3<int>> blocsDestroyed;
+
+				for (int x = 0; x < explosionRadius; x++)
+				{
+					for (int y = -explosionRadius; y < explosionRadius; y++)
+					{
+						for (int z = 0; z < explosionRadius; z++)
+						{
+							if ((x + z) <= (explosionRadius - abs(y)))
+							{
+								blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z + z));
+								blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x + x, (int)GetPosition().y + y, (int)GetPosition().z - z));
+								blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z - z));
+								blocsDestroyed.push_back(Vector3<int>((int)GetPosition().x - x, (int)GetPosition().y + y, (int)GetPosition().z + z));
+							}
+						}
+					}
+				}
+
+				Vector3<int> chunkPos(m_pos.x / CHUNK_SIZE_X, 0, m_pos.z / CHUNK_SIZE_Z);
+				for (int i = 0; i < blocsDestroyed.size(); i++)
+				{
+					int x = blocsDestroyed[i].x - (chunkPos.x * CHUNK_SIZE_X);
+					int y = blocsDestroyed[i].y - (chunkPos.y * CHUNK_SIZE_Y);
+					int z = blocsDestroyed[i].z - (chunkPos.z * CHUNK_SIZE_Z);
+
+					if (x < CHUNK_SIZE_X && x >= 0 &&
+						y < CHUNK_SIZE_Y && y >= 0 &&
+						z < CHUNK_SIZE_Z && z >= 0)
+						world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(x, y, z);
+					else
+					{
+						chunkPos = Vector3<int>(blocsDestroyed[i].x / CHUNK_SIZE_X, 0, blocsDestroyed[i].z / CHUNK_SIZE_Z);
+						i--;
+					}
+				}*/
 			}
 
 		}
