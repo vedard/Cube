@@ -8,7 +8,7 @@ Sprinter::Sprinter() :Monster(M_SPRINTER)
 	m_mouvementCooldown = 400;
 	m_vitesse = Vector3<float>(0.9f, 0, 0.9f);
 	m_soundPlayed = false;
-	m_deathSink = 4;
+	m_deathSink = 8;
 }
 Sprinter::~Sprinter()
 {

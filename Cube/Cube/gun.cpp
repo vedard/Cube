@@ -56,7 +56,7 @@ void Gun::Update()
 
 }
 
-bool Gun::Shoot(float x, float y, float z, float rotX, float rotY)
+bool Gun::Shoot(float x, float y, float z, float rotX, float rotY, Player* shooter)
 {
 	if (m_timerCooldown.getElapsedTime().asSeconds() > m_cooldown)
 	{
@@ -67,9 +67,9 @@ bool Gun::Shoot(float x, float y, float z, float rotX, float rotY)
 				for (int j = 0; j < m_numberofBullets && j + i < MAX_BULLET; j++)
 				{
 					if (m_isAiming)
-						m_bullets[i + j].Init(x, y, z, rotY + ((rand() % m_precisionAim) - (m_precisionAim / 2)) * 20 / 400, rotX + ((rand() % m_precisionAim) - (m_precisionAim / 2)) * 20 / 400, m_damage, m_distanceModif);
+						m_bullets[i + j].Init(x, y, z, rotY + ((rand() % m_precisionAim) - (m_precisionAim / 2)) * 20 / 400, rotX + ((rand() % m_precisionAim) - (m_precisionAim / 2)) * 20 / 400, m_damage, m_distanceModif, shooter);
 					else
-						m_bullets[i + j].Init(x, y, z, rotY + ((rand() % m_precision) - (m_precision / 2)) * 20 / 400, rotX + ((rand() % m_precision) - (m_precision / 2)) * 20 / 400, m_damage, m_distanceModif);
+						m_bullets[i + j].Init(x, y, z, rotY + ((rand() % m_precision) - (m_precision / 2)) * 20 / 400, rotX + ((rand() % m_precision) - (m_precision / 2)) * 20 / 400, m_damage, m_distanceModif, shooter);
 				}
 				m_recoilTotal += m_recoilByBullet;
 				Sound::Play(m_sound);

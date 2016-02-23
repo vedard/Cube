@@ -130,7 +130,7 @@ void Monster::GetDamage(float damage)
 {
 	m_ClockAnimationDmg.restart();
 
-	Character::GetDamage(damage,false,false);
+	Character::GetDamage(damage,false,false, this);
 }
 
 MONSTER_TYPE Monster::GetType()

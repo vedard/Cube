@@ -7,14 +7,13 @@
 #include "world.h"
 #include "network.h"
 
-
 class Bullet
 {
 public:
 	Bullet();
 	~Bullet();
 
-	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage, float distanceModif);
+	void Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage, float distanceModif, Player* shooter);
 
 	void Update();
 	bool CheckCollision(Character &character);
@@ -41,6 +40,8 @@ private:
 	float m_damage;
 	float m_distance;
 	float m_distanceModif;
+
+	Player* m_shooter;
 };
 
 #endif //BULLET_H__

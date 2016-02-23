@@ -5,7 +5,7 @@ Bird::Bird() :Animal(A_COW), m_falling(true)
 	m_maxHealth = 140;
 	m_dimension = Vector3<float>(1.f, 0.45f, 1.f);
 	m_Name = "Bird";
-	m_deathSink = 1;
+	m_deathSink = 0;
 }
 
 Bird::~Bird()

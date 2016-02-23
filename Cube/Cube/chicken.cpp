@@ -5,7 +5,7 @@ Chicken::Chicken() :Animal(A_CHICKEN), isHurt(false)
 	m_maxHealth = 250;
 	m_dimension = Vector3<float>(0.8f, 1.1f, 1.f);
 	m_Name = "Chicken";
-	m_deathSink = 1;
+	m_deathSink = 8;
 }
 
 Chicken::~Chicken()
@@ -32,8 +32,7 @@ void Chicken::Move(World &world)
 					//On le place face a la cible
 					m_HorizontalRot = ((atan2(-DeltaTarget.x, -DeltaTarget.z) * 180 / PI));
 
-					//On avance pas si on est assez proche de la cible
-
+					//On avance pas si on est assez proche de la cibleeee
 					Vector3<float> deplacementVector = Vector3<float>(-DeltaTarget.x, 0, -DeltaTarget.z);
 					deplacementVector.Normalize();
 
@@ -78,9 +77,9 @@ void Chicken::SetTarget(Character* target)
 	m_target = target;
 }
 
-bool Chicken::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Chicken::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	chillCount = 0;
 	isHurt = true;
-	return Animal::GetDamage(damage, ignoreArmor, godMode, son, playonce);
+	return Animal::GetDamage(damage, ignoreArmor, godMode, killer, son, playonce);
 }

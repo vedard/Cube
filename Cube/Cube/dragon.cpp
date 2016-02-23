@@ -11,7 +11,7 @@ Dragon::Dragon() :Animal(A_DRAGON), m_falling(true)
 	m_Armor = 10;
 	m_AttackDamage = 25;
 	m_AttackRange = 5;
-	m_deathSink = 4;
+	m_deathSink = 8;
 };
 Dragon::~Dragon()
 {
@@ -164,11 +164,11 @@ void Dragon::Move(World &world)
 		
 }
 
-bool Dragon::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Dragon::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	chillCount = 0;
 	isHurt = true;
-	return Animal::GetDamage(damage, ignoreArmor, godMode, son, playonce);
+	return Animal::GetDamage(damage, ignoreArmor, godMode, killer, son, playonce);
 }
 
 void Dragon::SetTarget(Character* target)

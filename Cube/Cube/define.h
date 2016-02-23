@@ -62,15 +62,18 @@ typedef long long int64;
 #define MAX_BULLET 500
 #define MAX_CHICKEN 20
 #define MAX_COW 10
-#define MAX_CREEPER 2
+#define MAX_CREEPER 5
 #define MAX_DRAGON 2
 #define MAX_SPRINTER 0
 #define MAX_TRAMPOLINE_JUMP 10
 #define MONSTER_MULTIPLIER 5
 #define NUMBER_OF_BLOCK 31
 #define NUMBER_OF_BLOCK 31
-#define PI 3.14159265359
+#define PI 3.14159265358
+#define BLOODMOON_PROBABILITY 1 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
+#define BLOODMOON_DURATION 2500 // Doit toujours rester 2500
 #define WORLD_SIZE 45
+#define IS_DYING_LENGTH 1.5
 
 #define AUDIO_PATH	"../Cube/media/audio/"
 #define DEATH_PATH  "../Cube/media/audio/death/"
@@ -91,7 +94,6 @@ typedef long long int64;
 
 
 #define HURT_TIME 20
-#define IS_DYING_LENGTH 3
 #define GUN_NUMBER 5
 
 #define XPBAR_WIDTH 25
