@@ -215,7 +215,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 20, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
-	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(false, 150, 8000, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 40, 150, 0.5);
 
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
@@ -322,21 +322,20 @@ void Engine::UpdateEnvironement(float gameTime)
 
 	//Update les Cow
 	for (int i = 0; i < MAX_COW; i++)
-	{
-
 		m_world.GetCow(i)->Move(m_world);
-	}
 
+	// Update les chickenne
 	for (int i = 0; i < MAX_CHICKEN; i++)
 		m_world.GetChicken(i)->Move(m_world);
 
+	// Update les bird
 	for (int i = 0; i < MAX_BIRD; i++)
 		m_world.GetBird(i)->Move(m_world);
 
 	//Update les Bears
 	for (int i = 0; i < MAX_BEAR; i++)
 		m_world.GetBear(i)->Move(m_world);
-	//
+
 	//Update les Bear
 	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
 		m_world.GetBear(i)->Move(m_world);
