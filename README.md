@@ -19,7 +19,9 @@
 #	Installation sur Linux
 
 #	Installation sur Windows
-
+Faire un gitclone avec cette URL: https://github.com/CegepSTH/HellRain.git
+Ouvrir le fichie Cube.sln situé à cette emplacement : \HellRain\Cube
+Compiler en mode release.
 #	Renseignement sur le fonctionement
 
 #	Qu'est-ce qui serait a ameliorer ?
