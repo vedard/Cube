@@ -230,9 +230,10 @@ void Engine::UnloadResource()
 void Engine::UpdateEnvironement(float gameTime)
 {
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
-	//
+	
 	//Update le player
-	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
+	if(!m_network.IsConnected() || m_world.ChunkAt(playerPos.x,playerPos.z)->m_iscreated)
+		m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
 	// Update Guns
 	if (m_mouseButton[4])

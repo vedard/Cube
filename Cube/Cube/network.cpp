@@ -8,6 +8,7 @@ Network::Network(World * world)
 	enet_initialize();
 
 	m_isServer = Parametre::GetInstance().m_isServer;
+	m_isConnected = false;
 	m_lstClient = vector<Client>();
 
 	m_EnetPeerServer = NULL;
@@ -103,25 +104,33 @@ vector<Client> Network::GetClient()
 
 bool Network::IsConnected()
 {
-	return m_EnetPeerServer != NULL;
+	return m_isConnected;
 }
 
 void Network::OnConnect()
 {
 	std::cout << "Connected event happens" << std::endl;
+	m_isConnected = true;
 
 	// les client efface leur map
 	if (!m_isServer)
+	{
 		m_world->InitMap(0);
+		m_world->SpawnPlayer();
+	}
 }
 
 void Network::OnDisconnect()
 {
 	std::cout << "Disconnected event happens" << std::endl;
+	m_isConnected = false;
 
 	m_EnetPeerServer = NULL;
 	if (!m_isServer)
+	{
 		m_world->InitMap(42);
+		m_world->SpawnPlayer();
+	}
 
 	// Force to recreate the list
 	m_lstClient.clear();

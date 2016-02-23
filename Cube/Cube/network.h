@@ -67,6 +67,7 @@ private:
 
 	// Network parameter
 	bool m_isServer;
+	bool m_isConnected;
 
 	// List of client connected to the server
 	vector<Client> m_lstClient;

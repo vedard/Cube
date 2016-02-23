@@ -55,10 +55,12 @@ public:
 	void InitChunks(int CenterX, int CenterZ);
 	void InitChunk(int i, int j);
 	void RequestChunks(int CenterX, int CenterZ, Network *net);
+	void RequestChunk(Chunk * chunk, Network * net);
 	void Update(int CenterX, int CenterZ, BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
+	void SpawnPlayer();
 	void SpawnCreepers(int maxMonsters);
 	void SpawnDragons();
 	void SpawnCows();

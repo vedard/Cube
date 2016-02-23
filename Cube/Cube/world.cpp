@@ -73,7 +73,7 @@ Bear* World::GetBear(int pos) const { return &m_bear[pos]; }
 Dragon* World::GetDragon(int pos) const { return &m_dragon[pos]; }
 Creeper* World::GetCreeper(int pos) const { return &m_creeper[pos]; }
 Sprinter* World::GetSprinter(int pos) const { return &m_sprinter[pos]; }
-Player* World::GetPlayer() const { return m_player; }
+Player* World::GetPlayer() const {  return m_player; }
 Chicken* World::GetChicken(int pos) const { return &m_chicken[pos]; }
 Bird* World::GetBird(int pos) const { return &m_bird[pos]; }
 
@@ -540,21 +540,50 @@ void World::InitChunks(int CenterX, int CenterZ)
 
 void World::RequestChunks(int CenterX, int CenterZ, Network *net)
 {
-	for (int i = 0; i < UpdateDistance * 2; i++)
-		for (int j = 0; j < UpdateDistance * 2; j++)
+	Chunk * chunk = ChunkAt((float)CenterX, (float)CenterZ);
+	this->RequestChunk(chunk,net);
+
+	//Parcours les chunk en cercle
+	for (int x = 1; x < UpdateDistance; ++x)
+		for (int a = 0; a <= x; ++a)
 		{
-			Chunk * chunk = ChunkAt((float)(CenterX + i - UpdateDistance), (float)(CenterZ + j - UpdateDistance));
+			chunk = ChunkAt((float)(CenterX + a), (float)(CenterZ - x));
+			this->RequestChunk(chunk,net);
+			
+			chunk = ChunkAt((float)(CenterX - a), (float)(CenterZ - x));
+			this->RequestChunk(chunk,net);
+		
+			chunk = ChunkAt((float)(CenterX + a), (float)(CenterZ + x));
+			this->RequestChunk(chunk,net);
 
-			//Si n'est pas creer
-			if (chunk && !chunk->m_isrequested)
-			{
-				std::stringstream ss;
-				ss << "RequestChunk " << (float)(CenterX + i - UpdateDistance)  << " " << (float)(CenterZ + j - UpdateDistance);
-				net->Send(ss.str(), true);
-				chunk->m_isrequested = true;
-			}
+			chunk = ChunkAt((float)(CenterX - a), (float)(CenterZ + x));
+			this->RequestChunk(chunk,net);
+		
+			chunk = ChunkAt((float)(CenterX - x), (float)(CenterZ + a));
+			this->RequestChunk(chunk,net);
+		
+			chunk = ChunkAt((float)(CenterX - x), (float)(CenterZ - a));
+			this->RequestChunk(chunk,net);
+		
+			chunk = ChunkAt((float)(CenterX + x), (float)(CenterZ + a));
+			this->RequestChunk(chunk,net);
 
+			chunk = ChunkAt((float)(CenterX + x), (float)(CenterZ - a));
+			this->RequestChunk(chunk,net);
 		}
+}
+void World::RequestChunk(Chunk * chunk, Network * net)
+{
+	if (chunk && !chunk->m_isrequested)
+	{
+		std::stringstream ss;
+
+		ss << "RequestChunk " << chunk->GetPosition().x / CHUNK_SIZE_X << " " << chunk->GetPosition().z / CHUNK_SIZE_Z;
+		net->Send(ss.str(), true);
+
+		chunk->m_isrequested = true;
+	}
+
 }
 
 void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
@@ -634,6 +663,7 @@ void World::Update(int CenterX, int CenterZ, BlockInfo* &info)
 
 int World::ChunkNotUpdated(int CenterX, int CenterZ)
 {
+
 	int chunkNotUpdated = 0;
 	for (int i = 0; i < UpdateDistance * 2; i++)
 		for (int j = 0; j < UpdateDistance * 2; j++)
@@ -686,6 +716,10 @@ void World::SetUpdateDistance(int updateDist)
 		UpdateDistance = updateDist;
 }
 
+void World::SpawnPlayer()
+{
+	m_player->Spawn(*this, WORLD_SIZE*CHUNK_SIZE_X / 2, WORLD_SIZE*CHUNK_SIZE_X / 2);
+}
 void World::SpawnCows()
 {
 	for (int i = 0; i < MAX_COW; i++)
