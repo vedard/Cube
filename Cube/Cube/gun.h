@@ -16,7 +16,7 @@ public:
 	void InitStat(bool isAuto, float RPM, float damage, float aimHeight);
 	void Draw(float x, float y, float z, float rotX, float rotY) const;
 	void Update();
-	bool Shoot(float x, float y, float z, float rotX, float rotY);
+	bool Shoot(float x, float y, float z, float rotX, float rotY, Player* shooter);
 	void EnableAiming();
 	void DisableAiming();
 	const bool isAiming();

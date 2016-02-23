@@ -992,7 +992,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
-				m_world.GetPlayer()->GetXp()->GainXp(m_world.GetPlayer()->GetXp()->GetXpGain());				
+				m_world.GetPlayer()->GetXp()->GainXp(1);				
 				m_network.Send("map " 
 						+ std::to_string(m_currentBlock.x) + " " 
 						+ std::to_string(m_currentBlock.y) + " " 
