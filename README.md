@@ -26,7 +26,8 @@
 
 #	Installation sur Windows
 Faire un gitclone avec cet URL: https://github.com/CegepSTH/HellRain.git
-Ouvrir le fichier Cube.sln situé à cet emplacement : \HellRain\Cube
+Ouvrir le fichier Cube.sln 
+situé à cet emplacement:\HellRain\Cube
 Compiler en mode release.
 #	Renseignements sur le fonctionement
 	La plupart des touches sont enregistrées dans un fichier de config, donc pour les modifier il faut ouvrir le menu dans le jeu.
@@ -66,10 +67,11 @@ Compiler en mode release.
 	Pour faire fonctionner le mode multijoueur, il faut tout d'abord changer son nom dans le fichier de configuration.
 	Le fichier de configuration se situe à cette emplacement: \HellRain\Cube\Cube\Cube.conf
 	il faut changer la ligne où il est écris playername pour playername "TonNom".
-	Ensuite il faut ouvrir le jeu, ouvrir le menu, naviguer vers l'option Multiplayer, entrer l'ip du serveur où on veut se connecter, dans notre cas, 
+	Ensuite il faut ouvrir le jeu, ouvrir le menu, 
+	naviguer vers l'option Multiplayer, entrer l'ip du serveur où on veut se connecter, dans notre cas, 
 	l'ip est 45.55.42.126.
 #	Qu'est-ce qui serait a améliorer ?
-	-Changer le pathing des monstres. En ce moment, ils se promènent dans la direction du joueur et ils sautent si il y a collision.
+	-Changer le pathing des monstres. En ce moment, ils vont vers le joueur et ils sautent s'il y a collision.
 	-Faire que l'on puisse cliquer sur le menu pour selectionner les options.
 	-Faire que l'on puisse cliquer sur l'inventaire pour bouger/placer/enlever les blocs.
 	-Faire qu'il y a plusieurs maps et que l'on puisse choirsir laquelle nous voulons.
