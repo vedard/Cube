@@ -62,7 +62,7 @@ typedef long long int64;
 #define MAX_BULLET 500
 #define MAX_CHICKEN 20
 #define MAX_COW 10
-#define MAX_CREEPER 2
+#define MAX_CREEPER 5
 #define MAX_DRAGON 2
 #define MAX_SPRINTER 0
 #define MAX_TRAMPOLINE_JUMP 10

@@ -84,11 +84,11 @@ void Bear::Move(World &world)
 	}
 }
 
-bool Bear::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Bear::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	chillCount = 0;
 	isHurt = true;
-	return Animal::GetDamage(damage,ignoreArmor,godMode,son,playonce);
+	return Animal::GetDamage(damage,ignoreArmor,godMode,killer,son,playonce);
 }
 
 void Bear::SetTarget(Character* target)

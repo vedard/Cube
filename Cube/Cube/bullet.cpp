@@ -63,7 +63,7 @@ bool Bullet::CheckCollision(Character &character)
 			{
 
 				//f(x) = -1 * 1.10 ^ (x + 10) + 50
-    			character.GetDamage((float)(-1 * pow(1.06, (m_distance * m_distanceModif) + 10) + m_damage),false,false);
+    			character.GetDamage((float)(-1 * pow(1.06, (m_distance * m_distanceModif) + 10) + m_damage),false,false, m_shooter);
 				m_isActive = false;
 				return true;
 			}
@@ -98,7 +98,7 @@ bool Bullet::CheckCollision(World &world, Network &net)
 				if (chunk)
 				{
 					chunk->RemoveBloc(x - (chunkPos.x * CHUNK_SIZE_X), y, z - (chunkPos.z * CHUNK_SIZE_X));
-					world.GetPlayer()->GetXp()->GainXp(world.GetPlayer()->GetXp()->GetXpGain());
+					m_shooter->GetXp()->GainXp(1);
 					net.Send("map " 
 						+ std::to_string(x) + " " 
 						+ std::to_string(y) + " " 
@@ -167,8 +167,9 @@ void Bullet::Draw() const
 
 	}
 }
-void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage, float distanceModif)
+void Bullet::Init(float x, float y, float z, float rotationVertical, float rotationHorizontal, float damage, float distanceModif, Player* shooter)
 {
+	m_shooter = shooter;
 	m_damage = damage;
 	m_pos = Vector3<float>(x, y, z);
 	directionVector = Vector3<float>(

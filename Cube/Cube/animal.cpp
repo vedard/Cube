@@ -105,12 +105,12 @@ void Animal::Draw(Model3d &model) const
 	}
 }
 
-bool Animal::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Animal::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	Jump();
 	if (rand() % 100 > 66)
 		Sound::Play(Sound::FLESH_IMPACT);
-	return Character::GetDamage(damage, ignoreArmor, godMode, son, playonce);
+	return Character::GetDamage(damage, ignoreArmor, godMode, killer, son, playonce);
 }
 
 ANIMAL_TYPE Animal::GetType()

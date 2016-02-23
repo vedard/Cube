@@ -208,7 +208,7 @@ bool Character::Attack(Character * character, float damage)
 				+ pow(character->GetPosition().z - m_pos.z, 2)) < m_AttackRange)
 			{
 				std::cout << m_Name << " attack " << character->GetName() << "." << std::endl;
-				character->GetDamage(damage, false, false);
+				character->GetDamage(damage, false, false, this);
 				m_cooldownAttackTimer.restart();
 				return true;
 			}
@@ -221,7 +221,7 @@ bool Character::Attack(Character * character)
 	return Attack(character, m_AttackDamage);
 }
 
-bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	if (!godMode && m_isAlive)
 	{
@@ -243,11 +243,15 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::L
 		if (m_health <= 0)
 		{
 			if (m_isDying == false && m_isAlive)
+			{
 				std::cout << m_Name << " is dying." << std::endl;
+				if(killer->GetXp() != nullptr)
+				{
+					killer->GetXp()->GainXp(this->XpGainOnDeath());
+				}
+			}			
 			m_deathTick.restart();
 			m_isDying = true;
-			//m_isAlive = false;
-			//std::cout << m_Name << " died." << std::endl;
 		}
 		DeathCheck();
 	}
