@@ -33,7 +33,6 @@ void Experience::Load()
 		m_level = stoi(m_data["level"]);
 		CalculateMaxXp();
 		CalculateXpGain();
-		std::cout << "plao" << std::endl;
 		GainXp(stoi(m_data["xp"]));
 	}
 	ifs.close();
@@ -63,7 +62,6 @@ void Experience::CalculateXpGain()
 void Experience::GainXp(const int& xpGain)
 {
 	m_xp += xpGain;
-	std::cout << "mmeeee" << std::endl;
 	while(m_xp >= m_maxXp)
 	{
 		m_xp -= m_maxXp;

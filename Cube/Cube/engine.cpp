@@ -1,4 +1,4 @@
-#include "engine.h"
+﻿#include "engine.h"
 
 Engine::Engine() :
 	m_wireframe(false),
@@ -124,7 +124,7 @@ void Engine::LoadResource()
 		AddTextureToAtlas(BTYPE_WATER, "Grass", TEXTURE_PATH "block_water.png", 1);
 		AddTextureToAtlas(BTYPE_SAND, "Grass", TEXTURE_PATH "block_sand.bmp", 1);
 		AddTextureToAtlas(BTYPE_NETHEREACK, "Grass", TEXTURE_PATH "block_netherrack.bmp", 1);
-		AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.bmp", 1);
+		AddTextureToAtlas(BTYPE_LAVA, "Grass", TEXTURE_PATH "block_lava.png", 1);
 
 		AddTextureToAtlas(BTYPE_RWATER1, "Grass", TEXTURE_PATH "block_rwater1.bmp", .90f);
 		AddTextureToAtlas(BTYPE_RWATER2, "Grass", TEXTURE_PATH "block_rwater2.bmp", .5f);
@@ -217,7 +217,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 1200, 150, 0.5);
-	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 7, 2.5f);
+	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 20, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 0.01f);
 
 	// -- Player

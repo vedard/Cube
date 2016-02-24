@@ -44,7 +44,7 @@ void main()
 			gl_Position = gl_ModelViewProjectionMatrix * newPos;
 	}
 	//BTYPE_LAVA
-	else if(type == 17.0 )
+	else if(type == 25.0 )
 	{		
 			vec4 newPos = vec4(gl_Vertex.x, gl_Vertex.y, gl_Vertex.z, gl_Vertex.w);
 			newPos.y -= 0.2;	

@@ -56,15 +56,15 @@ typedef long long int64;
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
 #define NUMBER_OF_BLOCK 31
-#define MAX_CREEPER 0
+#define MAX_CREEPER 10
 #define NUMBER_OF_BLOCK 31
 #define MAX_SPRINTER 0
 #define MAX_BULLET 500
-#define MAX_COW 0
-#define MAX_BEAR 0
-#define MAX_CHICKEN 0
-#define MAX_DRAGON 50
-#define MAX_BIRD 50
+#define MAX_COW 5
+#define MAX_BEAR 5
+#define MAX_CHICKEN 5
+#define MAX_DRAGON 1
+#define MAX_BIRD 10
 #define MONSTER_MULTIPLIER 5
 #define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
 #define BLOODMOON_DURATION 2500 // Doit toujours rester 2500#define PI 3.14159265358f
@@ -72,7 +72,7 @@ typedef long long int64;
 #define MAX_TRAMPOLINE_JUMP 10
 #define PI 3.14159265359
 
-#define TEXTURE_PATH	"../Cube/media/textures/"
+#define TEXTURE_PATH	"../Cube/media/textures2/"
 #define EFFECTS_PATH	"../Cube/media/effects/"
 #define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
