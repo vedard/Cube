@@ -224,3 +224,5 @@ pip-log.txt
 
 #Xp File
 *.xp
+/Cube/Cube/Cube.conf
+/Cube/Cube/Cube.conf

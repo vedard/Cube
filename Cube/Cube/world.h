@@ -2,6 +2,7 @@
 #define WORLD_H__
 
 #include "array2d.h"
+#include "network.h"
 #include "chunk.h"
 #include "tool.h"
 #include "shader.h"
@@ -25,6 +26,7 @@ class Dragon;
 class Sprinter;
 class Chicken;
 class Bird;
+class Network;
 
 class World
 {
@@ -32,8 +34,8 @@ public:
 	World();
 	~World();
 
-	BlockType BlockAt(float x, float y, float z);
-	Chunk* ChunkAt(float x, float z);
+	BlockType BlockAt(int x, int y, int z);
+	Chunk* ChunkAt(int x, int z);
 
 	Cow* GetCow(int pos) const;
 	Bear* GetBear(int pos) const;
@@ -51,10 +53,14 @@ public:
 	void LoadMap(std::string filename, BlockInfo* &binfo);
 	void SaveMap(std::string filename);
 	void InitChunks(int CenterX, int CenterZ);
+	void InitChunk(int i, int j);
+	void RequestChunks(int CenterX, int CenterZ, Network *net);
+	void RequestChunk(Chunk * chunk, Network * net);
 	void Update(int CenterX, int CenterZ, BlockInfo* &info);
 	int ChunkNotUpdated(int CenterX, int CenterZ);
 	void Render(int CenterX, int CenterZ, GLenum &program);
 	void SetUpdateDistance(int updateDist);
+	void SpawnPlayer();
 	void SpawnCreepers(int maxMonsters);
 	void SpawnDragons();
 	void SpawnCows();
@@ -68,7 +74,6 @@ public:
 private:
 	void AddMineral(BlockType mineral, Chunk * &chunk, int x, int y, int z);
 	void AddTree(Chunk * &chunk, int x, int y, int z);
-	void InitChunk(float i, float j);
 	std::thread m_threadChunks;
 public:
 	bool m_threadcontinue;

@@ -10,10 +10,12 @@ Engine::Engine() :
 	m_fastInventoryKeySelected(0),
 	m_missingTime(0),
 	m_network(&m_world),
-	m_isInventoryOpen(false)
-{
+	m_isInventoryOpen(false) {
+
 	m_LastTickTime = 0.0f;
 	m_LastTickTimeWater = 0.0f;
+
+	m_settings.m_isServer = false;
 
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
@@ -165,8 +167,6 @@ void Engine::LoadResource()
 		Sound::AddSound(Sound::BLOODMOON_THEME, EFFECT_PATH "bloodmoon_theme.wav");
 		Sound::AddSound(Sound::SPRINTER, SPRINTER_PATH "SprinterScream.wav");
 
-
-
 		for (int i = 0; i < 9; i++)
 		{
 			if (i < 9)
@@ -195,7 +195,7 @@ void Engine::LoadResource()
 		//Model 3d
 		m_modelChicken.LoadOBJ(MODEL_PATH "Chicken.obj", TEXTURE_PATH "Chicken.png");
 		m_modelBird.LoadOBJ(MODEL_PATH "Bird.obj", TEXTURE_PATH "Bird.png");
-		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "Cow.png");
+		m_modelCow.LoadOBJ(MODEL_PATH "Cow.obj", TEXTURE_PATH "cow.png");
 		m_modelCreeper.LoadOBJ(MODEL_PATH "Creeper.obj", TEXTURE_PATH "creeper.png");
 		m_modelBear.LoadOBJ(MODEL_PATH "bear.obj", TEXTURE_PATH "bear.png");
 		m_modelDragon.LoadOBJ(MODEL_PATH "dragon.obj", TEXTURE_PATH "dragonfire.png");
@@ -215,7 +215,7 @@ void Engine::LoadResource()
 	m_world.GetPlayer()->GetGuns()[W_PISTOL - 1].InitStat(false, 400, 20, 0.2);
 	m_world.GetPlayer()->GetGuns()[W_SUBMACHINE_GUN - 1].InitStat(true, 800, 25, 0.25);
 	m_world.GetPlayer()->GetGuns()[W_ASSAULT_RIFLE - 1].InitStat(true, 600, 35, 0.4);
-	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(true, 50, 350, 0.5);
+	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitStat(false, 150, 8000, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitStat(true, 1200, 150, 0.5);
 	m_world.GetPlayer()->GetGuns()[W_SHOTGUN - 1].InitAdvancedParameters(450, 350, 20, 2.5f);
 	m_world.GetPlayer()->GetGuns()[W_SNIPER - 1].InitAdvancedParameters(300, 1, 1, 0.01f);
@@ -232,9 +232,10 @@ void Engine::UnloadResource()
 void Engine::UpdateEnvironement(float gameTime)
 {
 	Vector3<int> playerPos((int)m_world.GetPlayer()->GetPosition().x / CHUNK_SIZE_X, 0, (int)m_world.GetPlayer()->GetPosition().z / CHUNK_SIZE_Z);
+	
 	//Update le player
-	m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
-
+	if(!m_network.IsConnected() || m_world.ChunkAt(playerPos.x,playerPos.z)->m_iscreated)
+		m_world.GetPlayer()->Move(m_keyboard[m_settings.m_avancer], m_keyboard[m_settings.m_reculer], m_keyboard[m_settings.m_gauche], m_keyboard[m_settings.m_droite], m_world);
 
 	// Update Guns
 	if (m_mouseButton[4])
@@ -311,46 +312,37 @@ void Engine::UpdateEnvironement(float gameTime)
 		}
 	}
 
-	//Update les Creepers
-	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
-		m_world.GetCreeper(i)->Move(m_world);
-
-	//Update les Sprinters
-	for (int i = 0; i < MAX_SPRINTER; i++)
-		m_world.GetSprinter(i)->Move(m_world);
-
-	//Update les Cow
-	for (int i = 0; i < MAX_COW; i++)
+	// Si on est en singleplayer ou un server
+	if (!m_network.IsConnected() || m_settings.m_isServer)
 	{
-
-		m_world.GetCow(i)->Move(m_world);
+		// update des animal et monstres
+		for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
+			m_world.GetCreeper(i)->Move(m_world);
+		for (int i = 0; i < MAX_SPRINTER; i++)
+			m_world.GetSprinter(i)->Move(m_world);
+		for (int i = 0; i < MAX_COW; i++)
+			m_world.GetCow(i)->Move(m_world);
+		for (int i = 0; i < MAX_CHICKEN; i++)
+			m_world.GetChicken(i)->Move(m_world);
+		for (int i = 0; i < MAX_BIRD; i++)
+			m_world.GetBird(i)->Move(m_world);
+		for (int i = 0; i < MAX_BEAR; i++)
+			m_world.GetBear(i)->Move(m_world);
+		for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
+			m_world.GetBear(i)->Move(m_world);
+		for (int i = 0; i < MAX_DRAGON; i++)
+			m_world.GetDragon(i)->Move(m_world);
+	
+		//m_world.InitChunks(playerPos.x, playerPos.z);
+		std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
+		t.detach();
+	}	
+else
+	{
+		m_world.RequestChunks(playerPos.x, playerPos.z, &m_network);
 	}
-
-	for (int i = 0; i < MAX_CHICKEN; i++)
-		m_world.GetChicken(i)->Move(m_world);
-
-	for (int i = 0; i < MAX_BIRD; i++)
-		m_world.GetBird(i)->Move(m_world);
-
-	//Update les Bears
-	for (int i = 0; i < MAX_BEAR; i++)
-		m_world.GetBear(i)->Move(m_world);
-	//
-	//Update les Bear
-	for (int i = 0; i < MAX_BEAR * MONSTER_MULTIPLIER; i++)
-		m_world.GetBear(i)->Move(m_world);
-
-	//Update les Dragons
-	for (int i = 0; i < MAX_DRAGON; i++)
-		m_world.GetDragon(i)->Move(m_world);
-
-	//m_world.InitChunks(playerPos.x, playerPos.z);
-	std::thread t(&World::InitChunks, &m_world, playerPos.x, playerPos.z);
-	t.detach();
-
 	//Update les chunk autour du joueur si il sont dirty
 	m_world.Update(playerPos.x, playerPos.z, m_bInfo);
-
 
 	m_network.Fetch();
 
@@ -362,12 +354,10 @@ void Engine::UpdateEnvironement(float gameTime)
 
 }
 
-
 void Engine::SyncWithServer()
 {
 	if (Parametre::GetInstance().m_isServer)
 	{
-		//std::cout << m_fps << std::endl;
 		for (auto c : m_network.GetClient())
 		{
 			m_network.Send("player " + c.ToString(), false);
@@ -380,7 +370,7 @@ void Engine::SyncWithServer()
 		c.x = m_world.GetPlayer()->GetPosition().x;
 		c.y = m_world.GetPlayer()->GetPosition().y;
 		c.z = m_world.GetPlayer()->GetPosition().z;
-		c.h = -m_world.GetPlayer()->GetHorizontalRotation();
+		c.h = -m_world.GetPlayer()->GetHorizontalRotation() - 180;
 		c.v = m_world.GetPlayer()->GetVerticalRotation();
 		m_network.Send("player " + c.ToString(), false);
 	}
@@ -477,6 +467,8 @@ void Engine::DrawEnvironement(float gameTime)
 		m_world.GetDragon(i)->Draw(m_modelDragon);
 	for (int i = 0; i < MAX_CREEPER * MONSTER_MULTIPLIER; i++)
 		m_world.GetCreeper(i)->Draw(m_modelCreeper, false);
+	for (int i = 0; i < MAX_SPRINTER; i++)
+		m_world.GetSprinter(i)->Draw(m_modelSprinter, false);
 
 	// Draw other player on network
 	for (auto c : m_network.GetClient())
@@ -1003,6 +995,7 @@ void Engine::MousePressEvent(const MOUSE_BUTTON &button, int x, int y)
 				}
 
 				m_world.ChunkAt((float)chunkPos.x, (float)chunkPos.z)->RemoveBloc(m_currentBlock.x - (chunkPos.x * CHUNK_SIZE_X), m_currentBlock.y, m_currentBlock.z - (chunkPos.z * CHUNK_SIZE_X));
+				m_world.GetPlayer()->GetXp()->GainXp(1);				
 				m_network.Send("map " 
 						+ std::to_string(m_currentBlock.x) + " " 
 						+ std::to_string(m_currentBlock.y) + " " 

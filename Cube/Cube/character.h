@@ -5,6 +5,7 @@
 #include "vector3.h"
 #include "world.h"
 #include "sound.h"
+#include "experience.h"
 
 class Character
 {
@@ -20,7 +21,7 @@ public:
 	void Draw() const;
 	bool Attack(Character * character, float damage);
 	virtual bool Attack(Character * character);
-	virtual bool GetDamage(float damage, bool ignoreArmor, bool godMode , Sound::ListeSons son = Sound::ListeSons::HURT, bool playonce = false);
+	virtual bool GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son = Sound::ListeSons::HURT, bool playonce = false);
 	void Jump();
 	void DeathCheck();
 
@@ -42,6 +43,9 @@ public:
 	bool GetisInAir() const;
 	void CheckBlock(World &world);
 
+	virtual Experience* GetXp(){ return nullptr; }
+	virtual int XpGainOnDeath() { return 20; }
+
 protected:
 
 	//Positionnement
@@ -60,6 +64,7 @@ protected:
 	float m_AttackSpeed;
 	float m_Armor;
 	float m_AttackDamage;
+	float m_deathSink;
 
 	//État
 	bool m_isInAir;

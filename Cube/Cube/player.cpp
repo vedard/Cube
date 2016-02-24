@@ -194,7 +194,7 @@ void Player::Move(bool front, bool back, bool left, bool right, World &world)
 				//Degat de chute 
 				if (m_vitesse.y > 0.40f && falldamage)
 				{
-					GetDamage(exp(m_vitesse.y * 6), false, m_godMode);
+					GetDamage(exp(m_vitesse.y * 6), false, m_godMode, this);
 					//isHurt = 20;
 				}
 			}
@@ -243,7 +243,6 @@ void Player::DeathCheck()
 	if (m_isDying)
 	{
 		m_isAlive = false;
-		std::cout << m_Name << " died." << std::endl;
 	}
 }
 void Player::CheckUnderwater(World &world)
@@ -395,6 +394,7 @@ void Player::SetBlock(int direction)
 		m_block = 1;
 }
 
+
 void Player::SetBlockDirect(BlockType blockType) {
 	m_block = blockType;
 }
@@ -425,7 +425,7 @@ void Player::Jump()
 
 bool Player::Shoot(World &world)
 {
-	Guns[GetWeapon() - 1].Shoot(GetPosition().x, GetPosition().y + world.GetPlayer()->GetDimension().y, GetPosition().z, GetHorizontalRotation(), GetVerticalRotation());
+	Guns[GetWeapon() - 1].Shoot(GetPosition().x, GetPosition().y + world.GetPlayer()->GetDimension().y, GetPosition().z, GetHorizontalRotation(), GetVerticalRotation(), this);
 	if (Guns[GetWeapon() - 1].GetIsAuto())
 		return true;
 	else
@@ -451,8 +451,7 @@ void Player::Tick()
 
 	if (m_footUnderLava)
 	{
-		GetDamage(8, true, m_godMode);
-		if (!GetDamage(8, true, m_godMode))
+		if (!GetDamage(8, true, m_godMode, this))
 		{
 			ResetDeath();
 		}
@@ -463,7 +462,7 @@ void Player::Tick()
 		if (m_BreathCount > 75)
 		{
 			m_headWasUnderwater = true;
-			if (!GetDamage(3, true, m_godMode, Sound::DROWNING, true))
+			if (!GetDamage(3, true, m_godMode, this, Sound::DROWNING, true))
 			{
 				ResetDeath();
 			}
@@ -481,7 +480,7 @@ void Player::Tick()
 	}
 }
 
-bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son, bool playonce)
+bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* killer, Sound::ListeSons son, bool playonce)
 {
 	bool b = true;
 	if (InvulnerabilityTimer <= 0)
@@ -489,7 +488,7 @@ bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::List
 		b = Character::GetisAlive();
 		if (b)
 		{
-			b = Character::GetDamage(damage, ignoreArmor, godMode);
+			b = Character::GetDamage(damage, ignoreArmor, godMode, this);
 			if (!godMode)
 			{
 				if (playonce)

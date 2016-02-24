@@ -46,13 +46,13 @@ public:
 	void SetRunning(bool running);
 
 	bool GetIsSneaked();
-	bool GetDamage(float damage, bool ignoreArmor, bool godMode, Sound::ListeSons son = Sound::HURT, bool playonce = false) override;
+	bool GetDamage(float damage, bool ignoreArmor, bool godMode,Character* killer, Sound::ListeSons son = Sound::HURT, bool playonce = false) override;
 
 	void AddToInventory(BlockType type);
 	bool RemoveFromInventory(BlockType type);
 	Inventory* GetInventory();
 	
-	Experience* GetXp() { return &m_xp; }
+	Experience* GetXp() override { return &m_xp; }
 
 private:
 	void CheckUnderwater(World &world);

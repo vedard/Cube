@@ -36,6 +36,8 @@ struct Client
 	}
 };
 
+class World;
+
 class Network : public NetworkEvent
 {
 
@@ -47,7 +49,9 @@ public:
 	bool Fetch();
 	void Connect(const char * ip, uint16 port);
 	void Disconnect();
-	bool Send(string data, bool reliable);
+	void Send(string data, bool reliable);
+	void SendTo(string data, bool reliable, ENetPeer * peer);
+	bool IsConnected();
 	vector<Client> GetClient();
 
 private:
@@ -55,7 +59,7 @@ private:
 	// Hérité via NetworkEvent
 	virtual void OnConnect() override;
 	virtual void OnDisconnect() override;
-	virtual void OnPacketReceive(string packet) override;
+	virtual void OnPacketReceive() override;
 
 
 // Members
@@ -63,6 +67,7 @@ private:
 
 	// Network parameter
 	bool m_isServer;
+	bool m_isConnected;
 
 	// List of client connected to the server
 	vector<Client> m_lstClient;

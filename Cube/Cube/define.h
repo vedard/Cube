@@ -1,4 +1,4 @@
-#ifndef DEFINE_H__
+ï»¿#ifndef DEFINE_H__
 #define DEFINE_H__
 
 #define PLATFORM_WINDOWS  1
@@ -49,41 +49,41 @@ typedef int int32;
 typedef long long int64;
 
 
+#define BLOODMOON_DURATION 2500 // Doit toujours rester 2500
+#define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. ï¿½ 1 t'as 100%, a 2 t'as 50%. etc
 #define CHUNK_SIZE_X 16
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
-#define WORLD_SIZE 45
 #define DAY_TIME 13
 #define EDITING_DISTANCE 7
-#define NUMBER_OF_BLOCK 31
-#define MAX_CREEPER 10
-#define NUMBER_OF_BLOCK 31
-#define MAX_SPRINTER 0
-#define MAX_BULLET 500
-#define MAX_COW 5
-#define MAX_BEAR 5
-#define MAX_CHICKEN 5
-#define MAX_DRAGON 1
-#define MAX_BIRD 10
-#define MONSTER_MULTIPLIER 5
-#define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. à 1 t'as 100%, a 2 t'as 50%. etc
-#define BLOODMOON_DURATION 2500 // Doit toujours rester 2500#define PI 3.14159265358f
 #define INVULNERABILITY_PLAYER_TIME 1
+#define MAX_BEAR 10
+#define MAX_BIRD 20
+#define MAX_BULLET 500
+#define MAX_CHICKEN 20
+#define MAX_COW 10
+#define MAX_CREEPER 2
+#define MAX_DRAGON 2
+#define MAX_SPRINTER 0
 #define MAX_TRAMPOLINE_JUMP 10
+#define MONSTER_MULTIPLIER 5
+#define NUMBER_OF_BLOCK 31
+#define NUMBER_OF_BLOCK 31
 #define PI 3.14159265359
+#define WORLD_SIZE 45
 
-#define TEXTURE_PATH	"../Cube/media/textures2/"
-#define EFFECTS_PATH	"../Cube/media/effects/"
-#define SHADER_PATH	"../Cube/media/shaders/"
 #define AUDIO_PATH	"../Cube/media/audio/"
-#define MUSIC_PATH	"../Cube/media/audio/music/"
-#define WEAPONS_PATH	"../Cube/media/audio/weapons/"
-#define WALK_PATH	"../Cube/media/audio/walk/"
-#define HURT_PATH	"../Cube/media/audio/hurt/"
 #define DEATH_PATH  "../Cube/media/audio/death/"
-#define LEAVE_PATH	"../Cube/media/audio/leave/"
+#define EFFECTS_PATH	"../Cube/media/effects/"
 #define EFFECT_PATH	"../Cube/media/audio/effect/"
+#define HURT_PATH	"../Cube/media/audio/hurt/"
+#define LEAVE_PATH	"../Cube/media/audio/leave/"
+#define MUSIC_PATH	"../Cube/media/audio/music/"
+#define SHADER_PATH	"../Cube/media/shaders/"
 #define SPRINTER_PATH	"../Cube/media/audio/sprinter/"
+#define TEXTURE_PATH	"../Cube/media/textures2/"
+#define WALK_PATH	"../Cube/media/audio/walk/"
+#define WEAPONS_PATH	"../Cube/media/audio/weapons/"
 
 
 #define MODEL_PATH	"../Cube/media/model/"
@@ -122,20 +122,20 @@ typedef long long int64;
 #define KEY_BINDED_SUCCESSFULLY "Key was binded succesfully"
 
 typedef uint8 BlockType;
-enum BLOCK_TYPE { 
-	BTYPE_AIR, 
-	BTYPE_GRASS, 
-	BTYPE_TEST, 
-	BTYPE_STONE, 
-	BTYPE_CHEST, 
-	BTYPE_WOOD_PLANK, 
-	BTYPE_BED_ROCK, 
-	BTYPE_DIRT, 
-	BTYPE_IRON, 
-	BTYPE_COAL, 
-	BTYPE_DIAMOND, 
-	BTYPE_GOLD, 
-	BTYPE_REDSTONE, 
+enum BLOCK_TYPE {
+	BTYPE_AIR,
+	BTYPE_GRASS,
+	BTYPE_TEST,
+	BTYPE_STONE,
+	BTYPE_CHEST,
+	BTYPE_WOOD_PLANK,
+	BTYPE_BED_ROCK,
+	BTYPE_DIRT,
+	BTYPE_IRON,
+	BTYPE_COAL,
+	BTYPE_DIAMOND,
+	BTYPE_GOLD,
+	BTYPE_REDSTONE,
 	BTYPE_LAPIS_LAZULI,
 	BTYPE_WOOD,
 	BTYPE_LEAVE,
