@@ -31,7 +31,7 @@ sans environnement graphique (exemple Digital Oceans). Il suffit alors de compil
 La version originale a besoin au minimun d'une carte graphique capable de
 supporter GLSL 3.30.
 
-Le jeu a été avec la carte NVIDIA NVS 5400m et un processeur Intel i5-3320M @2.60
+Le jeu a été testé avec la carte NVIDIA NVS 5400m et un processeur Intel i5-3320M @2.60
 
 #	Les librairies utilisées
 -	Enet
