@@ -26,6 +26,12 @@ void Sprinter::Move(World &world)
 			//On attaque, si c'est pas possible on avance
 			if (!Attack(m_target))
 			{
+				//Distance entre le monstre et sa cible
+				Vector3<float> DeltaTarget(m_target->GetPosition().x - m_pos.x, (m_target->GetPosition().y + m_target->GetDimension().y / 2) - (m_pos.y + m_dimension.y / 2), m_target->GetPosition().z - m_pos.z);
+
+				//On le place face a la cible
+				m_HorizontalRot = ((atan2(DeltaTarget.x, DeltaTarget.z) * 180 / PI));
+
 				m_mouvementCooldown--;
 				if (m_mouvementCooldown <= 0)
 				{
@@ -34,12 +40,6 @@ void Sprinter::Move(World &world)
 						Sound::Play(Sound::SPRINTER);
 						m_soundPlayed = true;
 					}
-
-					//Distance entre le monstre et sa cible
-					Vector3<float> DeltaTarget(m_target->GetPosition().x - m_pos.x, (m_target->GetPosition().y + m_target->GetDimension().y / 2) - (m_pos.y + m_dimension.y / 2), m_target->GetPosition().z - m_pos.z);
-
-					//On le place face a la cible
-					m_HorizontalRot = ((atan2(DeltaTarget.x, DeltaTarget.z) * 180 / PI));
 
 					//On avance pas si on est assez proche de la cible
 					if (sqrtf(pow(DeltaTarget.x, 2) + pow(DeltaTarget.y, 2) + pow(DeltaTarget.z, 2)) > m_AttackRange)
