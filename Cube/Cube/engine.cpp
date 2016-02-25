@@ -15,8 +15,6 @@ Engine::Engine() :
 	m_LastTickTime = 0.0f;
 	m_LastTickTimeWater = 0.0f;
 
-	m_settings.m_isServer = false;
-
 	//Initialisation des touches
 	for (int i = 0; i < sf::Keyboard::KeyCount; i++)
 		m_keyboard[i] = false;
