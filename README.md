@@ -1,8 +1,8 @@
-﻿#	Description
+#	Description
 HellRain est un clone de minecraft fait par une équipe de 8 programmeurs. Le
-jeu a été codé en c++ et fonctionne sur Windows et Linux. Le jeu à été
-dévelloper dans le cadre de notre cours d'Entretien de logiciels d’applications
-au Cegep de St-Hyacinthe.
+jeu a été codé en C++ et fonctionne sur Windows et Linux. Le jeu a été
+développé dans le cadre de notre cours d'Entretien de logiciels d’application
+au Cegep de Saint-Hyacinthe.
 
 #	Capture d'écran
 
@@ -24,12 +24,12 @@ au Cegep de St-Hyacinthe.
 -	Linux Mint 17.3 Rosa
 -	Arch Linux 4.4.1
 
-La version serveur du jeu peut facilement fonctionné sur une machine virtuelle
-sans environnement graphique (example Digital Oceans). Il suffit alors de compiler avec le flag
+La version serveur du jeu peut facilement fonctionner sur une machine virtuelle
+sans environnement graphique (exemple Digital Oceans). Il suffit alors de compiler avec le flag
 "-DNODISPLAY" (Ajouter à la ligne 3 du makefile)
 
-La version original a besoin au minimun d'une carte graphique capable de
-supporté GLSL 3.30.
+La version originale a besoin au minimun d'une carte graphique capable de
+supporter GLSL 3.30.
 
 Le jeu a été avec la carte NVIDIA NVS 5400m et un processeur Intel i5-3320M @2.60
 
@@ -41,50 +41,53 @@ Le jeu a été avec la carte NVIDIA NVS 5400m et un processeur Intel i5-3320M @2
 -	DevIL
 
 #	Installation sur Linux
-Il faut d'abord installé le necessaire
+Il faut d'abord installer le nécessaire.
 
 Sur Debian, Ubuntu, Mint, etc:
+
 	# apt install gcc make libsfml-dev libdevil-dev libglew-dev libenet-dev freeglut3-dev
 
 Sur Arch Linux:
+
 	# pacman -S gcc make sfml devil glew freeglut enet
 
 Ensuite pour compiler:
+
 	$ git clone https://github.com/cegepsth/hellrain.git
 	$ cd Hellrain/Cube/Cube
 	$ make
 	$ ./Cube
 
 #	Installation sur Windows
-Rien n'est a installé sauf Visual Studio
+Rien n'est a installr sauf Visual Studio
 
 1.	Faire un gitclone avec cet URL: https://github.com/CegepSTH/HellRain.git
 2.	Ouvrir le fichier Cube.sln avec Visual Studio situé à cet emplacement:\HellRain\Cube
 3.	Compiler en mode release pour de meilleur performance
 
-#	Renseignements sur le fonctionement
+#	Renseignements sur le fonctionnement
 La plupart des options sont enregistrées dans un fichier de configuration
-"Hellrain/Cube/Cube/Cube.conf". Il est possible de changer d'autre éléments du
+"Hellrain/Cube/Cube/Cube.conf". Il est possible de changer d'autres éléments du
 jeu avant la compilation en changeant les directives dans le "define.h"
-(Attention des résultat étranges peuvent se produire, Utilisation a vos propre
+(Attention des résultats étranges peuvent se produire, Utilisation à vos propre
 risque)
 
-Voici les touches par défaut
+##  Voici les touches par défaut
 
 	=================================================================
 	Fonction								Touche
 	=================================================================
 	Supprimer un bloc			 			Clic gauche
 	Placer un bloc			 				Clic droit
-	Déplacement			 					WASD
-	Changer de bloc en mode créatif			La roulette de la souris
+	Déplacement			 				WASD
+	Changer de bloc en mode créatif		La roulette de la souris
 	S'accroupir			 					Ctrl gauche
 	Courrir			 						Shift gauche
 	Sauter			 						Espace
 	Noclip			 						v
 	Wireframe			 					y
 	Informations		 					F3
-	Plein écran			 					F10
+	Plein écran			 				F10
 	Ouvrir une map		 					Shift Droit + O
 	Sauvegarder			 					Shift Droit + W
 	Refaire une map		 					Shift Droit + R
@@ -108,27 +111,27 @@ Voici les touches par défaut
 	=================================================================
 
 ##	Multijoueur
-Pour demarrer le serveur il faut allé dans le fichier de configuration et mettre
-la propriété "server" à "true". Ensuite, il suffit de demarrer Cube.exe
+Pour démarrer le serveur il faut aller dans le fichier de configuration et mettre
+la propriété "server" à "true". Ensuite, il suffit de démarrer Cube.exe
 
 Pour qu'un client se connecte au serveur il faut qu'il s'assure d'avoir un nom
 unique (modifiable dans le fichier de configuration), car le serveur affiche
-seulement les joueurs ayant des noms différents. Ensuite il suffit de demarrer
-le jeu normalement aller dans le menu, aller dans multijoueur et entrer
+seulement les joueurs ayant des noms différents. Ensuite, il suffit de démarrer
+le jeu normalement, aller dans le menu, aller dans multijoueur et entrer
 l'address du serveur (127.0.0.1 pour un serveur sur le même ordinateur).
 
-Une fois connecter le jeu met un certain moment a téléchargé la map il faut donc
+Une fois connecté le jeu prend un certain moment à télécharger la map il faut donc
 être un peu patient ;)
 
-#	Qu'est-ce qui serait a améliorer ?
--	Changer le pathing des monstres. En ce moment, ils vont vers le joueur et ils sautent s'il y a collision.
--	Faire que l'on puisse cliquer sur le menu pour selectionner les options.
+#	Qu'est-ce qui serait à améliorer ?
+-	Changer le IA des monstres. En ce moment, ils vont vers le joueur et ils sautent s'il y a collision.
+-	Faire que l'on puisse cliquer sur le menu pour sélectionner les options.
 -	Faire que l'on puisse cliquer sur l'inventaire pour bouger/placer/enlever les blocs.
--	Faire qu'il y a plusieurs maps et que l'on puisse choirsir laquelle nous voulons.
+-	Faire qu'il y a plusieurs maps et que l'on puisse choisir laquelle nous voulons.
 -	Synchroniser les monstres entre le serveur et client.
 -	Faire que les blocs ont une durabilité.
 -	Ajouter des armures.
 -	Optimisation de la sauvegarde de la map.
 -	Fall damage pour les monstres.
--	Optimiser la façon que les monstres spawnent.
--	Compression des packets
+-	Optimiser la façon que les monstres apparaissent.
+-	Compression des paquets
