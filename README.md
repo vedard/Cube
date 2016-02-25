@@ -1,11 +1,12 @@
-﻿#	Documentation développeur
-420-6GD-HY - Entretien de logiciels d’applications
+﻿#	Description
+HellRain est un clone de minecraft fait par une équipe de 8 programmeurs. Le
+jeu a été codé en c++ et fonctionne sur Windows et Linux. Le jeu à été
+dévelloper dans le cadre de notre cours d'Entretien de logiciels d’applications
+au Cegep de St-Hyacinthe.
 
-#	Description
-HellRain est un clone de minecraft fait par une équipe de 8 programmeurs.
-Le jeu a été codé en c++, nous étions supposé faire un jeu d'horreur,
-mais nous avons décidé de faire un jeu qui était plus oriente sur le combat contre monstre,
-il n'y a pas vraiment d'histoire pour ce jeu.
+#	Capture d'écran
+
+![Screenshot](http://i.imgur.com/RLC02Hx.png)	
 
 #	Collaborateurs
 -	Mikael Andries-Gounant
@@ -18,23 +19,44 @@ il n'y a pas vraiment d'histoire pour ce jeu.
 -	Stéphane Letarte
 	
 #	Les systèmes d'exploitation supportés/testés
--	Windows10 (testé) 
--	Windows7 (testé)
--	Windows8 (non testé)
--	Linux Mint 17.3 Rosa(Testé)
--	Arch Linux 4.4.1(Testé)
+-	Windows 10
+-	Windows 7
+-	Linux Mint 17.3 Rosa
+-	Arch Linux 4.4.1
+
+La version serveur du jeu peut facilement fonctionné sur une machine virtuelle
+sans environnement graphique (example Digital Oceans). Il suffit alors de compiler avec le flag
+"-DNODISPLAY" (Ajouter à la ligne 3 du makefile)
+
+La version original a besoin au minimun d'une carte graphique capable de
+supporté GLSL 3.30.
+
+Le jeu a été avec la carte NVIDIA NVS 5400m et un processeur Intel i5-3320M @2.60
+
+#	Les librairies utilisées
+-	Enet
+-	SFML 2
+-	Glew
+-	Glut
+-	DevIL
 
 #	Installation sur Linux
 
 #	Installation sur Windows
+Rien n'est a installé sauf Visual Studio
+
 1.	Faire un gitclone avec cet URL: https://github.com/CegepSTH/HellRain.git
-2.	Ouvrir le fichier Cube.sln 
-	situé à cet emplacement:\HellRain\Cube
-3.	Compiler en mode release.
+2.	Ouvrir le fichier Cube.sln avec Visual Studio situé à cet emplacement:\HellRain\Cube
+3.	Compiler en mode release pour de meilleur performance
 
 #	Renseignements sur le fonctionement
-La plupart des touches sont enregistrées dans un fichier de config, donc pour les modifier il faut ouvrir le menu dans le jeu.
-Sinon, les touches par défaut sont:
+La plupart des options sont enregistrées dans un fichier de configuration
+"Hellrain/Cube/Cube/Cube.conf". Il est possible de changer d'autre éléments du
+jeu avant la compilation en changeant les directives dans le "define.h"
+(Attention des résultat étranges peuvent se produire, Utilisation a vos propre
+ risque)
+
+Voici les touches par défaut
 
 	Supprimer un bloc: Clic gauche
 	Placer un bloc: Clic droit
@@ -69,12 +91,17 @@ Sinon, les touches par défaut sont:
 	Enlever un bloc de l'inventaire: E
 	
 ##	Multijoueur
-Pour faire fonctionner le mode multijoueur, il faut tout d'abord changer son nom dans le fichier de configuration.
-Le fichier de configuration se situe à cet emplacement: \HellRain\Cube\Cube\Cube.conf
-il faut changer la ligne où il est écrit "playername" pour "playername TonNom".
-Ensuite, il faut ouvrir le jeu, ouvrir le menu, 
-naviguer vers l'option Multiplayer, entrer l'ip du serveur où l'on veut se connecter, dans notre cas, 
-l'ip est 45.55.42.126.
+Pour demarrer le serveur il faut allé dans le fichier de configuration et mettre
+la propriété "server" à "true". Ensuite, il suffit de demarrer Cube.exe
+
+Pour qu'un client se connecte au serveur il faut qu'il s'assure d'avoir un nom
+unique (modifiable dans le fichier de configuration), car le serveur affiche
+seulement les joueurs ayant des noms différents. Ensuite il suffit de demarrer
+le jeu normalement aller dans le menu, aller dans multijoueur et entrer
+l'address du serveur (127.0.0.1 pour un serveur sur le même ordinateur). 
+
+Une fois connecter le jeu met un certain moment a téléchargé la map il faut donc
+être un peu patient ;)
 
 #	Qu'est-ce qui serait a améliorer ?
 -	Changer le pathing des monstres. En ce moment, ils vont vers le joueur et ils sautent s'il y a collision.
@@ -86,4 +113,5 @@ l'ip est 45.55.42.126.
 -	Ajouter des armures.
 -	Optimisation de la sauvegarde de la map.
 -	Fall damage pour les monstres.
--O	ptimiser la façon que les monstres spawnent.
+-	Optimiser la façon que les monstres spawnent.
+-	Compression des packets
