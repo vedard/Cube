@@ -1,4 +1,4 @@
-#	Description
+﻿#	Description
 HellRain est un clone de minecraft fait par une équipe de 8 programmeurs. Le
 jeu a été codé en C++ et fonctionne sur Windows et Linux. Le jeu a été
 développé dans le cadre de notre cours d'Entretien de logiciels d’application
@@ -59,18 +59,18 @@ Ensuite pour compiler:
 	$ ./Cube
 
 #	Installation sur Windows
-Rien n'est a installr sauf Visual Studio
+Rien n'est a installer sauf Visual Studio
 
 1.	Faire un gitclone avec cet URL: https://github.com/CegepSTH/HellRain.git
 2.	Ouvrir le fichier Cube.sln avec Visual Studio situé à cet emplacement:\HellRain\Cube
-3.	Compiler en mode release pour de meilleur performance
+3.	Compiler en mode release pour de meilleurs performances
 
 #	Renseignements sur le fonctionnement
 La plupart des options sont enregistrées dans un fichier de configuration
 "Hellrain/Cube/Cube/Cube.conf". Il est possible de changer d'autres éléments du
 jeu avant la compilation en changeant les directives dans le "define.h"
-(Attention des résultats étranges peuvent se produire, Utilisation à vos propre
-risque)
+(Attention des résultats étranges peuvent se produire, Utilisation à vos propres
+risques)
 
 ##  Voici les touches par défaut
 
