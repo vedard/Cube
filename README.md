@@ -59,7 +59,7 @@ Ensuite pour compiler:
 	$ ./Cube
 
 #	Installation sur Windows
-Rien n'est a installer sauf Visual Studio
+Rien n'est à installer sauf Visual Studio
 
 1.	Faire un gitclone avec cet URL: https://github.com/CegepSTH/HellRain.git
 2.	Ouvrir le fichier Cube.sln avec Visual Studio situé à cet emplacement:\HellRain\Cube
