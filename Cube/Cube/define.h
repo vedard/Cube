@@ -50,7 +50,7 @@ typedef long long int64;
 
 
 #define BLOODMOON_DURATION 2500 // Doit toujours rester 2500
-#define BLOODMOON_PROBABILITY 500 // Plus haut c'est, moins t'as de chances. � 1 t'as 100%, a 2 t'as 50%. etc
+#define BLOODMOON_PROBABILITY 5000000 // Plus haut c'est, moins t'as de chances. � 1 t'as 100%, a 2 t'as 50%. etc
 #define CHUNK_SIZE_X 16
 #define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
@@ -58,12 +58,12 @@ typedef long long int64;
 #define EDITING_DISTANCE 7
 #define INVULNERABILITY_PLAYER_TIME 1
 #define MAX_BEAR 10
-#define MAX_BIRD 20
+#define MAX_BIRD 40
 #define MAX_BULLET 500
-#define MAX_CHICKEN 20
-#define MAX_COW 10
-#define MAX_CREEPER 2
-#define MAX_DRAGON 2
+#define MAX_CHICKEN 40
+#define MAX_COW 40
+#define MAX_CREEPER 0
+#define MAX_DRAGON 50
 #define MAX_SPRINTER 0
 #define MAX_TRAMPOLINE_JUMP 10
 #define MONSTER_MULTIPLIER 5

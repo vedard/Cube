@@ -255,7 +255,7 @@ bool Character::GetDamage(float damage, bool ignoreArmor, bool godMode, Characte
 		}
 		DeathCheck();
 	}
-	return m_isAlive;
+	return !m_isDying;
 }
 
 void Character::Jump()

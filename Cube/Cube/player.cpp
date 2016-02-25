@@ -505,7 +505,7 @@ bool Player::GetDamage(float damage, bool ignoreArmor, bool godMode, Character* 
 			}
 			if (!b)
 			{
-				Sound::PlayOnce(Sound::DEATH1 + rand() % 9);
+				Sound::Play(Sound::DEATH1 + rand() % 9);
 			}
 		}
 
