@@ -12,7 +12,10 @@ Model3d::~Model3d()
 {
 	delete[] m_vertex;
 	delete[] m_face;
+	delete[] m_vertexTexture;
+	delete[] m_faceTexture;
 }
+
 
 void Model3d::LoadOBJ(std::string ModelPath, std::string TexPath)
 {
