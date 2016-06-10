@@ -74,41 +74,42 @@ risques)
 
 ##  Voici les touches par défaut
 
-	=================================================================
-	Fonction								Touche
-	=================================================================
-	Supprimer un bloc			 			Clic gauche
-	Placer un bloc			 				Clic droit
-	Déplacement			 				WASD
-	Changer de bloc en mode créatif		La roulette de la souris
-	S'accroupir			 					Ctrl gauche
-	Courrir			 						Shift gauche
-	Sauter			 						Espace
-	Noclip			 						v
-	Wireframe			 					y
-	Informations		 					F3
-	Plein écran			 				F10
-	Ouvrir une map		 					Shift Droit + O
-	Sauvegarder			 					Shift Droit + W
-	Refaire une map		 					Shift Droit + R
-	Faire une map plate	 					Shift Droit + F
-	Supprimer le cache	 					Shift Droit + F5
-	Ouvrir le menu		 					Échap
-	Naviguer dans le menu					les flèches de directions
-	Valider une option du menu				Entrée
-	Inventaire de bloc			 			1
-	Pistol			 						2
-	Mp5			 							3
-	Shotgun			 						4
-	Ak			 							5
-	Awp 			 						6
-	Ouvrir l'inventaire			 			I
-	Inventaire bloc 1			 			Z
-	Inventaire bloc 2			 			X
-	Inventaire bloc 3			 			C
-	Choisir un bloc dans l'inventaire	 	B
-	Enlever un bloc de l'inventaire			E
-	=================================================================
+
+|Fonction							   |Touche
+|--------------------------------------|:--------------------------:
+|Supprimer un bloc			 		   |Clic gauche
+|Placer un bloc			 			   |Clic droit
+|Déplacement			 			   |WASD
+|Changer de bloc en mode créatif	   |La roulette de la souris
+|S'accroupir			 			   |Ctrl gauche
+|Courrir			 				   |Shift gauche
+|Sauter			 					   |Espace
+|Noclip			 					   |v
+|Wireframe			 				   |y
+|Informations		 				   |F3
+|Plein écran			 			   |F10
+|Ouvrir une map		 				   |Shift Droit + O
+|Sauvegarder			 			   |Shift Droit + W
+|Refaire une map		 			   |Shift Droit + R
+|Faire une map plate	 			   |Shift Droit + F
+|Supprimer le cache	 				   |Shift Droit + F5
+|Ouvrir le menu		 				   |Échap
+|Naviguer dans le menu				   |les flèches de directions
+|Valider une option du menu			   |Entrée
+|Inventaire de bloc			 		   |1
+|Pistol			 					   |2
+|Mp5			 					   |3
+|Shotgun			 				   |4
+|Ak			 						   |5
+|Awp 			 					   |6
+|Ouvrir l'inventaire			 	   |I
+|Inventaire bloc 1			 		   |Z
+|Inventaire bloc 2			 		   |X
+|Inventaire bloc 3			 		   |C
+|Choisir un bloc dans l'inventaire	   |B
+|Enlever un bloc de l'inventaire	   |E
+
+
 
 ##	Multijoueur
 Pour démarrer le serveur il faut aller dans le fichier de configuration et mettre
